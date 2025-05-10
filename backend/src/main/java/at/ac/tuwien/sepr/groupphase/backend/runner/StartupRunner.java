@@ -10,7 +10,7 @@ import org.springframework.stereotype.Component;
 public class StartupRunner implements CommandLineRunner {
     private final UserService userService;
 
-    private final String ADMIN_USERNAME = "admin@shyft.local";
+    private final String adminUsername = "admin@shyft.local";
 
     @Value("admin.user.password")
     private String adminUserPassword;
@@ -21,7 +21,7 @@ public class StartupRunner implements CommandLineRunner {
 
     @Override
     public void run(String... args) throws Exception {
-        ApplicationUser adminUser = this.userService.createOrChangePassword(ADMIN_USERNAME, adminUserPassword);
+        ApplicationUser adminUser = this.userService.createOrChangePassword(adminUsername, adminUserPassword);
         this.userService.assignRoleToUser("ADMIN", adminUser);
     }
 }

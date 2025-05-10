@@ -12,7 +12,7 @@ import java.util.Set;
 @Entity
 public class ApplicationRole {
     @ManyToMany(mappedBy = "roles", fetch = FetchType.EAGER)
-    private Set<ApplicationUser> users  = new HashSet<>();
+    private Set<ApplicationUser> users = new HashSet<>();
 
     @Id
     @Column(unique = true, nullable = false)
@@ -44,9 +44,9 @@ public class ApplicationRole {
 
     @Override
     public String toString() {
-        return "ApplicationRole{" +
-            "users=" + users +
-            ", name='" + name + '\'' +
-            '}';
+        return "ApplicationRole{"
+            + "users=" + users
+            + ", name='" + name + '\''
+            + '}';
     }
 }

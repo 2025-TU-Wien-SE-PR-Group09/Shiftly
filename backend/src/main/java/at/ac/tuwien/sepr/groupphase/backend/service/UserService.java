@@ -52,7 +52,6 @@ public interface UserService extends UserDetailsService {
      *
      * @param role the name of the role
      * @param user the user to assign the role to
-     * @return application role
      * @throws NotFoundException when the role does not exist
      */
     void assignRoleToUser(String role, ApplicationUser user);

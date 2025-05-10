@@ -57,10 +57,10 @@ public class ApplicationUser {
 
     @Override
     public String toString() {
-        return "ApplicationUser{" +
-            "email='" + email + '\'' +
-            ", password='" + password + '\'' +
-            ", roles=" + roles +
-            '}';
+        return "ApplicationUser{"
+            + "email='" + email + '\''
+            + ", password='" + password + '\''
+            + ", roles=" + roles
+            + '}';
     }
 }

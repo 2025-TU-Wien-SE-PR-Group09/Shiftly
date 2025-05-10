@@ -99,7 +99,7 @@ public class UserServiceImpl implements UserService {
         } else {
             applicationUser = applicationUserOpt.get();
 
-            if(!passwordEncoder.matches(password, applicationUser.getPassword())) {
+            if (!passwordEncoder.matches(password, applicationUser.getPassword())) {
                 applicationUser.setPassword(passwordEncoder.encode(password));
                 userRepository.save(applicationUser);
             }
@@ -113,7 +113,7 @@ public class UserServiceImpl implements UserService {
         ApplicationRole applicationRole;
         Optional<ApplicationRole> applicationRoleOpt = roleRepository.findByName(role);
 
-        if(applicationRoleOpt.isPresent()) {
+        if (applicationRoleOpt.isPresent()) {
             applicationRole = applicationRoleOpt.get();
             applicationRole.getUsers().add(user);
             user.getRoles().add(applicationRole);
