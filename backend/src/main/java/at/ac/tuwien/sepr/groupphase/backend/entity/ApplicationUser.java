@@ -1,19 +1,38 @@
 package at.ac.tuwien.sepr.groupphase.backend.entity;
 
-//TODO: replace this class with a correct ApplicationUser Entity implementation
-public class ApplicationUser {
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.FetchType;
+import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.JoinTable;
+import jakarta.persistence.ManyToMany;
 
+import java.util.HashSet;
+import java.util.Set;
+
+@Entity
+public class ApplicationUser {
+    @Id
+    @Column(unique = true, nullable = false)
     private String email;
+
     private String password;
-    private Boolean admin;
+
+    @ManyToMany(fetch = FetchType.EAGER)
+    @JoinTable(
+        name = "application_user_role_binging",
+        joinColumns = @JoinColumn(name = "user_email"),
+        inverseJoinColumns = @JoinColumn(name = "role_name")
+    )
+    private Set<ApplicationRole> roles = new HashSet<>();
 
     public ApplicationUser() {
     }
 
-    public ApplicationUser(String email, String password, Boolean admin) {
+    public ApplicationUser(String email, String password) {
         this.email = email;
         this.password = password;
-        this.admin = admin;
     }
 
     public String getEmail() {
@@ -32,11 +51,16 @@ public class ApplicationUser {
         this.password = password;
     }
 
-    public Boolean getAdmin() {
-        return admin;
+    public Set<ApplicationRole> getRoles() {
+        return roles;
     }
 
-    public void setAdmin(Boolean admin) {
-        this.admin = admin;
+    @Override
+    public String toString() {
+        return "ApplicationUser{" +
+            "email='" + email + '\'' +
+            ", password='" + password + '\'' +
+            ", roles=" + roles +
+            '}';
     }
 }

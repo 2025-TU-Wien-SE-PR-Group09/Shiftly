@@ -2,6 +2,7 @@ package at.ac.tuwien.sepr.groupphase.backend.service;
 
 import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.UserLoginDto;
 import at.ac.tuwien.sepr.groupphase.backend.entity.ApplicationUser;
+import at.ac.tuwien.sepr.groupphase.backend.exception.NotFoundException;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
@@ -37,4 +38,22 @@ public interface UserService extends UserDetailsService {
      * @throws org.springframework.security.authentication.BadCredentialsException if credentials are bad
      */
     String login(UserLoginDto userLoginDto);
+
+    /**
+     * Create a user with a given email and password. If the user already exists, the password will be updated.
+     *
+     * @param email Email of the admin user
+     * @param password Password for the admin user
+     */
+    ApplicationUser createOrChangePassword(String email, String password);
+
+    /**
+     * Assign a role to a user. If the role does not exist, it is created by this method.
+     *
+     * @param role the name of the role
+     * @param user the user to assign the role to
+     * @return application role
+     * @throws NotFoundException when the role does not exist
+     */
+    void assignRoleToUser(String role, ApplicationUser user);
 }
