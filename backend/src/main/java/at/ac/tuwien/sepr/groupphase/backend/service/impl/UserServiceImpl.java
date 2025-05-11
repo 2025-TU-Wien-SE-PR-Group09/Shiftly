@@ -1,6 +1,7 @@
 package at.ac.tuwien.sepr.groupphase.backend.service.impl;
 
-import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.UserLoginDto;
+import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.UserDataDto;
+import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.UserRoleDto;
 import at.ac.tuwien.sepr.groupphase.backend.entity.ApplicationRole;
 import at.ac.tuwien.sepr.groupphase.backend.entity.ApplicationUser;
 import at.ac.tuwien.sepr.groupphase.backend.exception.NotFoundException;
@@ -45,30 +46,20 @@ public class UserServiceImpl implements UserService {
     @Override
     public UserDetails loadUserByUsername(String email) throws UsernameNotFoundException {
         LOGGER.debug("Load all user by email");
-        try {
-            ApplicationUser applicationUser = findApplicationUserByEmail(email);
-
-            String[] roles = applicationUser.getRoles().stream().map(ApplicationRole::getName).toArray(String[]::new);
-            List<GrantedAuthority> grantedAuthorities = AuthorityUtils.createAuthorityList(roles);
-
-            return new User(applicationUser.getEmail(), applicationUser.getPassword(), grantedAuthorities);
-        } catch (NotFoundException e) {
-            throw new UsernameNotFoundException(e.getMessage(), e);
-        }
-    }
-
-    @Override
-    public ApplicationUser findApplicationUserByEmail(String email) {
-        LOGGER.debug("Find application user by email");
         Optional<ApplicationUser> applicationUserOpt = userRepository.findByEmail(email);
-        if (applicationUserOpt.isPresent()) {
-            return applicationUserOpt.get();
+        if (applicationUserOpt.isEmpty()) {
+            throw new UsernameNotFoundException("User not found");
         }
-        throw new NotFoundException(String.format("Could not find the user with the email address %s", email));
+        ApplicationUser applicationUser = applicationUserOpt.get();
+
+        String[] roles = applicationUser.getRoles().stream().map(ApplicationRole::getName).toArray(String[]::new);
+        List<GrantedAuthority> grantedAuthorities = AuthorityUtils.createAuthorityList(roles);
+
+        return new User(applicationUser.getEmail(), applicationUser.getPassword(), grantedAuthorities);
     }
 
     @Override
-    public String login(UserLoginDto userLoginDto) {
+    public String login(UserDataDto userLoginDto) {
         UserDetails userDetails = loadUserByUsername(userLoginDto.getEmail());
         if (userDetails != null
             && userDetails.isAccountNonExpired()
@@ -86,21 +77,21 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public ApplicationUser createOrChangePassword(String email, String password) {
-        Optional<ApplicationUser> applicationUserOpt = userRepository.findByEmail(email);
+    public ApplicationUser createOrChangePassword(UserDataDto userData) {
+        Optional<ApplicationUser> applicationUserOpt = userRepository.findByEmail(userData.getEmail());
         ApplicationUser applicationUser;
 
         if (applicationUserOpt.isEmpty()) {
             applicationUser = new ApplicationUser();
 
-            applicationUser.setEmail(email);
-            applicationUser.setPassword(passwordEncoder.encode("password"));
+            applicationUser.setEmail(userData.getEmail());
+            applicationUser.setPassword(passwordEncoder.encode(userData.getPassword()));
             userRepository.save(applicationUser);
         } else {
             applicationUser = applicationUserOpt.get();
 
-            if (!passwordEncoder.matches(password, applicationUser.getPassword())) {
-                applicationUser.setPassword(passwordEncoder.encode(password));
+            if (!passwordEncoder.matches(userData.getPassword(), applicationUser.getPassword())) {
+                applicationUser.setPassword(passwordEncoder.encode(userData.getPassword()));
                 userRepository.save(applicationUser);
             }
         }
@@ -109,18 +100,25 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public void assignRoleToUser(String role, ApplicationUser user) throws NotFoundException {
-        ApplicationRole applicationRole;
-        Optional<ApplicationRole> applicationRoleOpt = roleRepository.findByName(role);
+    public void assignRoleToUser(UserRoleDto userRole) throws NotFoundException {
+        Optional<ApplicationUser> applicationUserOpt = userRepository.findByEmail(userRole.getUserEmail());
+        if (applicationUserOpt.isEmpty()) {
+            throw new NotFoundException("User with email " + userRole.getUserEmail() + " does not exist!");
+        }
+        ApplicationUser user = applicationUserOpt.get();
 
+        Optional<ApplicationRole> applicationRoleOpt = roleRepository.findByName(userRole.getRole().name());
+
+        // Many-To-Many relationships must be set on both sides in JPA, so we need to fetch both the user
+        // and the role from the database
         if (applicationRoleOpt.isPresent()) {
-            applicationRole = applicationRoleOpt.get();
+            ApplicationRole applicationRole = applicationRoleOpt.get();
             applicationRole.getUsers().add(user);
             user.getRoles().add(applicationRole);
             roleRepository.save(applicationRole);
             userRepository.save(user);
         } else {
-            applicationRole = new ApplicationRole(role, Set.of(user));
+            ApplicationRole applicationRole = new ApplicationRole(userRole.getRole().name(), Set.of(user));
             user.getRoles().add(applicationRole);
             roleRepository.save(applicationRole);
             userRepository.save(user);

@@ -1,5 +1,8 @@
 package at.ac.tuwien.sepr.groupphase.backend.runner;
 
+import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.Role;
+import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.UserDataDto;
+import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.UserRoleDto;
 import at.ac.tuwien.sepr.groupphase.backend.entity.ApplicationUser;
 import at.ac.tuwien.sepr.groupphase.backend.service.UserService;
 import org.springframework.beans.factory.annotation.Value;
@@ -21,7 +24,10 @@ public class StartupRunner implements CommandLineRunner {
 
     @Override
     public void run(String... args) throws Exception {
-        ApplicationUser adminUser = this.userService.createOrChangePassword(adminUsername, adminUserPassword);
-        this.userService.assignRoleToUser("ADMIN", adminUser);
+        ApplicationUser adminUser = this.userService.createOrChangePassword(
+            new UserDataDto(adminUsername, adminUserPassword)
+        );
+
+        this.userService.assignRoleToUser(new UserRoleDto(adminUser.getEmail(), Role.ADMIN));
     }
 }

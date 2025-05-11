@@ -16,7 +16,7 @@ public interface TestData {
     String BASE_URI = "/api/v1";
     String MESSAGE_BASE_URI = BASE_URI + "/messages";
 
-    String ADMIN_USER = "admin@email.com";
+    String ADMIN_USER_EMAIL = "admin@email.com";
     List<String> ADMIN_ROLES = new ArrayList<>() {
         {
             add("ROLE_ADMIN");
@@ -30,4 +30,5 @@ public interface TestData {
         }
     };
 
+    String ADMIN_PW = "pass123";
 }
