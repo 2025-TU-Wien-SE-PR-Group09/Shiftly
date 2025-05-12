@@ -28,11 +28,6 @@ public class ApplicationRole {
         this.users = users;
     }
 
-    public ApplicationRole(String name, Set<ApplicationUser> users) {
-        this.name = name;
-        this.users = users;
-    }
-
     public ApplicationRole() {
     }
 

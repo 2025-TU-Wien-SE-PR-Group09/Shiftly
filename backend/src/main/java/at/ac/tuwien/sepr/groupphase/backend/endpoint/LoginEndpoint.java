@@ -5,6 +5,10 @@ import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.UserDataRestDto;
 import at.ac.tuwien.sepr.groupphase.backend.service.dto.UserDataDto;
 import at.ac.tuwien.sepr.groupphase.backend.service.AuthService;
 import jakarta.annotation.security.PermitAll;
+import jakarta.annotation.security.RolesAllowed;
+import jakarta.transaction.Transactional;
+import org.springframework.http.MediaType;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -21,7 +25,9 @@ public class LoginEndpoint {
     }
 
     @PermitAll
-    @PostMapping
+    @PostMapping(produces = MediaType.APPLICATION_JSON_VALUE,
+        consumes = MediaType.APPLICATION_JSON_VALUE)
+    @Transactional
     public LoginResponseRestDto login(@RequestBody UserDataRestDto userLoginRestDto) {
         UserDataDto userLoginDto = UserDataDto.from(userLoginRestDto);
         return LoginResponseRestDto.from(authService.login(userLoginDto));

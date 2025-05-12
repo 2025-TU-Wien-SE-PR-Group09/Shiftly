@@ -32,6 +32,9 @@ public class UserDataRestDto {
         this.password = password;
     }
 
+    public UserDataRestDto() {
+    }
+
     public UserDataRestDto(String email, String password) {
         this.email = email;
         this.password = password;

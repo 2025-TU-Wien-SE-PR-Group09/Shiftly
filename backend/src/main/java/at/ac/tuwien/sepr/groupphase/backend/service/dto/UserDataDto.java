@@ -63,7 +63,7 @@ public class UserDataDto {
 
 
     /**
-     * Converts a {@link LoginResponseDto} to a {@link LoginResponseRestDto}
+     * Converts a {@link LoginResponseDto} to a {@link LoginResponseRestDto}.
      *
      * @param restDto the {@link LoginResponseDto} to convert
      * @return the converted {@link LoginResponseRestDto}

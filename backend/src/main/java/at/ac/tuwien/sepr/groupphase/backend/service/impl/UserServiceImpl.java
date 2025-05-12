@@ -60,27 +60,28 @@ public class UserServiceImpl implements UserService {
     @Override
     public void assignRoleToUser(UserRoleDto userRole) throws NotFoundException {
         LOGGER.trace("assignRoleToUser({})", userRole);
+
         Optional<ApplicationUser> applicationUserOpt = userRepository.findByEmail(userRole.getUserEmail());
         if (applicationUserOpt.isEmpty()) {
             throw new NotFoundException("User with email " + userRole.getUserEmail() + " does not exist!");
         }
         ApplicationUser user = applicationUserOpt.get();
 
+        // if user already has role, return
+        if (user.getRoles().stream().anyMatch(a -> a.getName().equals(userRole.getRole().name()))) {
+            return;
+        }
+
         Optional<ApplicationRole> applicationRoleOpt = roleRepository.findByName(userRole.getRole().name());
 
         // Many-To-Many relationships must be set on both sides in JPA, so we need to fetch both the user
         // and the role from the database
-        if (applicationRoleOpt.isPresent()) {
-            ApplicationRole applicationRole = applicationRoleOpt.get();
-            applicationRole.getUsers().add(user);
-            user.getRoles().add(applicationRole);
-            roleRepository.save(applicationRole);
-            userRepository.save(user);
-        } else {
-            ApplicationRole applicationRole = new ApplicationRole(userRole.getRole(), Set.of(user));
-            user.getRoles().add(applicationRole);
-            roleRepository.save(applicationRole);
-            userRepository.save(user);
-        }
+        ApplicationRole applicationRole = applicationRoleOpt
+            .orElseGet(() -> new ApplicationRole(userRole.getRole().name()));
+
+        applicationRole.getUsers().add(user);
+        user.getRoles().add(applicationRole);
+        roleRepository.save(applicationRole);
+        userRepository.save(user);
     }
 }

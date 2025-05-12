@@ -1,0 +1,15 @@
+### Login as admin
+POST http://localhost:8080/api/v1/authentication
+Content-Type: application/json
+
+{
+    "email": "admin@shyft.local",
+    "password": "password"
+}
+
+> {% client.global.set("auth_token", response.body.jwt); %}
+
+### Test admin endpoint
+GET http://localhost:8080/api/v1/admin
+Content-Type: application/json
+Authorization: {{auth_token}}

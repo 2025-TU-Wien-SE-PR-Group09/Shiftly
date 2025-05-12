@@ -20,7 +20,7 @@ public class StartupRunner implements CommandLineRunner {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
 
-    @Value("admin.user.password")
+    @Value("${admin.user.password}")
     private String adminUserPassword;
 
     public StartupRunner(UserService userService) {
