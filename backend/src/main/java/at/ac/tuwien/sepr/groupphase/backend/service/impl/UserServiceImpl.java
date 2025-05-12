@@ -34,52 +34,18 @@ public class UserServiceImpl implements UserService {
     private final UserRepository userRepository;
     private final RoleRepository roleRepository;
     private final PasswordEncoder passwordEncoder;
-    private final JwtTokenizer jwtTokenizer;
 
     @Autowired
-    public UserServiceImpl(UserRepository userRepository, RoleRepository roleRepository, PasswordEncoder passwordEncoder, JwtTokenizer jwtTokenizer) {
+    public UserServiceImpl(UserRepository userRepository,
+                           RoleRepository roleRepository,
+                           PasswordEncoder passwordEncoder) {
         this.userRepository = userRepository;
         this.roleRepository = roleRepository;
         this.passwordEncoder = passwordEncoder;
-        this.jwtTokenizer = jwtTokenizer;
     }
 
     @Override
-    public UserDetails loadUserByUsername(String email) throws UsernameNotFoundException {
-        LOGGER.trace("loadUserByUsername({})", email);
-        Optional<ApplicationUser> applicationUserOpt = userRepository.findByEmail(email);
-        if (applicationUserOpt.isEmpty()) {
-            throw new UsernameNotFoundException("User not found");
-        }
-        ApplicationUser applicationUser = applicationUserOpt.get();
-
-        String[] roles = applicationUser.getRoles().stream().map(ApplicationRole::getRole).toArray(String[]::new);
-        List<GrantedAuthority> grantedAuthorities = AuthorityUtils.createAuthorityList(roles);
-
-        return new User(applicationUser.getEmail(), applicationUser.getPasswordHash(), grantedAuthorities);
-    }
-
-    @Override
-    public LoginResponseDto login(UserDataDto userLoginDto) {
-        LOGGER.trace("login({})", userLoginDto);
-        UserDetails userDetails = loadUserByUsername(userLoginDto.getEmail());
-        if (userDetails != null
-            && userDetails.isAccountNonExpired()
-            && userDetails.isAccountNonLocked()
-            && userDetails.isCredentialsNonExpired()
-            && passwordEncoder.matches(userLoginDto.getPassword(), userDetails.getPassword())
-        ) {
-            List<String> roles = userDetails.getAuthorities()
-                .stream()
-                .map(GrantedAuthority::getAuthority)
-                .toList();
-            return new LoginResponseDto(jwtTokenizer.getAuthToken(userDetails.getUsername(), roles));
-        }
-        throw new BadCredentialsException("Username or password is incorrect or account is locked");
-    }
-
-    @Override
-    public ApplicationUser createOrChangePassword(UserDataDto userData) {
+    public void createOrChangePassword(UserDataDto userData) {
         LOGGER.trace("createOrChangePassword({})", userData);
         Optional<ApplicationUser> applicationUserOpt = userRepository.findByEmail(userData.getEmail());
         ApplicationUser applicationUser;
@@ -98,8 +64,6 @@ public class UserServiceImpl implements UserService {
                 userRepository.save(applicationUser);
             }
         }
-
-        return applicationUser;
     }
 
     @Override

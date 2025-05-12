@@ -17,26 +17,27 @@ public class ApplicationRole {
 
     @Id
     @Column(unique = true, nullable = false)
-    private Role role;
+    private String name;
 
-    public ApplicationRole(Role role) {
-        this.role = role;
+    public ApplicationRole(String name) {
+        this.name = name;
     }
 
     public ApplicationRole(Role role, Set<ApplicationUser> users) {
-        this.role = role;
+        this.name = role.name();
+        this.users = users;
+    }
+
+    public ApplicationRole(String name, Set<ApplicationUser> users) {
+        this.name = name;
         this.users = users;
     }
 
     public ApplicationRole() {
     }
 
-    public Role getRole() {
-        return role;
-    }
-
-    public void setRole(Role name) {
-        this.role = name;
+    public String getName() {
+        return name;
     }
 
     public Set<ApplicationUser> getUsers() {
@@ -47,7 +48,7 @@ public class ApplicationRole {
     public String toString() {
         return "ApplicationRole{"
             + "users=" + users
-            + ", name='" + role + '\''
+            + ", name='" + name + '\''
             + '}';
     }
 }

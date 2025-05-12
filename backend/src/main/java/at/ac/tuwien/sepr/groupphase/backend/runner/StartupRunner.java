@@ -33,10 +33,10 @@ public class StartupRunner implements CommandLineRunner {
     public void run(String... args) {
         LOGGER.trace("run({})", String.join(", ", args));
 
-        ApplicationUser adminUser = this.userService.createOrChangePassword(
+        this.userService.createOrChangePassword(
             new UserDataDto(adminUsername, adminUserPassword)
         );
 
-        this.userService.assignRoleToUser(new UserRoleDto(adminUser.getEmail(), Role.ADMIN));
+        this.userService.assignRoleToUser(new UserRoleDto(adminUsername, Role.ADMIN));
     }
 }

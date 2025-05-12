@@ -27,7 +27,7 @@ public class ApplicationUser {
     @JoinTable(
         name = "application_user_role_binding",
         joinColumns = @JoinColumn(name = "user_email"),
-        inverseJoinColumns = @JoinColumn(name = "role_name")
+        inverseJoinColumns = @JoinColumn(name = "role_role")
     )
     private Set<ApplicationRole> roles = new HashSet<>();
 

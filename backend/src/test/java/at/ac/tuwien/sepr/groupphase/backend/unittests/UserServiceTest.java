@@ -7,6 +7,7 @@ import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.UserRoleDto;
 import at.ac.tuwien.sepr.groupphase.backend.entity.ApplicationUser;
 import at.ac.tuwien.sepr.groupphase.backend.exception.NotFoundException;
 import at.ac.tuwien.sepr.groupphase.backend.repository.UserRepository;
+import at.ac.tuwien.sepr.groupphase.backend.service.AuthService;
 import at.ac.tuwien.sepr.groupphase.backend.service.UserService;
 import jakarta.inject.Inject;
 import jakarta.transaction.Transactional;
@@ -35,6 +36,8 @@ class UserServiceTest {
     @Inject
     private UserService userService;
     @Inject
+    private AuthService authService;
+    @Inject
     private PasswordEncoder passwordEncoder;
     @Inject
     private UserRepository userRepository; // used to verify if a user really exists
@@ -60,7 +63,7 @@ class UserServiceTest {
         userService.createOrChangePassword(new UserDataDto(TestData.ADMIN_USER_EMAIL, TestData.ADMIN_PW));
         userService.assignRoleToUser(new UserRoleDto(TestData.ADMIN_USER_EMAIL, Role.ADMIN));
 
-        UserDetails applicationUser = userService.loadUserByUsername(TestData.ADMIN_USER_EMAIL);
+        UserDetails applicationUser = authService.loadUserByUsername(TestData.ADMIN_USER_EMAIL);
         assertUserHasRole(applicationUser, Role.ADMIN);
     }
 
