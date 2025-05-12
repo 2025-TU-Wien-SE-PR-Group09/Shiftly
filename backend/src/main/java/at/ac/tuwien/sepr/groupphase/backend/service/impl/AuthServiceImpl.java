@@ -1,7 +1,7 @@
 package at.ac.tuwien.sepr.groupphase.backend.service.impl;
 
-import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.LoginResponseDto;
-import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.UserDataDto;
+import at.ac.tuwien.sepr.groupphase.backend.service.dto.LoginResponseDto;
+import at.ac.tuwien.sepr.groupphase.backend.service.dto.UserDataDto;
 import at.ac.tuwien.sepr.groupphase.backend.entity.ApplicationRole;
 import at.ac.tuwien.sepr.groupphase.backend.entity.ApplicationUser;
 import at.ac.tuwien.sepr.groupphase.backend.repository.UserRepository;

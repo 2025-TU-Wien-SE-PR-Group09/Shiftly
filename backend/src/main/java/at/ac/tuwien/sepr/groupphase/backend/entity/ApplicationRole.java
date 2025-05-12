@@ -1,6 +1,6 @@
 package at.ac.tuwien.sepr.groupphase.backend.entity;
 
-import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.Role;
+import at.ac.tuwien.sepr.groupphase.backend.service.dto.Role;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;

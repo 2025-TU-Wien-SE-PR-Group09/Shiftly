@@ -1,9 +1,8 @@
 package at.ac.tuwien.sepr.groupphase.backend.runner;
 
-import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.Role;
-import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.UserDataDto;
-import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.UserRoleDto;
-import at.ac.tuwien.sepr.groupphase.backend.entity.ApplicationUser;
+import at.ac.tuwien.sepr.groupphase.backend.service.dto.Role;
+import at.ac.tuwien.sepr.groupphase.backend.service.dto.UserDataDto;
+import at.ac.tuwien.sepr.groupphase.backend.service.dto.UserRoleDto;
 import at.ac.tuwien.sepr.groupphase.backend.service.UserService;
 import jakarta.transaction.Transactional;
 import org.slf4j.Logger;

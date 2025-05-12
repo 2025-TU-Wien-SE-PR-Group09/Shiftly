@@ -1,29 +1,20 @@
 package at.ac.tuwien.sepr.groupphase.backend.service.impl;
 
-import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.LoginResponseDto;
-import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.UserDataDto;
-import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.UserRoleDto;
+import at.ac.tuwien.sepr.groupphase.backend.service.dto.UserDataDto;
+import at.ac.tuwien.sepr.groupphase.backend.service.dto.UserRoleDto;
 import at.ac.tuwien.sepr.groupphase.backend.entity.ApplicationRole;
 import at.ac.tuwien.sepr.groupphase.backend.entity.ApplicationUser;
 import at.ac.tuwien.sepr.groupphase.backend.exception.NotFoundException;
 import at.ac.tuwien.sepr.groupphase.backend.repository.RoleRepository;
 import at.ac.tuwien.sepr.groupphase.backend.repository.UserRepository;
-import at.ac.tuwien.sepr.groupphase.backend.security.JwtTokenizer;
 import at.ac.tuwien.sepr.groupphase.backend.service.UserService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.authentication.BadCredentialsException;
-import org.springframework.security.core.GrantedAuthority;
-import org.springframework.security.core.authority.AuthorityUtils;
-import org.springframework.security.core.userdetails.User;
-import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.lang.invoke.MethodHandles;
-import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 

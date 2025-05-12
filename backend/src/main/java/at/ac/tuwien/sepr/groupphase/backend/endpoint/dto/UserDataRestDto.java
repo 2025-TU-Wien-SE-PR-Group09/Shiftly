@@ -1,10 +1,13 @@
 package at.ac.tuwien.sepr.groupphase.backend.endpoint.dto;
 
+import at.ac.tuwien.sepr.groupphase.backend.service.dto.LoginResponseDto;
+import at.ac.tuwien.sepr.groupphase.backend.service.dto.UserDataDto;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotNull;
+
 import java.util.Objects;
 
-public class UserDataDto {
+public class UserDataRestDto {
 
     @NotNull(message = "Email must not be null")
     @Email
@@ -29,7 +32,7 @@ public class UserDataDto {
         this.password = password;
     }
 
-    public UserDataDto(String email, String password) {
+    public UserDataRestDto(String email, String password) {
         this.email = email;
         this.password = password;
     }
@@ -39,7 +42,7 @@ public class UserDataDto {
         if (this == o) {
             return true;
         }
-        if (!(o instanceof UserDataDto userLoginDto)) {
+        if (!(o instanceof UserDataRestDto userLoginDto)) {
             return false;
         }
         return Objects.equals(email, userLoginDto.email)

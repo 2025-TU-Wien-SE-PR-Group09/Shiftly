@@ -1,9 +1,9 @@
 package at.ac.tuwien.sepr.groupphase.backend.unittests;
 
 import at.ac.tuwien.sepr.groupphase.backend.basetest.TestData;
-import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.Role;
-import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.UserDataDto;
-import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.UserRoleDto;
+import at.ac.tuwien.sepr.groupphase.backend.service.dto.Role;
+import at.ac.tuwien.sepr.groupphase.backend.service.dto.UserDataDto;
+import at.ac.tuwien.sepr.groupphase.backend.service.dto.UserRoleDto;
 import at.ac.tuwien.sepr.groupphase.backend.entity.ApplicationUser;
 import at.ac.tuwien.sepr.groupphase.backend.exception.NotFoundException;
 import at.ac.tuwien.sepr.groupphase.backend.repository.UserRepository;

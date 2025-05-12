@@ -1,14 +1,8 @@
 package at.ac.tuwien.sepr.groupphase.backend.service;
 
-import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.LoginResponseDto;
-import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.UserDataDto;
-import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.UserRoleDto;
-import at.ac.tuwien.sepr.groupphase.backend.entity.ApplicationUser;
+import at.ac.tuwien.sepr.groupphase.backend.service.dto.UserDataDto;
+import at.ac.tuwien.sepr.groupphase.backend.service.dto.UserRoleDto;
 import at.ac.tuwien.sepr.groupphase.backend.exception.NotFoundException;
-import org.aspectj.weaver.ast.Not;
-import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.security.core.userdetails.UserDetailsService;
-import org.springframework.security.core.userdetails.UsernameNotFoundException;
 
 public interface UserService {
     /**

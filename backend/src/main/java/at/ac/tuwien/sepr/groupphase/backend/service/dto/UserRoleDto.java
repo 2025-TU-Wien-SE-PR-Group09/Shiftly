@@ -1,4 +1,4 @@
-package at.ac.tuwien.sepr.groupphase.backend.endpoint.dto;
+package at.ac.tuwien.sepr.groupphase.backend.service.dto;
 
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotNull;
