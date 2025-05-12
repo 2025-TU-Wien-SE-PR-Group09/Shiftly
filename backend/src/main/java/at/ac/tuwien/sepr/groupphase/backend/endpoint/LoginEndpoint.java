@@ -1,5 +1,6 @@
 package at.ac.tuwien.sepr.groupphase.backend.endpoint;
 
+import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.LoginResponseDto;
 import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.UserDataDto;
 import at.ac.tuwien.sepr.groupphase.backend.service.UserService;
 import jakarta.annotation.security.PermitAll;
@@ -20,7 +21,7 @@ public class LoginEndpoint {
 
     @PermitAll
     @PostMapping
-    public String login(@RequestBody UserDataDto userLoginDto) {
+    public LoginResponseDto login(@RequestBody UserDataDto userLoginDto) {
         return userService.login(userLoginDto);
     }
 }

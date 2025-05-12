@@ -1,5 +1,6 @@
 package at.ac.tuwien.sepr.groupphase.backend.entity;
 
+import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.Role;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
@@ -11,31 +12,31 @@ import java.util.Set;
 
 @Entity
 public class ApplicationRole {
-    @ManyToMany(mappedBy = "roles", fetch = FetchType.EAGER)
+    @ManyToMany(mappedBy = "roles", fetch = FetchType.LAZY)
     private Set<ApplicationUser> users = new HashSet<>();
 
     @Id
     @Column(unique = true, nullable = false)
-    private String name;
+    private Role role;
 
-    public ApplicationRole(String name) {
-        this.name = name;
+    public ApplicationRole(Role role) {
+        this.role = role;
     }
 
-    public ApplicationRole(String name, Set<ApplicationUser> users) {
-        this.name = name;
+    public ApplicationRole(Role role, Set<ApplicationUser> users) {
+        this.role = role;
         this.users = users;
     }
 
     public ApplicationRole() {
     }
 
-    public String getName() {
-        return name;
+    public Role getRole() {
+        return role;
     }
 
-    public void setName(String name) {
-        this.name = name;
+    public void setRole(Role name) {
+        this.role = name;
     }
 
     public Set<ApplicationUser> getUsers() {
@@ -46,7 +47,7 @@ public class ApplicationRole {
     public String toString() {
         return "ApplicationRole{"
             + "users=" + users
-            + ", name='" + name + '\''
+            + ", name='" + role + '\''
             + '}';
     }
 }

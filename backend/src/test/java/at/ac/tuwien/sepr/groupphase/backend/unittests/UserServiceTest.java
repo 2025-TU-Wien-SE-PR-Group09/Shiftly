@@ -87,9 +87,9 @@ class UserServiceTest {
 
         assertAll(
             () -> assertEquals(user.getEmail(), applicationUser.getEmail()),
-            () -> assertThat(passwordEncoder.matches(user.getPassword(), applicationUser.getPassword()))
+            () -> assertThat(passwordEncoder.matches(user.getPassword(), applicationUser.getPasswordHash()))
                 .as("Password of " + user.getEmail() + " ("+ user.getPassword() + ") does not match "
-                    + applicationUser.getPassword())
+                    + applicationUser.getPasswordHash())
                 .isTrue()
         );
     }

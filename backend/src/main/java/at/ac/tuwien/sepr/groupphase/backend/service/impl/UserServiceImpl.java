@@ -1,5 +1,6 @@
 package at.ac.tuwien.sepr.groupphase.backend.service.impl;
 
+import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.LoginResponseDto;
 import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.UserDataDto;
 import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.UserRoleDto;
 import at.ac.tuwien.sepr.groupphase.backend.entity.ApplicationRole;
@@ -45,21 +46,22 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public UserDetails loadUserByUsername(String email) throws UsernameNotFoundException {
-        LOGGER.debug("Load all user by email");
+        LOGGER.trace("loadUserByUsername({})", email);
         Optional<ApplicationUser> applicationUserOpt = userRepository.findByEmail(email);
         if (applicationUserOpt.isEmpty()) {
             throw new UsernameNotFoundException("User not found");
         }
         ApplicationUser applicationUser = applicationUserOpt.get();
 
-        String[] roles = applicationUser.getRoles().stream().map(ApplicationRole::getName).toArray(String[]::new);
+        String[] roles = applicationUser.getRoles().stream().map(ApplicationRole::getRole).toArray(String[]::new);
         List<GrantedAuthority> grantedAuthorities = AuthorityUtils.createAuthorityList(roles);
 
-        return new User(applicationUser.getEmail(), applicationUser.getPassword(), grantedAuthorities);
+        return new User(applicationUser.getEmail(), applicationUser.getPasswordHash(), grantedAuthorities);
     }
 
     @Override
-    public String login(UserDataDto userLoginDto) {
+    public LoginResponseDto login(UserDataDto userLoginDto) {
+        LOGGER.trace("login({})", userLoginDto);
         UserDetails userDetails = loadUserByUsername(userLoginDto.getEmail());
         if (userDetails != null
             && userDetails.isAccountNonExpired()
@@ -71,13 +73,14 @@ public class UserServiceImpl implements UserService {
                 .stream()
                 .map(GrantedAuthority::getAuthority)
                 .toList();
-            return jwtTokenizer.getAuthToken(userDetails.getUsername(), roles);
+            return new LoginResponseDto(jwtTokenizer.getAuthToken(userDetails.getUsername(), roles));
         }
         throw new BadCredentialsException("Username or password is incorrect or account is locked");
     }
 
     @Override
     public ApplicationUser createOrChangePassword(UserDataDto userData) {
+        LOGGER.trace("createOrChangePassword({})", userData);
         Optional<ApplicationUser> applicationUserOpt = userRepository.findByEmail(userData.getEmail());
         ApplicationUser applicationUser;
 
@@ -85,13 +88,13 @@ public class UserServiceImpl implements UserService {
             applicationUser = new ApplicationUser();
 
             applicationUser.setEmail(userData.getEmail());
-            applicationUser.setPassword(passwordEncoder.encode(userData.getPassword()));
+            applicationUser.setPasswordHash(passwordEncoder.encode(userData.getPassword()));
             userRepository.save(applicationUser);
         } else {
             applicationUser = applicationUserOpt.get();
 
-            if (!passwordEncoder.matches(userData.getPassword(), applicationUser.getPassword())) {
-                applicationUser.setPassword(passwordEncoder.encode(userData.getPassword()));
+            if (!passwordEncoder.matches(userData.getPassword(), applicationUser.getPasswordHash())) {
+                applicationUser.setPasswordHash(passwordEncoder.encode(userData.getPassword()));
                 userRepository.save(applicationUser);
             }
         }
@@ -101,6 +104,7 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public void assignRoleToUser(UserRoleDto userRole) throws NotFoundException {
+        LOGGER.trace("assignRoleToUser({})", userRole);
         Optional<ApplicationUser> applicationUserOpt = userRepository.findByEmail(userRole.getUserEmail());
         if (applicationUserOpt.isEmpty()) {
             throw new NotFoundException("User with email " + userRole.getUserEmail() + " does not exist!");
@@ -118,7 +122,7 @@ public class UserServiceImpl implements UserService {
             roleRepository.save(applicationRole);
             userRepository.save(user);
         } else {
-            ApplicationRole applicationRole = new ApplicationRole(userRole.getRole().name(), Set.of(user));
+            ApplicationRole applicationRole = new ApplicationRole(userRole.getRole(), Set.of(user));
             user.getRoles().add(applicationRole);
             roleRepository.save(applicationRole);
             userRepository.save(user);

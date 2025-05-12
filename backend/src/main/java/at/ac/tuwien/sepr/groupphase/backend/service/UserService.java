@@ -1,5 +1,6 @@
 package at.ac.tuwien.sepr.groupphase.backend.service;
 
+import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.LoginResponseDto;
 import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.UserDataDto;
 import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.UserRoleDto;
 import at.ac.tuwien.sepr.groupphase.backend.entity.ApplicationUser;
@@ -28,10 +29,10 @@ public interface UserService extends UserDetailsService {
      * Log in a user.
      *
      * @param userLoginDto login credentials
-     * @return the JWT, if successful
+     * @return {@link LoginResponseDto} containing the JWT, if successful
      * @throws org.springframework.security.authentication.BadCredentialsException if credentials are bad
      */
-    String login(UserDataDto userLoginDto);
+    LoginResponseDto login(UserDataDto userLoginDto);
 
     /**
      * Create a user with a given email and password. If the user already exists, the password will be updated.
