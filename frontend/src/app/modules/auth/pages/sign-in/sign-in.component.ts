@@ -58,8 +58,8 @@ export class SignInComponent implements OnInit {
 
         if (roles.includes("ADMIN")) {
           this._router.navigateByUrl('/dashboard/admin').then();
-        } else if (roles.includes("WORKER")) {
-          this._router.navigateByUrl('/dashboard/worker').then();
+        } else if (roles.includes("EMPLOYEE")) {
+          this._router.navigateByUrl('/dashboard/employee').then();
         } else if (roles.includes("SUPERVISOR")) {
           this._router.navigateByUrl('/dashboard/supervisor').then();
         }

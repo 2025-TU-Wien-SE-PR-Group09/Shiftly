@@ -47,23 +47,23 @@ export class Menu {
       role: "ADMIN"
     },
     {
-      group: 'Worker',
+      group: 'Employee',
       separator: false,
       items: [
         {
           icon: 'assets/icons/heroicons/outline/home.svg',
           label: 'Home',
-          route: '/dashboard/worker',
+          route: '/dashboard/employee',
         },
         {
           icon: 'assets/icons/heroicons/outline/sun.svg',
           label: 'Vacations',
-          route: '/vacations/worker',
+          route: '/vacations/employee',
         },
         {
           icon: 'assets/icons/heroicons/outline/heart.svg',
           label: 'Sick Notes',
-          route: '/sick-notes/worker',
+          route: '/sick-notes/employee',
         }
       ],
       role: "ADMIN"

@@ -3,7 +3,7 @@ import { RouterModule, Routes } from '@angular/router';
 import { DashboardComponent } from './dashboard.component';
 import { AdminDashboardComponent } from './pages/admin-dashboard/admin-dashboard.component';
 import { SupervisorDashboardComponent } from './pages/supervisor-dashboard/supervisor-dashboard.component';
-import { WorkerDashboardComponent } from './pages/worker-dashboard/worker-dashboard.component';
+import { EmployeeDashboardComponent } from './pages/employee-dashboard/employee-dashboard.component';
 
 const routes: Routes = [
   {
@@ -19,8 +19,8 @@ const routes: Routes = [
         component: SupervisorDashboardComponent,
       },
       {
-        path: 'worker',
-        component: WorkerDashboardComponent,
+        path: 'employee',
+        component: EmployeeDashboardComponent,
       },
     ]
   },

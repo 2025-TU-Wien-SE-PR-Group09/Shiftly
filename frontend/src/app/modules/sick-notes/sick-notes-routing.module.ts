@@ -1,9 +1,7 @@
 import { NgModule } from '@angular/core';
 import { RouterModule, Routes } from '@angular/router';
 import { SickNotesComponent } from './sick-notes.component';
-import { SupervisorVacationsComponent } from '../vacations/pages/supervisor-vacations/supervisor-vacations.component';
-import { WorkerVacationsComponent } from '../vacations/pages/worker-vacations/worker-vacations.component';
-import { WorkerSickNotesComponent } from './pages/worker-sick-notes/worker-sick-notes.component';
+import { EmployeeSickNotesComponent } from './pages/employee-sick-notes/employee-sick-notes.component';
 import { SupervisorSickNotesComponent } from './pages/supervisor-sick-notes/supervisor-sick-notes.component';
 
 const routes: Routes = [
@@ -16,8 +14,8 @@ const routes: Routes = [
         component: SupervisorSickNotesComponent,
       },
       {
-        path: 'worker',
-        component: WorkerSickNotesComponent,
+        path: 'employee',
+        component: EmployeeSickNotesComponent,
       }
     ]
   },

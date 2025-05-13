@@ -1,7 +1,9 @@
 import { NgModule } from '@angular/core';
 import { RouterModule, Routes } from '@angular/router';
 import { VacationsComponent } from './vacations.component';
-import { WorkerVacationsComponent } from './pages/worker-vacations/worker-vacations.component';
+import {
+  EmployeeVacationsComponent
+} from './pages/employee-vacations/employee-vacations.component';
 import { SupervisorVacationsComponent } from './pages/supervisor-vacations/supervisor-vacations.component';
 
 const routes: Routes = [
@@ -10,8 +12,8 @@ const routes: Routes = [
     component: VacationsComponent,
     children: [
       {
-        path: 'worker',
-        component: WorkerVacationsComponent
+        path: 'employee',
+        component: EmployeeVacationsComponent
       },
       {
         path: 'supervisor',

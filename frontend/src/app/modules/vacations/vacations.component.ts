@@ -1,8 +1,5 @@
 import { Component, OnInit } from '@angular/core';
 import { AuthService } from '../../core/services/auth.service';
-import { NgIf } from '@angular/common';
-import { SupervisorVacationsComponent } from './pages/supervisor-vacations/supervisor-vacations.component';
-import { WorkerVacationsComponent } from './pages/worker-vacations/worker-vacations.component';
 import { RouterOutlet } from '@angular/router';
 
 @Component({
