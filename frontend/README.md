@@ -1,8 +1,12 @@
-# Shiftly Frontend
+## Shiftly Frontend
 
-Frontend of Shiftly
+### Generating the rest client
 
-#### Disclaimer
+In order to generate the rest client, the script `./generate_api.sh` for Linux/MacOS or `./generate_api.ps1` for Windows must be executed.
+
+The scripts require docker and the backend server must be running.
+
+### Disclaimer
 
 The Tailwind name and logos are trademarks of Tailwind Labs Inc.
 The Angular name and logos are trademarks of Google.
