@@ -61,7 +61,6 @@ management:
     metrics:
       export:
         enabled: true
-
 ---
 spring:
   config:
@@ -71,3 +70,7 @@ spring:
     timeout-per-shutdown-phase: 30s
 server:
   shutdown: graceful
+---
+admin:
+  user:
+    password: "password"

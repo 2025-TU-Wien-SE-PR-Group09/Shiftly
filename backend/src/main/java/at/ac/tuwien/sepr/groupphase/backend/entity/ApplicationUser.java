@@ -1,19 +1,42 @@
 package at.ac.tuwien.sepr.groupphase.backend.entity;
 
-//TODO: replace this class with a correct ApplicationUser Entity implementation
-public class ApplicationUser {
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.FetchType;
+import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.JoinTable;
+import jakarta.persistence.ManyToMany;
+import jakarta.validation.constraints.Size;
 
+import java.util.HashSet;
+import java.util.Set;
+
+@Entity
+public class ApplicationUser {
+    @Id
+    @Column(unique = true, nullable = false, length = 50)
+    @Size(max = 50)
     private String email;
-    private String password;
-    private Boolean admin;
+
+    @Column(nullable = false, length = 200)
+    @Size(max = 200)
+    private String passwordHash;
+
+    @ManyToMany(fetch = FetchType.LAZY)
+    @JoinTable(
+        name = "application_user_role_binding",
+        joinColumns = @JoinColumn(name = "user_email"),
+        inverseJoinColumns = @JoinColumn(name = "role_role")
+    )
+    private Set<ApplicationRole> roles = new HashSet<>();
 
     public ApplicationUser() {
     }
 
-    public ApplicationUser(String email, String password, Boolean admin) {
+    public ApplicationUser(String email, String password) {
         this.email = email;
-        this.password = password;
-        this.admin = admin;
+        this.passwordHash = password;
     }
 
     public String getEmail() {
@@ -24,19 +47,24 @@ public class ApplicationUser {
         this.email = email;
     }
 
-    public String getPassword() {
-        return password;
+    public String getPasswordHash() {
+        return passwordHash;
     }
 
-    public void setPassword(String password) {
-        this.password = password;
+    public void setPasswordHash(String password) {
+        this.passwordHash = password;
     }
 
-    public Boolean getAdmin() {
-        return admin;
+    public Set<ApplicationRole> getRoles() {
+        return roles;
     }
 
-    public void setAdmin(Boolean admin) {
-        this.admin = admin;
+    @Override
+    public String toString() {
+        return "ApplicationUser{"
+            + "email='" + email + '\''
+            + ", password='" + passwordHash + '\''
+            + ", roles=" + roles
+            + '}';
     }
 }

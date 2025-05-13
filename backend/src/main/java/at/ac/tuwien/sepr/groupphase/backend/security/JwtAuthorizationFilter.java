@@ -73,9 +73,11 @@ public class JwtAuthorizationFilter extends OncePerRequestFilter {
 
         String username = claims.getSubject();
 
+        // The name of the role must start with ROLE_ (requirement of spring boot)
+        // We only use roles, and not simple authority grants.
         List<SimpleGrantedAuthority> authorities = ((List<?>) claims
             .get("rol")).stream()
-            .map(authority -> new SimpleGrantedAuthority((String) authority))
+            .map(authority -> new SimpleGrantedAuthority("ROLE_" + authority))
             .toList();
 
         if (username == null || username.isEmpty()) {

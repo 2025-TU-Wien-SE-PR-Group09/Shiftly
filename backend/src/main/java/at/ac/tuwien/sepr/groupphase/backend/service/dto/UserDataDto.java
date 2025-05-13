@@ -1,10 +1,12 @@
-package at.ac.tuwien.sepr.groupphase.backend.endpoint.dto;
+package at.ac.tuwien.sepr.groupphase.backend.service.dto;
 
+import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.LoginResponseRestDto;
+import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.UserDataRestDto;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotNull;
 import java.util.Objects;
 
-public class UserLoginDto {
+public class UserDataDto {
 
     @NotNull(message = "Email must not be null")
     @Email
@@ -29,12 +31,17 @@ public class UserLoginDto {
         this.password = password;
     }
 
+    public UserDataDto(String email, String password) {
+        this.email = email;
+        this.password = password;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) {
             return true;
         }
-        if (!(o instanceof UserLoginDto userLoginDto)) {
+        if (!(o instanceof UserDataDto userLoginDto)) {
             return false;
         }
         return Objects.equals(email, userLoginDto.email)
@@ -55,32 +62,16 @@ public class UserLoginDto {
     }
 
 
-    public static final class UserLoginDtoBuilder {
-        private String email;
-        private String password;
-
-        private UserLoginDtoBuilder() {
-        }
-
-        public static UserLoginDtoBuilder anUserLoginDto() {
-            return new UserLoginDtoBuilder();
-        }
-
-        public UserLoginDtoBuilder withEmail(String email) {
-            this.email = email;
-            return this;
-        }
-
-        public UserLoginDtoBuilder withPassword(String password) {
-            this.password = password;
-            return this;
-        }
-
-        public UserLoginDto build() {
-            UserLoginDto userLoginDto = new UserLoginDto();
-            userLoginDto.setEmail(email);
-            userLoginDto.setPassword(password);
-            return userLoginDto;
-        }
+    /**
+     * Converts a {@link LoginResponseDto} to a {@link LoginResponseRestDto}.
+     *
+     * @param restDto the {@link LoginResponseDto} to convert
+     * @return the converted {@link LoginResponseRestDto}
+     */
+    public static UserDataDto from(UserDataRestDto restDto) {
+        return new UserDataDto(
+            restDto.getEmail(),
+            restDto.getPassword()
+        );
     }
 }
