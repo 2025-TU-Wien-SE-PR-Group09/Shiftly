@@ -6,4 +6,4 @@ docker run --rm --net=host -u="$(id -u)" -v ${PWD}:/local swaggerapi/swagger-cod
     -i /local/tmp/spec.json \
     -l typescript-angular \
     -o /local/src/app/rest_client/ \
-    --additional-properties ngVersion=19.1.4
+    --additional-properties ngVersion=19.1.4, providedInRoot=true, useOverride=true

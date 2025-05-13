@@ -6,6 +6,9 @@ import { AppComponent } from './app/app.component';
 import { AppRoutingModule } from './app/app-routing.module';
 import { BrowserModule, bootstrapApplication } from '@angular/platform-browser';
 import { provideAnimations } from '@angular/platform-browser/animations';
+import { httpInterceptorProviders } from './app/core/interceptor';
+import { provideHttpClient, withInterceptorsFromDi } from '@angular/common/http';
+import { provideToastr } from 'ngx-toastr';
 
 if (environment.production) {
   enableProdMode();
@@ -16,7 +19,11 @@ if (environment.production) {
 }
 
 bootstrapApplication(AppComponent, {
-  providers: [importProvidersFrom(BrowserModule, AppRoutingModule), provideAnimations()],
+  providers: [importProvidersFrom(BrowserModule, AppRoutingModule),
+    provideAnimations(),
+    httpInterceptorProviders,
+    provideToastr(),
+    provideHttpClient(withInterceptorsFromDi())],
 }).catch((err) => console.error(err));
 
 function selfXSSWarning() {

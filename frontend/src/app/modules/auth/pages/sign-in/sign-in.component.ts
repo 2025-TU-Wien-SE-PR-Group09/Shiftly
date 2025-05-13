@@ -4,6 +4,8 @@ import { FormBuilder, FormGroup, FormsModule, ReactiveFormsModule, Validators } 
 import { Router, RouterLink } from '@angular/router';
 import { AngularSvgIconModule } from 'angular-svg-icon';
 import { ButtonComponent } from '../../../../shared/components/button/button.component';
+import { AuthService } from '../../../../core/services/auth.service';
+import { ToastrService } from 'ngx-toastr';
 
 @Component({
   selector: 'app-sign-in',
@@ -16,7 +18,10 @@ export class SignInComponent implements OnInit {
   submitted = false;
   passwordTextType!: boolean;
 
-  constructor(private readonly _formBuilder: FormBuilder, private readonly _router: Router) {}
+  constructor(private readonly _formBuilder: FormBuilder,
+              private _authService: AuthService ,
+              private readonly _router: Router,
+              private readonly _toastr: ToastrService,) {}
 
   onClick() {
     console.log('Button clicked');
@@ -45,6 +50,13 @@ export class SignInComponent implements OnInit {
       return;
     }
 
-    this._router.navigate(['/']);
+    this._authService.loginUser({ email, password }).subscribe(
+      next => {
+        this._router.navigate(['/']).then();
+      },
+      error => {
+        this._toastr.error("Login Failed");
+      }
+    )
   }
 }

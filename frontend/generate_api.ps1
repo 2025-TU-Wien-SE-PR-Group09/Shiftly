@@ -6,4 +6,4 @@ docker run --rm -v ${PWD}:/local swaggerapi/swagger-codegen-cli-v3:3.0.68 genera
     -i /local/tmp/spec.json `
     -l typescript-angular `
     -o /local/src/app/rest_client/ `
-    --additional-properties ngVersion=19.1.4
+    --additional-properties ngVersion=19.1.4, providedInRoot=true, useOverride=true

@@ -4,6 +4,7 @@
 
 
 /** Plugins **/
+@import 'ngx-toastr/toastr';
 @import './assets/styles/apexchart.css';
 
 @plugin "@tailwindcss/forms";

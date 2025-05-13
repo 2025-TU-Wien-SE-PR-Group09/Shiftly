@@ -22,7 +22,9 @@ import { BASE_PATH, COLLECTION_FORMATS }                     from '../variables'
 import { Configuration }                                     from '../configuration';
 
 
-@Injectable()
+@Injectable({
+  providedIn: 'root'
+})
 export class CustomHealthEndpointService {
 
     protected basePath = 'http://localhost:8080';
