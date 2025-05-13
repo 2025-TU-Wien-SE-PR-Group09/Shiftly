@@ -18,10 +18,12 @@ export class SignInComponent implements OnInit {
   submitted = false;
   passwordTextType!: boolean;
 
-  constructor(private readonly _formBuilder: FormBuilder,
-              private _authService: AuthService ,
-              private readonly _router: Router,
-              private readonly _toastr: ToastrService,) {}
+  constructor(
+    private readonly _formBuilder: FormBuilder,
+    private _authService: AuthService,
+    private readonly _router: Router,
+    private readonly _toastr: ToastrService,
+  ) {}
 
   onClick() {
     console.log('Button clicked');
@@ -50,13 +52,21 @@ export class SignInComponent implements OnInit {
       return;
     }
 
-    this._authService.loginUser({ email, password }).subscribe(
-      next => {
-        this._router.navigate(['/']).then();
+    this._authService.loginUser({ email, password }).subscribe({
+      next: (resp) => {
+        const roles = this._authService.getUserRoles();
+
+        if (roles.includes("ADMIN")) {
+          this._router.navigateByUrl('/dashboard/admin').then();
+        } else if (roles.includes("WORKER")) {
+          this._router.navigateByUrl('/dashboard/worker').then();
+        } else if (roles.includes("SUPERVISOR")) {
+          this._router.navigateByUrl('/dashboard/supervisor').then();
+        }
       },
-      error => {
-        this._toastr.error("Login Failed");
-      }
-    )
+      error: (error) => {
+        this._toastr.error('Login Failed');
+      },
+    });
   }
 }

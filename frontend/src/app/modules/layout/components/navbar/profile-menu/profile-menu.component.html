@@ -2,24 +2,19 @@
   <!-- Profile Button -->
   <button (click)="toggleMenu()" class="bg-card relative flex rounded-full text-sm" type="button">
     <span class="sr-only">Open user menu</span>
-    <img
-      clickOutside
-      (clickOutside)="isOpen = false"
-      class="size-9 shrink-0 rounded-md"
-      src="https://avatars.githubusercontent.com/u/12519008?v=4"
-      alt="" />
+    <svg-icon class="hover:cursor-pointer bg-primary/70 text-background rounded-4xl p-1" src="/assets/icons/heroicons/outline/avatar.svg" [svgClass]="'h-9 w-9'"></svg-icon>
   </button>
   <!-- Dropdown -->
   <div
     [@openClose]="isOpen ? 'open' : 'closed'"
     class="bg-background shadow-custom border-muted absolute z-20 mt-2 w-60 origin-top-right transform rounded-md border border-dashed py-4 ring-1 ring-transparent ring-opacity-5 transition focus:outline-hidden ltr:right-0 rtl:left-0">
     <div class="flext-row flex items-center px-4 pb-4">
-      <div class="w-10 shrink-0">
-        <img class="rounded-md" src="https://avatars.githubusercontent.com/u/12519008?v=4" alt="" />
+      <div class="w-10 shrink-0 bg-primary/70 text-background rounded-4xl">
+        <svg-icon src="/assets/icons/heroicons/outline/avatar.svg" [svgClass]="'h-10 w-10'"></svg-icon>
       </div>
       <div class="text-foreground overflow-hidden px-2 text-sm font-semibold">
-        Luciano Oliveira
-        <p class="text-muted-foreground truncate text-ellipsis text-xs font-semibold">me&#64;lanno.dev</p>
+        Logged in
+        <p class="text-muted-foreground truncate text-ellipsis text-xs font-semibold">{{getUserEmail()}}</p>
       </div>
     </div>
 

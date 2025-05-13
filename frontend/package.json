@@ -1,12 +1,12 @@
 {
-  "name": "angular-tailwind",
-  "displayName": "Angular Tailwind",
-  "version": "0.10.1",
+  "name": "shiftly",
+  "displayName": "Shiftly",
+  "version": "0.0.1",
   "description": "Angular & Tailwind CSS Admin Dashboard Starter Kit, Free and Open Source",
-  "homepage": "https://github.com/lannodev/angular-tailwind#readme",
+  "homepage": "https://reset.inso-world.com/repo/2025ss-se-pr-group/25ss-se-pr-qse-09",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/lannodev/angular-tailwind.git"
+    "url": "git+https://reset.inso-world.com/repo/2025ss-se-pr-group/25ss-se-pr-qse-09.git"
   },
   "keywords": [
     "angular",
@@ -16,7 +16,7 @@
     "dark mode",
     "open source"
   ],
-  "author": "Luciano Oliveira <me@lanno.dev>",
+  "author": "SEPR QSE Team09",
   "license": "MIT",
   "scripts": {
     "ng": "ng",

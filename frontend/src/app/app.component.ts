@@ -10,7 +10,7 @@ import { ResponsiveHelperComponent } from './shared/components/responsive-helper
   imports: [RouterOutlet, ResponsiveHelperComponent, NgxSonnerToaster],
 })
 export class AppComponent {
-  title = 'Angular Tailwind';
+  title = 'Shiftly';
 
   constructor(public themeService: ThemeService) {}
 }

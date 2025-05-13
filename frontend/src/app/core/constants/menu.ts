@@ -3,15 +3,76 @@ import { MenuItem } from '../models/menu.model';
 export class Menu {
   public static pages: MenuItem[] = [
     {
-      group: 'Base',
+      group: 'Admin',
       separator: false,
       items: [
         {
-          icon: 'assets/icons/heroicons/outline/chart-pie.svg',
-          label: 'Dashboard',
-          route: '/dashboard',
-          children: [{ label: 'Nfts', route: '/dashboard/nfts' }],
+          icon: 'assets/icons/heroicons/outline/home.svg',
+          label: 'Home',
+          route: '/dashboard/admin',
         },
+        {
+          icon: 'assets/icons/heroicons/outline/building-office.svg',
+          label: 'Departments',
+          route: '/departments/admin',
+        },
+      ],
+      role: "ADMIN"
+    },
+    {
+      group: 'Supervisor',
+      separator: false,
+      items: [
+        {
+          icon: 'assets/icons/heroicons/outline/home.svg',
+          label: 'Home',
+          route: '/dashboard/supervisor',
+        },
+        {
+          icon: 'assets/icons/heroicons/outline/building-office.svg',
+          label: 'Department',
+          route: '/departments/supervisor',
+        },
+        {
+          icon: 'assets/icons/heroicons/outline/sun.svg',
+          label: 'Vacations',
+          route: '/vacations/supervisor',
+        },
+        {
+          icon: 'assets/icons/heroicons/outline/heart.svg',
+          label: 'Sick Notes',
+          route: '/sick-notes/supervisor',
+        },
+      ],
+      role: "ADMIN"
+    },
+    {
+      group: 'Worker',
+      separator: false,
+      items: [
+        {
+          icon: 'assets/icons/heroicons/outline/home.svg',
+          label: 'Home',
+          route: '/dashboard/worker',
+        },
+        {
+          icon: 'assets/icons/heroicons/outline/sun.svg',
+          label: 'Vacations',
+          route: '/vacations/worker',
+        },
+        {
+          icon: 'assets/icons/heroicons/outline/heart.svg',
+          label: 'Sick Notes',
+          route: '/sick-notes/worker',
+        }
+      ],
+      role: "ADMIN"
+    },
+
+    {
+      group: 'Template',
+      separator: false,
+      items: [
         {
           icon: 'assets/icons/heroicons/outline/lock-closed.svg',
           label: 'Auth',
@@ -25,68 +86,13 @@ export class Menu {
           ],
         },
         {
-          icon: 'assets/icons/heroicons/outline/exclamation-triangle.svg',
-          label: 'Errors',
-          route: '/errors',
-          children: [
-            { label: '404', route: '/errors/404' },
-            { label: '500', route: '/errors/500' },
-          ],
-        },
-        {
           icon: 'assets/icons/heroicons/outline/cube.svg',
           label: 'Components',
           route: '/components',
           children: [{ label: 'Table', route: '/components/table' }],
         },
       ],
-    },
-    {
-      group: 'Collaboration',
-      separator: true,
-      items: [
-        {
-          icon: 'assets/icons/heroicons/outline/download.svg',
-          label: 'Download',
-          route: '/download',
-        },
-        {
-          icon: 'assets/icons/heroicons/outline/gift.svg',
-          label: 'Gift Card',
-          route: '/gift',
-        },
-        {
-          icon: 'assets/icons/heroicons/outline/users.svg',
-          label: 'Users',
-          route: '/users',
-        },
-      ],
-    },
-    {
-      group: 'Config',
-      separator: false,
-      items: [
-        {
-          icon: 'assets/icons/heroicons/outline/cog.svg',
-          label: 'Settings',
-          route: '/settings',
-        },
-        {
-          icon: 'assets/icons/heroicons/outline/bell.svg',
-          label: 'Notifications',
-          route: '/gift',
-        },
-        {
-          icon: 'assets/icons/heroicons/outline/folder.svg',
-          label: 'Folders',
-          route: '/folders',
-          children: [
-            { label: 'Current Files', route: '/folders/current-files' },
-            { label: 'Downloads', route: '/folders/download' },
-            { label: 'Trash', route: '/folders/trash' },
-          ],
-        },
-      ],
-    },
+      role: "ADMIN"
+    }
   ];
 }

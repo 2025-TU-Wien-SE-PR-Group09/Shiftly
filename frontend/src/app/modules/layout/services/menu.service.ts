@@ -3,6 +3,7 @@ import { NavigationEnd, Router } from '@angular/router';
 import { Subscription } from 'rxjs';
 import { Menu } from 'src/app/core/constants/menu';
 import { MenuItem, SubMenuItem } from 'src/app/core/models/menu.model';
+import { AuthService } from '../../../core/services/auth.service';
 
 @Injectable({
   providedIn: 'root',
@@ -13,7 +14,7 @@ export class MenuService implements OnDestroy {
   private _pagesMenu = signal<MenuItem[]>([]);
   private _subscription = new Subscription();
 
-  constructor(private router: Router) {
+  constructor(private router: Router, private authService: AuthService,) {
     /** Set dynamic menu */
     this._pagesMenu.set(Menu.pages);
 
@@ -45,7 +46,18 @@ export class MenuService implements OnDestroy {
     return this._showMobileMenu();
   }
   get pagesMenu() {
-    return this._pagesMenu();
+    const pages: MenuItem[] = [];
+    const roles = this.authService.getUserRoles();
+
+    this._pagesMenu().forEach((menu) => {
+      if(menu.role && !roles.includes(menu.role)) {
+        return
+      }
+
+      pages.push(menu);
+    })
+
+    return pages;
   }
 
   set showSideBar(value: boolean) {

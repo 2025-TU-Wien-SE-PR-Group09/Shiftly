@@ -42,19 +42,16 @@ export class AuthService {
   }
 
   /**
-   * Returns the user role based on the current token
+   * Returns the user roles based on the current token
    */
-  getUserRole() {
+  getUserRoles() {
     if (this.getToken() != null) {
       const decoded: any = jwtDecode(this.getToken()!);
       const authInfo: string[] = decoded.rol;
-      if (authInfo.includes('ROLE_ADMIN')) {
-        return 'ADMIN';
-      } else if (authInfo.includes('ROLE_USER')) {
-        return 'USER';
-      }
+      return authInfo;
     }
-    return 'UNDEFINED';
+
+    return [];
   }
 
   private setToken(authResponse: string) {
@@ -73,4 +70,12 @@ export class AuthService {
     return date;
   }
 
+  getUserEmail() {
+    if (this.getToken() != null) {
+      const decoded: any = jwtDecode(this.getToken()!);
+      return decoded.sub;
+    }
+
+    return 'none';
+  }
 }
