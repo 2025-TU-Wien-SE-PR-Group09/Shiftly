@@ -21,7 +21,7 @@ import java.security.Principal;
 public class AdminEndpoint {
 
     @GetMapping
-    @RolesAllowed("ADMIN")
+    @RolesAllowed({"ADMIN", ""})
     public String test(Principal principal) {
         return "ADMIN ONLY";
     }

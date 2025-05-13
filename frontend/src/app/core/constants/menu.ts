@@ -9,7 +9,7 @@ export class Menu {
         {
           icon: 'assets/icons/heroicons/outline/home.svg',
           label: 'Home',
-          route: '/dashboard/admin',
+          route: '/home/admin',
         },
         {
           icon: 'assets/icons/heroicons/outline/building-office.svg',
@@ -26,7 +26,7 @@ export class Menu {
         {
           icon: 'assets/icons/heroicons/outline/home.svg',
           label: 'Home',
-          route: '/dashboard/supervisor',
+          route: '/home/supervisor',
         },
         {
           icon: 'assets/icons/heroicons/outline/building-office.svg',
@@ -53,7 +53,7 @@ export class Menu {
         {
           icon: 'assets/icons/heroicons/outline/home.svg',
           label: 'Home',
-          route: '/dashboard/employee',
+          route: '/home/employee',
         },
         {
           icon: 'assets/icons/heroicons/outline/sun.svg',

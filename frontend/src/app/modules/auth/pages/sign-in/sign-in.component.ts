@@ -57,11 +57,11 @@ export class SignInComponent implements OnInit {
         const roles = this._authService.getUserRoles();
 
         if (roles.includes("ADMIN")) {
-          this._router.navigateByUrl('/dashboard/admin').then();
+          this._router.navigateByUrl('/home/admin').then();
         } else if (roles.includes("EMPLOYEE")) {
-          this._router.navigateByUrl('/dashboard/employee').then();
+          this._router.navigateByUrl('/home/employee').then();
         } else if (roles.includes("SUPERVISOR")) {
-          this._router.navigateByUrl('/dashboard/supervisor').then();
+          this._router.navigateByUrl('/home/supervisor').then();
         }
       },
       error: (error) => {
