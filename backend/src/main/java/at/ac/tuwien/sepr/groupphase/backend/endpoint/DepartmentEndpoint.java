@@ -8,6 +8,7 @@ import at.ac.tuwien.sepr.groupphase.backend.service.dto.DepartmentCreateDto;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.annotation.security.RolesAllowed;
 import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -30,6 +31,7 @@ public class DepartmentEndpoint {
         this.departmentService = departmentService;
     }
 
+    @RolesAllowed({"ADMIN"})
     @Operation(summary = "Get all departments")
     @ApiResponse(responseCode = "200", description = "List of all departments")
     @GetMapping
@@ -37,6 +39,7 @@ public class DepartmentEndpoint {
         return departmentService.getAllDepartments();
     }
 
+    @RolesAllowed({"ADMIN"})
     @Operation(summary = "Create a new department")
     @ApiResponse(responseCode = "201", description = "New department created")
     @PostMapping

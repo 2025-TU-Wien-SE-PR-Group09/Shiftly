@@ -41,10 +41,14 @@ public class DepartmentCreateRestDto {
 
     @Override
     public boolean equals(Object o) {
-        if (this == o) return true;
-        if (!(o instanceof DepartmentCreateRestDto that)) return false;
-        return Objects.equals(name, that.name) &&
-            Objects.equals(supervisorEmail, that.supervisorEmail);
+        if (this == o) {
+            return true;
+        }
+        if (!(o instanceof DepartmentCreateRestDto that)) {
+            return false;
+        }
+        return Objects.equals(name, that.name)
+            && Objects.equals(supervisorEmail, that.supervisorEmail);
     }
 
     @Override
@@ -54,9 +58,12 @@ public class DepartmentCreateRestDto {
 
     @Override
     public String toString() {
-        return "DepartmentCreateRestDto{" +
-            "name='" + name + '\'' +
-            ", supervisorEmail='" + supervisorEmail + '\'' +
-            '}';
+        return "DepartmentCreateRestDto{"
+            + "name='"
+            + name
+            + '\''
+            + ", supervisorEmail='"
+            + supervisorEmail
+            + '\'' + '}';
     }
 }

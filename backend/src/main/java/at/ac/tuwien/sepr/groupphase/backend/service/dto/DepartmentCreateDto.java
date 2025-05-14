@@ -33,10 +33,14 @@ public class DepartmentCreateDto {
 
     @Override
     public boolean equals(Object o) {
-        if (this == o) return true;
-        if (!(o instanceof DepartmentCreateDto that)) return false;
-        return Objects.equals(name, that.name) &&
-            Objects.equals(supervisorEmail, that.supervisorEmail);
+        if (this == o) {
+            return true;
+        }
+        if (!(o instanceof DepartmentCreateDto that)) {
+            return false;
+        }
+        return Objects.equals(name, that.name)
+            && Objects.equals(supervisorEmail, that.supervisorEmail);
     }
 
     @Override
@@ -46,9 +50,8 @@ public class DepartmentCreateDto {
 
     @Override
     public String toString() {
-        return "DepartmentCreateServiceDto{" +
-            "name='" + name + '\'' +
-            ", supervisorEmail='" + supervisorEmail + '\'' +
-            '}';
+        return "DepartmentCreateServiceDto{"
+            + "name='" + name + '\''
+            + ", supervisorEmail='" + supervisorEmail + '\'' + '}';
     }
 }
