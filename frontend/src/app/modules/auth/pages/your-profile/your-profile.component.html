@@ -1,1 +1,55 @@
-<p class="text-foreground">your-profile works!</p>
+<!-- Profile View -->
+<div class="my-10 space-y-6 max-w-lg mx-auto p-6 bg-card rounded-2xl shadow-lg">
+  <div class="text-center">
+    <h2 class="text-white mb-1 text-3xl font-semibold">Your Profile</h2>
+    <p class="text-muted-foreground text-sm">Here’s what we know about you.</p>
+  </div>
+
+  <div class="space-y-4 text-left">
+    <div class="form__group">
+      <label class="block text-muted-foreground text-sm mb-1">Name</label>
+      <div class="bg-background p-3 rounded-md text-white">{{ userData.name }}</div>
+    </div>
+
+    <div class="form__group">
+      <label class="block text-muted-foreground text-sm mb-1">Email</label>
+      <div class="bg-background p-3 rounded-md text-white">{{ userData.email }}</div>
+    </div>
+
+    <div class="form__group">
+      <label class="block text-muted-foreground text-sm mb-1">Role</label>
+      <div class="bg-background p-3 rounded-md text-white">{{ userData.role }}</div>
+    </div>
+
+    <div class="form__group">
+      <label class="block text-muted-foreground text-sm mb-1">Department</label>
+      <div class="bg-background p-3 rounded-md text-white">{{ userData.department }}</div>
+    </div>
+  </div>
+
+  <!-- Change Password -->
+  <div class="pt-6 text-center">
+    <app-button
+      (click)="changePassword()"
+      impact="bold"
+      tone="primary"
+      shape="rounded"
+      size="medium"
+    >
+      Change Password
+    </app-button>
+  </div>
+</div>
+
+<!-- Back to Home -->
+<div class="pt-3 text-center">
+  <app-button
+    (click)="goHome()"
+    impact="bold"
+    tone="primary"
+    shape="rounded"
+    size="medium"
+  >
+    Back to Home
+  </app-button>
+</div>
