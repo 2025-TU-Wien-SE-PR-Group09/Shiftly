@@ -1,3 +1,5 @@
+export * from './departmentCreateRestDto';
+export * from './departmentDetailRestDto';
 export * from './detailedMessageDto';
 export * from './loginResponseRestDto';
 export * from './messageInquiryDto';

@@ -5,6 +5,7 @@ import { HttpClient } from '@angular/common/http';
 
 import { AdminEndpointService } from './api/adminEndpoint.service';
 import { CustomHealthEndpointService } from './api/customHealthEndpoint.service';
+import { DepartmentService } from './api/department.service';
 import { LoginEndpointService } from './api/loginEndpoint.service';
 import { MessageEndpointService } from './api/messageEndpoint.service';
 
@@ -15,6 +16,7 @@ import { MessageEndpointService } from './api/messageEndpoint.service';
   providers: [
     AdminEndpointService,
     CustomHealthEndpointService,
+    DepartmentService,
     LoginEndpointService,
     MessageEndpointService ]
 })
