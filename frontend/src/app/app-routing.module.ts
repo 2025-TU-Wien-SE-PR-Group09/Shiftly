@@ -1,19 +1,26 @@
-import {NgModule} from '@angular/core';
-import {mapToCanActivate, RouterModule, Routes} from '@angular/router';
-import {HomeComponent} from './components/home/home.component';
-import {LoginComponent} from './components/login/login.component';
-import {AuthGuard} from './guards/auth.guard';
-import {MessageComponent} from './components/message/message.component';
+import { NgModule } from '@angular/core';
+import { RouterModule, Routes } from '@angular/router';
+import { AuthGuard } from './core/guards/auth.guard';
 
 const routes: Routes = [
-  {path: '', component: HomeComponent},
-  {path: 'login', component: LoginComponent},
-  {path: 'message', canActivate: mapToCanActivate([AuthGuard]), component: MessageComponent}
+  {
+    path: '',
+    loadChildren: () => import('./modules/layout/layout.module').then((m) => m.LayoutModule),
+    canActivate: [AuthGuard],
+  },
+  {
+    path: 'auth',
+    loadChildren: () => import('./modules/auth/auth.module').then((m) => m.AuthModule),
+  },
+  {
+    path: 'errors',
+    loadChildren: () => import('./modules/error/error.module').then((m) => m.ErrorModule),
+  },
+  { path: '**', redirectTo: 'errors/404' },
 ];
 
 @NgModule({
-  imports: [RouterModule.forRoot(routes, {useHash: true})],
-  exports: [RouterModule]
+  imports: [RouterModule.forRoot(routes)],
+  exports: [RouterModule],
 })
-export class AppRoutingModule {
-}
+export class AppRoutingModule {}

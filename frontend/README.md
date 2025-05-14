@@ -1,24 +1,14 @@
-# SE PR Group Phase
+## Shiftly Frontend
 
-## First Steps
+### Generating the rest client
 
-Navigate to the root folder of the project and execute `npm install`. Based on the *package.json* file, npm will download all required node_modules to run an Angular application.
-Afterwards, execute `npm install -g @angular/cli` to install the Angular CLI globally.
+In order to generate the rest client, the script `./generate_api.sh` for Linux/MacOS or `./generate_api.ps1` for Windows must be executed.
 
-## Development
+The scripts require docker and the backend server must be running.
 
-### Development server
+### Disclaimer
 
-Run `ng serve` to start the web application. Navigate to `http://localhost:4200/`. The app will automatically reload if you change any of the source files.
+The Tailwind name and logos are trademarks of Tailwind Labs Inc.
+The Angular name and logos are trademarks of Google.
 
-### Code scaffolding
-
-Run `ng generate component component-name` to generate a new component. You can also use `ng generate directive|pipe|service|class|guard|interface|enum|module`.
-
-### Build
-
-Run `ng build` to build the project. The build artifacts will be stored in the `dist/` directory. Use the `--prod` flag for a production build.
-
-### Further help
-
-To get more help on the Angular CLI use `ng help` or go check out the [Angular CLI README](https://github.com/angular/angular-cli/blob/master/README.md).
+The frontend is based on [https://github.com/lannodev/angular-tailwind](https://github.com/lannodev/angular-tailwind).
