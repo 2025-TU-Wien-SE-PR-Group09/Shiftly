@@ -40,11 +40,11 @@ management:
     port: 8081
   endpoint:
     shutdown:
-      enabled: true
+      access: read_only
     metrics:
-      enabled: true
+      access: read_only
     prometheus:
-      enabled: true
+      access: read_only
     health:
       probes:
         enabled: true
