@@ -40,11 +40,6 @@ public class SecurityConfig {
           .build();
     }
 
-    @Bean
-    public PasswordEncoder passwordEncoder() {
-        return new BCryptPasswordEncoder();
-    }
-
 
     @Configuration
     public static class CorsConfig implements WebMvcConfigurer {
