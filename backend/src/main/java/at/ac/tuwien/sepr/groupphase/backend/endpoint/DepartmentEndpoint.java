@@ -1,17 +1,25 @@
 package at.ac.tuwien.sepr.groupphase.backend.endpoint;
 
 import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.DepartmentCreateRestDto;
+import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.DepartmentDetailRestDto;
 import at.ac.tuwien.sepr.groupphase.backend.entity.Department;
 import at.ac.tuwien.sepr.groupphase.backend.service.DepartmentService;
 import at.ac.tuwien.sepr.groupphase.backend.service.dto.DepartmentCreateDto;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.util.List;
+
+@Tag(name = "Department")
 @RestController
 @RequestMapping("/api/departments")
 public class DepartmentEndpoint {
@@ -22,6 +30,15 @@ public class DepartmentEndpoint {
         this.departmentService = departmentService;
     }
 
+    @Operation(summary = "Get all departments")
+    @ApiResponse(responseCode = "200", description = "List of all departments")
+    @GetMapping
+    public List<DepartmentDetailRestDto> getAllDepartments() {
+        return departmentService.getAllDepartments();
+    }
+
+    @Operation(summary = "Create a new department")
+    @ApiResponse(responseCode = "201", description = "New department created")
     @PostMapping
     public ResponseEntity<Void> createDepartment(@RequestBody @Valid DepartmentCreateRestDto restDto) {
         DepartmentCreateDto serviceDto = new DepartmentCreateDto(
