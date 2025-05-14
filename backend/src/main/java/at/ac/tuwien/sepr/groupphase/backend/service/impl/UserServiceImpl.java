@@ -13,6 +13,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import at.ac.tuwien.sepr.groupphase.backend.service.dto.ChangePasswordDto;
 
 import java.lang.invoke.MethodHandles;
 import java.util.Optional;
@@ -98,4 +99,38 @@ public class UserServiceImpl implements UserService {
         roleRepository.save(applicationRole);
         userRepository.save(user);
     }
+
+    @Override
+    public void changePasswordOfCurrentUser(ChangePasswordDto dto) {
+        LOGGER.trace("changePasswordOfCurrentUser({})", dto);
+
+        String currentEmail = org.springframework.security.core.context.SecurityContextHolder
+            .getContext()
+            .getAuthentication()
+            .getName();
+
+        Optional<ApplicationUser> applicationUserOpt = userRepository.findByEmail(currentEmail);
+        if (applicationUserOpt.isEmpty()) {
+            throw new NotFoundException("User with email " + currentEmail + " not found.");
+        }
+
+        ApplicationUser user = applicationUserOpt.get();
+
+        if ("admin@shyft.local".equalsIgnoreCase(user.getEmail())) {
+            throw new org.springframework.security.access.AccessDeniedException("Admin password cannot be changed.");
+        }
+
+        if (!passwordEncoder.matches(dto.getOldPassword(), user.getPasswordHash())) {
+            throw new org.springframework.security.authentication.BadCredentialsException("Old password is incorrect.");
+        }
+
+        if (passwordEncoder.matches(dto.getNewPassword(), user.getPasswordHash())) {
+            throw new IllegalArgumentException("New password must be different from the current password.");
+        }
+
+        user.setPasswordHash(passwordEncoder.encode(dto.getNewPassword()));
+        userRepository.save(user);
+
+    }
+
 }
