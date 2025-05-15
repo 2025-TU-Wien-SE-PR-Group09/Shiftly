@@ -2,6 +2,7 @@ package at.ac.tuwien.sepr.groupphase.backend.service;
 
 import at.ac.tuwien.sepr.groupphase.backend.service.dto.ChangePasswordDto;
 import at.ac.tuwien.sepr.groupphase.backend.service.dto.UserDataDto;
+import at.ac.tuwien.sepr.groupphase.backend.service.dto.UserProfileDto;
 import at.ac.tuwien.sepr.groupphase.backend.service.dto.UserRoleDto;
 import at.ac.tuwien.sepr.groupphase.backend.exception.NotFoundException;
 
@@ -28,6 +29,13 @@ public interface UserService {
      * @param dto contains the old and new password
      */
     void changePasswordOfCurrentUser(ChangePasswordDto dto);
+
+    /**
+     * Retrieves the profile information of the currently authenticated user.
+     *
+     * @return a {@link UserProfileDto} containing user name, email, role, and department
+     */
+    UserProfileDto getCurrentUserProfile();
 
 
     /**

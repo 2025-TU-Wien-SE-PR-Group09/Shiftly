@@ -1,11 +1,14 @@
 package at.ac.tuwien.sepr.groupphase.backend.endpoint;
 
 import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.ChangePasswordRestDto;
+import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.UserProfileRestDto;
 import at.ac.tuwien.sepr.groupphase.backend.service.UserService;
 import at.ac.tuwien.sepr.groupphase.backend.service.dto.ChangePasswordDto;
+import at.ac.tuwien.sepr.groupphase.backend.service.dto.UserProfileDto;
 import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -42,6 +45,26 @@ public class UserEndpoint {
         ChangePasswordDto dto = ChangePasswordDto.from(restDto);
         userService.changePasswordOfCurrentUser(dto);
         return ResponseEntity.ok().build();
+    }
+
+    /**
+     * Get the profile information of the currently authenticated user.
+     *
+     * @return a UserProfileRestDto with user details
+     */
+    @PreAuthorize("isAuthenticated()")
+    @GetMapping("/me")
+    public ResponseEntity<UserProfileRestDto> getCurrentUserProfile() {
+        UserProfileDto serviceDto = userService.getCurrentUserProfile();
+
+        UserProfileRestDto restDto = new UserProfileRestDto(
+            serviceDto.getName(),
+            serviceDto.getEmail(),
+            serviceDto.getRole(),
+            serviceDto.getDepartment()
+        );
+
+        return ResponseEntity.ok(restDto);
     }
 
 }
