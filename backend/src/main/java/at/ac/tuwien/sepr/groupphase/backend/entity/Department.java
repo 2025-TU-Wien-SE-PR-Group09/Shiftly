@@ -9,6 +9,7 @@ import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Size;
 
 @Entity
 public class Department {
@@ -18,6 +19,7 @@ public class Department {
     private Long id;
 
     @NotBlank
+    @Size(min = 1, max = 100)
     @Column(nullable = false, unique = true)
     private String name;
 

@@ -3,6 +3,7 @@ import {DepartmentDetailRestDto, DepartmentCreateRestDto, DepartmentService} fro
 import {ButtonComponent} from "../../../../shared/components/button/button.component";
 import {FormsModule} from "@angular/forms";
 import {CommonModule} from "@angular/common";
+import {ToastrService} from "ngx-toastr";
 
 @Component({
   selector: 'app-department-detail-admin',
@@ -19,7 +20,7 @@ export class DepartmentDetailAdminComponent {
   };
   protected departments: DepartmentDetailRestDto[] = [];
 
-  constructor(private departmentService: DepartmentService) {}
+  constructor(private departmentService: DepartmentService, private toastr: ToastrService) {}
 
   toggleForm(): void {
     this.showForm = !this.showForm;
@@ -30,10 +31,11 @@ export class DepartmentDetailAdminComponent {
       next: () => {
         this.newDepartment = { name: '', supervisorEmail: '' };
         this.showForm = false;
-        this.loadDepartments(); // neu laden
+        this.loadDepartments();
+        this.toastr.success('Department created successfully', 'Success');
       },
       error: err => {
-        console.error('Failed to create department', err);
+        this.toastr.error(err.message, 'Failed to create department');
       }
     });
   }
@@ -45,7 +47,7 @@ export class DepartmentDetailAdminComponent {
   loadDepartments(): void {
     this.departmentService.getAllDepartments().subscribe({
       next: data => this.departments = data,
-      error: err => console.error('Error loading departments', err)
+      error: err => this.toastr.error(err.message, 'Failed to load department list')
     });
   }
 }

@@ -4,11 +4,11 @@ import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.DepartmentDetailRestDto
 import at.ac.tuwien.sepr.groupphase.backend.entity.ApplicationUser;
 import at.ac.tuwien.sepr.groupphase.backend.entity.Department;
 import at.ac.tuwien.sepr.groupphase.backend.exception.ConflictException;
+import at.ac.tuwien.sepr.groupphase.backend.exception.NotFoundException;
 import at.ac.tuwien.sepr.groupphase.backend.repository.DepartmentRepository;
 import at.ac.tuwien.sepr.groupphase.backend.repository.UserRepository;
 import at.ac.tuwien.sepr.groupphase.backend.service.DepartmentService;
 import at.ac.tuwien.sepr.groupphase.backend.service.dto.DepartmentCreateDto;
-import jakarta.persistence.EntityNotFoundException;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -26,19 +26,23 @@ public class DepartmentServiceImpl implements DepartmentService {
     }
 
     @Override
-    public Department createDepartment(DepartmentCreateDto dto) {
+    public DepartmentDetailRestDto createDepartment(DepartmentCreateDto dto) throws ConflictException{
         if (departmentRepository.existsByName(dto.getName())) {
             throw new ConflictException("Department with name '" + dto.getName() + "' already exists");
         }
 
         ApplicationUser supervisor = applicationUserRepository.findById(dto.getSupervisorEmail())
-            .orElseThrow(() -> new EntityNotFoundException("Supervisor not found"));
+            .orElseThrow(() -> new NotFoundException("Supervisor not found"));
 
         Department department = new Department();
         department.setName(dto.getName());
         department.setSupervisor(supervisor);
 
-        return departmentRepository.save(department);
+        return new DepartmentDetailRestDto(
+            departmentRepository.save(department).getId(),
+            department.getName(),
+            department.getSupervisor().getEmail()
+        );
     }
 
     @Override

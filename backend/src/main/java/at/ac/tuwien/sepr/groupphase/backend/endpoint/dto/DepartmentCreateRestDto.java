@@ -1,5 +1,6 @@
 package at.ac.tuwien.sepr.groupphase.backend.endpoint.dto;
 
+import jakarta.validation.constraints.Size;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotNull;
@@ -9,9 +10,12 @@ import java.util.Objects;
 public class DepartmentCreateRestDto {
 
     @NotBlank(message = "Department name must not be blank")
+    @Size(min = 1, max = 100, message = "Department name must be between 1 and 100 characters long")
     private String name;
 
+    @NotBlank(message = "Supervisor email must not be blank")
     @NotNull(message = "Supervisor email must not be null")
+    @Size(min = 6, max = 100, message = "Supervisor email must be between 6 and 100 characters long")
     @Email
     private String supervisorEmail;
 
