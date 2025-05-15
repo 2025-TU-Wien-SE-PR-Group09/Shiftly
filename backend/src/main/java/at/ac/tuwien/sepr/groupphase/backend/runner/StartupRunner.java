@@ -1,9 +1,15 @@
 package at.ac.tuwien.sepr.groupphase.backend.runner;
 
+import at.ac.tuwien.sepr.groupphase.backend.service.DepartmentService;
+import at.ac.tuwien.sepr.groupphase.backend.service.ShiftPlanningService;
+import at.ac.tuwien.sepr.groupphase.backend.service.dto.DepartmentCreateDto;
 import at.ac.tuwien.sepr.groupphase.backend.service.dto.Role;
 import at.ac.tuwien.sepr.groupphase.backend.service.dto.UserDataDto;
 import at.ac.tuwien.sepr.groupphase.backend.service.dto.UserRoleDto;
 import at.ac.tuwien.sepr.groupphase.backend.service.UserService;
+import at.ac.tuwien.sepr.groupphase.backend.service.dto.shift.ShiftDayDto;
+import at.ac.tuwien.sepr.groupphase.backend.service.dto.shift.ShiftDto;
+import at.ac.tuwien.sepr.groupphase.backend.service.dto.shift.ShiftWeekDto;
 import jakarta.transaction.Transactional;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -12,21 +18,28 @@ import org.springframework.boot.CommandLineRunner;
 import org.springframework.stereotype.Component;
 
 import java.lang.invoke.MethodHandles;
+import java.time.DayOfWeek;
+import java.time.Duration;
+import java.time.LocalTime;
+import java.util.List;
 
 import static at.ac.tuwien.sepr.groupphase.backend.config.Constants.ADMIN_EMAIL;
 
 @Component
 public class StartupRunner implements CommandLineRunner {
     private final UserService userService;
-
+    private final ShiftPlanningService shiftPlanningService;
+    private final DepartmentService departmentService;
 
     private static final Logger LOGGER = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
 
     @Value("${admin.user.password}")
     private String adminUserPassword;
 
-    public StartupRunner(UserService userService) {
+    public StartupRunner(UserService userService, ShiftPlanningService shiftPlanningService, DepartmentService departmentService) {
         this.userService = userService;
+        this.shiftPlanningService = shiftPlanningService;
+        this.departmentService = departmentService;
     }
 
     @Override
@@ -39,5 +52,41 @@ public class StartupRunner implements CommandLineRunner {
         );
 
         this.userService.assignRoleToUser(new UserRoleDto(ADMIN_EMAIL, Role.ADMIN));
+
+        var production = this.departmentService.getDepartmentByName("Produktion");
+
+        if (production.isEmpty()) {
+            LOGGER.info("Department not found, creating department.");
+            this.departmentService.createDepartment(new DepartmentCreateDto("Produktion", ADMIN_EMAIL));
+            createPlan();
+        } else {
+            LOGGER.info("Department found: {}", production.get().name());
+            if (production.get().plans().isEmpty()) {
+                LOGGER.info("Department does not have a plan.");
+                createPlan();
+            } else {
+                LOGGER.info("Department has a plan.");
+            }
+        }
+    }
+
+    private void createPlan() {
+        var monNight = new ShiftDayDto(DayOfWeek.MONDAY, LocalTime.of(18, 0), Duration.ofHours(8));
+        var tuesNight = new ShiftDayDto(DayOfWeek.TUESDAY, LocalTime.of(18, 0), Duration.ofHours(8));
+        var thurNight = new ShiftDayDto(DayOfWeek.THURSDAY, LocalTime.of(18, 0), Duration.ofHours(8));
+        var wedNight = new ShiftDayDto(DayOfWeek.WEDNESDAY, LocalTime.of(18, 0), Duration.ofHours(8));
+        var fridayNight = new ShiftDayDto(DayOfWeek.FRIDAY, LocalTime.of(18, 0), Duration.ofHours(8));
+        var satNight = new ShiftDayDto(DayOfWeek.SATURDAY, LocalTime.of(18, 0), Duration.ofHours(8));
+        var sunNight = new ShiftDayDto(DayOfWeek.SUNDAY, LocalTime.of(18, 0), Duration.ofHours(8));
+
+
+        var monDay = new ShiftDayDto(DayOfWeek.MONDAY, LocalTime.of(8, 0), Duration.ofHours(8));
+
+        var nightShiftWeekOne = new ShiftWeekDto(List.of(monNight, thurNight, fridayNight, sunNight));
+        var nightShiftWeekTwo = new ShiftWeekDto(List.of(monDay, tuesNight, wedNight, satNight));
+
+        var shift = new ShiftDto("Nachtschicht", 4, List.of(nightShiftWeekOne, nightShiftWeekTwo));
+
+        this.shiftPlanningService.createPlan(1L, List.of(shift));
     }
 }

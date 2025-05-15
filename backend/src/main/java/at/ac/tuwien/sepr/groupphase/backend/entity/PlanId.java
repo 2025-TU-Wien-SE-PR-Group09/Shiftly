@@ -1,7 +1,10 @@
 package at.ac.tuwien.sepr.groupphase.backend.entity;
 
 import at.ac.tuwien.sepr.groupphase.backend.entity.converter.MonthConverter;
-import jakarta.persistence.*;
+import jakarta.persistence.Column;
+import jakarta.persistence.Convert;
+import jakarta.persistence.Embeddable;
+
 import java.io.Serializable;
 import java.time.Month;
 import java.util.Objects;
@@ -42,12 +45,13 @@ public class PlanId implements Serializable {
 
     @Override
     public boolean equals(Object o) {
-        if (this == o)
+        if (this == o) {
             return true;
-        if (!(o instanceof PlanId that))
+        }
+        if (!(o instanceof PlanId that)) {
             return false;
-        return month == that.month &&
-                Objects.equals(departmentId, that.departmentId);
+        }
+        return month == that.month && Objects.equals(departmentId, that.departmentId);
     }
 
     @Override

@@ -3,7 +3,15 @@ package at.ac.tuwien.sepr.groupphase.backend.entity;
 import java.util.ArrayList;
 import java.util.List;
 
-import jakarta.persistence.*;
+import jakarta.persistence.Entity;
+import jakarta.persistence.Id;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
+import jakarta.persistence.OneToMany;
+import jakarta.persistence.CascadeType;
+
 
 @Entity
 public class ShiftWeek {
@@ -29,4 +37,11 @@ public class ShiftWeek {
         this.shift = shift;
     }
 
+    public List<ShiftDay> getDays() {
+        return days;
+    }
+
+    public void setDays(List<ShiftDay> shiftdays) {
+        this.days = shiftdays;
+    }
 }

@@ -2,8 +2,11 @@ package at.ac.tuwien.sepr.groupphase.backend.endpoint;
 
 import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.DepartmentCreateRestDto;
 import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.DepartmentDetailRestDto;
+import at.ac.tuwien.sepr.groupphase.backend.exception.NotFoundException;
 import at.ac.tuwien.sepr.groupphase.backend.service.DepartmentService;
+import at.ac.tuwien.sepr.groupphase.backend.service.ShiftPlanningService;
 import at.ac.tuwien.sepr.groupphase.backend.service.dto.DepartmentCreateDto;
+import at.ac.tuwien.sepr.groupphase.backend.service.dto.shift.PlanDto;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -13,6 +16,7 @@ import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -26,9 +30,11 @@ import java.util.List;
 public class DepartmentEndpoint {
 
     private final DepartmentService departmentService;
+    private final ShiftPlanningService shiftPlanningService;
 
-    public DepartmentEndpoint(DepartmentService departmentService) {
+    public DepartmentEndpoint(DepartmentService departmentService, ShiftPlanningService shiftPlanningService) {
         this.departmentService = departmentService;
+        this.shiftPlanningService = shiftPlanningService;
     }
 
     @RolesAllowed({"ADMIN"})
@@ -52,4 +58,19 @@ public class DepartmentEndpoint {
         departmentService.createDepartment(serviceDto);
         return ResponseEntity.status(HttpStatus.CREATED).build();
     }
+
+    @Transactional
+    @RolesAllowed({"ADMIN"})
+    @Operation(summary = "Get shift plan for a department")
+    @ApiResponse(responseCode = "200", description = "Shiftplan for the department")
+    @GetMapping("/{departmentName}/shiftplan")
+    public ResponseEntity<List<PlanDto>> getShiftplan(@PathVariable(name = "departmentName") String departmentName) {
+
+        var department = departmentService.getDepartmentByName(departmentName)
+            .orElseThrow(() -> new NotFoundException("Department not found!"));
+
+        return ResponseEntity.<List<PlanDto>>ok(department.plans());
+    }
+
+
 }

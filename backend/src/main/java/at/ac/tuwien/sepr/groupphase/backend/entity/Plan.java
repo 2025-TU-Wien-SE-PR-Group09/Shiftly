@@ -1,6 +1,12 @@
 package at.ac.tuwien.sepr.groupphase.backend.entity;
 
-import jakarta.persistence.*;
+import jakarta.persistence.Entity;
+import jakarta.persistence.EmbeddedId;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.JoinTable;
+import jakarta.persistence.ManyToMany;
+import jakarta.persistence.ManyToOne;
+import jakarta.persistence.MapsId;
 
 import java.time.Month;
 import java.util.HashSet;
@@ -19,8 +25,8 @@ public class Plan {
 
     @ManyToMany
     @JoinTable(name = "plan_shift", joinColumns = {
-            @JoinColumn(name = "plan_month", referencedColumnName = "plan_month"),
-            @JoinColumn(name = "department_id", referencedColumnName = "department_id")
+        @JoinColumn(name = "plan_month", referencedColumnName = "plan_month"),
+        @JoinColumn(name = "department_id", referencedColumnName = "department_id")
     }, inverseJoinColumns = @JoinColumn(name = "shift_id"))
     private Set<Shift> shifts = new HashSet<>();
 
@@ -65,8 +71,9 @@ public class Plan {
     }
 
     public void setMonth(Month month) {
-        if (this.id == null)
+        if (this.id == null) {
             this.id = new PlanId();
+        }
         this.id.setMonth(month);
     }
 }

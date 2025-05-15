@@ -1,0 +1,7 @@
+package at.ac.tuwien.sepr.groupphase.backend.service.dto.shift;
+
+
+import java.util.List;
+
+public record PlanDto(String department, List<ShiftDto> shifts) {
+}

@@ -9,9 +9,12 @@ import at.ac.tuwien.sepr.groupphase.backend.repository.DepartmentRepository;
 import at.ac.tuwien.sepr.groupphase.backend.repository.UserRepository;
 import at.ac.tuwien.sepr.groupphase.backend.service.DepartmentService;
 import at.ac.tuwien.sepr.groupphase.backend.service.dto.DepartmentCreateDto;
+import at.ac.tuwien.sepr.groupphase.backend.service.dto.DepartmentDto;
+import at.ac.tuwien.sepr.groupphase.backend.service.mapper.ShiftPlanningMapper;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Optional;
 
 @Service
 public class DepartmentServiceImpl implements DepartmentService {
@@ -55,5 +58,15 @@ public class DepartmentServiceImpl implements DepartmentService {
                 dept.getSupervisor().getEmail()
             ))
             .toList();
+    }
+
+    @Override
+    public Optional<DepartmentDto> getDepartmentByName(String departmentName) {
+        return departmentRepository.findByName(departmentName)
+            .map(dept -> new DepartmentDto(
+                dept.getId(),
+                dept.getName(),
+                dept.getPlans().stream().map(ShiftPlanningMapper::fromEntity).toList()
+            ));
     }
 }

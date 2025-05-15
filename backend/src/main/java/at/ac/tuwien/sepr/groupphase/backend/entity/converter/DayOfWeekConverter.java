@@ -2,6 +2,7 @@ package at.ac.tuwien.sepr.groupphase.backend.entity.converter;
 
 import jakarta.persistence.AttributeConverter;
 import jakarta.persistence.Converter;
+
 import java.time.DayOfWeek;
 
 @Converter(autoApply = true)
