@@ -41,7 +41,6 @@ export class SignUpComponent implements OnInit {
     return this.form.controls;
   }
 
-  //todo is this needed??
   togglePasswordTextType() {
     this.passwordTextType = !this.passwordTextType;
   }

@@ -51,10 +51,10 @@ public class RegisterRestDto {
 
     @Override
     public String toString() {
-        return "RegisterDto{" +
-            "email='" + email + '\'' +
-            ", password='" + password + '\'' +
-            '}';
+        return "RegisterDto{"
+            + "email='" + email + '\''
+            + ", password='" + password + '\''
+            + '}';
     }
 
     public static UserDataDto from(RegisterRestDto registerRestDto) {
