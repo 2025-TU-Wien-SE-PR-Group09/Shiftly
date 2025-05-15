@@ -7,7 +7,9 @@ Content-Type: application/json
     "password": "password"
 }
 
-> {% client.global.set("auth_token", response.body.jwt); %}
+> {%
+    client.global.set("auth_token", response.body.jwt);
+%}
 
 ### Test admin endpoint
 GET http://localhost:8080/api/v1/admin

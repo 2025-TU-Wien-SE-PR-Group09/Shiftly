@@ -1,6 +1,7 @@
 package at.ac.tuwien.sepr.groupphase.backend.service.impl;
 
 import at.ac.tuwien.sepr.groupphase.backend.service.dto.UserDataDto;
+import at.ac.tuwien.sepr.groupphase.backend.service.dto.UserProfileDto;
 import at.ac.tuwien.sepr.groupphase.backend.service.dto.UserRoleDto;
 import at.ac.tuwien.sepr.groupphase.backend.entity.ApplicationRole;
 import at.ac.tuwien.sepr.groupphase.backend.entity.ApplicationUser;
@@ -11,12 +12,16 @@ import at.ac.tuwien.sepr.groupphase.backend.service.UserService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import at.ac.tuwien.sepr.groupphase.backend.service.dto.ChangePasswordDto;
 
 import java.lang.invoke.MethodHandles;
 import java.util.Optional;
 import java.util.Set;
+
+import static at.ac.tuwien.sepr.groupphase.backend.config.Constants.ADMIN_EMAIL;
 
 @Service
 public class UserServiceImpl implements UserService {
@@ -98,4 +103,59 @@ public class UserServiceImpl implements UserService {
         roleRepository.save(applicationRole);
         userRepository.save(user);
     }
+
+    @Override
+    public void changePasswordOfCurrentUser(ChangePasswordDto dto) {
+        LOGGER.trace("changePasswordOfCurrentUser({})", dto);
+
+        String currentEmail = org.springframework.security.core.context.SecurityContextHolder
+            .getContext()
+            .getAuthentication()
+            .getName();
+
+        Optional<ApplicationUser> applicationUserOpt = userRepository.findByEmail(currentEmail);
+        if (applicationUserOpt.isEmpty()) {
+            throw new NotFoundException("User with email " + currentEmail + " not found.");
+        }
+
+        ApplicationUser user = applicationUserOpt.get();
+
+        if (ADMIN_EMAIL.equalsIgnoreCase(user.getEmail())) {
+            throw new org.springframework.security.access.AccessDeniedException("Admin password cannot be changed.");
+        }
+
+        user.setPasswordHash(passwordEncoder.encode(dto.getNewPassword()));
+        userRepository.save(user);
+
+    }
+
+
+    @Override
+    public UserProfileDto getCurrentUserProfile() {
+        LOGGER.trace("getCurrentUserProfile()");
+
+        String currentEmail = SecurityContextHolder.getContext().getAuthentication().getName();
+
+        Optional<ApplicationUser> applicationUserOpt = userRepository.findByEmailWithRoles(currentEmail);
+        if (applicationUserOpt.isEmpty()) {
+            throw new NotFoundException("User with email " + currentEmail + " not found.");
+        }
+
+        ApplicationUser user = applicationUserOpt.get();
+
+        String role = user.getRoles().stream()
+            .findFirst()
+            .map(ApplicationRole::getName)
+            .orElse("UNKNOWN");
+
+        // Name is derived from email prefix, department is left empty for now
+        return new UserProfileDto(
+            currentEmail.split("@")[0],
+            user.getEmail(),
+            role,
+            ""   // user.getDepartment() != null ? user.getDepartment() : ""
+        );
+    }
+
+
 }

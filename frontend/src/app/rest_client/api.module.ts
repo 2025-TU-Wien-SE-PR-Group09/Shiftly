@@ -7,8 +7,8 @@ import { AdminEndpointService } from './api/adminEndpoint.service';
 import { CustomHealthEndpointService } from './api/customHealthEndpoint.service';
 import { DepartmentService } from './api/department.service';
 import { LoginEndpointService } from './api/loginEndpoint.service';
-import { MessageEndpointService } from './api/messageEndpoint.service';
 import { RegistrationEndpointService } from './api/registrationEndpoint.service';
+import { UserEndpointService } from './api/userEndpoint.service';
 
 @NgModule({
   imports:      [],
@@ -19,8 +19,8 @@ import { RegistrationEndpointService } from './api/registrationEndpoint.service'
     CustomHealthEndpointService,
     DepartmentService,
     LoginEndpointService,
-    MessageEndpointService,
-    RegistrationEndpointService ]
+    RegistrationEndpointService,
+    UserEndpointService ]
 })
 export class ApiModule {
     public static forRoot(configurationFactory: () => Configuration): ModuleWithProviders<ApiModule> {

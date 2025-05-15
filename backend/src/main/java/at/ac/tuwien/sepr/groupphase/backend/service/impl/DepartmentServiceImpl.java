@@ -25,6 +25,7 @@ public class DepartmentServiceImpl implements DepartmentService {
         this.applicationUserRepository = applicationUserRepository;
     }
 
+    //Todo return service dto not rest
     @Override
     public DepartmentDetailRestDto createDepartment(DepartmentCreateDto dto) throws ConflictException {
         if (departmentRepository.existsByName(dto.getName())) {

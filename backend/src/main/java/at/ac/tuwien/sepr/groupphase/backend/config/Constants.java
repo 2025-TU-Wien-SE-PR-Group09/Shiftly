@@ -10,4 +10,6 @@ public class Constants {
         .mapToObj(i -> String.valueOf("ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789".charAt(i)))
         .collect(Collectors.joining());
 
+    public static final String ADMIN_EMAIL = "admin@shyft.local";
+
 }

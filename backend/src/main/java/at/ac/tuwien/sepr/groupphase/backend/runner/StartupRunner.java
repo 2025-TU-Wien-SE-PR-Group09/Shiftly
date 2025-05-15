@@ -13,10 +13,12 @@ import org.springframework.stereotype.Component;
 
 import java.lang.invoke.MethodHandles;
 
+import static at.ac.tuwien.sepr.groupphase.backend.config.Constants.ADMIN_EMAIL;
+
 @Component
 public class StartupRunner implements CommandLineRunner {
     private final UserService userService;
-    private final String adminUsername = "admin@shyft.local";
+
 
     private static final Logger LOGGER = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
 
@@ -33,9 +35,9 @@ public class StartupRunner implements CommandLineRunner {
         LOGGER.trace("run({})", String.join(", ", args));
 
         this.userService.createOrChangePassword(
-            new UserDataDto(adminUsername, adminUserPassword)
+            new UserDataDto(ADMIN_EMAIL, adminUserPassword)
         );
 
-        this.userService.assignRoleToUser(new UserRoleDto(adminUsername, Role.ADMIN));
+        this.userService.assignRoleToUser(new UserRoleDto(ADMIN_EMAIL, Role.ADMIN));
     }
 }
