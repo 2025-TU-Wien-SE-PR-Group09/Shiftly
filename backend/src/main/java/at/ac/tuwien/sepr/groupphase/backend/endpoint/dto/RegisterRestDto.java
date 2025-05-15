@@ -39,9 +39,10 @@ public class RegisterRestDto {
     public RegisterRestDto() {
     }
 
-    public RegisterRestDto(String email, String password) {
+    public RegisterRestDto(String email, String password, String code) {
         this.email = email;
         this.password = password;
+        this.code = code;
     }
 
     @Override
