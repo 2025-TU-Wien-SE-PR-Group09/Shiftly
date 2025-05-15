@@ -18,7 +18,7 @@ public class DepartmentDetailRestDto {
     @NotBlank(message = "Supervisor email must not be blank")
     @NotNull(message = "Supervisor email must not be null")
     @Size(min = 6, max = 100, message = "Supervisor email must be between 6 and 100 characters long")
-    @Email
+    @Email(message = "Supervisor email must be a valid email address")
     private String supervisorEmail;
 
     public DepartmentDetailRestDto() {
