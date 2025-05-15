@@ -19,11 +19,7 @@ import jakarta.validation.constraints.Pattern;
  */
 public class ChangePasswordDto {
 
-    /**
-     * The current password of the user, used to verify identity.
-     */
-    @NotBlank(message = "Old password must not be blank")
-    private String oldPassword;
+
 
     /**
      * The new password to be set. Must be at least 8 characters long.
@@ -35,13 +31,7 @@ public class ChangePasswordDto {
     )
     private String newPassword;
 
-    public String getOldPassword() {
-        return oldPassword;
-    }
 
-    public void setOldPassword(String oldPassword) {
-        this.oldPassword = oldPassword;
-    }
 
     public String getNewPassword() {
         return newPassword;
@@ -54,7 +44,6 @@ public class ChangePasswordDto {
 
     public static ChangePasswordDto from(ChangePasswordRestDto restDto) {
         ChangePasswordDto dto = new ChangePasswordDto();
-        dto.setOldPassword(restDto.getOldPassword());
         dto.setNewPassword(restDto.getNewPassword());
         return dto;
     }

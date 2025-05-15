@@ -9,20 +9,11 @@ import jakarta.validation.constraints.Size;
  */
 public class ChangePasswordRestDto {
 
-    @NotBlank(message = "Old password must not be blank")
-    private String oldPassword;
 
     @NotBlank(message = "New password must not be blank")
     @Size(min = 8, message = "New password must be at least 8 characters long")
     private String newPassword;
 
-    public String getOldPassword() {
-        return oldPassword;
-    }
-
-    public void setOldPassword(String oldPassword) {
-        this.oldPassword = oldPassword;
-    }
 
     public String getNewPassword() {
         return newPassword;
