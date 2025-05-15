@@ -12,7 +12,7 @@
 
 export interface UserProfileRestDto { 
     name?: any;
-    email?: any;
+    email: any;
     role?: any;
     department?: any;
 }
