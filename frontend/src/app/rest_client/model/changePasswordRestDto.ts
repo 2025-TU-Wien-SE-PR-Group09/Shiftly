@@ -11,6 +11,5 @@
  */
 
 export interface ChangePasswordRestDto { 
-    oldPassword?: any;
     newPassword?: any;
 }
