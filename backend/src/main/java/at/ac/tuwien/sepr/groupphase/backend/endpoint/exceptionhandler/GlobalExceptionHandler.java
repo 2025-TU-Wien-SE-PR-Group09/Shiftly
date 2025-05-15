@@ -13,6 +13,7 @@ import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.context.request.WebRequest;
 import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler;
+import org.springframework.security.access.AccessDeniedException;
 
 import java.lang.invoke.MethodHandles;
 import java.util.LinkedHashMap;
@@ -51,8 +52,8 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
      */
     @Override
     protected ResponseEntity<Object> handleMethodArgumentNotValid(MethodArgumentNotValidException ex,
-        HttpHeaders headers,
-        HttpStatusCode status, WebRequest request) {
+                                                                  HttpHeaders headers,
+                                                                  HttpStatusCode status, WebRequest request) {
         Map<String, Object> body = new LinkedHashMap<>();
         //Get all errors
         List<String> errors = ex.getBindingResult()
@@ -64,5 +65,35 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
 
         return new ResponseEntity<>(body.toString(), headers, status);
 
+    }
+
+    /**
+     * Handles access denial scenarios, such as forbidden actions for specific users (e.g., admin password change).
+     * Returns HTTP 403 with a descriptive message.
+     *
+     * @param ex      the thrown AccessDeniedException
+     * @param request the web request
+     * @return a {@link ResponseEntity} with 403 status and custom message
+     */
+    @ExceptionHandler(value = {AccessDeniedException.class})
+    protected ResponseEntity<Object> handleAccessDenied(RuntimeException ex, WebRequest request) {
+        LOGGER.warn("Access denied: {}", ex.getMessage());
+        Map<String, String> body = Map.of("message", ex.getMessage());
+        return handleExceptionInternal(ex, body, new HttpHeaders(), HttpStatus.FORBIDDEN, request);
+    }
+
+    /**
+     * Handles illegal arguments in service or controller layers (e.g., invalid request states).
+     * Returns HTTP 400 BAD REQUEST with the cause message.
+     *
+     * @param ex      the thrown IllegalArgumentException
+     * @param request the web request
+     * @return a {@link ResponseEntity} with 400 status and explanation message
+     */
+    @ExceptionHandler(value = {IllegalArgumentException.class})
+    protected ResponseEntity<Object> handleIllegalArgument(RuntimeException ex, WebRequest request) {
+        LOGGER.warn("Illegal argument: {}", ex.getMessage());
+        Map<String, String> body = Map.of("message", ex.getMessage());
+        return handleExceptionInternal(ex, body, new HttpHeaders(), HttpStatus.BAD_REQUEST, request);
     }
 }
