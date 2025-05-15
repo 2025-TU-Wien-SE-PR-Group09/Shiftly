@@ -57,7 +57,7 @@ export class SignUpComponent implements OnInit {
     this._registrationEndpoint.registerUser({email, password, code: authCode}).subscribe({
       next: (resp) => {
         this._toastr.success('Registration successful');
-        this._router.navigateByUrl('/login').then();
+        this._router.navigateByUrl('/auth/sign-in').then();
       },
       error: (error) => {
         this._toastr.error('Registration failed');

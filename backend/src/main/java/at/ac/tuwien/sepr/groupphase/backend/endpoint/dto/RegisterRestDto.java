@@ -3,13 +3,21 @@ package at.ac.tuwien.sepr.groupphase.backend.endpoint.dto;
 import at.ac.tuwien.sepr.groupphase.backend.service.dto.UserDataDto;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Pattern;
+import jakarta.validation.constraints.Size;
 
 public class RegisterRestDto {
     @NotNull(message = "Email must not be null")
+    @Size(max = 50, min = 1, message = "Email must be between 1 and 50 characters long")
     @Email
     private String email;
 
+    @Size(max = 50, min = 8, message = "Password must be between 8 and 50 characters long")
     @NotNull(message = "Password must not be null")
+    @Pattern(
+        regexp = "^(?=.[a-z])(?=.[A-Z])(?=.*\\d).{8,}$",
+        message = "New password must be at least 8 characters long and include uppercase, lowercase and a digit"
+    )
     private String password;
 
     @NotNull(message = "Code must not be null")

@@ -10,6 +10,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.server.ResponseStatusException;
 import static at.ac.tuwien.sepr.groupphase.backend.config.Constants.AUTH_CODE;
@@ -26,12 +27,13 @@ public class RegistrationEndpoint {
     @PermitAll
     @PostMapping
     @Transactional
+    @ResponseStatus(HttpStatus.CREATED)
     public MessageResponseDto registerUser(@RequestBody RegisterRestDto registerRestDto) {
         if (!registerRestDto.getCode().equals(AUTH_CODE)) {
             throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Ungültiger oder fehlender Token");
         }
         UserDataDto userDataDto = RegisterRestDto.from(registerRestDto);
-        userService.createOrChangePassword(userDataDto);
+        userService.createUser(userDataDto);
         return new MessageResponseDto("User registered successfully");
     }
 }
