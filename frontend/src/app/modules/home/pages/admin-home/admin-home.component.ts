@@ -20,8 +20,7 @@ export class AdminHomeComponent implements OnInit{
   ngOnInit(): void {
     this._adminService.authCode().subscribe({
       next: (data) => {
-        console.log("Code: " + data);
-        this.code = data;
+        this.code = data.code;
       },
       error: (err) => {
         console.error('Full error:', err); // Log the full error

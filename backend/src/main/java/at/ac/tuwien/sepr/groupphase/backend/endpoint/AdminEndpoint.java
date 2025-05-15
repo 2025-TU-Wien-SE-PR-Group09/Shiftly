@@ -1,5 +1,6 @@
 package at.ac.tuwien.sepr.groupphase.backend.endpoint;
 
+import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.AdminAuthCodeRestDto;
 import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.LoginResponseRestDto;
 import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.UserDataRestDto;
 import at.ac.tuwien.sepr.groupphase.backend.service.dto.UserDataDto;
@@ -8,6 +9,7 @@ import jakarta.annotation.security.RolesAllowed;
 import jakarta.transaction.Transactional;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -27,7 +29,7 @@ public class AdminEndpoint {
     @GetMapping(value = "/authCode")
     @RolesAllowed({"ADMIN"})
     @ResponseStatus(HttpStatus.OK)
-    public String authCode() {
-        return AUTH_CODE;
+    public AdminAuthCodeRestDto authCode() { // todo use a dto instead
+        return new AdminAuthCodeRestDto(AUTH_CODE);
     }
 }

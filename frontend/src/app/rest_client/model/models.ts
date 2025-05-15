@@ -1,3 +1,4 @@
+export * from './adminAuthCodeRestDto';
 export * from './changePasswordRestDto';
 export * from './departmentCreateRestDto';
 export * from './departmentDetailRestDto';
