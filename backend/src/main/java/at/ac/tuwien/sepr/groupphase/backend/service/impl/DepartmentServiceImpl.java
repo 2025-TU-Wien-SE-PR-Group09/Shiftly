@@ -26,7 +26,7 @@ public class DepartmentServiceImpl implements DepartmentService {
     }
 
     @Override
-    public DepartmentDetailRestDto createDepartment(DepartmentCreateDto dto) throws ConflictException{
+    public DepartmentDetailRestDto createDepartment(DepartmentCreateDto dto) throws ConflictException {
         if (departmentRepository.existsByName(dto.getName())) {
             throw new ConflictException("Department with name '" + dto.getName() + "' already exists");
         }
