@@ -13,5 +13,5 @@
 export interface DepartmentDetailRestDto { 
     id?: any;
     name?: any;
-    supervisorEmail?: any;
+    supervisorEmail: any;
 }
