@@ -1,6 +1,7 @@
 package at.ac.tuwien.sepr.groupphase.backend.endpoint.dto;
 
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Pattern;
 import jakarta.validation.constraints.Size;
 
 /**
@@ -10,8 +11,15 @@ import jakarta.validation.constraints.Size;
 public class ChangePasswordRestDto {
 
 
+
+    /**
+     * The new password to be set. Must be at least 8 characters long.
+     */
     @NotBlank(message = "New password must not be blank")
-    @Size(min = 8, message = "New password must be at least 8 characters long")
+    @Pattern(
+        regexp = "^(?=.*[a-z])(?=.*[A-Z])(?=.*\\d).{8,}$",
+        message = "New password must be at least 8 characters long and include uppercase, lowercase and a digit"
+    )
     private String newPassword;
 
 

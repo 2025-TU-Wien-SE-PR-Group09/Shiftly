@@ -21,6 +21,8 @@ import java.lang.invoke.MethodHandles;
 import java.util.Optional;
 import java.util.Set;
 
+import static at.ac.tuwien.sepr.groupphase.backend.config.Constants.ADMIN_EMAIL;
+
 @Service
 public class UserServiceImpl implements UserService {
 
@@ -118,14 +120,9 @@ public class UserServiceImpl implements UserService {
 
         ApplicationUser user = applicationUserOpt.get();
 
-        if ("admin@shyft.local".equalsIgnoreCase(user.getEmail())) {
+        if (ADMIN_EMAIL.equalsIgnoreCase(user.getEmail())) {
             throw new org.springframework.security.access.AccessDeniedException("Admin password cannot be changed.");
         }
-
-
-        /*if (passwordEncoder.matches(dto.getNewPassword(), user.getPasswordHash())) {
-            throw new IllegalArgumentException("New password must be different from the current password.");
-        }*/
 
         user.setPasswordHash(passwordEncoder.encode(dto.getNewPassword()));
         userRepository.save(user);

@@ -8,6 +8,7 @@ import at.ac.tuwien.sepr.groupphase.backend.service.dto.UserProfileDto;
 import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -41,6 +42,7 @@ public class UserEndpoint {
      */
     @PreAuthorize("isAuthenticated()")
     @PutMapping("/me/password")
+    @Transactional
     public ResponseEntity<Void> changePassword(@RequestBody @Valid ChangePasswordRestDto restDto) {
         ChangePasswordDto dto = ChangePasswordDto.from(restDto);
         userService.changePasswordOfCurrentUser(dto);
