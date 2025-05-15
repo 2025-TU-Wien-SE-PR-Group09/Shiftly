@@ -2,6 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
 import { ButtonComponent } from '../../../../shared/components/button/button.component';
 import { AuthService } from '../../../../core/services/auth.service';
+import { UserEndpointService, UserProfileRestDto } from '../../../../rest_client';
 
 @Component({
   selector: 'app-your-profile',
@@ -10,22 +11,26 @@ import { AuthService } from '../../../../core/services/auth.service';
   styleUrl: './your-profile.component.css',
 })
 export class YourProfileComponent implements OnInit {
-  userData = {
+  userData: Partial<UserProfileRestDto> = {
     name: '',
-    role: '',
-    department: '',
     email: '',
+    role: '',
+    department: ''
   };
 
   constructor(private router: Router,
-              private authService: AuthService) {}
+              private userEndpoint: UserEndpointService) {}
 
 
   ngOnInit(): void {
-    const roles = this.authService.getUserRoles();
-    this.userData.email = this.authService.getUserEmail();
-    this.userData.role = roles.length > 0 ? roles[0] : 'Unknown';
-    this.userData.name = this.userData.email.split('@')[0];
+    this.userEndpoint.getCurrentUserProfile().subscribe({
+      next: (data) => {
+        this.userData = data;
+      },
+      error: (err) => {
+        console.error('Failed to load user profile', err);
+      },
+    });
   }
 
   changePassword(): void {
