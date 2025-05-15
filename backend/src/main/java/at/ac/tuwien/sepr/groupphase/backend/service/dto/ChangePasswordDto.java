@@ -5,7 +5,6 @@ import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Pattern;
 
 
-
 /**
  * Data Transfer Object for requesting a password change.
  *
@@ -20,7 +19,6 @@ import jakarta.validation.constraints.Pattern;
 public class ChangePasswordDto {
 
 
-
     /**
      * The new password to be set. Must be at least 8 characters long.
      */
@@ -30,7 +28,6 @@ public class ChangePasswordDto {
         message = "New password must be at least 8 characters long and include uppercase, lowercase and a digit"
     )
     private String newPassword;
-
 
 
     public String getNewPassword() {

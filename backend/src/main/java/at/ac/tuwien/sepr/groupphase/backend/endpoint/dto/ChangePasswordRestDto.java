@@ -11,7 +11,6 @@ import jakarta.validation.constraints.Size;
 public class ChangePasswordRestDto {
 
 
-
     /**
      * The new password to be set. Must be at least 8 characters long.
      */

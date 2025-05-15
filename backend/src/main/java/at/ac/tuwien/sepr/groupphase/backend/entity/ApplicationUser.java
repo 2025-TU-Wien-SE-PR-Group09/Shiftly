@@ -29,7 +29,7 @@ public class ApplicationUser {
         joinColumns = @JoinColumn(name = "user_email"),
         inverseJoinColumns = @JoinColumn(name = "role_role")
     )
-    private Set<ApplicationRole> roles = new HashSet<>();
+    private final Set<ApplicationRole> roles = new HashSet<>();
 
     public ApplicationUser() {
     }

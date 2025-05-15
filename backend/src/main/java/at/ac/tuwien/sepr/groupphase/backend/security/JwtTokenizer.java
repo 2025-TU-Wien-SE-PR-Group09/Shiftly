@@ -3,7 +3,9 @@ package at.ac.tuwien.sepr.groupphase.backend.security;
 import at.ac.tuwien.sepr.groupphase.backend.config.properties.SecurityProperties;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.security.Keys;
+
 import javax.crypto.SecretKey;
+
 import org.springframework.stereotype.Component;
 
 import java.util.Date;
