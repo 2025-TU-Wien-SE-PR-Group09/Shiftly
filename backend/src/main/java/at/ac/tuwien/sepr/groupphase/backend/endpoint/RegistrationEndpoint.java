@@ -1,14 +1,20 @@
 package at.ac.tuwien.sepr.groupphase.backend.endpoint;
 
-import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.UserDataRestDto;
+import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.MessageResponseDto;
+import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.RegisterRestDto;
 import at.ac.tuwien.sepr.groupphase.backend.service.UserService;
 import at.ac.tuwien.sepr.groupphase.backend.service.dto.UserDataDto;
+import jakarta.annotation.security.PermitAll;
 import jakarta.transaction.Transactional;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
+import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+
+import static at.ac.tuwien.sepr.groupphase.backend.config.Constants.AUTH_CODE;
 
 @RestController
 @RequestMapping(value = "/api/v1/registration")
@@ -17,12 +23,16 @@ public class RegistrationEndpoint {
     public RegistrationEndpoint(UserService userService) { this.userService = userService; }
 
     //todo review
-    @PostMapping(produces = MediaType.APPLICATION_JSON_VALUE, consumes = MediaType.APPLICATION_JSON_VALUE)
+    @PermitAll
+    @PostMapping
     @Transactional
-    public UserDataRestDto registerUser(@RequestBody UserDataRestDto userDataRestDto) {
-        UserDataDto userDataDto = UserDataDto.from(userDataRestDto);
+    public MessageResponseDto registerUser(@RequestBody RegisterRestDto registerRestDto) {
+        if (!registerRestDto.getCode().equals(AUTH_CODE)) {
+            throw new IllegalArgumentException("Invalid auth code");
+        }
+        UserDataDto userDataDto = RegisterRestDto.from(registerRestDto);
         userService.createOrChangePassword(userDataDto);
-        return userDataRestDto;
+        return new MessageResponseDto("User registered successfully");
     }
 }
 

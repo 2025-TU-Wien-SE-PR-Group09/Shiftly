@@ -17,6 +17,8 @@ import { CustomHttpUrlEncodingCodec }                        from '../encoder';
 
 import { Observable }                                        from 'rxjs';
 
+import { MessageResponseDto } from '../model/messageResponseDto';
+import { RegisterRestDto } from '../model/registerRestDto';
 
 import { BASE_PATH, COLLECTION_FORMATS }                     from '../variables';
 import { Configuration }                                     from '../configuration';
@@ -25,7 +27,7 @@ import { Configuration }                                     from '../configurat
 @Injectable({
   providedIn: 'root'
 })
-export class AdminEndpointService {
+export class RegistrationEndpointService {
 
     protected basePath = 'http://localhost:8080';
     public defaultHeaders = new HttpHeaders();
@@ -59,19 +61,24 @@ export class AdminEndpointService {
     /**
      * 
      * 
+     * @param body 
      * @param observe set whether or not to return the data Observable as the body, response or events. defaults to returning the body.
      * @param reportProgress flag to report request and response progress.
      */
-    public authCode(observe?: 'body', reportProgress?: boolean): Observable<any>;
-    public authCode(observe?: 'response', reportProgress?: boolean): Observable<HttpResponse<any>>;
-    public authCode(observe?: 'events', reportProgress?: boolean): Observable<HttpEvent<any>>;
-    public authCode(observe: any = 'body', reportProgress: boolean = false ): Observable<any> {
+    public registerUser(body: RegisterRestDto, observe?: 'body', reportProgress?: boolean): Observable<MessageResponseDto>;
+    public registerUser(body: RegisterRestDto, observe?: 'response', reportProgress?: boolean): Observable<HttpResponse<MessageResponseDto>>;
+    public registerUser(body: RegisterRestDto, observe?: 'events', reportProgress?: boolean): Observable<HttpEvent<MessageResponseDto>>;
+    public registerUser(body: RegisterRestDto, observe: any = 'body', reportProgress: boolean = false ): Observable<any> {
+
+        if (body === null || body === undefined) {
+            throw new Error('Required parameter body was null or undefined when calling registerUser.');
+        }
 
         let headers = this.defaultHeaders;
 
         // to determine the Accept header
         let httpHeaderAccepts: string[] = [
-            '*/*'
+            'application/json'
         ];
         const httpHeaderAcceptSelected: string | undefined = this.configuration.selectHeaderAccept(httpHeaderAccepts);
         if (httpHeaderAcceptSelected != undefined) {
@@ -80,10 +87,16 @@ export class AdminEndpointService {
 
         // to determine the Content-Type header
         const consumes: string[] = [
+            'application/json'
         ];
+        const httpContentTypeSelected: string | undefined = this.configuration.selectHeaderContentType(consumes);
+        if (httpContentTypeSelected != undefined) {
+            headers = headers.set('Content-Type', httpContentTypeSelected);
+        }
 
-        return this.httpClient.request<any>('get',`${this.basePath}/api/v1/admin/authCode`,
+        return this.httpClient.request<MessageResponseDto>('post',`${this.basePath}/api/v1/registration`,
             {
+                body: body,
                 withCredentials: this.configuration.withCredentials,
                 headers: headers,
                 observe: observe,

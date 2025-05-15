@@ -1,0 +1,66 @@
+package at.ac.tuwien.sepr.groupphase.backend.endpoint.dto;
+
+import at.ac.tuwien.sepr.groupphase.backend.service.dto.UserDataDto;
+import jakarta.validation.constraints.Email;
+import jakarta.validation.constraints.NotNull;
+
+public class RegisterRestDto {
+    @NotNull(message = "Email must not be null")
+    @Email
+    private String email;
+
+    @NotNull(message = "Password must not be null")
+    private String password;
+
+    @NotNull(message = "Code must not be null")
+    private String code;
+
+
+    public String getEmail() {
+        return email;
+    }
+
+    public void setEmail(String email) {
+        this.email = email;
+    }
+
+    public String getPassword() {
+        return password;
+    }
+
+    public void setPassword(String password) {
+        this.password = password;
+    }
+
+    public String getCode() {
+        return code;
+    }
+
+    public RegisterRestDto() {
+    }
+
+    public RegisterRestDto(String email, String password) {
+        this.email = email;
+        this.password = password;
+    }
+
+    @Override
+    public int hashCode() {
+        return email.hashCode() + password.hashCode();
+    }
+
+    @Override
+    public String toString() {
+        return "RegisterDto{" +
+            "email='" + email + '\'' +
+            ", password='" + password + '\'' +
+            '}';
+    }
+
+    public static UserDataDto from(RegisterRestDto registerRestDto) {
+        return new UserDataDto(
+            registerRestDto.getEmail(),
+            registerRestDto.getPassword()
+        );
+    }
+}

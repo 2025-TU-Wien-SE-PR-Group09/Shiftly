@@ -3,5 +3,7 @@ export * from './departmentDetailRestDto';
 export * from './detailedMessageDto';
 export * from './loginResponseRestDto';
 export * from './messageInquiryDto';
+export * from './messageResponseDto';
+export * from './registerRestDto';
 export * from './simpleMessageDto';
 export * from './userDataRestDto';

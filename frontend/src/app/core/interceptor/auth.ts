@@ -7,6 +7,7 @@ import { environment } from '../../../environments/environment';
 @Injectable()
 export class AuthInterceptor implements HttpInterceptor {
   private authUri = environment.apiBaseUrl + '/authentication';
+  private registerUri = environment.apiBaseUrl + '/registration';
 
 
   constructor(private authService: AuthService) {
@@ -14,7 +15,7 @@ export class AuthInterceptor implements HttpInterceptor {
 
   intercept(req: HttpRequest<any>, next: HttpHandler): Observable<HttpEvent<any>> {
     // Do not intercept authentication requests
-    if (req.url === this.authUri) {
+    if (req.url === this.authUri || req.url === this.registerUri || !this.authService.getToken()) {
       return next.handle(req);
     }
 
