@@ -58,6 +58,20 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
+    public void createUser(UserDataDto userData) {
+        LOGGER.trace("createUser({})", userData);
+        Optional<ApplicationUser> applicationUserOpt = userRepository.findByEmail(userData.getEmail());
+        if (applicationUserOpt.isPresent()) {
+            throw new IllegalArgumentException("User with this email already exists!");
+        } else {
+            ApplicationUser applicationUser = new ApplicationUser();
+            applicationUser.setEmail(userData.getEmail());
+            applicationUser.setPasswordHash(passwordEncoder.encode(userData.getPassword()));
+            userRepository.save(applicationUser);
+        }
+    }
+
+    @Override
     public void assignRoleToUser(UserRoleDto userRole) throws NotFoundException {
         LOGGER.trace("assignRoleToUser({})", userRole);
 

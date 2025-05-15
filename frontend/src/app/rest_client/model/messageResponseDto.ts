@@ -10,8 +10,6 @@
  * Do not edit the class manually.
  */
 
-export interface DepartmentDetailRestDto { 
-    id?: any;
-    name?: any;
-    supervisorEmail: any;
+export interface MessageResponseDto { 
+    message?: any;
 }

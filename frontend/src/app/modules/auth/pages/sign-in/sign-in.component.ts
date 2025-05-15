@@ -62,7 +62,10 @@ export class SignInComponent implements OnInit {
           this._router.navigateByUrl('/home/employee').then();
         } else if (roles.includes("SUPERVISOR")) {
           this._router.navigateByUrl('/home/supervisor').then();
+        } else {
+          this._router.navigateByUrl('/home/employee').then();
         }
+        //todo remove this ^^^^^^
       },
       error: (error) => {
         this._toastr.error('Login Failed');

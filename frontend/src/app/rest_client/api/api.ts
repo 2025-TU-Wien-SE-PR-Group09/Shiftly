@@ -8,4 +8,6 @@ export * from './loginEndpoint.service';
 import { LoginEndpointService } from './loginEndpoint.service';
 export * from './messageEndpoint.service';
 import { MessageEndpointService } from './messageEndpoint.service';
-export const APIS = [AdminEndpointService, CustomHealthEndpointService, DepartmentService, LoginEndpointService, MessageEndpointService];
+export * from './registrationEndpoint.service';
+import { RegistrationEndpointService } from './registrationEndpoint.service';
+export const APIS = [AdminEndpointService, CustomHealthEndpointService, DepartmentService, LoginEndpointService, MessageEndpointService, RegistrationEndpointService];

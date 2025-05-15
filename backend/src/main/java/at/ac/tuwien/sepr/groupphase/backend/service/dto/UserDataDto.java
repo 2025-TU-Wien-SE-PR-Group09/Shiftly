@@ -4,14 +4,18 @@ import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.LoginResponseRestDto;
 import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.UserDataRestDto;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Size;
+
 import java.util.Objects;
 
 public class UserDataDto {
 
     @NotNull(message = "Email must not be null")
+    @Size(max = 50, min = 1, message = "Email must be between 1 and 50 characters long")
     @Email(message = "Email must be a valid email address")
     private String email;
 
+    @Size(max = 50, min = 8, message = "Password must be between 8 and 50 characters long")
     @NotNull(message = "Password must not be null")
     private String password;
 

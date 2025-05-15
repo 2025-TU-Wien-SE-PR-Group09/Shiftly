@@ -1,23 +1,28 @@
 package at.ac.tuwien.sepr.groupphase.backend.endpoint.dto;
 
-import at.ac.tuwien.sepr.groupphase.backend.service.dto.LoginResponseDto;
 import at.ac.tuwien.sepr.groupphase.backend.service.dto.UserDataDto;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Pattern;
 import jakarta.validation.constraints.Size;
 
-import java.util.Objects;
-
-public class UserDataRestDto {
-
+public class RegisterRestDto {
     @NotNull(message = "Email must not be null")
     @Size(max = 50, min = 1, message = "Email must be between 1 and 50 characters long")
-    @Email(message = "Email must be a valid email address")
+    @Email
     private String email;
 
     @Size(max = 50, min = 8, message = "Password must be between 8 and 50 characters long")
     @NotNull(message = "Password must not be null")
+    @Pattern(
+        regexp = "^(?=.[a-z])(?=.[A-Z])(?=.*\\d).{8,}$",
+        message = "New password must be at least 8 characters long and include uppercase, lowercase and a digit"
+    )
     private String password;
+
+    @NotNull(message = "Code must not be null")
+    private String code;
+
 
     public String getEmail() {
         return email;
@@ -35,36 +40,36 @@ public class UserDataRestDto {
         this.password = password;
     }
 
-    public UserDataRestDto() {
+    public String getCode() {
+        return code;
     }
 
-    public UserDataRestDto(String email, String password) {
+    public RegisterRestDto() {
+    }
+
+    public RegisterRestDto(String email, String password, String code) {
         this.email = email;
         this.password = password;
-    }
-
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) {
-            return true;
-        }
-        if (!(o instanceof UserDataRestDto userLoginDto)) {
-            return false;
-        }
-        return Objects.equals(email, userLoginDto.email)
-            && Objects.equals(password, userLoginDto.password);
+        this.code = code;
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(email, password);
+        return email.hashCode() + password.hashCode();
     }
 
     @Override
     public String toString() {
-        return "UserLoginDto{"
+        return "RegisterDto{"
             + "email='" + email + '\''
             + ", password='" + password + '\''
             + '}';
+    }
+
+    public static UserDataDto from(RegisterRestDto registerRestDto) {
+        return new UserDataDto(
+            registerRestDto.getEmail(),
+            registerRestDto.getPassword()
+        );
     }
 }

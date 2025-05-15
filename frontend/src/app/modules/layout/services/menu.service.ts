@@ -50,7 +50,7 @@ export class MenuService implements OnDestroy {
     const roles = this.authService.getUserRoles();
 
     this._pagesMenu().forEach((menu) => {
-      if(menu.role && !roles.includes(menu.role)) {
+      if(menu.role && menu.role != "ANY" && !roles.includes(menu.role)) {
         return
       }
 
