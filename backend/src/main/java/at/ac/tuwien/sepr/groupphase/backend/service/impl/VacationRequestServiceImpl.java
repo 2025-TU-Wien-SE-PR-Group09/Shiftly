@@ -48,7 +48,7 @@ public class VacationRequestServiceImpl implements VacationRequestService {
 
         return new VacationRequestDto(
             saved.getId(),
-            saved.getEmployee().getEmail(),
+            userEmail,
             saved.getStartDate(),
             saved.getEndDate(),
             saved.getStatus()
