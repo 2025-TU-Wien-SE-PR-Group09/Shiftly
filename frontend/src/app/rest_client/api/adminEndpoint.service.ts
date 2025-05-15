@@ -17,6 +17,7 @@ import { CustomHttpUrlEncodingCodec }                        from '../encoder';
 
 import { Observable }                                        from 'rxjs';
 
+import { AdminAuthCodeRestDto } from '../model/adminAuthCodeRestDto';
 
 import { BASE_PATH, COLLECTION_FORMATS }                     from '../variables';
 import { Configuration }                                     from '../configuration';
@@ -62,9 +63,9 @@ export class AdminEndpointService {
      * @param observe set whether or not to return the data Observable as the body, response or events. defaults to returning the body.
      * @param reportProgress flag to report request and response progress.
      */
-    public authCode(observe?: 'body', reportProgress?: boolean): Observable<any>;
-    public authCode(observe?: 'response', reportProgress?: boolean): Observable<HttpResponse<any>>;
-    public authCode(observe?: 'events', reportProgress?: boolean): Observable<HttpEvent<any>>;
+    public authCode(observe?: 'body', reportProgress?: boolean): Observable<AdminAuthCodeRestDto>;
+    public authCode(observe?: 'response', reportProgress?: boolean): Observable<HttpResponse<AdminAuthCodeRestDto>>;
+    public authCode(observe?: 'events', reportProgress?: boolean): Observable<HttpEvent<AdminAuthCodeRestDto>>;
     public authCode(observe: any = 'body', reportProgress: boolean = false ): Observable<any> {
 
         let headers = this.defaultHeaders;
@@ -82,7 +83,7 @@ export class AdminEndpointService {
         const consumes: string[] = [
         ];
 
-        return this.httpClient.request<any>('get',`${this.basePath}/api/v1/admin/authCode`,
+        return this.httpClient.request<AdminAuthCodeRestDto>('get',`${this.basePath}/api/v1/admin/authCode`,
             {
                 withCredentials: this.configuration.withCredentials,
                 headers: headers,
