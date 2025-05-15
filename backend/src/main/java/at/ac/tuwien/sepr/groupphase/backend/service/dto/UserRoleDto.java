@@ -5,7 +5,7 @@ import jakarta.validation.constraints.NotNull;
 
 public class UserRoleDto {
     @NotNull(message = "Email must not be null")
-    @Email
+    @Email(message = "Email must be a valid email address")
     private String userEmail;
 
     @NotNull(message = "Role must not be null")

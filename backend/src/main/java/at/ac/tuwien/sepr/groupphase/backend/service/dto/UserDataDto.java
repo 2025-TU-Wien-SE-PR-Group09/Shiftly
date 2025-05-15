@@ -9,7 +9,7 @@ import java.util.Objects;
 public class UserDataDto {
 
     @NotNull(message = "Email must not be null")
-    @Email
+    @Email(message = "Email must be a valid email address")
     private String email;
 
     @NotNull(message = "Password must not be null")

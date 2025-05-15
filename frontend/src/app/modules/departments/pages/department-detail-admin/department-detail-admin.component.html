@@ -1,1 +1,100 @@
-<p>department-detail-admin works!</p>
+<!-- Modal Overlay -->
+<div
+  *ngIf="showForm"
+  class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50"
+>
+  <!-- Modal Box -->
+  <div class="bg-white dark:bg-gray-900 p-6 rounded shadow-lg w-full max-w-md relative">
+    <h2 class="text-xl font-bold mb-4 text-gray-900 dark:text-white">
+      Create Department
+    </h2>
+
+    <!-- Form fields -->
+    <input
+      type="text"
+      class="border p-2 w-full rounded mb-3"
+      placeholder="Department Name"
+      [(ngModel)]="newDepartment.name"
+    />
+
+    <input
+      type="email"
+      class="border p-2 w-full rounded mb-4"
+      placeholder="Supervisor Email"
+      [(ngModel)]="newDepartment.supervisorEmail"
+    />
+
+    <!-- Buttons -->
+    <div class="flex justify-end space-x-2">
+      <app-button
+        tone="warning"
+        shape="rounded"
+        impact="bold"
+        size="medium"
+        (click)="toggleForm()"
+      >
+        Cancel
+      </app-button>
+
+      <app-button
+        tone="success"
+        shape="rounded"
+        impact="bold"
+        size="medium"
+        (click)="submitDepartment()"
+      >
+        Submit
+      </app-button>
+    </div>
+  </div>
+</div>
+
+<!-- Header -->
+<div class="mb-4 flex justify-between">
+  <div class="inline-block">
+    <h3 class="text-foreground font-semibold">Departments</h3>
+    <div class="text-muted-foreground space-x-1 text-xs font-medium">
+      <span>Total:</span>
+      <span class="text-foreground">{{ departments.length }}</span>
+    </div>
+  </div>
+  <app-button
+    tone="primary"
+    shape="rounded"
+    impact="bold"
+    size="medium"
+    (click)="toggleForm()"
+    class="mb-4"
+  >
+    + Create Department
+  </app-button>
+</div>
+
+<!-- Table -->
+<div class="border-muted/20 bg-background flex min-w-full flex-col rounded-xl border p-2">
+  <div class="overflow-x-auto px-5">
+    <table
+      class="text-muted-foreground table w-full table-auto border-collapse border-0 text-left align-middle leading-5"
+    >
+      <thead class="border-muted/20 text-muted-foreground border text-xs">
+      <tr>
+        <th class="px-2 py-3">Name</th>
+        <th class="px-2 py-3">Supervisor Email</th>
+      </tr>
+      </thead>
+      <tbody>
+      <tr
+        *ngFor="let dept of departments; let i = index"
+        class="hover:bg-card/50"
+      >
+        <td class="px-2 py-3">{{ dept.name }}</td>
+        <td class="px-2 py-3">{{ dept.supervisorEmail }}</td>
+      </tr>
+      <tr *ngIf="departments.length === 0">
+        <td class="py-4 text-center text-sm" colspan="3">No departments found</td>
+      </tr>
+      </tbody>
+    </table>
+  </div>
+</div>
+
