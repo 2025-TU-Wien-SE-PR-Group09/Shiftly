@@ -36,12 +36,19 @@ public class UserEndpoint {
     }
 
     /**
-     * Change the password of the currently authenticated user.
+     * Changes the password of the currently authenticated non-admin user.
      *
-     * @param restDto the DTO containing old and new passwords
-     * @return 204 NoContent if successful, or appropriate error otherwise
+     * <p>Only authenticated users without the {@code ADMIN} role are allowed to access this endpoint.
+     *
+     * <p>If the request is unauthenticated, or the user has the {@code ADMIN} role,
+     * access is denied with a 403 Forbidden response.
+     *
+     * @param restDto DTO containing the new password (validated)
+     * @return 200 OK on successful password change,
+     *     400 Bad Request if the input is invalid,
+     *     403 Forbidden if the user is not authenticated or has the ADMIN role
      */
-    @PreAuthorize("isAuthenticated()")
+    @PreAuthorize("isAuthenticated() and !hasRole('ADMIN')")
     @PutMapping(path = "/me/password", produces = MediaType.APPLICATION_JSON_VALUE)
     @Transactional
     public ResponseEntity<Void> changePassword(@RequestBody @Valid ChangePasswordRestDto restDto) {
@@ -51,9 +58,10 @@ public class UserEndpoint {
     }
 
     /**
-     * Get the profile information of the currently authenticated user.
+     * Retrieve the profile information of the currently authenticated user.
      *
-     * @return a UserProfileRestDto with user details
+     * @return a {@link UserProfileRestDto} containing user details such as name,
+     *     email, role, and department
      */
     @PreAuthorize("isAuthenticated()")
     @GetMapping(value = "/me", produces = MediaType.APPLICATION_JSON_VALUE)
