@@ -7,14 +7,11 @@ import { NgIf } from '@angular/common';
   selector: 'app-auth',
   templateUrl: './profile.component.html',
   styleUrls: ['./profile.component.css'],
-  imports: [AngularSvgIconModule, RouterOutlet, NgIf],
+  imports: [AngularSvgIconModule, RouterOutlet],
 })
 export class ProfileComponent implements OnInit {
   constructor(private router: Router) {}
 
   ngOnInit(): void {}
 
-  isPasswordPage(): boolean {
-    return this.router.url.includes('new-password');
-  }
 }
