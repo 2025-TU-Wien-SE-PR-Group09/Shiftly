@@ -52,7 +52,12 @@ export class NewPasswordComponent implements OnInit {
           } else if (err?.status === 403) {
             this.errorMessage = 'Access denied. You might not have permission.';
           } else if (err?.status === 400) {
-            this.errorMessage = 'Invalid request. Check your input.';
+            const validationErrors = err?.error?.['Validation errors'];
+            if (Array.isArray(validationErrors) && validationErrors.length > 0) {
+              this.errorMessage = validationErrors[0].split(' ').slice(1).join(' ');
+            } else {
+              this.errorMessage = 'Invalid request. Check your input.';
+            }
           } else if (err?.status === 500) {
             this.errorMessage = 'Internal server error. Please try again later.';
           } else {
