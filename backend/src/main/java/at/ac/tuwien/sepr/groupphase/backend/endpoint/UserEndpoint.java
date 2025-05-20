@@ -38,7 +38,7 @@ public class UserEndpoint {
      * Change the password of the currently authenticated user.
      *
      * @param restDto the DTO containing old and new passwords
-     * @return 200 OK if successful, or appropriate error otherwise
+     * @return 204 NoContent if successful, or appropriate error otherwise
      */
     @PreAuthorize("isAuthenticated()")
     @PutMapping("/me/password")
@@ -46,7 +46,7 @@ public class UserEndpoint {
     public ResponseEntity<Void> changePassword(@RequestBody @Valid ChangePasswordRestDto restDto) {
         ChangePasswordDto dto = ChangePasswordDto.from(restDto);
         userService.changePasswordOfCurrentUser(dto);
-        return ResponseEntity.ok().build();
+        return ResponseEntity.noContent().build();
     }
 
     /**
@@ -56,17 +56,15 @@ public class UserEndpoint {
      */
     @PreAuthorize("isAuthenticated()")
     @GetMapping("/me")
-    public ResponseEntity<UserProfileRestDto> getCurrentUserProfile() {
+    public UserProfileRestDto getCurrentUserProfile() {
         UserProfileDto serviceDto = userService.getCurrentUserProfile();
 
-        UserProfileRestDto restDto = new UserProfileRestDto(
+        return new UserProfileRestDto(
             serviceDto.getName(),
             serviceDto.getEmail(),
             serviceDto.getRole(),
             serviceDto.getDepartment()
         );
-
-        return ResponseEntity.ok(restDto);
     }
 
 }

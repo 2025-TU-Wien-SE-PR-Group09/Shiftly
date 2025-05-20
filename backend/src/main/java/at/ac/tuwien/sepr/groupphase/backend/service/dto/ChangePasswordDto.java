@@ -22,7 +22,7 @@ public class ChangePasswordDto {
     /**
      * The new password to be set. Must be at least 8 characters long.
      */
-    @NotBlank(message = "New password must not be blank")
+
     @Pattern(
         regexp = "^(?=.*[a-z])(?=.*[A-Z])(?=.*\\d).{8,}$",
         message = "New password must be at least 8 characters long and include uppercase, lowercase and a digit"
