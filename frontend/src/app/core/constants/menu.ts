@@ -82,7 +82,7 @@ export class Menu {
             { label: 'Sign up', route: '/auth/sign-up' },
             { label: 'Sign in', route: '/auth/sign-in' },
             { label: 'Forgot Password', route: '/auth/forgot-password' },
-            { label: 'New Password', route: '/auth/new-password' },
+            { label: 'New Password', route: '/profile/new-password' },
             { label: 'Two Steps', route: '/auth/two-steps' },
           ],
         },
