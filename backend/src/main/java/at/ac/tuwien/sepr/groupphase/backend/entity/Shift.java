@@ -4,17 +4,20 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
-import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToMany;
-import jakarta.persistence.JoinTable;
 import jakarta.persistence.CascadeType;
+import jakarta.persistence.Column;
 import jakarta.persistence.OneToMany;
 
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+/**
+ * Represents a shift in the system.
+ * A shift has a description and a required manpower.
+ * It can be associated with multiple plans and can have multiple weeks.
+ */
 @Entity
 public class Shift {
 
@@ -22,12 +25,14 @@ public class Shift {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @Column(length = 255, nullable = false)
     private String description;
 
+    @Column(nullable = false)
     private int manPower;
 
     @ManyToMany(mappedBy = "shifts")
-    private Set<Plan> plans;
+    private Set<PlanBlueprint> plans;
 
     @OneToMany(mappedBy = "shift", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<ShiftWeek> weeks = new ArrayList<ShiftWeek>();
@@ -56,11 +61,11 @@ public class Shift {
         this.description = description;
     }
 
-    public Set<Plan> getPlans() {
+    public Set<PlanBlueprint> getPlans() {
         return plans;
     }
 
-    public void setPlans(Set<Plan> plans) {
+    public void setPlans(Set<PlanBlueprint> plans) {
         this.plans = plans;
     }
 
@@ -70,5 +75,9 @@ public class Shift {
 
     public List<ShiftWeek> getShiftWeeks() {
         return weeks;
+    }
+
+    public void setId(long id) {
+        this.id = id;
     }
 }

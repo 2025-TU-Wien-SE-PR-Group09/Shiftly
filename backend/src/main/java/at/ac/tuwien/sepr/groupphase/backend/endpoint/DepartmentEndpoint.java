@@ -2,11 +2,13 @@ package at.ac.tuwien.sepr.groupphase.backend.endpoint;
 
 import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.DepartmentCreateRestDto;
 import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.DepartmentDetailRestDto;
+import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.PlanBlueprintResponse;
 import at.ac.tuwien.sepr.groupphase.backend.exception.NotFoundException;
 import at.ac.tuwien.sepr.groupphase.backend.service.DepartmentService;
 import at.ac.tuwien.sepr.groupphase.backend.service.ShiftPlanningService;
+import at.ac.tuwien.sepr.groupphase.backend.service.mapper.ShiftPlanningMapper;
 import at.ac.tuwien.sepr.groupphase.backend.service.dto.DepartmentCreateDto;
-import at.ac.tuwien.sepr.groupphase.backend.service.dto.shift.PlanDto;
+import at.ac.tuwien.sepr.groupphase.backend.service.dto.DepartmentDto;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -53,8 +55,7 @@ public class DepartmentEndpoint {
     public ResponseEntity<Void> createDepartment(@RequestBody @Valid DepartmentCreateRestDto restDto) {
         DepartmentCreateDto serviceDto = new DepartmentCreateDto(
             restDto.getName(),
-            restDto.getSupervisorEmail()
-        );
+            restDto.getSupervisorEmail());
         departmentService.createDepartment(serviceDto);
         return ResponseEntity.status(HttpStatus.CREATED).build();
     }
@@ -63,14 +64,14 @@ public class DepartmentEndpoint {
     @RolesAllowed({"ADMIN"})
     @Operation(summary = "Get shift plan for a department")
     @ApiResponse(responseCode = "200", description = "Shiftplan for the department")
-    @GetMapping("/{departmentName}/shiftplan")
-    public ResponseEntity<List<PlanDto>> getShiftplan(@PathVariable(name = "departmentName") String departmentName) {
+    @GetMapping("/{departmentName}/shiftplanBlueprint")
+    public List<PlanBlueprintResponse> getShiftplanBlueprints(
+        @PathVariable(name = "departmentName") String departmentName) {
 
-        var department = departmentService.getDepartmentByName(departmentName)
+        DepartmentDto department = departmentService.getDepartmentByName(departmentName)
             .orElseThrow(() -> new NotFoundException("Department not found!"));
 
-        return ResponseEntity.<List<PlanDto>>ok(department.plans());
+        return department.plans().stream().map(ShiftPlanningMapper.Plans::toResponse).toList();
     }
-
 
 }

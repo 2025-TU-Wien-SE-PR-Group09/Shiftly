@@ -1,7 +1,8 @@
 import { Component } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { ActivatedRoute } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 import { DepartmentService } from 'src/app/rest_client';
+import { ToastrService } from 'ngx-toastr';
 
 @Component({
   selector: 'app-department-shiftplan',
@@ -15,28 +16,46 @@ export class DepartmentShiftplanComponent {
   error: string | null = null;
   departmentName: string | null = null;
 
-  constructor(private departmentService: DepartmentService, private route: ActivatedRoute) {}
+  constructor(
+    private departmentService: DepartmentService,
+    private route: ActivatedRoute,
+    private toastrService: ToastrService,
+    private router: Router,
+  ) {}
 
   ngOnInit(): void {
     this.departmentName = this.route.snapshot.paramMap.get('name');
 
     if (!this.departmentName) {
-      console.log(this.departmentName);
       this.error = 'Kein Department angegeben';
+      this.toastrService.error(this.error);
       this.isLoading = false;
       return;
     }
-    console.log(this.departmentName);
 
-    this.departmentService.getShiftplan(this.departmentName).subscribe({
+    this.departmentService.getShiftplanBlueprints(this.departmentName).subscribe({
       next: (data) => {
         this.shiftplans = data;
         this.isLoading = false;
       },
       error: (err) => {
-        this.error = 'Fehler beim Laden des Shiftplans';
-        console.error(err);
         this.isLoading = false;
+        console.log(err);
+
+        if (err.status == 404) {
+          this.toastrService.error('Department nicht gefunden.');
+          this.router.navigate(['/departments']);
+          return;
+        }
+
+        if (err?.error?.validation_errors) {
+          err.error.validation_errors.forEach((msg: string) => {
+            this.toastrService.error(msg);
+          });
+          return;
+        }
+
+        this.toastrService.error(err.error);
       },
     });
   }

@@ -15,6 +15,10 @@ import jakarta.persistence.ManyToOne;
 import jakarta.persistence.GenerationType;
 
 
+/*
+ * This class represents a single day of a shift, including the start time and duration.
+ * It is part of a ShiftWeek, which contains multiple ShiftDay entities.
+ */
 @Entity
 public class ShiftDay {
 

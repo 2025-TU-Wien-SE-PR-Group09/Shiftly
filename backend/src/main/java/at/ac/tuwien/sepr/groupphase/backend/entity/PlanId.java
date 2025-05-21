@@ -1,20 +1,21 @@
 package at.ac.tuwien.sepr.groupphase.backend.entity;
 
-import at.ac.tuwien.sepr.groupphase.backend.entity.converter.MonthConverter;
 import jakarta.persistence.Column;
-import jakarta.persistence.Convert;
 import jakarta.persistence.Embeddable;
 
 import java.io.Serializable;
-import java.time.Month;
+import java.time.LocalDate;
 import java.util.Objects;
 
+/**
+ * The PlanId class is used as a composite key for the Plan entity.
+ * It consists of a start date and a department ID.
+ */
 @Embeddable
 public class PlanId implements Serializable {
 
-    @Convert(converter = MonthConverter.class)
-    @Column(name = "plan_month", nullable = false)
-    private Month month;
+    @Column(name = "plan_startdate", nullable = false)
+    private LocalDate startDate;
 
     @Column(name = "department_id", nullable = false)
     private Long departmentId;
@@ -22,21 +23,9 @@ public class PlanId implements Serializable {
     public PlanId() {
     }
 
-    public PlanId(Month month, Long departmentId) {
-        this.month = month;
+    public PlanId(LocalDate startDate, Long departmentId) {
+        this.startDate = startDate;
         this.departmentId = departmentId;
-    }
-
-    public Month getMonth() {
-        return month;
-    }
-
-    public void setMonth(Month month) {
-        this.month = month;
-    }
-
-    public Long getDepartmentId() {
-        return departmentId;
     }
 
     public void setDepartmentId(Long departmentId) {
@@ -51,11 +40,15 @@ public class PlanId implements Serializable {
         if (!(o instanceof PlanId that)) {
             return false;
         }
-        return month == that.month && Objects.equals(departmentId, that.departmentId);
+        return startDate == that.startDate && Objects.equals(departmentId, that.departmentId);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(month, departmentId);
+        return Objects.hash(startDate, departmentId);
+    }
+
+    public LocalDate getStartDate() {
+        return startDate;
     }
 }

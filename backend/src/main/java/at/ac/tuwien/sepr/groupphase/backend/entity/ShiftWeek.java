@@ -12,7 +12,10 @@ import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.CascadeType;
 
-
+/**
+ * Represents a week of shifts in the system.
+ * A shift week is associated with a specific shift and contains multiple days.
+ */
 @Entity
 public class ShiftWeek {
 

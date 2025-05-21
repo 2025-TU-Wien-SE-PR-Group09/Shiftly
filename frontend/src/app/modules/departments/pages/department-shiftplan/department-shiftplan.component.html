@@ -1,27 +1,32 @@
-<!-- department-shiftplan.component.html -->
-<div class="rounded-xl bg-white p-6 shadow-sm">
-  <h2 class="mb-4 flex items-center text-xl font-semibold text-gray-800">
-    <svg class="mr-2 h-6 w-6 text-blue-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+<div class="bg-card text-foreground font-[var(--font-poppins)] rounded-xl p-6 shadow-sm">
+  <h2 class="mb-4 flex items-center text-xl font-semibold">
+    <svg class="text-primary mr-2 h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
       <path
         stroke-linecap="round"
         stroke-linejoin="round"
         stroke-width="1.5"
         d="M8 7V3m8 4V3m-9 8h10M5.25 21h13.5a2.25 2.25 0 0 0 2.25-2.25V7.5A2.25 2.25 0 0 0 18.75 5.25H5.25A2.25 2.25 0 0 0 3 7.5v11.25A2.25 2.25 0 0 0 5.25 21z" />
     </svg>
-    Shiftplan
+    Shiftplan Blueprint
   </h2>
 
   <div *ngFor="let plan of shiftplans" class="mb-6">
-    <div class="mb-2 text-lg font-medium text-gray-700">{{ plan.department }}</div>
+    <div class="text-foreground/80 mb-2 text-lg font-medium">{{ plan.department }}</div>
 
-    <div *ngFor="let shift of plan.shifts" class="mb-4 rounded-lg border bg-gray-50 p-4">
-      <div class="font-semibold text-blue-700">{{ shift.description }} ({{ shift.manPower }} Personen)</div>
+    <div *ngFor="let shift of plan.shifts" class="border-border bg-muted mb-4 rounded-lg border p-4">
+      <div class="text-primary font-semibold">{{ shift.description }} ({{ shift.manPower }} Personen)</div>
 
-      <div class="mt-2 space-y-2">
-        <div *ngFor="let week of shift.shiftWeeks" class="border-l-4 border-blue-300 pl-4">
-          <div *ngFor="let day of week.shiftDays" class="flex justify-between text-sm text-gray-600">
-            <span>{{ day.day }}</span>
-            <span>{{ day.startTime }} – {{ formatDuration(day.duration) }}</span>
+      <div class="mt-4 space-y-4">
+        <div *ngFor="let week of shift.shiftWeeks" class="border-primary/30 border-l-4 pl-4">
+          <div class="mt-2 flex flex-wrap gap-4">
+            <div
+              *ngFor="let day of week.shiftDays"
+              class="border-border bg-card flex min-w-[120px] flex-col items-start rounded-md border p-3 shadow transition hover:shadow-md">
+              <span class="text-foreground text-sm font-medium">{{ day.day }}</span>
+              <span class="text-muted-foreground text-xs"
+                >{{ day.startTime }} – {{ formatDuration(day.duration) }}</span
+              >
+            </div>
           </div>
         </div>
       </div>

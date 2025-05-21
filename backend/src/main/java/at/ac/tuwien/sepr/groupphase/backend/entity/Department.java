@@ -55,13 +55,13 @@ public class Department {
     }
 
     @OneToMany(mappedBy = "department", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.EAGER)
-    private Set<Plan> plans = new HashSet<>();
+    private Set<PlanBlueprint> plans = new HashSet<>();
 
-    public Set<Plan> getPlans() {
+    public Set<PlanBlueprint> getPlans() {
         return plans;
     }
 
-    public void setPlans(Set<Plan> plans) {
+    public void setPlans(Set<PlanBlueprint> plans) {
         this.plans = plans;
     }
 }

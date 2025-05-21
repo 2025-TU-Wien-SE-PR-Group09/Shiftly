@@ -146,13 +146,13 @@ export class DepartmentService {
      * @param observe set whether or not to return the data Observable as the body, response or events. defaults to returning the body.
      * @param reportProgress flag to report request and response progress.
      */
-    public getShiftplan(departmentName: any, observe?: 'body', reportProgress?: boolean): Observable<any>;
-    public getShiftplan(departmentName: any, observe?: 'response', reportProgress?: boolean): Observable<HttpResponse<any>>;
-    public getShiftplan(departmentName: any, observe?: 'events', reportProgress?: boolean): Observable<HttpEvent<any>>;
-    public getShiftplan(departmentName: any, observe: any = 'body', reportProgress: boolean = false ): Observable<any> {
+    public getShiftplanBlueprints(departmentName: any, observe?: 'body', reportProgress?: boolean): Observable<any>;
+    public getShiftplanBlueprints(departmentName: any, observe?: 'response', reportProgress?: boolean): Observable<HttpResponse<any>>;
+    public getShiftplanBlueprints(departmentName: any, observe?: 'events', reportProgress?: boolean): Observable<HttpEvent<any>>;
+    public getShiftplanBlueprints(departmentName: any, observe: any = 'body', reportProgress: boolean = false ): Observable<any> {
 
         if (departmentName === null || departmentName === undefined) {
-            throw new Error('Required parameter departmentName was null or undefined when calling getShiftplan.');
+            throw new Error('Required parameter departmentName was null or undefined when calling getShiftplanBlueprints.');
         }
 
         let headers = this.defaultHeaders;
@@ -170,7 +170,7 @@ export class DepartmentService {
         const consumes: string[] = [
         ];
 
-        return this.httpClient.request<any>('get',`${this.basePath}/api/departments/${encodeURIComponent(String(departmentName))}/shiftplan`,
+        return this.httpClient.request<any>('get',`${this.basePath}/api/departments/${encodeURIComponent(String(departmentName))}/shiftplanBlueprint`,
             {
                 withCredentials: this.configuration.withCredentials,
                 headers: headers,
