@@ -104,6 +104,47 @@ export class DepartmentService {
     }
 
     /**
+     * Generate concrete shift plan for the given department and return the scheduled shifts
+     * 
+     * @param id 
+     * @param observe set whether or not to return the data Observable as the body, response or events. defaults to returning the body.
+     * @param reportProgress flag to report request and response progress.
+     */
+    public generateConcretePlan(id: any, observe?: 'body', reportProgress?: boolean): Observable<any>;
+    public generateConcretePlan(id: any, observe?: 'response', reportProgress?: boolean): Observable<HttpResponse<any>>;
+    public generateConcretePlan(id: any, observe?: 'events', reportProgress?: boolean): Observable<HttpEvent<any>>;
+    public generateConcretePlan(id: any, observe: any = 'body', reportProgress: boolean = false ): Observable<any> {
+
+        if (id === null || id === undefined) {
+            throw new Error('Required parameter id was null or undefined when calling generateConcretePlan.');
+        }
+
+        let headers = this.defaultHeaders;
+
+        // to determine the Accept header
+        let httpHeaderAccepts: string[] = [
+            '*/*'
+        ];
+        const httpHeaderAcceptSelected: string | undefined = this.configuration.selectHeaderAccept(httpHeaderAccepts);
+        if (httpHeaderAcceptSelected != undefined) {
+            headers = headers.set('Accept', httpHeaderAcceptSelected);
+        }
+
+        // to determine the Content-Type header
+        const consumes: string[] = [
+        ];
+
+        return this.httpClient.request<any>('post',`${this.basePath}/api/departments/${encodeURIComponent(String(id))}/generate-concrete-plan`,
+            {
+                withCredentials: this.configuration.withCredentials,
+                headers: headers,
+                observe: observe,
+                reportProgress: reportProgress
+            }
+        );
+    }
+
+    /**
      * Get all departments
      * 
      * @param observe set whether or not to return the data Observable as the body, response or events. defaults to returning the body.
@@ -130,6 +171,47 @@ export class DepartmentService {
         ];
 
         return this.httpClient.request<any>('get',`${this.basePath}/api/departments`,
+            {
+                withCredentials: this.configuration.withCredentials,
+                headers: headers,
+                observe: observe,
+                reportProgress: reportProgress
+            }
+        );
+    }
+
+    /**
+     * Get detailed scheduled shifts for a department
+     * 
+     * @param departmentId 
+     * @param observe set whether or not to return the data Observable as the body, response or events. defaults to returning the body.
+     * @param reportProgress flag to report request and response progress.
+     */
+    public getDetailedConcretePlan(departmentId: any, observe?: 'body', reportProgress?: boolean): Observable<any>;
+    public getDetailedConcretePlan(departmentId: any, observe?: 'response', reportProgress?: boolean): Observable<HttpResponse<any>>;
+    public getDetailedConcretePlan(departmentId: any, observe?: 'events', reportProgress?: boolean): Observable<HttpEvent<any>>;
+    public getDetailedConcretePlan(departmentId: any, observe: any = 'body', reportProgress: boolean = false ): Observable<any> {
+
+        if (departmentId === null || departmentId === undefined) {
+            throw new Error('Required parameter departmentId was null or undefined when calling getDetailedConcretePlan.');
+        }
+
+        let headers = this.defaultHeaders;
+
+        // to determine the Accept header
+        let httpHeaderAccepts: string[] = [
+            '*/*'
+        ];
+        const httpHeaderAcceptSelected: string | undefined = this.configuration.selectHeaderAccept(httpHeaderAccepts);
+        if (httpHeaderAcceptSelected != undefined) {
+            headers = headers.set('Accept', httpHeaderAcceptSelected);
+        }
+
+        // to determine the Content-Type header
+        const consumes: string[] = [
+        ];
+
+        return this.httpClient.request<any>('get',`${this.basePath}/api/departments/${encodeURIComponent(String(departmentId))}/concrete-plan-details`,
             {
                 withCredentials: this.configuration.withCredentials,
                 headers: headers,

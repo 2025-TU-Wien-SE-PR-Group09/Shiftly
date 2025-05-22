@@ -3,10 +3,10 @@ import { CommonModule } from '@angular/common';
 import { ActivatedRoute, Router } from '@angular/router';
 import { DepartmentService } from 'src/app/rest_client';
 import { ToastrService } from 'ngx-toastr';
-
+import { DepartmentConcreteShiftplanComponent } from '../department-concrete-shiftplan/department-concrete-shiftplan.component';
 @Component({
   selector: 'app-department-shiftplan',
-  imports: [CommonModule],
+  imports: [CommonModule, DepartmentConcreteShiftplanComponent],
   templateUrl: './department-shiftplan.component.html',
   styleUrl: './department-shiftplan.component.css',
 })
@@ -16,6 +16,11 @@ export class DepartmentShiftplanComponent {
   error: string | null = null;
   departmentName: string | null = null;
 
+  daysOfWeek = ['MONDAY', 'TUESDAY', 'WEDNESDAY', 'THURSDAY', 'FRIDAY', 'SATURDAY', 'SUNDAY'];
+
+  getDayForWeekday(days: any[], weekday: string): any | null {
+    return days.find((d) => d.day === weekday) ?? null;
+  }
   constructor(
     private departmentService: DepartmentService,
     private route: ActivatedRoute,
@@ -59,6 +64,10 @@ export class DepartmentShiftplanComponent {
       },
     });
   }
+
+  getHourMinute(time: string): string {
+    return time?.slice(0, 5);
+  }
   formatDuration(isoDuration: string): string {
     const match = isoDuration.match(/PT(?:(\d+)H)?(?:(\d+)M)?/);
 
@@ -69,7 +78,7 @@ export class DepartmentShiftplanComponent {
 
     const parts = [];
     if (hours > 0) parts.push(`${hours}h`);
-    if (minutes > 0) parts.push(`${minutes}min`);
+    if (minutes > 0) parts.push(`${minutes}m`);
 
     return parts.join(' ') || '0min';
   }

@@ -4,6 +4,7 @@ import at.ac.tuwien.sepr.groupphase.backend.entity.*;
 import at.ac.tuwien.sepr.groupphase.backend.exception.ConflictException;
 import at.ac.tuwien.sepr.groupphase.backend.exception.NotFoundException;
 import at.ac.tuwien.sepr.groupphase.backend.repository.*;
+import at.ac.tuwien.sepr.groupphase.backend.service.UserService;
 import at.ac.tuwien.sepr.groupphase.backend.service.dto.shift.*;
 import at.ac.tuwien.sepr.groupphase.backend.service.impl.ShiftPlanningServiceImpl;
 import at.ac.tuwien.sepr.groupphase.backend.service.impl.TimeService;
@@ -30,6 +31,9 @@ class ShiftPlanningServiceTest {
     private DepartmentRepository departmentRepository;
     private TimeService timeService;
     private PlanBlueprintRepository planBlueprintRepository;
+    private ScheduledShiftRepository scheduledShiftRepository;
+    private ConcreteShiftPlanRepository concreteShiftPlanRepository;
+    private UserRepository userRepository;
 
     @BeforeEach
     void setUp() {
@@ -39,7 +43,12 @@ class ShiftPlanningServiceTest {
         departmentRepository = mock(DepartmentRepository.class);
         timeService = mock(TimeService.class);
         planBlueprintRepository = mock(PlanBlueprintRepository.class);
+        scheduledShiftRepository = mock(ScheduledShiftRepository.class);
+        userRepository = mock(UserRepository.class);
+        concreteShiftPlanRepository = mock(ConcreteShiftPlanRepository.class);
 
+
+        //TODO
         shiftPlanningService = new ShiftPlanningServiceImpl(
             shiftDayRepository,
             shiftWeekRepository,
@@ -47,7 +56,10 @@ class ShiftPlanningServiceTest {
             timeService,
             new ShiftWeekValidatorImpl(),
             planBlueprintRepository,
-            departmentRepository
+            departmentRepository,
+            concreteShiftPlanRepository,
+            scheduledShiftRepository,
+            userRepository
         );
     }
 

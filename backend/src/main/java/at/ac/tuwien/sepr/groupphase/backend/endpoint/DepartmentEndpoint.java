@@ -3,9 +3,12 @@ package at.ac.tuwien.sepr.groupphase.backend.endpoint;
 import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.DepartmentCreateRestDto;
 import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.DepartmentDetailRestDto;
 import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.PlanBlueprintResponse;
+import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.ScheduledShiftResponseDto;
+import at.ac.tuwien.sepr.groupphase.backend.entity.ConcreteShiftPlan;
 import at.ac.tuwien.sepr.groupphase.backend.exception.NotFoundException;
 import at.ac.tuwien.sepr.groupphase.backend.service.DepartmentService;
 import at.ac.tuwien.sepr.groupphase.backend.service.ShiftPlanningService;
+import at.ac.tuwien.sepr.groupphase.backend.service.dto.ScheduledShiftDetailDto;
 import at.ac.tuwien.sepr.groupphase.backend.service.mapper.ShiftPlanningMapper;
 import at.ac.tuwien.sepr.groupphase.backend.service.dto.DepartmentCreateDto;
 import at.ac.tuwien.sepr.groupphase.backend.service.dto.DepartmentDto;
@@ -74,4 +77,31 @@ public class DepartmentEndpoint {
         return department.plans().stream().map(ShiftPlanningMapper.Plans::toResponse).toList();
     }
 
+    @Transactional
+    @Operation(summary = "Generate concrete shift plan for the given department and return the scheduled shifts")
+    @ApiResponse(responseCode = "201", description = "Concrete shift plan generated and returned")
+    @PostMapping("/{id}/generate-concrete-plan")
+    public ResponseEntity<List<ScheduledShiftResponseDto>> generateConcretePlan(@PathVariable("id") Long id) {
+        ConcreteShiftPlan plan = shiftPlanningService.generateQuarterlyPlan(id);
+        List<ScheduledShiftResponseDto> response = plan.getScheduledShifts().stream()
+            .map(s -> new ScheduledShiftResponseDto(
+                s.getId().getCalendarWeek(),
+                s.getId().getCalendarYear(),
+                s.getShift().getDescription(),
+                s.getWeekStartDate()
+            ))
+            .toList();
+
+        return ResponseEntity.status(HttpStatus.CREATED).body(response);
+    }
+
+    @Transactional
+    @Operation(summary = "Get detailed scheduled shifts for a department")
+    @ApiResponse(responseCode = "200", description = "Detailed shifts returned")
+    @GetMapping("/{departmentId}/concrete-plan-details")
+    public List<ScheduledShiftDetailDto> getDetailedConcretePlan(
+        @PathVariable("departmentId") Long departmentId
+    ) {
+        return shiftPlanningService.getDetailedConcretePlan(departmentId);
+    }
 }

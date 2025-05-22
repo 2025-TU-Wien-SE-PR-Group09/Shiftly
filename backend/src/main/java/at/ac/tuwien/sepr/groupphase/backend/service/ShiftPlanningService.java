@@ -1,9 +1,11 @@
 package at.ac.tuwien.sepr.groupphase.backend.service;
 
+import at.ac.tuwien.sepr.groupphase.backend.entity.ConcreteShiftPlan;
 import at.ac.tuwien.sepr.groupphase.backend.service.dto.shift.PlanBlueprintDto;
 import at.ac.tuwien.sepr.groupphase.backend.service.dto.shift.ShiftDto;
 import at.ac.tuwien.sepr.groupphase.backend.service.dto.shift.ShiftWeekDto;
 import at.ac.tuwien.sepr.groupphase.backend.service.dto.shift.CreateShiftDto;
+import at.ac.tuwien.sepr.groupphase.backend.service.dto.ScheduledShiftDetailDto;
 
 import java.util.List;
 
@@ -37,4 +39,22 @@ public interface ShiftPlanningService {
      * @return the created PlanBlueprintDto
      */
     PlanBlueprintDto createPlan(Long departmentId, List<Long> shiftIds);
+
+    /**
+     * Generates a concrete plan for a department based on the provided department ID.
+     * This is done quarterly, meaning that the plan will be generated for a specific quarter of the year.
+     *
+     * @param departmentId the ID of the department for which the plan will be generated
+     * @return the generated ConcreteShiftPlan
+     */
+    ConcreteShiftPlan generateQuarterlyPlan(Long departmentId);
+
+    /**
+     * Retrieves a detailed view of the scheduled shifts for a department based on the concrete quarterly plan.
+     *
+     * @param departmentId the ID of the department for which the scheduled shifts will be retrieved
+     * @return a list of ScheduledShiftDetailedViewDto containing the details of the scheduled shifts
+     */
+    List<ScheduledShiftDetailDto> getDetailedConcretePlan(Long departmentId);
+
 }

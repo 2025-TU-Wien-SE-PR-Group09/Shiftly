@@ -71,18 +71,6 @@ public class StartupRunner implements CommandLineRunner {
     }
 
     private void createPlan(Long departmentId) {
-        // === Nachtschicht: 18:00 – 02:00 bzw. 6.5h Fr ===
-        var monNight = new ShiftDayDto(DayOfWeek.MONDAY, LocalTime.of(18, 0), Duration.ofHours(8));
-        var tuesNight = new ShiftDayDto(DayOfWeek.TUESDAY, LocalTime.of(18, 0), Duration.ofHours(8));
-        var wedNight = new ShiftDayDto(DayOfWeek.WEDNESDAY, LocalTime.of(18, 0), Duration.ofHours(8));
-        var thurNight = new ShiftDayDto(DayOfWeek.THURSDAY, LocalTime.of(18, 0), Duration.ofHours(8));
-        var fridayNight = new ShiftDayDto(DayOfWeek.FRIDAY, LocalTime.of(18, 0), Duration.ofHours(6).plusMinutes(30));
-
-        var nightShift = shiftPlanningService.createShift(
-            new CreateShiftDto(departmentId, "Nachtschicht", 4)
-        );
-        shiftPlanningService.addWeekToShift(nightShift.id(),
-            new ShiftWeekDto(List.of(monNight, tuesNight, wedNight, thurNight, fridayNight)));
 
         // === Tagschicht: 07:00 – 15:00 ===
         var monDay = new ShiftDayDto(DayOfWeek.MONDAY, LocalTime.of(7, 0), Duration.ofHours(8));
@@ -96,6 +84,19 @@ public class StartupRunner implements CommandLineRunner {
         );
         shiftPlanningService.addWeekToShift(dayShift.id(),
             new ShiftWeekDto(List.of(monDay, tuesDay, wedDay, thurDay, fridayDay)));
+
+        // === Nachtschicht: 18:00 – 02:00 bzw. 6.5h Fr ===
+        var monNight = new ShiftDayDto(DayOfWeek.MONDAY, LocalTime.of(18, 0), Duration.ofHours(8));
+        var tuesNight = new ShiftDayDto(DayOfWeek.TUESDAY, LocalTime.of(18, 0), Duration.ofHours(8));
+        var wedNight = new ShiftDayDto(DayOfWeek.WEDNESDAY, LocalTime.of(18, 0), Duration.ofHours(8));
+        var thurNight = new ShiftDayDto(DayOfWeek.THURSDAY, LocalTime.of(18, 0), Duration.ofHours(8));
+        var saturdayNight = new ShiftDayDto(DayOfWeek.SATURDAY, LocalTime.of(18, 0), Duration.ofHours(6).plusMinutes(30));
+
+        var nightShift = shiftPlanningService.createShift(
+            new CreateShiftDto(departmentId, "Nachtschicht", 4)
+        );
+        shiftPlanningService.addWeekToShift(nightShift.id(),
+            new ShiftWeekDto(List.of(monNight, tuesNight, wedNight, thurNight, saturdayNight)));
 
         shiftPlanningService.createPlan(departmentId, List.of(dayShift.id(), nightShift.id()));
     }

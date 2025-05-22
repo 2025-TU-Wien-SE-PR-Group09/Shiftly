@@ -1,7 +1,14 @@
 package at.ac.tuwien.sepr.groupphase.backend.endpoint.dto;
 
+import io.swagger.v3.oas.annotations.media.Schema;
+
 import java.util.List;
 
-public record PlanBlueprintResponse(String department, List<ShiftResponseDto> shifts) {
+@Schema(description = "Response for shift plan blueprint")
+public record PlanBlueprintResponse(
+    @Schema(description = "Name of  department", example = "Production")
+    String department,
+    @Schema(description = "List of shifts")
+    List<ShiftResponseDto> shifts) {
 
 }
