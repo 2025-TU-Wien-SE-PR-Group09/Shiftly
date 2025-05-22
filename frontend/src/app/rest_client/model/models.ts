@@ -3,6 +3,8 @@ export * from './changePasswordRestDto';
 export * from './createPlanBlueprintDto';
 export * from './departmentCreateRestDto';
 export * from './departmentDetailRestDto';
+export * from './employeeListItemResponseDto';
+export * from './employeeRestResponseDto';
 export * from './loginResponseRestDto';
 export * from './messageResponseDto';
 export * from './planBlueprintResponse';

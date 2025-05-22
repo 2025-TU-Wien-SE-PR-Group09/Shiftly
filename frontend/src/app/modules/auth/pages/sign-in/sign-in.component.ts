@@ -63,7 +63,7 @@ export class SignInComponent implements OnInit {
         } else if (roles.includes("SUPERVISOR")) {
           this._router.navigateByUrl('/home/supervisor').then();
         } else {
-          this._router.navigateByUrl('/home/employee').then();
+          this._router.navigateByUrl('/no-role').then();
         }
         //todo remove this ^^^^^^
       },

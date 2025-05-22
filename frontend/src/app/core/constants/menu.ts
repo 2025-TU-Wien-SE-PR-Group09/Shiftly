@@ -44,7 +44,7 @@ export class Menu {
           route: '/sick-notes/supervisor',
         },
       ],
-      role: "ADMIN"
+      role: "SUPERVISOR"
     },
     {
       group: 'Employee',
@@ -66,8 +66,7 @@ export class Menu {
           route: '/sick-notes/employee',
         }
       ],
-      //todo change to role: "EMPLOYEE"
-      role: "ANY"
+      role: "EMPLOYEE"
     },
 
     {

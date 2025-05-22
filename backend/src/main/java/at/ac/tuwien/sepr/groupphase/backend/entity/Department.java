@@ -13,6 +13,7 @@ import jakarta.persistence.OneToMany;
 import jakarta.validation.constraints.NotBlank;
 
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 @Entity
@@ -26,9 +27,8 @@ public class Department {
     @Column(nullable = false, unique = true, length = 100)
     private String name;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "supervisor_email")
-    private ApplicationUser supervisor;
+    @OneToMany(fetch = FetchType.EAGER, mappedBy = "department")
+    private Set<ApplicationUser> users = new HashSet<>();
 
     public Long getId() {
         return id;
@@ -38,20 +38,12 @@ public class Department {
         return name;
     }
 
-    public ApplicationUser getSupervisor() {
-        return supervisor;
-    }
-
     public void setId(Long id) {
         this.id = id;
     }
 
     public void setName(String name) {
         this.name = name;
-    }
-
-    public void setSupervisor(ApplicationUser supervisor) {
-        this.supervisor = supervisor;
     }
 
     @OneToMany(mappedBy = "department", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.EAGER)
@@ -63,5 +55,13 @@ public class Department {
 
     public void setPlans(Set<PlanBlueprint> plans) {
         this.plans = plans;
+    }
+
+    public Set<ApplicationUser> getUsers() {
+        return users;
+    }
+
+    public void setUsers(Set<ApplicationUser> users) {
+        this.users = users;
     }
 }

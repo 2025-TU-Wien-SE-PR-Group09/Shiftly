@@ -1,14 +1,20 @@
 package at.ac.tuwien.sepr.groupphase.backend.endpoint;
 
-import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.createplanblueprint.CreatePlanBlueprintDto;
 import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.DepartmentCreateRestDto;
 import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.DepartmentDetailRestDto;
-import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.getplanblueprint.PlanBlueprintResponse;
+import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.EmployeeListItemResponseDto;
+import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.EmployeeRestResponseDto;
 import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.ScheduledShiftResponseDto;
+import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.createplanblueprint.CreatePlanBlueprintDto;
+import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.getplanblueprint.PlanBlueprintResponse;
 import at.ac.tuwien.sepr.groupphase.backend.entity.ConcreteShiftPlan;
 import at.ac.tuwien.sepr.groupphase.backend.exception.NotFoundException;
 import at.ac.tuwien.sepr.groupphase.backend.service.DepartmentService;
+import at.ac.tuwien.sepr.groupphase.backend.service.EmployeeService;
 import at.ac.tuwien.sepr.groupphase.backend.service.ShiftPlanningService;
+import at.ac.tuwien.sepr.groupphase.backend.service.dto.DepartmentNameDto;
+import at.ac.tuwien.sepr.groupphase.backend.service.dto.EmployeeDto;
+import at.ac.tuwien.sepr.groupphase.backend.service.dto.EmployeeListItemDto;
 import at.ac.tuwien.sepr.groupphase.backend.service.dto.ScheduledShiftDetailDto;
 import at.ac.tuwien.sepr.groupphase.backend.service.dto.shift.PlanBlueprintDto;
 import at.ac.tuwien.sepr.groupphase.backend.service.dto.shift.ShiftDayDto;
@@ -39,11 +45,16 @@ import java.util.List;
 public class DepartmentEndpoint {
 
     private final DepartmentService departmentService;
+    private final EmployeeService employeeService;
+
     private final ShiftPlanningService shiftPlanningService;
 
-    public DepartmentEndpoint(DepartmentService departmentService, ShiftPlanningService shiftPlanningService) {
+    public DepartmentEndpoint(DepartmentService departmentService,
+                              ShiftPlanningService shiftPlanningService,
+                              EmployeeService employeeService) {
         this.departmentService = departmentService;
         this.shiftPlanningService = shiftPlanningService;
+        this.employeeService = employeeService;
     }
 
     @RolesAllowed({"ADMIN"})
@@ -124,6 +135,49 @@ public class DepartmentEndpoint {
             .orElseThrow(() -> new NotFoundException("Department not found!"));
 
         return department.plans().stream().map(ShiftPlanningMapper.Plans::toResponse).toList();
+    }
+
+    @Transactional
+    @RolesAllowed({"SUPERVISOR"})
+    @Operation(summary = "Add an employee to a department")
+    @ApiResponse(responseCode = "200", description = "Successfully added employee to department")
+    @PostMapping("/{departmentName}/addEmployee/{employeeEmail}")
+    public EmployeeRestResponseDto addEmployeeToDepartment(
+        @PathVariable(name = "departmentName") String departmentName,
+        @PathVariable(name = "employeeEmail") String employeeEmail) {
+
+        DepartmentDto department = departmentService.getDepartmentByName(departmentName)
+            .orElseThrow(() -> new NotFoundException("Department not found!"));
+
+        // TODO: Verify if user has access to this department
+
+        EmployeeDto employee = new EmployeeDto(employeeEmail, department.id());
+        employee = employeeService.convertUserToEmployee(employee);
+
+        // in this case, a mapper function cannot be used because the service
+        // does not require the department name, only the id
+        // and the rest response does not require the department id, only the name
+        return new EmployeeRestResponseDto(employee.email(), department.name());
+    }
+
+    @RolesAllowed({"SUPERVISOR"})
+    @Operation(summary = "List all employees of a department")
+    @ApiResponse(responseCode = "200", description = "List all employees of a department")
+    @GetMapping("/{departmentName}/employees")
+    @Transactional
+    public List<EmployeeListItemResponseDto> getEmployeesOfDepartment(
+        @PathVariable(name = "departmentName") String departmentName) {
+
+        DepartmentDto department = departmentService.getDepartmentByName(departmentName)
+            .orElseThrow(() -> new NotFoundException("Department not found!"));
+
+        // TODO: Verify if user has access to this department
+
+        List<EmployeeListItemDto> employees = employeeService.getEmployeesOfDepartment(
+            new DepartmentNameDto(department.name())
+        );
+
+        return employees.stream().map(EmployeeListItemResponseDto::from).toList();
     }
 
 

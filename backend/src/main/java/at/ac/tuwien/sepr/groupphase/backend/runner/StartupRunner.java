@@ -1,5 +1,8 @@
 package at.ac.tuwien.sepr.groupphase.backend.runner;
 
+import at.ac.tuwien.sepr.groupphase.backend.entity.ApplicationUser;
+import at.ac.tuwien.sepr.groupphase.backend.repository.DepartmentRepository;
+import at.ac.tuwien.sepr.groupphase.backend.repository.UserRepository;
 import at.ac.tuwien.sepr.groupphase.backend.service.DepartmentService;
 import at.ac.tuwien.sepr.groupphase.backend.service.ShiftPlanningService;
 import at.ac.tuwien.sepr.groupphase.backend.service.dto.DepartmentCreateDto;
@@ -31,16 +34,21 @@ public class StartupRunner implements CommandLineRunner {
     private final ShiftPlanningService shiftPlanningService;
     private final DepartmentService departmentService;
 
+    private final UserRepository userRepository;
+    private final DepartmentRepository departmentRepository;
+
     private static final Logger LOGGER = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
 
     @Value("${admin.user.password}")
     private String adminUserPassword;
 
     public StartupRunner(UserService userService, ShiftPlanningService shiftPlanningService,
-                         DepartmentService departmentService) {
+                         DepartmentService departmentService, UserRepository userRepository, DepartmentRepository departmentRepository) {
         this.userService = userService;
         this.shiftPlanningService = shiftPlanningService;
         this.departmentService = departmentService;
+        this.userRepository = userRepository;
+        this.departmentRepository = departmentRepository;
     }
 
     @Override
@@ -50,7 +58,6 @@ public class StartupRunner implements CommandLineRunner {
 
         this.userService.createOrChangePassword(
             new UserDataDto(ADMIN_EMAIL, adminUserPassword));
-
         this.userService.assignRoleToUser(new UserRoleDto(ADMIN_EMAIL, Role.ADMIN));
 
         var production = this.departmentService.getDepartmentByName("Produktion");
@@ -67,6 +74,26 @@ public class StartupRunner implements CommandLineRunner {
             } else {
                 LOGGER.info("Department has a plan.");
             }
+        }
+
+        if (this.userRepository.findAll().size() <= 1) {
+            LOGGER.info("Creating default users");
+            this.userService.createUser(new UserDataDto(
+                "supervisor@shyft.local",
+                "password"
+            ));
+            this.userService.createUser(new UserDataDto(
+                "new_account@shyft.local",
+                "password"
+            ));
+
+            ApplicationUser supervisor = this.userRepository.findByEmail("supervisor@shyft.local").get();
+            supervisor.setDepartment(this.departmentRepository.findByName("Produktion").get());
+            this.userRepository.save(supervisor);
+
+            this.userService.assignRoleToUser(
+                new UserRoleDto("supervisor@shyft.local", Role.SUPERVISOR)
+            );
         }
     }
 
