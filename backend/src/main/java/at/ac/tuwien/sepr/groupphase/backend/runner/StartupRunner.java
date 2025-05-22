@@ -63,42 +63,53 @@ public class StartupRunner implements CommandLineRunner {
         var production = this.departmentService.getDepartmentByName("Produktion");
 
         if (production.isEmpty()) {
-            LOGGER.info("Department not found, creating department.");
-            var dep = this.departmentService.createDepartment(new DepartmentCreateDto("Produktion", ADMIN_EMAIL));
-            // createPlan(dep.getId());
-        } else {
-            LOGGER.info("Department found: {}", production.get().name());
-            if (production.get().plans().isEmpty()) {
-                LOGGER.info("Department does not have a plan.");
-                // createPlan(production.get().id());
-            } else {
-                LOGGER.info("Department has a plan.");
-            }
-        }
-
-        if (this.userRepository.findAll().size() <= 1) {
-            LOGGER.info("Creating default users");
             this.userService.createUser(new UserDataDto(
                 "supervisor@shyft.local",
                 "password"
             ));
-            this.userService.createUser(new UserDataDto(
-                "new_account@shyft.local",
-                "password"
-            ));
 
-            ApplicationUser supervisor = this.userRepository.findByEmail("supervisor@shyft.local").get();
-            supervisor.setDepartment(this.departmentRepository.findByName("Produktion").get());
-            this.userRepository.save(supervisor);
-
-            this.userService.assignRoleToUser(
-                new UserRoleDto("supervisor@shyft.local", Role.SUPERVISOR)
-            );
+            LOGGER.info("Department not found, creating department.");
+            var dep = this.departmentService.createDepartment(new DepartmentCreateDto("Produktion", "supervisor@shyft.local"));
+            createPlan(dep.getId());
+            createUsers();
+        } else {
+            LOGGER.info("Department found: {}", production.get().name());
+            if (production.get().plans().isEmpty()) {
+                LOGGER.info("Department does not have a plan.");
+                createPlan(production.get().id());
+            } else {
+                LOGGER.info("Department has a plan.");
+            }
         }
     }
 
-    private void createPlan(Long departmentId) {
+    private void createUsers() {
+        LOGGER.info("Creating default users");
+        this.userService.createUser(new UserDataDto(
+            "employee@shyft.local",
+            "password"
+        ));
+        this.userService.createUser(new UserDataDto(
+            "new_account@shyft.local",
+            "password"
+        ));
 
+        ApplicationUser supervisor = this.userRepository.findByEmail("supervisor@shyft.local").get();
+        supervisor.setDepartment(this.departmentRepository.findByName("Produktion").get());
+        this.userRepository.save(supervisor);
+        this.userService.assignRoleToUser(
+            new UserRoleDto("supervisor@shyft.local", Role.SUPERVISOR)
+        );
+
+        ApplicationUser employee = this.userRepository.findByEmail("employee@shyft.local").get();
+        employee.setDepartment(this.departmentRepository.findByName("Produktion").get());
+        this.userRepository.save(employee);
+        this.userService.assignRoleToUser(
+            new UserRoleDto("employee@shyft.local", Role.EMPLOYEE)
+        );
+    }
+
+    private void createPlan(Long departmentId) {
         // === Tagschicht: 07:00 – 15:00 ===
         var monDay = new ShiftDayDto(DayOfWeek.MONDAY, LocalTime.of(7, 0), Duration.ofHours(8));
         var tuesDay = new ShiftDayDto(DayOfWeek.TUESDAY, LocalTime.of(7, 0), Duration.ofHours(8));
