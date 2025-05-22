@@ -10,8 +10,20 @@
  * Do not edit the class manually.
  */
 
+/**
+ * Shift day response
+ */
 export interface ShiftDayResponseDto { 
+    /**
+     * Day of the week
+     */
     day?: any;
+    /**
+     * Start time of the shift
+     */
     startTime?: any;
+    /**
+     * Duration of the shift
+     */
     duration?: any;
 }

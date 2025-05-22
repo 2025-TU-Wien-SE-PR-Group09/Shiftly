@@ -18,17 +18,17 @@ public class ScheduledShiftId implements Serializable {
     @Column(name = "calendar_year")
     private int calendarYear;
 
-    @Column(name = "shift_id")
-    private Long shiftId;
+    @Column(name = "shift_blueprint_id")
+    private Long shiftBlueprintId;
 
     public ScheduledShiftId() {
     }
 
-    public ScheduledShiftId(Long departmentId, int calendarWeek, int calendarYear, Long shiftId) {
+    public ScheduledShiftId(Long departmentId, int calendarWeek, int calendarYear, Long shiftBlueprintId) {
         this.departmentId = departmentId;
         this.calendarWeek = calendarWeek;
         this.calendarYear = calendarYear;
-        this.shiftId = shiftId;
+        this.shiftBlueprintId = shiftBlueprintId;
     }
 
     public Long getDepartmentId() {
@@ -55,12 +55,12 @@ public class ScheduledShiftId implements Serializable {
         this.calendarYear = calendarYear;
     }
 
-    public Long getShiftId() {
-        return shiftId;
+    public Long getShiftBlueprintId() {
+        return shiftBlueprintId;
     }
 
-    public void setShiftId(Long shiftId) {
-        this.shiftId = shiftId;
+    public void setShiftBlueprintId(Long shiftId) {
+        this.shiftBlueprintId = shiftId;
     }
 
     @Override
@@ -77,11 +77,11 @@ public class ScheduledShiftId implements Serializable {
             &&
             Objects.equals(departmentId, that.departmentId)
             &&
-            Objects.equals(shiftId, that.shiftId);
+            Objects.equals(shiftBlueprintId, that.shiftBlueprintId);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(departmentId, calendarWeek, calendarYear, shiftId);
+        return Objects.hash(departmentId, calendarWeek, calendarYear, shiftBlueprintId);
     }
 }

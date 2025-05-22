@@ -1,14 +1,10 @@
 package at.ac.tuwien.sepr.groupphase.backend.entity;
 
-import jakarta.persistence.EmbeddedId;
-import jakarta.persistence.Entity;
-import jakarta.persistence.JoinColumns;
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.ManyToOne;
-import jakarta.persistence.MapsId;
+import jakarta.persistence.*;
 
 
 @Entity
+@Table(name = "scheduled_shift_assignment")
 public class ScheduledShiftAssignment {
 
     @EmbeddedId
@@ -20,7 +16,7 @@ public class ScheduledShiftAssignment {
         @JoinColumn(name = "department_id", referencedColumnName = "department_id"),
         @JoinColumn(name = "calendar_week", referencedColumnName = "calendar_week"),
         @JoinColumn(name = "calendar_year", referencedColumnName = "calendar_year"),
-        @JoinColumn(name = "shift_id", referencedColumnName = "shift_id")
+        @JoinColumn(name = "shift_blueprint_id", referencedColumnName = "shift_blueprint_id")
     })
     private ScheduledShift scheduledShift;
 

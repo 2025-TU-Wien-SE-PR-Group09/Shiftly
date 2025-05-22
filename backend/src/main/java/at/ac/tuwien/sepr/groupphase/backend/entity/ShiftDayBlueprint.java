@@ -5,14 +5,7 @@ import java.time.Duration;
 import java.time.LocalTime;
 
 import at.ac.tuwien.sepr.groupphase.backend.entity.converter.DayOfWeekConverter;
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.Id;
-import jakarta.persistence.Column;
-import jakarta.persistence.Convert;
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.ManyToOne;
-import jakarta.persistence.GenerationType;
+import jakarta.persistence.*;
 
 
 /*
@@ -20,7 +13,8 @@ import jakarta.persistence.GenerationType;
  * It is part of a ShiftWeek, which contains multiple ShiftDay entities.
  */
 @Entity
-public class ShiftDay {
+@Table(name = "shift_day_blueprint")
+public class ShiftDayBlueprint {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -36,16 +30,16 @@ public class ShiftDay {
 
     @ManyToOne
     @JoinColumn(name = "shift_week_id")
-    private ShiftWeek shiftWeek;
+    private ShiftWeekBlueprint shiftWeekBlueprint;
 
-    public ShiftDay() {
+    public ShiftDayBlueprint() {
     }
 
-    public ShiftDay(DayOfWeek day, LocalTime startTime, Duration duration, ShiftWeek shiftWeek) {
+    public ShiftDayBlueprint(DayOfWeek day, LocalTime startTime, Duration duration, ShiftWeekBlueprint shiftWeekBlueprint) {
         this.day = day;
         this.startTime = startTime;
         this.duration = duration;
-        this.shiftWeek = shiftWeek;
+        this.shiftWeekBlueprint = shiftWeekBlueprint;
     }
 
     public LocalTime getStartTime() {

@@ -12,7 +12,7 @@ import java.util.Objects;
  * It consists of a start date and a department ID.
  */
 @Embeddable
-public class PlanId implements Serializable {
+public class PlanBlueprintId implements Serializable {
 
     @Column(name = "plan_startdate", nullable = false)
     private LocalDate startDate;
@@ -20,10 +20,10 @@ public class PlanId implements Serializable {
     @Column(name = "department_id", nullable = false)
     private Long departmentId;
 
-    public PlanId() {
+    public PlanBlueprintId() {
     }
 
-    public PlanId(LocalDate startDate, Long departmentId) {
+    public PlanBlueprintId(LocalDate startDate, Long departmentId) {
         this.startDate = startDate;
         this.departmentId = departmentId;
     }
@@ -37,7 +37,7 @@ public class PlanId implements Serializable {
         if (this == o) {
             return true;
         }
-        if (!(o instanceof PlanId that)) {
+        if (!(o instanceof PlanBlueprintId that)) {
             return false;
         }
         return startDate == that.startDate && Objects.equals(departmentId, that.departmentId);

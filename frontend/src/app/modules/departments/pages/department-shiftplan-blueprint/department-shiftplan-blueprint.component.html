@@ -9,7 +9,7 @@
     </svg>
     Shiftplan Blueprint
   </h2>
-
+  <app-editor (blueprintSaved)="loadBlueprints()" [departmentName]="departmentName!"></app-editor>
   <div *ngFor="let plan of shiftplans" class="mb-6">
     <div class="text-foreground/80 mb-2 text-lg font-medium">{{ plan.department }}</div>
 
@@ -40,7 +40,9 @@
         </div>
       </div>
     </div>
-    <!-- calendar view -->
-    <app-department-concrete-shiftplan [departmentId]="1"> </app-department-concrete-shiftplan>
+    <button (click)="finalizePlan()" class="bg-primary rounded px-4 py-2 text-sm text-white shadow">
+      Generate Plan!
+    </button>
+    <app-department-concrete-shiftplan [departmentId]="departmentId"> </app-department-concrete-shiftplan>
   </div>
 </div>

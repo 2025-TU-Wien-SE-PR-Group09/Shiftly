@@ -7,9 +7,9 @@ import at.ac.tuwien.sepr.groupphase.backend.service.dto.Role;
 import at.ac.tuwien.sepr.groupphase.backend.service.dto.UserDataDto;
 import at.ac.tuwien.sepr.groupphase.backend.service.dto.UserRoleDto;
 import at.ac.tuwien.sepr.groupphase.backend.service.UserService;
-import at.ac.tuwien.sepr.groupphase.backend.service.dto.shift.CreateShiftDto;
+import at.ac.tuwien.sepr.groupphase.backend.service.dto.shift.CreateShiftBlueprintDto;
 import at.ac.tuwien.sepr.groupphase.backend.service.dto.shift.ShiftDayDto;
-import at.ac.tuwien.sepr.groupphase.backend.service.dto.shift.ShiftWeekDto;
+import at.ac.tuwien.sepr.groupphase.backend.service.dto.shift.ShiftWeekBlueprintDto;
 import jakarta.transaction.Transactional;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -58,12 +58,12 @@ public class StartupRunner implements CommandLineRunner {
         if (production.isEmpty()) {
             LOGGER.info("Department not found, creating department.");
             var dep = this.departmentService.createDepartment(new DepartmentCreateDto("Produktion", ADMIN_EMAIL));
-            createPlan(dep.getId());
+            // createPlan(dep.getId());
         } else {
             LOGGER.info("Department found: {}", production.get().name());
             if (production.get().plans().isEmpty()) {
                 LOGGER.info("Department does not have a plan.");
-                createPlan(production.get().id());
+                // createPlan(production.get().id());
             } else {
                 LOGGER.info("Department has a plan.");
             }
@@ -79,11 +79,11 @@ public class StartupRunner implements CommandLineRunner {
         var thurDay = new ShiftDayDto(DayOfWeek.THURSDAY, LocalTime.of(7, 0), Duration.ofHours(8));
         var fridayDay = new ShiftDayDto(DayOfWeek.FRIDAY, LocalTime.of(7, 0), Duration.ofHours(8));
 
-        var dayShift = shiftPlanningService.createShift(
-            new CreateShiftDto(departmentId, "Tagschicht", 4)
+        var dayShift = shiftPlanningService.createShiftBlueprint(
+            new CreateShiftBlueprintDto(departmentId, "Tagschicht", 4)
         );
-        shiftPlanningService.addWeekToShift(dayShift.id(),
-            new ShiftWeekDto(List.of(monDay, tuesDay, wedDay, thurDay, fridayDay)));
+        var a = List.of(new ShiftWeekBlueprintDto(List.of(monDay, tuesDay, wedDay, thurDay, fridayDay)));
+        shiftPlanningService.addWeeksToShift(dayShift.id(), a);
 
         // === Nachtschicht: 18:00 – 02:00 bzw. 6.5h Fr ===
         var monNight = new ShiftDayDto(DayOfWeek.MONDAY, LocalTime.of(18, 0), Duration.ofHours(8));
@@ -92,13 +92,14 @@ public class StartupRunner implements CommandLineRunner {
         var thurNight = new ShiftDayDto(DayOfWeek.THURSDAY, LocalTime.of(18, 0), Duration.ofHours(8));
         var saturdayNight = new ShiftDayDto(DayOfWeek.SATURDAY, LocalTime.of(18, 0), Duration.ofHours(6).plusMinutes(30));
 
-        var nightShift = shiftPlanningService.createShift(
-            new CreateShiftDto(departmentId, "Nachtschicht", 4)
+        var nightShift = shiftPlanningService.createShiftBlueprint(
+            new CreateShiftBlueprintDto(departmentId, "Nachtschicht", 4)
         );
-        shiftPlanningService.addWeekToShift(nightShift.id(),
-            new ShiftWeekDto(List.of(monNight, tuesNight, wedNight, thurNight, saturdayNight)));
 
-        shiftPlanningService.createPlan(departmentId, List.of(dayShift.id(), nightShift.id()));
+        shiftPlanningService.addWeeksToShift(nightShift.id(),
+            List.of(new ShiftWeekBlueprintDto(List.of(monNight, tuesNight, wedNight, thurNight, saturdayNight))));
+
+        shiftPlanningService.createPlanBlueprint(departmentId, List.of(dayShift.id(), nightShift.id()));
     }
 
 }
