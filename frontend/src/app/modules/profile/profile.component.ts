@@ -5,12 +5,13 @@ import { NgIf } from '@angular/common';
 
 @Component({
   selector: 'app-auth',
-  templateUrl: './auth.component.html',
-  styleUrls: ['./auth.component.css'],
-  imports: [AngularSvgIconModule, RouterOutlet, NgIf],
+  templateUrl: './profile.component.html',
+  styleUrls: ['./profile.component.css'],
+  imports: [AngularSvgIconModule, RouterOutlet],
 })
-export class AuthComponent implements OnInit {
+export class ProfileComponent implements OnInit {
   constructor(private router: Router) {}
 
   ngOnInit(): void {}
+
 }

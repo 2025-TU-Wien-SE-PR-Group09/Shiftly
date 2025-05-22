@@ -3,10 +3,11 @@ import { Router } from '@angular/router';
 import { ButtonComponent } from '../../../../shared/components/button/button.component';
 import { AuthService } from '../../../../core/services/auth.service';
 import { UserEndpointService, UserProfileRestDto } from '../../../../rest_client';
+import { NgIf } from '@angular/common';
 
 @Component({
   selector: 'app-your-profile',
-  imports: [ButtonComponent],
+  imports: [ButtonComponent, NgIf],
   templateUrl: './your-profile.component.html',
   styleUrl: './your-profile.component.css',
 })
@@ -34,11 +35,15 @@ export class YourProfileComponent implements OnInit {
   }
 
   changePassword(): void {
-    this.router.navigate(['/auth/new-password']);
+    this.router.navigate(['/profile/new-password']);
   }
 
   goHome(): void {
     this.router.navigate(['/home']);
+  }
+
+  isAdmin(): boolean {
+    return this.userData.role === 'ADMIN';
   }
 
 }

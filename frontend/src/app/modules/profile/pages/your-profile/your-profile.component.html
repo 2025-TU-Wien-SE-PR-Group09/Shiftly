@@ -21,7 +21,7 @@
       <div class="bg-background p-3 rounded-md text-foreground">{{ userData.role }}</div>
     </div>
 
-    <div class="form__group">
+    <div class="form__group" *ngIf="!isAdmin() && userData.department">
       <label class="block text-muted-foreground text-sm mb-1">Department</label>
       <div class="bg-background p-3 rounded-md text-foreground">{{ userData.department }}</div>
     </div>
