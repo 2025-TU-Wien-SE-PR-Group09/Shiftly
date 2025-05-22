@@ -1,18 +1,14 @@
 package at.ac.tuwien.sepr.groupphase.backend.entity;
 
 
-import jakarta.persistence.CascadeType;
-import jakarta.persistence.EmbeddedId;
-import jakarta.persistence.Entity;
-import jakarta.persistence.ManyToOne;
-import jakarta.persistence.OneToMany;
-import jakarta.persistence.MapsId;
+import jakarta.persistence.*;
 
 import java.time.LocalDate;
 import java.util.HashSet;
 import java.util.Set;
 
 @Entity
+@Table(name = "scheduled_shift")
 public class ScheduledShift {
 
     @EmbeddedId
@@ -23,8 +19,8 @@ public class ScheduledShift {
     private Department department;
 
     @ManyToOne(optional = false)
-    @MapsId("shiftId")
-    private Shift shift;
+    @MapsId("shiftBlueprintId")
+    private ShiftBlueprint shiftBlueprint;
 
     private LocalDate weekStartDate;
 
@@ -50,12 +46,12 @@ public class ScheduledShift {
         this.department = department;
     }
 
-    public Shift getShift() {
-        return shift;
+    public ShiftBlueprint getShift() {
+        return shiftBlueprint;
     }
 
-    public void setShift(Shift shift) {
-        this.shift = shift;
+    public void setShift(ShiftBlueprint shiftBlueprint) {
+        this.shiftBlueprint = shiftBlueprint;
     }
 
     public LocalDate getWeekStartDate() {

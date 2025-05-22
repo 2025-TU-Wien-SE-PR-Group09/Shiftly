@@ -1,4 +1,4 @@
-package at.ac.tuwien.sepr.groupphase.backend.endpoint.dto;
+package at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.getplanblueprint;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 

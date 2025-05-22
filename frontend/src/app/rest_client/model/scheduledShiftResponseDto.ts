@@ -10,9 +10,24 @@
  * Do not edit the class manually.
  */
 
+/**
+ * Scheduled shift response
+ */
 export interface ScheduledShiftResponseDto { 
+    /**
+     * Calendar week of the shift
+     */
     calendarWeek?: any;
+    /**
+     * Year of the shift
+     */
     year?: any;
+    /**
+     * Description of the shift
+     */
     shiftDescription?: any;
+    /**
+     * Start date of the week
+     */
     weekStartDate?: any;
 }

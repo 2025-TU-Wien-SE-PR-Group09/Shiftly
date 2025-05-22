@@ -1,17 +1,23 @@
 package at.ac.tuwien.sepr.groupphase.backend.service.mapper;
 
+import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.createplanblueprint.ShiftCreateDto;
+import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.createplanblueprint.ShiftDayCreateDto;
 import at.ac.tuwien.sepr.groupphase.backend.entity.PlanBlueprint;
-import at.ac.tuwien.sepr.groupphase.backend.entity.Shift;
-import at.ac.tuwien.sepr.groupphase.backend.entity.ShiftDay;
-import at.ac.tuwien.sepr.groupphase.backend.entity.ShiftWeek;
-import at.ac.tuwien.sepr.groupphase.backend.service.dto.shift.ShiftDayDto;
-import at.ac.tuwien.sepr.groupphase.backend.service.dto.shift.PlanBlueprintDto;
-import at.ac.tuwien.sepr.groupphase.backend.service.dto.shift.ShiftDto;
-import at.ac.tuwien.sepr.groupphase.backend.service.dto.shift.ShiftWeekDto;
-import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.PlanBlueprintResponse;
-import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.ShiftResponseDto;
-import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.ShiftWeekResponseDto;
-import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.ShiftDayResponseDto;
+import at.ac.tuwien.sepr.groupphase.backend.entity.ShiftBlueprint;
+import at.ac.tuwien.sepr.groupphase.backend.entity.ShiftDayBlueprint;
+import at.ac.tuwien.sepr.groupphase.backend.entity.ShiftWeekBlueprint;
+import at.ac.tuwien.sepr.groupphase.backend.service.dto.shift.*;
+import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.getplanblueprint.PlanBlueprintResponse;
+import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.getplanblueprint.ShiftResponseDto;
+import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.getplanblueprint.ShiftWeekResponseDto;
+import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.getplanblueprint.ShiftDayResponseDto;
+
+import java.time.DayOfWeek;
+import java.time.Duration;
+import java.time.LocalTime;
+import java.util.Optional;
+
+import static at.ac.tuwien.sepr.groupphase.backend.service.util.OptionalExtension.ofThrowable;
 
 /**
  * Mapper class for the Shift Planning.
@@ -53,18 +59,22 @@ public class ShiftPlanningMapper {
      */
     public static class Shifts {
 
+        public static CreateShiftBlueprintDto toDto(Long departmentId, ShiftCreateDto shiftCreateDto) {
+            return new CreateShiftBlueprintDto(departmentId, shiftCreateDto.getDescription(), shiftCreateDto.getManPower());
+        }
+
         /**
          * Converts a Shift(DAO) entity to a ShiftDto(Service DTO).
          *
-         * @param shift the Shift entity
+         * @param shiftBlueprint the Shift entity
          * @return the ShiftDto
          */
-        public static ShiftDto fromEntity(Shift shift) {
-            var shiftWeeks = shift.getShiftWeeks().stream()
+        public static ShiftBlueprintDto fromEntity(ShiftBlueprint shiftBlueprint) {
+            var shiftWeeks = shiftBlueprint.getShiftWeeks().stream()
                 .map(ShiftPlanningMapper.ShiftWeeks::fromEntity)
                 .toList();
 
-            return new ShiftDto(shift.getId(), shift.getDescription(), shift.getManPower(), shiftWeeks);
+            return new ShiftBlueprintDto(shiftBlueprint.getId(), shiftBlueprint.getDescription(), shiftBlueprint.getManPower(), shiftWeeks);
         }
 
         /**
@@ -73,7 +83,7 @@ public class ShiftPlanningMapper {
          * @param shift the ShiftDto
          * @return the ShiftResponseDto(Rest)
          */
-        public static ShiftResponseDto toResponse(ShiftDto shift) {
+        public static ShiftResponseDto toResponse(ShiftBlueprintDto shift) {
             return new ShiftResponseDto(shift.description(), shift.manPower(),
                 shift.shiftWeeks().stream().map(ShiftPlanningMapper.ShiftWeeks::toResponse).toList());
         }
@@ -84,17 +94,18 @@ public class ShiftPlanningMapper {
      */
     public static class ShiftWeeks {
 
+
         /**
          * Converts a ShiftWeek(DAO) entity to a ShiftWeekDto(Service DTO).
          *
-         * @param shiftWeek the ShiftWeek entity
+         * @param shiftWeekBlueprint the ShiftWeek entity
          * @return the ShiftWeekDto
          */
-        public static ShiftWeekDto fromEntity(ShiftWeek shiftWeek) {
-            var shiftDays = shiftWeek.getDays().stream()
+        public static ShiftWeekBlueprintDto fromEntity(ShiftWeekBlueprint shiftWeekBlueprint) {
+            var shiftDays = shiftWeekBlueprint.getDays().stream()
                 .map(ShiftPlanningMapper.ShiftDays::fromEntity)
                 .toList();
-            return new ShiftWeekDto(shiftDays);
+            return new ShiftWeekBlueprintDto(shiftDays);
         }
 
         /**
@@ -103,7 +114,7 @@ public class ShiftPlanningMapper {
          * @param shiftWeek the ShiftWeekDto
          * @return the ShiftWeekResponseDto(Rest)
          */
-        public static ShiftWeekResponseDto toResponse(ShiftWeekDto shiftWeek) {
+        public static ShiftWeekResponseDto toResponse(ShiftWeekBlueprintDto shiftWeek) {
             return new ShiftWeekResponseDto(
                 shiftWeek.shiftDays().stream().map(ShiftPlanningMapper.ShiftDays::toResponse).toList());
         }
@@ -114,14 +125,29 @@ public class ShiftPlanningMapper {
      */
     public static class ShiftDays {
 
+        public static CreateShiftDayDto toDto(ShiftDayCreateDto shiftDayCreateDto) {
+
+            var dayOfWeek = ofThrowable(() -> DayOfWeek.valueOf(shiftDayCreateDto.getDay()));
+            var startTime = ofThrowable(() -> LocalTime.parse(shiftDayCreateDto.getStartTime()));
+            var endTime = ofThrowable(() -> LocalTime.parse(shiftDayCreateDto.getEndTime()));
+
+            Optional<Duration> duration = startTime.flatMap(st -> endTime.map(et -> Duration.between(st, et)));
+
+            return new CreateShiftDayDto(
+                dayOfWeek,
+                startTime,
+                duration
+            );
+        }
+
         /**
          * Converts a ShiftDay(DAO) entity to a ShiftDayDto(Service DTO).
          *
-         * @param shiftDay the ShiftDay entity
+         * @param shiftDayBlueprint the ShiftDay entity
          * @return the ShiftDayDto
          */
-        public static ShiftDayDto fromEntity(ShiftDay shiftDay) {
-            return new ShiftDayDto(shiftDay.getDay(), shiftDay.getStartTime(), shiftDay.getDuration());
+        public static ShiftDayDto fromEntity(ShiftDayBlueprint shiftDayBlueprint) {
+            return new ShiftDayDto(shiftDayBlueprint.getDay(), shiftDayBlueprint.getStartTime(), shiftDayBlueprint.getDuration());
         }
 
         /**

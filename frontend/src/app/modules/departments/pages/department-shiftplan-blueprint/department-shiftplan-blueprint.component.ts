@@ -4,17 +4,20 @@ import { ActivatedRoute, Router } from '@angular/router';
 import { DepartmentService } from 'src/app/rest_client';
 import { ToastrService } from 'ngx-toastr';
 import { DepartmentConcreteShiftplanComponent } from '../department-concrete-shiftplan/department-concrete-shiftplan.component';
+import { EditorComponent } from './editor/editor.component';
+
 @Component({
   selector: 'app-department-shiftplan',
-  imports: [CommonModule, DepartmentConcreteShiftplanComponent],
-  templateUrl: './department-shiftplan.component.html',
-  styleUrl: './department-shiftplan.component.css',
+  imports: [CommonModule, DepartmentConcreteShiftplanComponent, EditorComponent],
+  templateUrl: './department-shiftplan-blueprint.component.html',
+  styleUrl: './department-shiftplan-blueprint.component.css',
 })
-export class DepartmentShiftplanComponent {
+export class DepartmentShiftplanBlueprintComponent {
   shiftplans: any[] = [];
   isLoading = true;
   error: string | null = null;
   departmentName: string | null = null;
+  departmentId: number | null = null;
 
   daysOfWeek = ['MONDAY', 'TUESDAY', 'WEDNESDAY', 'THURSDAY', 'FRIDAY', 'SATURDAY', 'SUNDAY'];
 
@@ -28,7 +31,7 @@ export class DepartmentShiftplanComponent {
     private router: Router,
   ) {}
 
-  ngOnInit(): void {
+  loadBlueprints(): void {
     this.departmentName = this.route.snapshot.paramMap.get('name');
 
     if (!this.departmentName) {
@@ -37,6 +40,15 @@ export class DepartmentShiftplanComponent {
       this.isLoading = false;
       return;
     }
+
+    type Department = {
+      id: number;
+      name: string;
+    };
+
+    this.departmentService.getAllDepartments().subscribe({
+      next: (data: Department[]) => (this.departmentId = data.find((x) => x.name === this.departmentName)!.id),
+    });
 
     this.departmentService.getShiftplanBlueprints(this.departmentName).subscribe({
       next: (data) => {
@@ -63,6 +75,20 @@ export class DepartmentShiftplanComponent {
         this.toastrService.error(err.error);
       },
     });
+  }
+
+  finalizePlan(): void {
+    this.departmentService.generateConcretePlan(this.departmentId).subscribe({
+      next: (data) => {
+        this.toastrService.success('Generated plan!');
+        this.router.navigate(['/departments', this.departmentName, 'shiftplan-editor']);
+      },
+      error: (err) => this.toastrService.error(err.error),
+    });
+  }
+
+  ngOnInit(): void {
+    this.loadBlueprints();
   }
 
   getHourMinute(time: string): string {

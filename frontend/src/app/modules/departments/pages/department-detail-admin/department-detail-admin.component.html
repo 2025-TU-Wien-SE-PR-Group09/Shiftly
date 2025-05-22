@@ -60,7 +60,7 @@
         <tr *ngFor="let dept of departments; let i = index" class="hover:bg-card/50">
           <td class="px-2 py-3">{{ dept.name }}</td>
           <td class="px-2 py-3">{{ dept.supervisorEmail }}</td>
-          <td class="px-2 py-3" [routerLink]="['/departments', dept.name, 'shiftplan']">
+          <td class="px-2 py-3" [routerLink]="['/departments', dept.name, 'shiftplan-editor']">
             <div class="flex items-center space-x-2">
               <svg
                 xmlns="http://www.w3.org/2000/svg"

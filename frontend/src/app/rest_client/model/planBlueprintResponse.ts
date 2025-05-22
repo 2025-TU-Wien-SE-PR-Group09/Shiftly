@@ -10,7 +10,16 @@
  * Do not edit the class manually.
  */
 
+/**
+ * Response for shift plan blueprint
+ */
 export interface PlanBlueprintResponse { 
+    /**
+     * Name of  department
+     */
     department?: any;
+    /**
+     * List of shifts
+     */
     shifts?: any;
 }

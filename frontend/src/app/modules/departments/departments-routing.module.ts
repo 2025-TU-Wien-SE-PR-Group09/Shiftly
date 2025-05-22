@@ -3,7 +3,7 @@ import { RouterModule, Routes } from '@angular/router';
 import { DepartmentsComponent } from './departments.component';
 import { DepartmentDetailSupervisorComponent } from './pages/department-detail-supervisor/department-detail-supervisor.component';
 import { DepartmentDetailAdminComponent } from './pages/department-detail-admin/department-detail-admin.component';
-import { DepartmentShiftplanComponent } from './pages/department-shiftplan/department-shiftplan.component';
+import { DepartmentShiftplanBlueprintComponent } from './pages/department-shiftplan-blueprint/department-shiftplan-blueprint.component';
 
 const routes: Routes = [
   {
@@ -19,8 +19,8 @@ const routes: Routes = [
         component: DepartmentDetailSupervisorComponent,
       },
       {
-        path: ':name/shiftplan',
-        component: DepartmentShiftplanComponent,
+        path: ':name/shiftplan-editor',
+        component: DepartmentShiftplanBlueprintComponent,
       },
     ],
   },

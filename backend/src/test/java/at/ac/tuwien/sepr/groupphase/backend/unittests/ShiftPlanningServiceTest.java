@@ -4,7 +4,6 @@ import at.ac.tuwien.sepr.groupphase.backend.entity.*;
 import at.ac.tuwien.sepr.groupphase.backend.exception.ConflictException;
 import at.ac.tuwien.sepr.groupphase.backend.exception.NotFoundException;
 import at.ac.tuwien.sepr.groupphase.backend.repository.*;
-import at.ac.tuwien.sepr.groupphase.backend.service.UserService;
 import at.ac.tuwien.sepr.groupphase.backend.service.dto.shift.*;
 import at.ac.tuwien.sepr.groupphase.backend.service.impl.ShiftPlanningServiceImpl;
 import at.ac.tuwien.sepr.groupphase.backend.service.impl.TimeService;
@@ -25,9 +24,9 @@ class ShiftPlanningServiceTest {
 
     private ShiftPlanningServiceImpl shiftPlanningService;
 
-    private ShiftDayRepository shiftDayRepository;
-    private ShiftRepository shiftRepository;
-    private ShiftWeekRepository shiftWeekRepository;
+    private ShiftDayBlueprintRepository shiftDayBlueprintRepository;
+    private ShiftBlueprintRepository shiftBlueprintRepository;
+    private ShiftWeekBlueprintRepository shiftWeekBlueprintRepository;
     private DepartmentRepository departmentRepository;
     private TimeService timeService;
     private PlanBlueprintRepository planBlueprintRepository;
@@ -37,9 +36,9 @@ class ShiftPlanningServiceTest {
 
     @BeforeEach
     void setUp() {
-        shiftDayRepository = mock(ShiftDayRepository.class);
-        shiftRepository = mock(ShiftRepository.class);
-        shiftWeekRepository = mock(ShiftWeekRepository.class);
+        shiftDayBlueprintRepository = mock(ShiftDayBlueprintRepository.class);
+        shiftBlueprintRepository = mock(ShiftBlueprintRepository.class);
+        shiftWeekBlueprintRepository = mock(ShiftWeekBlueprintRepository.class);
         departmentRepository = mock(DepartmentRepository.class);
         timeService = mock(TimeService.class);
         planBlueprintRepository = mock(PlanBlueprintRepository.class);
@@ -50,9 +49,9 @@ class ShiftPlanningServiceTest {
 
         //TODO
         shiftPlanningService = new ShiftPlanningServiceImpl(
-            shiftDayRepository,
-            shiftWeekRepository,
-            shiftRepository,
+            shiftDayBlueprintRepository,
+            shiftWeekBlueprintRepository,
+            shiftBlueprintRepository,
             timeService,
             new ShiftWeekValidatorImpl(),
             planBlueprintRepository,
@@ -64,7 +63,7 @@ class ShiftPlanningServiceTest {
     }
 
     @Test
-    void createPlan_shouldReturnPlanBlueprintDto_withAllFieldsCorrect() {
+    void createPlan_shouldReturnPlanBlueprintBlueprintDto_withAllFieldsCorrect() {
         // GIVEN
         Long departmentId = 1L;
         Department department = new Department();
@@ -72,16 +71,16 @@ class ShiftPlanningServiceTest {
         department.setName("Produktion");
 
         LocalDate monday = LocalDate.of(2025, 6, 2);
-        Shift shift = new Shift("Frühschicht", 3);
-        shift.setId(100L);
+        ShiftBlueprint shiftBlueprint = new ShiftBlueprint("Frühschicht", 3);
+        shiftBlueprint.setId(100L);
 
         when(departmentRepository.findById(departmentId)).thenReturn(Optional.of(department));
-        when(shiftRepository.findAllById(List.of(100L))).thenReturn(List.of(shift));
+        when(shiftBlueprintRepository.findAllById(List.of(100L))).thenReturn(List.of(shiftBlueprint));
         when(timeService.nextMonday()).thenReturn(monday);
         when(planBlueprintRepository.save(any())).thenAnswer(invocation -> invocation.getArgument(0));
 
         // WHEN
-        PlanBlueprintDto result = shiftPlanningService.createPlan(departmentId, List.of(100L));
+        PlanBlueprintDto result = shiftPlanningService.createPlanBlueprint(departmentId, List.of(100L));
 
         // THEN
         assertAll(
@@ -89,28 +88,28 @@ class ShiftPlanningServiceTest {
             () -> assertEquals("Produktion", result.department()),
             () -> assertEquals(1, result.shifts().size()),
             () -> {
-                ShiftDto shiftDto = result.shifts().getFirst();
+                ShiftBlueprintDto shiftBlueprintDto = result.shifts().getFirst();
                 assertAll("ShiftDto",
-                    () -> assertEquals(100L, shiftDto.id()),
-                    () -> assertEquals("Frühschicht", shiftDto.description()),
-                    () -> assertEquals(3, shiftDto.manPower()),
-                    () -> assertTrue(shiftDto.shiftWeeks().isEmpty())
+                    () -> assertEquals(100L, shiftBlueprintDto.id()),
+                    () -> assertEquals("Frühschicht", shiftBlueprintDto.description()),
+                    () -> assertEquals(3, shiftBlueprintDto.manPower()),
+                    () -> assertTrue(shiftBlueprintDto.shiftWeeks().isEmpty())
                 );
             }
         );
     }
 
     @Test
-    void createShift_shouldReturnShiftDto_withCorrectFields() {
+    void createShift_shouldReturnShiftBlueprintDto_withCorrectFields() {
         // GIVEN
-        CreateShiftDto input = new CreateShiftDto(1L, "Nachtschicht", 5);
-        Shift savedShift = new Shift("Nachtschicht", 5);
-        savedShift.setId(123L);
+        CreateShiftBlueprintDto input = new CreateShiftBlueprintDto(1L, "Nachtschicht", 5);
+        ShiftBlueprint savedShiftBlueprint = new ShiftBlueprint("Nachtschicht", 5);
+        savedShiftBlueprint.setId(123L);
 
-        when(shiftRepository.save(any())).thenReturn(savedShift);
+        when(shiftBlueprintRepository.save(any())).thenReturn(savedShiftBlueprint);
 
         // WHEN
-        ShiftDto result = shiftPlanningService.createShift(input);
+        ShiftBlueprintDto result = shiftPlanningService.createShiftBlueprint(input);
 
         // THEN
         assertAll(
@@ -124,30 +123,30 @@ class ShiftPlanningServiceTest {
     }
 
     @Test
-    void addWeekToShift_shouldReturnShiftDto_withCorrectWeekAndDays() {
+    void addWeekToShift_shouldReturnShiftDto_withCorrectWeeksAndDays() {
         // GIVEN
         Long shiftId = 77L;
-        Shift shift = new Shift("Spätschicht", 4);
-        shift.setId(shiftId);
+        ShiftBlueprint shiftBlueprint = new ShiftBlueprint("Spätschicht", 4);
+        shiftBlueprint.setId(shiftId);
 
-        ShiftWeekDto weekDto = new ShiftWeekDto(List.of(
+        ShiftWeekBlueprintDto weekDto = new ShiftWeekBlueprintDto(List.of(
             new ShiftDayDto(DayOfWeek.TUESDAY, LocalTime.of(14, 0), Duration.ofHours(4)),
             new ShiftDayDto(DayOfWeek.WEDNESDAY, LocalTime.of(14, 0), Duration.ofHours(4))
         ));
 
-        ShiftWeek shiftWeek = new ShiftWeek(0, shift);
-        List<ShiftDay> savedDays = List.of(
-            new ShiftDay(DayOfWeek.TUESDAY, LocalTime.of(14, 0), Duration.ofHours(4), shiftWeek),
-            new ShiftDay(DayOfWeek.WEDNESDAY, LocalTime.of(14, 0), Duration.ofHours(4), shiftWeek)
+        ShiftWeekBlueprint shiftWeekBlueprint = new ShiftWeekBlueprint(0, shiftBlueprint);
+        List<ShiftDayBlueprint> savedDays = List.of(
+            new ShiftDayBlueprint(DayOfWeek.TUESDAY, LocalTime.of(14, 0), Duration.ofHours(4), shiftWeekBlueprint),
+            new ShiftDayBlueprint(DayOfWeek.WEDNESDAY, LocalTime.of(14, 0), Duration.ofHours(4), shiftWeekBlueprint)
         );
 
-        when(shiftRepository.findById(shiftId)).thenReturn(Optional.of(shift));
-        when(shiftWeekRepository.save(any())).thenReturn(shiftWeek);
-        when(shiftDayRepository.saveAll(any())).thenReturn(savedDays);
-        when(shiftRepository.save(any())).thenReturn(shift);
+        when(shiftBlueprintRepository.findById(shiftId)).thenReturn(Optional.of(shiftBlueprint));
+        when(shiftWeekBlueprintRepository.save(any())).thenReturn(shiftWeekBlueprint);
+        when(shiftDayBlueprintRepository.saveAll(any())).thenReturn(savedDays);
+        when(shiftBlueprintRepository.save(any())).thenReturn(shiftBlueprint);
 
         // WHEN
-        ShiftDto result = shiftPlanningService.addWeekToShift(shiftId, weekDto);
+        ShiftBlueprintDto result = shiftPlanningService.addWeeksToShift(shiftId, List.of(weekDto));
 
         // THEN
         assertAll(
@@ -157,7 +156,7 @@ class ShiftPlanningServiceTest {
             () -> assertEquals(4, result.manPower()),
             () -> assertEquals(1, result.shiftWeeks().size()),
             () -> {
-                ShiftWeekDto returnedWeek = result.shiftWeeks().getFirst();
+                ShiftWeekBlueprintDto returnedWeek = result.shiftWeeks().getFirst();
                 assertEquals(2, returnedWeek.shiftDays().size());
                 assertAll("ShiftDayDto checks",
                     () -> assertEquals(DayOfWeek.TUESDAY, returnedWeek.shiftDays().getFirst().day()),
@@ -170,32 +169,32 @@ class ShiftPlanningServiceTest {
     }
 
     @Test
-    void createShift_withZeroManPower_shouldThrowConflict() {
-        CreateShiftDto input = new CreateShiftDto(1L, "Leerer Shift", 0);
-        assertThrows(ConflictException.class, () -> shiftPlanningService.createShift(input));
+    void createShift_Blueprint_withZeroManPower_shouldThrowConflict() {
+        CreateShiftBlueprintDto input = new CreateShiftBlueprintDto(1L, "Leerer Shift", 0);
+        assertThrows(ConflictException.class, () -> shiftPlanningService.createShiftBlueprint(input));
     }
 
     @Test
-    void createPlan_withMissingDepartment_shouldThrowNotFound() {
+    void createPlan_Blueprint_withMissingDepartment_shouldThrowNotFound() {
         when(departmentRepository.findById(42L)).thenReturn(Optional.empty());
-        assertThrows(NotFoundException.class, () -> shiftPlanningService.createPlan(42L, List.of()));
+        assertThrows(NotFoundException.class, () -> shiftPlanningService.createPlanBlueprint(42L, List.of()));
     }
 
     @Test
-    void createPlan_withNoShiftsFound_shouldThrowNotFound() {
+    void createPlan_Blueprint_withNoShiftsFound_shouldThrowNotFound() {
         Department d = new Department();
         d.setId(1L);
         when(departmentRepository.findById(1L)).thenReturn(Optional.of(d));
-        when(shiftRepository.findAllById(List.of(99L))).thenReturn(List.of());
+        when(shiftBlueprintRepository.findAllById(List.of(99L))).thenReturn(List.of());
 
-        assertThrows(NotFoundException.class, () -> shiftPlanningService.createPlan(1L, List.of(99L)));
+        assertThrows(NotFoundException.class, () -> shiftPlanningService.createPlanBlueprint(1L, List.of(99L)));
     }
 
     @Test
-    void addWeekToShift_withMissingShift_shouldThrowNotFound() {
-        when(shiftRepository.findById(777L)).thenReturn(Optional.empty());
+    void addWeeksToShift_withMissingShift_shouldThrowNotFound() {
+        when(shiftBlueprintRepository.findById(777L)).thenReturn(Optional.empty());
         assertThrows(NotFoundException.class, () ->
-            shiftPlanningService.addWeekToShift(777L, new ShiftWeekDto(List.of()))
+            shiftPlanningService.addWeeksToShift(777L,List.of( new ShiftWeekBlueprintDto(List.of())))
         );
     }
 }

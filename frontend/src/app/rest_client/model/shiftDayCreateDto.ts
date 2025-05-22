@@ -10,12 +10,8 @@
  * Do not edit the class manually.
  */
 
-/**
- * Response for a week of shifts
- */
-export interface ShiftWeekResponseDto { 
-    /**
-     * List of shift day blueprints
-     */
-    shiftDays?: any;
+export interface ShiftDayCreateDto { 
+    day?: any;
+    startTime?: any;
+    endTime?: any;
 }

@@ -10,8 +10,20 @@
  * Do not edit the class manually.
  */
 
+/**
+ * Response for shift plan blueprint
+ */
 export interface ShiftResponseDto { 
+    /**
+     * Name of the department
+     */
     description?: any;
+    /**
+     * Number of employees needed for the shift
+     */
     manPower?: any;
+    /**
+     * List of shift weeks
+     */
     shiftWeeks?: any;
 }

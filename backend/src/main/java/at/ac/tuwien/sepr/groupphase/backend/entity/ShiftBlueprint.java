@@ -1,13 +1,6 @@
 package at.ac.tuwien.sepr.groupphase.backend.entity;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.Id;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.ManyToMany;
-import jakarta.persistence.CascadeType;
-import jakarta.persistence.Column;
-import jakarta.persistence.OneToMany;
+import jakarta.persistence.*;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -19,7 +12,8 @@ import java.util.Set;
  * It can be associated with multiple plans and can have multiple weeks.
  */
 @Entity
-public class Shift {
+@Table(name = "shift_blueprint")
+public class ShiftBlueprint {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -31,21 +25,21 @@ public class Shift {
     @Column(nullable = false)
     private int manPower;
 
-    @ManyToMany(mappedBy = "shifts")
+    @ManyToMany(mappedBy = "shiftBlueprints")
     private Set<PlanBlueprint> plans;
 
-    @OneToMany(mappedBy = "shift", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<ShiftWeek> weeks = new ArrayList<ShiftWeek>();
+    @OneToMany(mappedBy = "shiftBlueprint", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<ShiftWeekBlueprint> weeks = new ArrayList<ShiftWeekBlueprint>();
 
-    public Shift() {
+    public ShiftBlueprint() {
     }
 
-    public Shift(String description, int manPower) {
+    public ShiftBlueprint(String description, int manPower) {
         this.description = description;
         this.manPower = manPower;
     }
 
-    public Shift(String description) {
+    public ShiftBlueprint(String description) {
         this.description = description;
     }
 
@@ -73,7 +67,7 @@ public class Shift {
         return this.manPower;
     }
 
-    public List<ShiftWeek> getShiftWeeks() {
+    public List<ShiftWeekBlueprint> getShiftWeeks() {
         return weeks;
     }
 

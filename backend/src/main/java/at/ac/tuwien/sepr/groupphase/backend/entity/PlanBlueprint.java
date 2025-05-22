@@ -1,12 +1,6 @@
 package at.ac.tuwien.sepr.groupphase.backend.entity;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.EmbeddedId;
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.JoinTable;
-import jakarta.persistence.ManyToMany;
-import jakarta.persistence.ManyToOne;
-import jakarta.persistence.MapsId;
+import jakarta.persistence.*;
 
 import java.time.LocalDate;
 import java.time.Month;
@@ -18,10 +12,11 @@ import java.util.Set;
  * associated with that plan.
  */
 @Entity
+@Table(name = "plan_blueprint")
 public class PlanBlueprint {
 
     @EmbeddedId
-    private PlanId id;
+    private PlanBlueprintId id;
 
     @MapsId("departmentId")
     @ManyToOne
@@ -32,22 +27,22 @@ public class PlanBlueprint {
     @JoinTable(name = "plan_shift", joinColumns = {
         @JoinColumn(name = "plan_startdate", referencedColumnName = "plan_startdate"),
         @JoinColumn(name = "department_id", referencedColumnName = "department_id")
-    }, inverseJoinColumns = @JoinColumn(name = "shift_id"))
-    private Set<Shift> shifts = new HashSet<>();
+    }, inverseJoinColumns = @JoinColumn(name = "shift_blueprint_id"))
+    private Set<ShiftBlueprint> shiftBlueprints = new HashSet<>();
 
     public PlanBlueprint() {
     }
 
     public PlanBlueprint(LocalDate firstMondayInQuart, Department department) {
-        this.id = new PlanId(firstMondayInQuart, department.getId());
+        this.id = new PlanBlueprintId(firstMondayInQuart, department.getId());
         this.department = department;
     }
 
-    public PlanId getId() {
+    public PlanBlueprintId getId() {
         return id;
     }
 
-    public void setId(PlanId id) {
+    public void setId(PlanBlueprintId id) {
         this.id = id;
     }
 
@@ -58,17 +53,17 @@ public class PlanBlueprint {
     public void setDepartment(Department department) {
         this.department = department;
         if (this.id == null) {
-            this.id = new PlanId();
+            this.id = new PlanBlueprintId();
         }
         this.id.setDepartmentId(department.getId());
     }
 
-    public Set<Shift> getShifts() {
-        return shifts;
+    public Set<ShiftBlueprint> getShifts() {
+        return shiftBlueprints;
     }
 
-    public void setShifts(Set<Shift> shifts) {
-        this.shifts = shifts;
+    public void setShifts(Set<ShiftBlueprint> shiftBlueprints) {
+        this.shiftBlueprints = shiftBlueprints;
     }
 
     public Month getMonth() {

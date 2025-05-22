@@ -1,10 +1,11 @@
 package at.ac.tuwien.sepr.groupphase.backend.service;
 
 import at.ac.tuwien.sepr.groupphase.backend.entity.ConcreteShiftPlan;
+import at.ac.tuwien.sepr.groupphase.backend.entity.Department;
 import at.ac.tuwien.sepr.groupphase.backend.service.dto.shift.PlanBlueprintDto;
-import at.ac.tuwien.sepr.groupphase.backend.service.dto.shift.ShiftDto;
-import at.ac.tuwien.sepr.groupphase.backend.service.dto.shift.ShiftWeekDto;
-import at.ac.tuwien.sepr.groupphase.backend.service.dto.shift.CreateShiftDto;
+import at.ac.tuwien.sepr.groupphase.backend.service.dto.shift.ShiftBlueprintDto;
+import at.ac.tuwien.sepr.groupphase.backend.service.dto.shift.ShiftWeekBlueprintDto;
+import at.ac.tuwien.sepr.groupphase.backend.service.dto.shift.CreateShiftBlueprintDto;
 import at.ac.tuwien.sepr.groupphase.backend.service.dto.ScheduledShiftDetailDto;
 
 import java.util.List;
@@ -15,21 +16,21 @@ import java.util.List;
 public interface ShiftPlanningService {
 
     /**
-     * Creates a new shift based on the provided CreateShiftDto.
+     * Creates a new shift-blueprint based on the provided CreateShiftDto.
      *
-     * @param createShiftDto the DTO containing the details of the shift to be created
+     * @param createShiftBlueprintDto the DTO containing the details of the shift to be created
      * @return the created ShiftDto
      */
-    ShiftDto createShift(CreateShiftDto createShiftDto);
+    ShiftBlueprintDto createShiftBlueprint(CreateShiftBlueprintDto createShiftBlueprintDto);
 
     /**
-     * Adds a week to an existing shift.
+     * Adds a week to an existing shift blueprint.
      *
-     * @param shiftId   the ID of the shift to which the week will be added
-     * @param shiftWeek the DTO containing the details of the week to be added
+     * @param shiftId    the ID of the shift to which the week will be added
+     * @param shiftWeeks the DTO containing the details of the week to be added
      * @return the updated ShiftDto
      */
-    ShiftDto addWeekToShift(Long shiftId, ShiftWeekDto shiftWeek);
+    ShiftBlueprintDto addWeeksToShift(Long shiftId, List<ShiftWeekBlueprintDto> shiftWeeks);
 
     /**
      * Creates a new plan blueprint for a department based on the provided department ID and list of shift IDs.
@@ -38,7 +39,10 @@ public interface ShiftPlanningService {
      * @param shiftIds     the list of shift IDs to be included in the plan
      * @return the created PlanBlueprintDto
      */
-    PlanBlueprintDto createPlan(Long departmentId, List<Long> shiftIds);
+    PlanBlueprintDto createPlanBlueprint(Long departmentId, List<Long> shiftIds);
+
+    PlanBlueprintDto addShiftToCurrentPlan(Long departmentId, ShiftBlueprintDto shift);
+
 
     /**
      * Generates a concrete plan for a department based on the provided department ID.
@@ -47,7 +51,7 @@ public interface ShiftPlanningService {
      * @param departmentId the ID of the department for which the plan will be generated
      * @return the generated ConcreteShiftPlan
      */
-    ConcreteShiftPlan generateQuarterlyPlan(Long departmentId);
+    ConcreteShiftPlan generateConcreteQuarterlyPlan(Long departmentId);
 
     /**
      * Retrieves a detailed view of the scheduled shifts for a department based on the concrete quarterly plan.
@@ -55,6 +59,6 @@ public interface ShiftPlanningService {
      * @param departmentId the ID of the department for which the scheduled shifts will be retrieved
      * @return a list of ScheduledShiftDetailedViewDto containing the details of the scheduled shifts
      */
-    List<ScheduledShiftDetailDto> getDetailedConcretePlan(Long departmentId);
+    List<ScheduledShiftDetailDto> getCurrentConcretePlan(Long departmentId);
 
 }
