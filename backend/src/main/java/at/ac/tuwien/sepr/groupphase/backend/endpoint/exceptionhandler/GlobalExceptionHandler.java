@@ -38,7 +38,7 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
     private static final Logger LOGGER = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
 
     /**
-     * Handles exceptions that only have one message
+     * Handles exceptions that only have one message.
      */
     @ExceptionHandler(value = {NotFoundException.class, BadCredentialsException.class, UsernameNotFoundException.class})
     protected ResponseEntity<Object> handleNotFound(Exception ex, WebRequest request) {
