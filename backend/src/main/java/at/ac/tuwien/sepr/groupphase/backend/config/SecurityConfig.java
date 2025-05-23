@@ -60,7 +60,8 @@ public class SecurityConfig {
         @Override
         public void doFilter(ServletRequest req, ServletResponse res, FilterChain chain) throws IOException, ServletException {
             final HttpServletResponse response = (HttpServletResponse) res;
-            if (((HttpServletRequest) req).getHeader("Host").contains("localhost")) {
+            String hostHeader = ((HttpServletRequest) req).getHeader("Host");
+            if (hostHeader == null || hostHeader.contains("localhost")) {
                 response.setHeader("Access-Control-Allow-Origin", "http://localhost:4200");
             } else {
                 response.setHeader("Access-Control-Allow-Origin", "https://*.apps.student.inso-w.at");
