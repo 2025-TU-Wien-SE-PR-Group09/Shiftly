@@ -9,7 +9,10 @@
     </svg>
     Shiftplan Blueprint
   </h2>
-  <app-editor (blueprintSaved)="loadBlueprints()" [departmentName]="departmentName!"></app-editor>
+  <app-editor
+    *ngIf="!this.planFinalized"
+    (blueprintSaved)="loadBlueprints()"
+    [departmentName]="departmentName!"></app-editor>
   <div *ngFor="let plan of shiftplans" class="mb-6">
     <div class="text-foreground/80 mb-2 text-lg font-medium">{{ plan.department }}</div>
 
@@ -40,9 +43,13 @@
         </div>
       </div>
     </div>
-    <button (click)="finalizePlan()" class="bg-primary rounded px-4 py-2 text-sm text-white shadow">
+    <button
+      *ngIf="!this.planFinalized"
+      (click)="finalizePlan()"
+      class="bg-primary rounded px-4 py-2 text-sm text-white shadow">
       Generate Plan!
     </button>
-    <app-department-concrete-shiftplan [departmentId]="departmentId"> </app-department-concrete-shiftplan>
+    <app-department-concrete-shiftplan (hasConcretePlan)="onFinalized($event)" [departmentId]="departmentId">
+    </app-department-concrete-shiftplan>
   </div>
 </div>

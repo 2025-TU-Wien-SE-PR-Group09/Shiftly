@@ -18,6 +18,7 @@ export class DepartmentShiftplanBlueprintComponent {
   error: string | null = null;
   departmentName: string | null = null;
   departmentId: number | null = null;
+  planFinalized: boolean = false;
 
   daysOfWeek = ['MONDAY', 'TUESDAY', 'WEDNESDAY', 'THURSDAY', 'FRIDAY', 'SATURDAY', 'SUNDAY'];
 
@@ -48,6 +49,10 @@ export class DepartmentShiftplanBlueprintComponent {
 
     this.departmentService.getAllDepartments().subscribe({
       next: (data: Department[]) => (this.departmentId = data.find((x) => x.name === this.departmentName)!.id),
+      error: (err) => {
+        this.toastrService.error(`Could not find department with id: ${this.departmentId}`);
+        this.router.navigate(['/departments']);
+      },
     });
 
     this.departmentService.getShiftplanBlueprints(this.departmentName).subscribe({
@@ -77,11 +82,16 @@ export class DepartmentShiftplanBlueprintComponent {
     });
   }
 
+  onFinalized(event: boolean) {
+    console.log(event);
+    this.planFinalized = event;
+  }
+
   finalizePlan(): void {
     this.departmentService.generateConcretePlan(this.departmentId).subscribe({
       next: (data) => {
         this.toastrService.success('Generated plan!');
-        this.router.navigate(['/departments', this.departmentName, 'shiftplan-editor']);
+        this.loadBlueprints();
       },
       error: (err) => this.toastrService.error(err.error),
     });

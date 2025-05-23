@@ -1,4 +1,4 @@
-import { Component, Input } from '@angular/core';
+import { Component, Input, Output, EventEmitter } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ActivatedRoute, Router } from '@angular/router';
 import { DepartmentService, ScheduledShiftDetailDto } from 'src/app/rest_client';
@@ -12,6 +12,7 @@ import { ToastrService } from 'ngx-toastr';
 export class DepartmentConcreteShiftplanComponent {
   @Input() departmentId: number | null = null;
   shiftDetails: any[] = [];
+  @Output() hasConcretePlan = new EventEmitter<boolean>();
 
   isLoading = true;
   error: string | null = null;
@@ -65,10 +66,14 @@ export class DepartmentConcreteShiftplanComponent {
           .sort((a, b) => new Date(a.weekStart).getTime() - new Date(b.weekStart).getTime());
 
         this.isLoading = false;
+        if (this.shiftDetails.length !== 0) {
+          this.hasConcretePlan.emit(true);
+        }
       },
       error: (err) => {
         this.toastrService.error('Fehler beim Laden des konkreten Plans');
         this.isLoading = false;
+        this.hasConcretePlan.emit(false);
       },
     });
   }
