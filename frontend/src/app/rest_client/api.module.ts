@@ -3,24 +3,11 @@ import { Configuration } from './configuration';
 import { HttpClient } from '@angular/common/http';
 
 
-import { AdminEndpointService } from './api/adminEndpoint.service';
-import { CustomHealthEndpointService } from './api/customHealthEndpoint.service';
-import { DepartmentService } from './api/department.service';
-import { LoginEndpointService } from './api/loginEndpoint.service';
-import { RegistrationEndpointService } from './api/registrationEndpoint.service';
-import { UserEndpointService } from './api/userEndpoint.service';
-
 @NgModule({
   imports:      [],
   declarations: [],
   exports:      [],
-  providers: [
-    AdminEndpointService,
-    CustomHealthEndpointService,
-    DepartmentService,
-    LoginEndpointService,
-    RegistrationEndpointService,
-    UserEndpointService ]
+  providers: []
 })
 export class ApiModule {
     public static forRoot(configurationFactory: () => Configuration): ModuleWithProviders<ApiModule> {

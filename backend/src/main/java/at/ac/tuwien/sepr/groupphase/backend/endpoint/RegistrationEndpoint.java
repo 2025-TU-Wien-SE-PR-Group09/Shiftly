@@ -7,6 +7,7 @@ import at.ac.tuwien.sepr.groupphase.backend.service.dto.UserDataDto;
 import jakarta.annotation.security.PermitAll;
 import jakarta.transaction.Transactional;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -26,7 +27,8 @@ public class RegistrationEndpoint {
     }
 
     @PermitAll
-    @PostMapping
+    @PostMapping(produces = MediaType.APPLICATION_JSON_VALUE,
+        consumes = MediaType.APPLICATION_JSON_VALUE)
     @Transactional
     @ResponseStatus(HttpStatus.CREATED)
     public MessageResponseDto registerUser(@RequestBody RegisterRestDto registerRestDto) {

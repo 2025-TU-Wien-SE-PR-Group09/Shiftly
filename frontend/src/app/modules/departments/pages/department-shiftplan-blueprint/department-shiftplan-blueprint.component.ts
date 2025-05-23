@@ -1,7 +1,7 @@
 import { Component } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ActivatedRoute, Router } from '@angular/router';
-import { DepartmentService } from 'src/app/rest_client';
+import { DepartmentDetailRestDto, DepartmentService } from 'src/app/rest_client';
 import { ToastrService } from 'ngx-toastr';
 import { DepartmentConcreteShiftplanComponent } from '../department-concrete-shiftplan/department-concrete-shiftplan.component';
 import { EditorComponent } from './editor/editor.component';
@@ -48,7 +48,7 @@ export class DepartmentShiftplanBlueprintComponent {
     };
 
     this.departmentService.getAllDepartments().subscribe({
-      next: (data: Department[]) => (this.departmentId = data.find((x) => x.name === this.departmentName)!.id),
+      next: (data: DepartmentDetailRestDto[]) => (this.departmentId = data.find((x) => x.name === this.departmentName)!.id!),
       error: (err) => {
         this.toastrService.error(`Could not find department with id: ${this.departmentId}`);
         this.router.navigate(['/departments']);
@@ -88,7 +88,7 @@ export class DepartmentShiftplanBlueprintComponent {
   }
 
   finalizePlan(): void {
-    this.departmentService.generateConcretePlan(this.departmentId).subscribe({
+    this.departmentService.generateConcretePlan(this.departmentId!).subscribe({
       next: (data) => {
         this.toastrService.success('Generated plan!');
         this.loadBlueprints();

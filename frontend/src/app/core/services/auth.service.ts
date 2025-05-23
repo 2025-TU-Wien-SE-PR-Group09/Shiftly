@@ -20,7 +20,7 @@ export class AuthService {
   loginUser(authRequest: UserDataRestDto): Observable<LoginResponseRestDto> {
     return this.loginEndpoint.login(authRequest)
       .pipe(
-        tap((authResponse: LoginResponseRestDto) => this.setToken(authResponse.jwt))
+        tap((authResponse: LoginResponseRestDto) => this.setToken(authResponse.jwt!))
       );
   }
 

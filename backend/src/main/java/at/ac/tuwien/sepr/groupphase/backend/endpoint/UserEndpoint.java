@@ -6,6 +6,7 @@ import at.ac.tuwien.sepr.groupphase.backend.service.UserService;
 import at.ac.tuwien.sepr.groupphase.backend.service.dto.ChangePasswordDto;
 import at.ac.tuwien.sepr.groupphase.backend.service.dto.UserProfileDto;
 import jakarta.validation.Valid;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.transaction.annotation.Transactional;
@@ -41,7 +42,7 @@ public class UserEndpoint {
      * @return 204 NoContent if successful, or appropriate error otherwise
      */
     @PreAuthorize("isAuthenticated()")
-    @PutMapping("/me/password")
+    @PutMapping(path="/me/password", produces = MediaType.APPLICATION_JSON_VALUE)
     @Transactional
     public ResponseEntity<Void> changePassword(@RequestBody @Valid ChangePasswordRestDto restDto) {
         ChangePasswordDto dto = ChangePasswordDto.from(restDto);
@@ -55,7 +56,7 @@ public class UserEndpoint {
      * @return a UserProfileRestDto with user details
      */
     @PreAuthorize("isAuthenticated()")
-    @GetMapping("/me")
+    @GetMapping(value = "/me", produces = MediaType.APPLICATION_JSON_VALUE)
     public UserProfileRestDto getCurrentUserProfile() {
         UserProfileDto serviceDto = userService.getCurrentUserProfile();
 
