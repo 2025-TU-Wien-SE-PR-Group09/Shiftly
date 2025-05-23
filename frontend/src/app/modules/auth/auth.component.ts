@@ -7,7 +7,7 @@ import { NgIf } from '@angular/common';
   selector: 'app-auth',
   templateUrl: './auth.component.html',
   styleUrls: ['./auth.component.css'],
-  imports: [AngularSvgIconModule, RouterOutlet, NgIf],
+  imports: [AngularSvgIconModule, RouterOutlet],
 })
 export class AuthComponent implements OnInit {
   constructor(private router: Router) {}

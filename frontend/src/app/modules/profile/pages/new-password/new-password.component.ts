@@ -12,7 +12,7 @@ import { ToastrService } from 'ngx-toastr';
   templateUrl: './new-password.component.html',
   styleUrls: ['./new-password.component.css'],
   standalone: true,
-  imports: [FormsModule, RouterLink, AngularSvgIconModule, ButtonComponent, NgIf],
+  imports: [FormsModule, RouterLink, AngularSvgIconModule, ButtonComponent],
 })
 export class NewPasswordComponent implements OnInit {
   newPassword: string = '';
