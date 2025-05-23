@@ -21,14 +21,7 @@ export class AdminHomeComponent implements OnInit{
     this._adminService.authCode().subscribe({
       next: (data) => {
         this.code = data.code!;
-      },
-      error: (err) => {
-        console.error('Full error:', err); // Log the full error
-        console.error('Status:', err.status); // Log the status code
-        console.error('Message:', err.message); // Log the error message
-        this._toastr.error('Error fetching code');
       }
-
     })
   }
 }

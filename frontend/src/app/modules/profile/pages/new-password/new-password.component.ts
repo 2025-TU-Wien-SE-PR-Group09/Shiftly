@@ -17,7 +17,6 @@ import { ToastrService } from 'ngx-toastr';
 export class NewPasswordComponent implements OnInit {
   newPassword: string = '';
   confirmPassword: string = '';
-  errorMessage: string = '';
   successMessage: string = '';
   passwordTextType: boolean = false;
 
@@ -30,11 +29,10 @@ export class NewPasswordComponent implements OnInit {
   }
 
   submitPasswordChange(): void {
-    this.errorMessage = '';
     this.successMessage = '';
 
     if (this.newPassword !== this.confirmPassword) {
-      this.errorMessage = 'Passwords do not match.';
+      this.toastrService.error('Passwords do not match.', "Error");
       return;
     }
 

@@ -1,5 +1,6 @@
 import { Component, OnInit } from '@angular/core';
-import { RouterOutlet } from '@angular/router';
+import { Router, RouterOutlet } from '@angular/router';
+import { AuthService } from '../../core/services/auth.service';
 
 @Component({
   selector: 'app-home',
@@ -7,5 +8,22 @@ import { RouterOutlet } from '@angular/router';
   imports: [RouterOutlet],
 })
 export class HomeComponent implements OnInit {
-  ngOnInit(): void {}
+  constructor(
+    private _authService: AuthService,
+    private readonly _router: Router,
+  ) {}
+
+  ngOnInit(): void {
+    const roles = this._authService.getUserRoles();
+
+    if (roles.includes("ADMIN")) {
+      this._router.navigateByUrl('/home/admin').then();
+    } else if (roles.includes("EMPLOYEE")) {
+      this._router.navigateByUrl('/home/employee').then();
+    } else if (roles.includes("SUPERVISOR")) {
+      this._router.navigateByUrl('/home/supervisor').then();
+    } else {
+      this._router.navigateByUrl('/no-role').then();
+    }
+  }
 }

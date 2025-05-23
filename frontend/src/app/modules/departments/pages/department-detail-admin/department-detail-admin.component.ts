@@ -33,10 +33,7 @@ export class DepartmentDetailAdminComponent {
         this.showForm = false;
         this.loadDepartments();
         this.toastr.success('Department created successfully', 'Success');
-      },
-      error: (err) => {
-        this.toastr.error(err.message, 'Failed to create department');
-      },
+      }
     });
   }
 
@@ -47,7 +44,6 @@ export class DepartmentDetailAdminComponent {
   loadDepartments(): void {
     this.departmentService.getAllDepartments().subscribe({
       next: (data) => (this.departments = data),
-      error: (err) => this.toastr.error(err.message, 'Failed to load department list'),
     });
   }
 }

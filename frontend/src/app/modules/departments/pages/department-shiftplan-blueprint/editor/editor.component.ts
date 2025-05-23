@@ -106,7 +106,6 @@ export class EditorComponent {
         this.blueprintSaved.emit();
         this.resetFormCompletely();
       },
-      error: () => this.toastr.error('Fehler beim Speichern des Plans'),
     });
   }
 }
