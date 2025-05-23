@@ -17,6 +17,7 @@ import { CustomHttpUrlEncodingCodec }                        from '../encoder';
 
 import { Observable }                                        from 'rxjs';
 
+import { CreatePlanBlueprintDto } from '../model/createPlanBlueprintDto';
 import { DepartmentCreateRestDto } from '../model/departmentCreateRestDto';
 
 import { BASE_PATH, COLLECTION_FORMATS }                     from '../variables';
@@ -104,6 +105,99 @@ export class DepartmentService {
     }
 
     /**
+     * Create shift plan(Blueprint) for a department
+     * 
+     * @param body 
+     * @param departmentName 
+     * @param observe set whether or not to return the data Observable as the body, response or events. defaults to returning the body.
+     * @param reportProgress flag to report request and response progress.
+     */
+    public createShiftplanBlueprint(body: CreatePlanBlueprintDto, departmentName: any, observe?: 'body', reportProgress?: boolean): Observable<any>;
+    public createShiftplanBlueprint(body: CreatePlanBlueprintDto, departmentName: any, observe?: 'response', reportProgress?: boolean): Observable<HttpResponse<any>>;
+    public createShiftplanBlueprint(body: CreatePlanBlueprintDto, departmentName: any, observe?: 'events', reportProgress?: boolean): Observable<HttpEvent<any>>;
+    public createShiftplanBlueprint(body: CreatePlanBlueprintDto, departmentName: any, observe: any = 'body', reportProgress: boolean = false ): Observable<any> {
+
+        if (body === null || body === undefined) {
+            throw new Error('Required parameter body was null or undefined when calling createShiftplanBlueprint.');
+        }
+
+        if (departmentName === null || departmentName === undefined) {
+            throw new Error('Required parameter departmentName was null or undefined when calling createShiftplanBlueprint.');
+        }
+
+        let headers = this.defaultHeaders;
+
+        // to determine the Accept header
+        let httpHeaderAccepts: string[] = [
+            '*/*'
+        ];
+        const httpHeaderAcceptSelected: string | undefined = this.configuration.selectHeaderAccept(httpHeaderAccepts);
+        if (httpHeaderAcceptSelected != undefined) {
+            headers = headers.set('Accept', httpHeaderAcceptSelected);
+        }
+
+        // to determine the Content-Type header
+        const consumes: string[] = [
+            'application/json'
+        ];
+        const httpContentTypeSelected: string | undefined = this.configuration.selectHeaderContentType(consumes);
+        if (httpContentTypeSelected != undefined) {
+            headers = headers.set('Content-Type', httpContentTypeSelected);
+        }
+
+        return this.httpClient.request<any>('post',`${this.basePath}/api/departments/${encodeURIComponent(String(departmentName))}/shiftplanBlueprint`,
+            {
+                body: body,
+                withCredentials: this.configuration.withCredentials,
+                headers: headers,
+                observe: observe,
+                reportProgress: reportProgress
+            }
+        );
+    }
+
+    /**
+     * Generate concrete shift plan for the given department and return the scheduled shifts
+     * 
+     * @param id 
+     * @param observe set whether or not to return the data Observable as the body, response or events. defaults to returning the body.
+     * @param reportProgress flag to report request and response progress.
+     */
+    public generateConcretePlan(id: any, observe?: 'body', reportProgress?: boolean): Observable<any>;
+    public generateConcretePlan(id: any, observe?: 'response', reportProgress?: boolean): Observable<HttpResponse<any>>;
+    public generateConcretePlan(id: any, observe?: 'events', reportProgress?: boolean): Observable<HttpEvent<any>>;
+    public generateConcretePlan(id: any, observe: any = 'body', reportProgress: boolean = false ): Observable<any> {
+
+        if (id === null || id === undefined) {
+            throw new Error('Required parameter id was null or undefined when calling generateConcretePlan.');
+        }
+
+        let headers = this.defaultHeaders;
+
+        // to determine the Accept header
+        let httpHeaderAccepts: string[] = [
+            '*/*'
+        ];
+        const httpHeaderAcceptSelected: string | undefined = this.configuration.selectHeaderAccept(httpHeaderAccepts);
+        if (httpHeaderAcceptSelected != undefined) {
+            headers = headers.set('Accept', httpHeaderAcceptSelected);
+        }
+
+        // to determine the Content-Type header
+        const consumes: string[] = [
+        ];
+
+        return this.httpClient.request<any>('post',`${this.basePath}/api/departments/${encodeURIComponent(String(id))}/generate-concrete-plan`,
+            {
+                withCredentials: this.configuration.withCredentials,
+                headers: headers,
+                observe: observe,
+                reportProgress: reportProgress
+            }
+        );
+    }
+
+    /**
      * Get all departments
      * 
      * @param observe set whether or not to return the data Observable as the body, response or events. defaults to returning the body.
@@ -130,6 +224,88 @@ export class DepartmentService {
         ];
 
         return this.httpClient.request<any>('get',`${this.basePath}/api/departments`,
+            {
+                withCredentials: this.configuration.withCredentials,
+                headers: headers,
+                observe: observe,
+                reportProgress: reportProgress
+            }
+        );
+    }
+
+    /**
+     * Get detailed scheduled shifts for a department
+     * 
+     * @param departmentId 
+     * @param observe set whether or not to return the data Observable as the body, response or events. defaults to returning the body.
+     * @param reportProgress flag to report request and response progress.
+     */
+    public getDetailedConcretePlan(departmentId: any, observe?: 'body', reportProgress?: boolean): Observable<any>;
+    public getDetailedConcretePlan(departmentId: any, observe?: 'response', reportProgress?: boolean): Observable<HttpResponse<any>>;
+    public getDetailedConcretePlan(departmentId: any, observe?: 'events', reportProgress?: boolean): Observable<HttpEvent<any>>;
+    public getDetailedConcretePlan(departmentId: any, observe: any = 'body', reportProgress: boolean = false ): Observable<any> {
+
+        if (departmentId === null || departmentId === undefined) {
+            throw new Error('Required parameter departmentId was null or undefined when calling getDetailedConcretePlan.');
+        }
+
+        let headers = this.defaultHeaders;
+
+        // to determine the Accept header
+        let httpHeaderAccepts: string[] = [
+            '*/*'
+        ];
+        const httpHeaderAcceptSelected: string | undefined = this.configuration.selectHeaderAccept(httpHeaderAccepts);
+        if (httpHeaderAcceptSelected != undefined) {
+            headers = headers.set('Accept', httpHeaderAcceptSelected);
+        }
+
+        // to determine the Content-Type header
+        const consumes: string[] = [
+        ];
+
+        return this.httpClient.request<any>('get',`${this.basePath}/api/departments/${encodeURIComponent(String(departmentId))}/concrete-plan-details`,
+            {
+                withCredentials: this.configuration.withCredentials,
+                headers: headers,
+                observe: observe,
+                reportProgress: reportProgress
+            }
+        );
+    }
+
+    /**
+     * Get shift plan for a department
+     * 
+     * @param departmentName 
+     * @param observe set whether or not to return the data Observable as the body, response or events. defaults to returning the body.
+     * @param reportProgress flag to report request and response progress.
+     */
+    public getShiftplanBlueprints(departmentName: any, observe?: 'body', reportProgress?: boolean): Observable<any>;
+    public getShiftplanBlueprints(departmentName: any, observe?: 'response', reportProgress?: boolean): Observable<HttpResponse<any>>;
+    public getShiftplanBlueprints(departmentName: any, observe?: 'events', reportProgress?: boolean): Observable<HttpEvent<any>>;
+    public getShiftplanBlueprints(departmentName: any, observe: any = 'body', reportProgress: boolean = false ): Observable<any> {
+
+        if (departmentName === null || departmentName === undefined) {
+            throw new Error('Required parameter departmentName was null or undefined when calling getShiftplanBlueprints.');
+        }
+
+        let headers = this.defaultHeaders;
+
+        // to determine the Accept header
+        let httpHeaderAccepts: string[] = [
+            '*/*'
+        ];
+        const httpHeaderAcceptSelected: string | undefined = this.configuration.selectHeaderAccept(httpHeaderAccepts);
+        if (httpHeaderAcceptSelected != undefined) {
+            headers = headers.set('Accept', httpHeaderAcceptSelected);
+        }
+
+        // to determine the Content-Type header
+        const consumes: string[] = [
+        ];
+
+        return this.httpClient.request<any>('get',`${this.basePath}/api/departments/${encodeURIComponent(String(departmentName))}/shiftplanBlueprint`,
             {
                 withCredentials: this.configuration.withCredentials,
                 headers: headers,

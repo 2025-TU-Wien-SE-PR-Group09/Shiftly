@@ -3,6 +3,7 @@ import { RouterModule, Routes } from '@angular/router';
 import { DepartmentsComponent } from './departments.component';
 import { DepartmentDetailSupervisorComponent } from './pages/department-detail-supervisor/department-detail-supervisor.component';
 import { DepartmentDetailAdminComponent } from './pages/department-detail-admin/department-detail-admin.component';
+import { DepartmentShiftplanBlueprintComponent } from './pages/department-shiftplan-blueprint/department-shiftplan-blueprint.component';
 
 const routes: Routes = [
   {
@@ -11,13 +12,17 @@ const routes: Routes = [
     children: [
       {
         path: 'admin',
-        component: DepartmentDetailAdminComponent
+        component: DepartmentDetailAdminComponent,
       },
       {
         path: 'supervisor',
-        component: DepartmentDetailSupervisorComponent
-      }
-    ]
+        component: DepartmentDetailSupervisorComponent,
+      },
+      {
+        path: ':name/shiftplan-editor',
+        component: DepartmentShiftplanBlueprintComponent,
+      },
+    ],
   },
 ];
 

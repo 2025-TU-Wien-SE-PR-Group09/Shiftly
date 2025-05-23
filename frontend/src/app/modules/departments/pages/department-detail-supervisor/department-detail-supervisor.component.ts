@@ -4,8 +4,6 @@ import { Component } from '@angular/core';
   selector: 'app-department-detail-supervisor',
   imports: [],
   templateUrl: './department-detail-supervisor.component.html',
-  styleUrl: './department-detail-supervisor.component.css'
+  styleUrl: './department-detail-supervisor.component.css',
 })
-export class DepartmentDetailSupervisorComponent {
-
-}
+export class DepartmentDetailSupervisorComponent {}

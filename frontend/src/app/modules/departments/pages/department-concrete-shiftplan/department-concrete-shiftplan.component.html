@@ -1,0 +1,43 @@
+<div *ngIf="shiftDetails!.length > 0" class="overflow-x-auto rounded-xl border shadow-sm">
+  <div class="bg-muted text-foreground grid grid-cols-8 text-sm font-semibold">
+    <div class="p-2">Woche ab</div>
+    <div *ngFor="let d of ['Mo', 'Di', 'Mi', 'Do', 'Fr', 'Sa', 'So']" class="p-2 text-center">{{ d }}</div>
+  </div>
+
+  <div *ngFor="let week of shiftDetails" class="border-border border-t">
+    <ng-container *ngFor="let shift of week.shifts">
+      <div class="grid grid-cols-8">
+        <div class="text-primary p-2 font-medium">{{ formatWeekDate(week.weekStart) }}</div>
+
+        <ng-container *ngFor="let weekday of weekdays">
+          <ng-container *ngIf="getDayForWeekday(shift.days, weekday) as day; else empty">
+            <div class="border-border bg-card border p-2 text-center text-xs">
+              <div class="text-muted-foreground mb-1">
+                <strong>{{ getHourMinute(day.startTime) }}</strong
+                ><br />
+                {{ formatDuration(day.duration) }}
+              </div>
+
+              <div *ngIf="day.assignedUsers.length > 0; else noUsers">
+                <div
+                  *ngFor="let user of day.assignedUsers"
+                  class="bg-primary truncate rounded px-1 py-0.5 text-xs text-white">
+                  {{ user }}
+                </div>
+              </div>
+              <ng-template #noUsers>
+                <div class="text-muted-foreground italic">–</div>
+              </ng-template>
+            </div>
+          </ng-container>
+          <ng-template #empty>
+            <div
+              class="border-border text-muted-foreground bg-muted border border-dashed p-2 text-center text-xs italic">
+              {{ ' ' }}
+            </div>
+          </ng-template>
+        </ng-container>
+      </div>
+    </ng-container>
+  </div>
+</div>

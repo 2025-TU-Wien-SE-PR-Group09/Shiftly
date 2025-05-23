@@ -9,9 +9,12 @@ import at.ac.tuwien.sepr.groupphase.backend.repository.DepartmentRepository;
 import at.ac.tuwien.sepr.groupphase.backend.repository.UserRepository;
 import at.ac.tuwien.sepr.groupphase.backend.service.DepartmentService;
 import at.ac.tuwien.sepr.groupphase.backend.service.dto.DepartmentCreateDto;
+import at.ac.tuwien.sepr.groupphase.backend.service.dto.DepartmentDto;
+import at.ac.tuwien.sepr.groupphase.backend.service.mapper.DepartmentMapper;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Optional;
 
 @Service
 public class DepartmentServiceImpl implements DepartmentService {
@@ -25,7 +28,7 @@ public class DepartmentServiceImpl implements DepartmentService {
         this.applicationUserRepository = applicationUserRepository;
     }
 
-    //Todo return service dto not rest
+    // Todo return service dto not rest
     @Override
     public DepartmentDetailRestDto createDepartment(DepartmentCreateDto dto) throws ConflictException {
         if (departmentRepository.existsByName(dto.getName())) {
@@ -42,8 +45,7 @@ public class DepartmentServiceImpl implements DepartmentService {
         return new DepartmentDetailRestDto(
             departmentRepository.save(department).getId(),
             department.getName(),
-            department.getSupervisor().getEmail()
-        );
+            department.getSupervisor().getEmail());
     }
 
     @Override
@@ -52,8 +54,13 @@ public class DepartmentServiceImpl implements DepartmentService {
             .map(dept -> new DepartmentDetailRestDto(
                 dept.getId(),
                 dept.getName(),
-                dept.getSupervisor().getEmail()
-            ))
+                dept.getSupervisor().getEmail()))
             .toList();
+    }
+
+    @Override
+    public Optional<DepartmentDto> getDepartmentByName(String departmentName) {
+        return departmentRepository.findByName(departmentName)
+            .map(DepartmentMapper::fromEntity);
     }
 }
