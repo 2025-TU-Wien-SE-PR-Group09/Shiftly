@@ -23,7 +23,6 @@ export class VacationsComponent implements OnInit {
     } else if (roles.includes("EMPLOYEE")) {
       this._router.navigateByUrl('/vacations/employee').then();
     } else {
-      this._toastr.error("You do not have permission to visit /vacations", "Unauthorized")
       this._router.navigateByUrl('/home').then();
     }
   }

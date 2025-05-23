@@ -23,7 +23,6 @@ export class DepartmentsComponent implements OnInit {
     } else if (roles.includes("SUPERVISOR")) {
       this._router.navigateByUrl('/departments/supervisor').then();
     } else {
-      this._toastr.error("You do not have permission to visit /departments", "Unauthorized")
       this._router.navigateByUrl('/home').then();
     }
   }

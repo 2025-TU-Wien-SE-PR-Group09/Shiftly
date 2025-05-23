@@ -100,6 +100,7 @@ export class ButtonComponent implements OnInit {
       this.shapeClasses[this.shape()],
       this.shadowClasses[this.shadow()],
       this.full() ? 'w-full' : '',
+      "hover:cursor-pointer"
     );
   }
 

@@ -23,7 +23,6 @@ export class SickNotesComponent implements OnInit {
     } else if (roles.includes("EMPLOYEE")) {
       this._router.navigateByUrl('/sick-notes/employee').then();
     } else {
-      this._toastr.error("You do not have permission to visit /sick-notes", "Unauthorized")
       this._router.navigateByUrl('/home').then();
     }
   }
