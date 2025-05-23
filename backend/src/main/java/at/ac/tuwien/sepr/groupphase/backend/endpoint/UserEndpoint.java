@@ -42,7 +42,7 @@ public class UserEndpoint {
      * @return 204 NoContent if successful, or appropriate error otherwise
      */
     @PreAuthorize("isAuthenticated()")
-    @PutMapping(path="/me/password", produces = MediaType.APPLICATION_JSON_VALUE)
+    @PutMapping(path = "/me/password", produces = MediaType.APPLICATION_JSON_VALUE)
     @Transactional
     public ResponseEntity<Void> changePassword(@RequestBody @Valid ChangePasswordRestDto restDto) {
         ChangePasswordDto dto = ChangePasswordDto.from(restDto);
