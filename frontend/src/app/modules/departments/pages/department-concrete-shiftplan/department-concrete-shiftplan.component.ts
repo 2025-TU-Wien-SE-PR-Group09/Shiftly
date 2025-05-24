@@ -71,7 +71,6 @@ export class DepartmentConcreteShiftplanComponent {
         }
       },
       error: (err) => {
-        this.toastrService.error('Fehler beim Laden des konkreten Plans');
         this.isLoading = false;
         this.hasConcretePlan.emit(false);
       },

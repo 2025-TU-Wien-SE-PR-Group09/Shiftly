@@ -23,10 +23,7 @@ export class DepartmentDetailSupervisorComponent implements OnInit {
     this.userService.getCurrentUserProfile().subscribe({
       next: (data: UserProfileRestDto) => {
         this.departmentName = data.department!;
-      },
-      error: () => {
-        this.toastrService.error('Failed to get Current User Profile!');
-      },
+      }
     });
   }
 

@@ -37,7 +37,6 @@ export class DepartmentShiftplanBlueprintComponent {
 
     if (!this.departmentName) {
       this.error = 'Kein Department angegeben';
-      this.toastrService.error(this.error);
       this.isLoading = false;
       return;
     }
@@ -50,7 +49,6 @@ export class DepartmentShiftplanBlueprintComponent {
     this.departmentService.getAllDepartments().subscribe({
       next: (data: DepartmentDetailRestDto[]) => (this.departmentId = data.find((x) => x.name === this.departmentName)!.id!),
       error: (err) => {
-        this.toastrService.error(`Could not find department with id: ${this.departmentId}`);
         this.router.navigate(['/departments']);
       },
     });
@@ -65,19 +63,10 @@ export class DepartmentShiftplanBlueprintComponent {
         console.log(err);
 
         if (err.status == 404) {
-          this.toastrService.error('Department nicht gefunden.');
           this.router.navigate(['/departments']);
           return;
         }
 
-        if (err?.error?.validation_errors) {
-          err.error.validation_errors.forEach((msg: string) => {
-            this.toastrService.error(msg);
-          });
-          return;
-        }
-
-        this.toastrService.error(err.error);
       },
     });
   }
@@ -90,10 +79,8 @@ export class DepartmentShiftplanBlueprintComponent {
   finalizePlan(): void {
     this.departmentService.generateConcretePlan(this.departmentId!).subscribe({
       next: (data) => {
-        this.toastrService.success('Generated plan!');
         this.loadBlueprints();
       },
-      error: (err) => this.toastrService.error(err.error),
     });
   }
 

@@ -43,10 +43,7 @@ export class DepartmentUserManagementComponent implements OnChanges, OnInit {
     this.departmentService.getEmployeesOfDepartment(this.departmentName).subscribe({
       next: (employees) => {
         this.employees = employees;
-      },
-      error: (err) => {
-        this.toastrService.error('Failed to load employees');
-      },
+      }
     });
   }
 
@@ -56,9 +53,6 @@ export class DepartmentUserManagementComponent implements OnChanges, OnInit {
         this.toastrService.success('Successfully added ' + employee.email + ' to ' + employee.departmentName +'!');
         this.loadEmployees();
         this.showForm = false;
-      },
-      error: (err) => {
-        this.toastrService.error(err.error,'Failed to add employee');
       }
     })
   }

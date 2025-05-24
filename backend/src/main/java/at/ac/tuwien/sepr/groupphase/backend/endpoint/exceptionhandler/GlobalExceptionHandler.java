@@ -53,6 +53,7 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
 
     @ExceptionHandler(value = {ConflictException.class})
     protected ResponseEntity<Object> handleConflict(ConflictException ex, WebRequest request) {
+        LOGGER.warn("Conflict exception: {}", ex.getMessage());
         Map<String, Object> body = new LinkedHashMap<>();
 
         //Get all errors
@@ -77,6 +78,8 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
             .map(DefaultMessageSourceResolvable::getDefaultMessage)
             .collect(Collectors.toList());
         body.put("errors", errors);
+
+        LOGGER.warn("Argument not valid exception: {}", String.join(", ", errors));
 
         return new ResponseEntity<>(body, headers, status);
     }

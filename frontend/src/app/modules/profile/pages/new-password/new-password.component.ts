@@ -32,7 +32,6 @@ export class NewPasswordComponent implements OnInit {
     this.successMessage = '';
 
     if (this.newPassword !== this.confirmPassword) {
-      this.toastrService.error('Passwords do not match.', "Error");
       return;
     }
 
@@ -44,11 +43,6 @@ export class NewPasswordComponent implements OnInit {
         next: () => {
           this.toastrService.success("Password changes successfully");
           this.router.navigate(['/home']).then();
-        },
-        error: (err) => {
-             err.error['validation_errors'].forEach((errMsg: string ) => {
-               this.toastrService.error(errMsg);
-             });
         },
       });
   }
