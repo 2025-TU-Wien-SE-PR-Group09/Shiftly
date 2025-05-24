@@ -5,6 +5,7 @@ import at.ac.tuwien.sepr.groupphase.backend.service.VacationRequestService;
 import at.ac.tuwien.sepr.groupphase.backend.service.dto.VacationRequestDto;
 import jakarta.annotation.security.RolesAllowed;
 import jakarta.transaction.Transactional;
+import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -32,7 +33,7 @@ public class VacationRequestEndpoint {
        consumes = MediaType.APPLICATION_JSON_VALUE)
    @Transactional
    @RolesAllowed({"EMPLOYEE"})
-   public ResponseEntity<VacationRequestRestDto> createVacationRequest(@RequestBody VacationRequestRestDto restDto) {
+   public ResponseEntity<VacationRequestRestDto> createVacationRequest(@Valid @RequestBody VacationRequestRestDto restDto) {
        VacationRequestDto dto = VacationRequestDto.from(restDto);
        VacationRequestDto created = vacationRequestService.createVacationRequest(dto);
        return ResponseEntity.status(HttpStatus.CREATED).body(VacationRequestRestDto.from(created));

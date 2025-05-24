@@ -29,10 +29,7 @@ public class VacationRequestServiceImpl implements VacationRequestService {
         LocalDate start = vacationRequestDto.getStartDate();
         LocalDate end = vacationRequestDto.getEndDate();
 
-        //TODO: Validate the dates(Validator)
-        if (start == null || end == null || end.isBefore(start)) {
-            throw new IllegalArgumentException("Start date must be before end date and both must be provided.");
-        }
+
 
         String userEmail = getCurrentUserEmail();
         ApplicationUser employee = userRepository.findByEmail(userEmail)
