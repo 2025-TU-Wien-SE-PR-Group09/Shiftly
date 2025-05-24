@@ -3,6 +3,7 @@ package at.ac.tuwien.sepr.groupphase.backend.endpoint.dto;
 import at.ac.tuwien.sepr.groupphase.backend.service.dto.VacationRequestDto;
 
 import at.ac.tuwien.sepr.groupphase.backend.service.dto.VacationRequestResponseDto;
+import at.ac.tuwien.sepr.groupphase.backend.type.VacationStatus;
 import java.time.LocalDate;
 
 public class VacationRequestResponseRestDto {
@@ -10,7 +11,7 @@ public class VacationRequestResponseRestDto {
     private Long id;
     private LocalDate startDate;
     private LocalDate endDate;
-    private String status;
+    private VacationStatus status;
 
     public Long getId() {
         return id;
@@ -36,11 +37,11 @@ public class VacationRequestResponseRestDto {
         this.endDate = endDate;
     }
 
-    public String getStatus() {
+    public VacationStatus getStatus() {
         return status;
     }
 
-    public void setStatus(String status) {
+    public void setStatus(VacationStatus status) {
         this.status = status;
     }
 

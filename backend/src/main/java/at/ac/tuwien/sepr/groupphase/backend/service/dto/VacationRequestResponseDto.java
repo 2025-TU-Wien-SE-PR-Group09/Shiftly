@@ -1,5 +1,6 @@
 package at.ac.tuwien.sepr.groupphase.backend.service.dto;
 
+import at.ac.tuwien.sepr.groupphase.backend.type.VacationStatus;
 import java.time.LocalDate;
 
 public class VacationRequestResponseDto {
@@ -8,9 +9,9 @@ public class VacationRequestResponseDto {
     private String employeeEmail;
     private LocalDate startDate;
     private LocalDate endDate;
-    private String status;
+    private VacationStatus status;
 
-    public VacationRequestResponseDto(Long id, String employeeEmail, LocalDate startDate, LocalDate endDate, String status) {
+    public VacationRequestResponseDto(Long id, String employeeEmail, LocalDate startDate, LocalDate endDate, VacationStatus status) {
         this.id = id;
         this.employeeEmail = employeeEmail;
         this.startDate = startDate;
@@ -30,7 +31,7 @@ public class VacationRequestResponseDto {
         return endDate;
     }
 
-    public String getStatus() {
+    public VacationStatus getStatus() {
         return status;
     }
 }

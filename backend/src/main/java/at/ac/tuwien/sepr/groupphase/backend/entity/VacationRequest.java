@@ -1,7 +1,10 @@
 package at.ac.tuwien.sepr.groupphase.backend.entity;
 
+import at.ac.tuwien.sepr.groupphase.backend.type.VacationStatus;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
@@ -24,8 +27,9 @@ public class VacationRequest {
     @Column(nullable = false, length = 20)
     private LocalDate endDate;
 
+    @Enumerated(EnumType.STRING)
     @Column(nullable = false, length = 20)
-    private String status;
+    private VacationStatus status;
 
     public VacationRequest() {
     }
@@ -55,11 +59,11 @@ public class VacationRequest {
         this.endDate = endDate;
     }
 
-    public String getStatus() {
+    public VacationStatus getStatus() {
         return status;
     }
 
-    public void setStatus(String status) {
+    public void setStatus(VacationStatus status) {
         this.status = status;
     }
 }

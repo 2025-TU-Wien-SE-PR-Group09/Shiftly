@@ -2,6 +2,7 @@ package at.ac.tuwien.sepr.groupphase.backend.endpoint.dto;
 
 import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.validator.annotation.ValidDateRange;
 import at.ac.tuwien.sepr.groupphase.backend.service.dto.VacationRequestDto;
+import at.ac.tuwien.sepr.groupphase.backend.type.VacationStatus;
 import jakarta.validation.constraints.Future;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
@@ -18,43 +19,56 @@ public class VacationRequestRestDto {
     @Future(message = "End date must be in the future")
     private LocalDate endDate;
 
-    @Size(min = 1, max = 20, message = "Status must be between 1 and 20 characters")
-    private String status;
+
 
 
     public VacationRequestRestDto() {
     }
 
+
     public LocalDate getStartDate() {
         return startDate;
     }
 
+    /**
+     * Sets the start date of the vacation request.
+     *
+     * @param startDate the start date to set
+     */
     public void setStartDate(LocalDate startDate) {
         this.startDate = startDate;
     }
 
+    /**
+     * Gets the end date of the vacation request.
+     *
+     * @return the end date
+     */
     public LocalDate getEndDate() {
         return endDate;
     }
 
+    /**
+     * Sets the end date of the vacation request.
+     *
+     * @param endDate the end date to set
+     */
     public void setEndDate(LocalDate endDate) {
         this.endDate = endDate;
     }
 
-    public String getStatus() {
-        return status;
-    }
-
-    public void setStatus(String status) {
-        this.status = status;
-    }
 
 
+    /**
+     * Converts a VacationRequestRestDto to a VacationRequestDto.
+     *
+     * @param dto the VacationRequestRestDto to convert
+     * @return the converted VacationRequestDto
+     */
     public static VacationRequestRestDto from(VacationRequestDto dto) {
         VacationRequestRestDto restDto = new VacationRequestRestDto();
         restDto.setStartDate(dto.getStartDate());
         restDto.setEndDate(dto.getEndDate());
-        restDto.setStatus(dto.getStatus());
         return restDto;
     }
 

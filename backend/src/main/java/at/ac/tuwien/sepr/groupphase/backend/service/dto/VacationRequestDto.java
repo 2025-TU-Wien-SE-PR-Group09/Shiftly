@@ -1,6 +1,7 @@
 package at.ac.tuwien.sepr.groupphase.backend.service.dto;
 
 import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.VacationRequestRestDto;
+import at.ac.tuwien.sepr.groupphase.backend.type.VacationStatus;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotNull;
 import java.time.LocalDate;
@@ -17,15 +18,14 @@ public class VacationRequestDto {
     @NotNull(message = "End date must not be null")
     private LocalDate endDate;
 
-    @NotNull(message = "Status must not be null")
-    private String status;
 
 
-    public VacationRequestDto(String employeeEmail, LocalDate startDate, LocalDate endDate, String status) {
+
+    public VacationRequestDto(String employeeEmail, LocalDate startDate, LocalDate endDate) {
         this.employeeEmail = employeeEmail;
         this.startDate = startDate;
         this.endDate = endDate;
-        this.status = status;
+
     }
 
     public LocalDate getStartDate() {
@@ -36,17 +36,28 @@ public class VacationRequestDto {
         return endDate;
     }
 
-    public String getStatus() {
-        return status;
+    public void setEmployeeEmail(String employeeEmail) {
+        this.employeeEmail = employeeEmail;
+    }
+
+    public String getEmployeeEmail() {
+        return employeeEmail;
     }
 
 
+
+
+    /**
+     * Converts a VacationRequestDto to a VacationRequestResponseDto.
+     *
+     * @param restDto the status of the vacation request
+     * @return a VacationRequestResponseDto
+     */
     public static VacationRequestDto from(VacationRequestRestDto restDto) {
         return new VacationRequestDto(
             null,
             restDto.getStartDate(),
-            restDto.getEndDate(),
-            "PENDING"
+            restDto.getEndDate()
         );
     }
 
