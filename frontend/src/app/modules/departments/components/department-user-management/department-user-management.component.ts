@@ -48,6 +48,11 @@ export class DepartmentUserManagementComponent implements OnChanges, OnInit {
   }
 
   inviteEmployee() {
+    if(!this.newEmployeeMail || !this.newEmployeeMail.trim()) {
+      this.toastrService.error("Please enter a valid Employee Mail", "Error occurred");
+      return;
+    }
+
     this.departmentService.addEmployeeToDepartment(this.departmentName, this.newEmployeeMail).subscribe({
       next: (employee) => {
         this.toastrService.success('Successfully added ' + employee.email + ' to ' + employee.departmentName +'!');
