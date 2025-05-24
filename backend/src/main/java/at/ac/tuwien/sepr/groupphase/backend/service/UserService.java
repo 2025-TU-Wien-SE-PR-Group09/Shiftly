@@ -2,6 +2,7 @@ package at.ac.tuwien.sepr.groupphase.backend.service;
 
 import at.ac.tuwien.sepr.groupphase.backend.service.dto.ChangePasswordDto;
 import at.ac.tuwien.sepr.groupphase.backend.service.dto.UserDataDto;
+import at.ac.tuwien.sepr.groupphase.backend.service.dto.UserEmailDto;
 import at.ac.tuwien.sepr.groupphase.backend.service.dto.UserProfileDto;
 import at.ac.tuwien.sepr.groupphase.backend.service.dto.UserRoleDto;
 import at.ac.tuwien.sepr.groupphase.backend.exception.NotFoundException;
@@ -44,5 +45,4 @@ public interface UserService {
      * @param userData {@link UserDataDto} object containing the username and password
      */
     void createUser(UserDataDto userData);
-
 }

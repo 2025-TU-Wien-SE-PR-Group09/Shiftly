@@ -1,6 +1,7 @@
 package at.ac.tuwien.sepr.groupphase.backend.service.impl;
 
 import at.ac.tuwien.sepr.groupphase.backend.service.dto.UserDataDto;
+import at.ac.tuwien.sepr.groupphase.backend.service.dto.UserEmailDto;
 import at.ac.tuwien.sepr.groupphase.backend.service.dto.UserProfileDto;
 import at.ac.tuwien.sepr.groupphase.backend.service.dto.UserRoleDto;
 import at.ac.tuwien.sepr.groupphase.backend.entity.ApplicationRole;
@@ -153,7 +154,7 @@ public class UserServiceImpl implements UserService {
             currentEmail.split("@")[0],
             user.getEmail(),
             role,
-            ""   // user.getDepartment() != null ? user.getDepartment() : ""
+            user.getDepartment() == null ? "NONE" : user.getDepartment().getName()
         );
     }
 

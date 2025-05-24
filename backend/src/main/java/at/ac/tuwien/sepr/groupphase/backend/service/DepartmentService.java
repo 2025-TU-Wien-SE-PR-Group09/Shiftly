@@ -4,6 +4,7 @@ import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.DepartmentDetailRestDto
 import at.ac.tuwien.sepr.groupphase.backend.exception.ConflictException;
 import at.ac.tuwien.sepr.groupphase.backend.service.dto.DepartmentCreateDto;
 import at.ac.tuwien.sepr.groupphase.backend.service.dto.DepartmentDto;
+import at.ac.tuwien.sepr.groupphase.backend.service.dto.UserEmailDto;
 
 import java.util.List;
 import java.util.Optional;
@@ -33,4 +34,12 @@ public interface DepartmentService {
      * @return an optional containing the department details if found, or empty if not found
      */
     Optional<DepartmentDto> getDepartmentByName(String departmentName);
+
+    /**
+     * Retrieves the supervisor of a department by the department name.
+     *
+     * @param departmentName the name of the department
+     * @return an optional containing the supervisor details if found, or empty if not found
+     */
+    Optional<UserEmailDto> getSupervisorByDepartmentName(String departmentName);
 }

@@ -7,6 +7,7 @@ import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.JoinTable;
 import jakarta.persistence.ManyToMany;
+import jakarta.persistence.ManyToOne;
 import jakarta.validation.constraints.Size;
 
 import java.util.HashSet;
@@ -23,7 +24,11 @@ public class ApplicationUser {
     @Size(max = 200)
     private String passwordHash;
 
-    @ManyToMany(fetch = FetchType.LAZY)
+    @JoinColumn()
+    @ManyToOne(fetch = FetchType.EAGER)
+    private Department department;
+
+    @ManyToMany(fetch = FetchType.EAGER)
     @JoinTable(
         name = "application_user_role_binding",
         joinColumns = @JoinColumn(name = "user_email"),
@@ -32,11 +37,6 @@ public class ApplicationUser {
     private final Set<ApplicationRole> roles = new HashSet<>();
 
     public ApplicationUser() {
-    }
-
-    public ApplicationUser(String email, String password) {
-        this.email = email;
-        this.passwordHash = password;
     }
 
     public String getEmail() {
@@ -66,5 +66,13 @@ public class ApplicationUser {
             + ", password='" + passwordHash + '\''
             + ", roles=" + roles
             + '}';
+    }
+
+    public Department getDepartment() {
+        return department;
+    }
+
+    public void setDepartment(Department department) {
+        this.department = department;
     }
 }

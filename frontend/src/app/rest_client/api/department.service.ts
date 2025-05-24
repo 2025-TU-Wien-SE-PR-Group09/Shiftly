@@ -19,6 +19,7 @@ import { Observable }                                        from 'rxjs';
 
 import { CreatePlanBlueprintDto } from '../model/createPlanBlueprintDto';
 import { DepartmentCreateRestDto } from '../model/departmentCreateRestDto';
+import { EmployeeRestResponseDto } from '../model/employeeRestResponseDto';
 
 import { BASE_PATH, COLLECTION_FORMATS }                     from '../variables';
 import { Configuration }                                     from '../configuration';
@@ -57,6 +58,52 @@ export class DepartmentService {
         return false;
     }
 
+
+    /**
+     * Add an employee to a department
+     * 
+     * @param departmentName 
+     * @param employeeEmail 
+     * @param observe set whether or not to return the data Observable as the body, response or events. defaults to returning the body.
+     * @param reportProgress flag to report request and response progress.
+     */
+    public addEmployeeToDepartment(departmentName: any, employeeEmail: any, observe?: 'body', reportProgress?: boolean): Observable<EmployeeRestResponseDto>;
+    public addEmployeeToDepartment(departmentName: any, employeeEmail: any, observe?: 'response', reportProgress?: boolean): Observable<HttpResponse<EmployeeRestResponseDto>>;
+    public addEmployeeToDepartment(departmentName: any, employeeEmail: any, observe?: 'events', reportProgress?: boolean): Observable<HttpEvent<EmployeeRestResponseDto>>;
+    public addEmployeeToDepartment(departmentName: any, employeeEmail: any, observe: any = 'body', reportProgress: boolean = false ): Observable<any> {
+
+        if (departmentName === null || departmentName === undefined) {
+            throw new Error('Required parameter departmentName was null or undefined when calling addEmployeeToDepartment.');
+        }
+
+        if (employeeEmail === null || employeeEmail === undefined) {
+            throw new Error('Required parameter employeeEmail was null or undefined when calling addEmployeeToDepartment.');
+        }
+
+        let headers = this.defaultHeaders;
+
+        // to determine the Accept header
+        let httpHeaderAccepts: string[] = [
+            '*/*'
+        ];
+        const httpHeaderAcceptSelected: string | undefined = this.configuration.selectHeaderAccept(httpHeaderAccepts);
+        if (httpHeaderAcceptSelected != undefined) {
+            headers = headers.set('Accept', httpHeaderAcceptSelected);
+        }
+
+        // to determine the Content-Type header
+        const consumes: string[] = [
+        ];
+
+        return this.httpClient.request<EmployeeRestResponseDto>('post',`${this.basePath}/api/departments/${encodeURIComponent(String(departmentName))}/addEmployee/${encodeURIComponent(String(employeeEmail))}`,
+            {
+                withCredentials: this.configuration.withCredentials,
+                headers: headers,
+                observe: observe,
+                reportProgress: reportProgress
+            }
+        );
+    }
 
     /**
      * Create a new department
@@ -265,6 +312,47 @@ export class DepartmentService {
         ];
 
         return this.httpClient.request<any>('get',`${this.basePath}/api/departments/${encodeURIComponent(String(departmentId))}/concrete-plan-details`,
+            {
+                withCredentials: this.configuration.withCredentials,
+                headers: headers,
+                observe: observe,
+                reportProgress: reportProgress
+            }
+        );
+    }
+
+    /**
+     * List all employees of a department
+     * 
+     * @param departmentName 
+     * @param observe set whether or not to return the data Observable as the body, response or events. defaults to returning the body.
+     * @param reportProgress flag to report request and response progress.
+     */
+    public getEmployeesOfDepartment(departmentName: any, observe?: 'body', reportProgress?: boolean): Observable<any>;
+    public getEmployeesOfDepartment(departmentName: any, observe?: 'response', reportProgress?: boolean): Observable<HttpResponse<any>>;
+    public getEmployeesOfDepartment(departmentName: any, observe?: 'events', reportProgress?: boolean): Observable<HttpEvent<any>>;
+    public getEmployeesOfDepartment(departmentName: any, observe: any = 'body', reportProgress: boolean = false ): Observable<any> {
+
+        if (departmentName === null || departmentName === undefined) {
+            throw new Error('Required parameter departmentName was null or undefined when calling getEmployeesOfDepartment.');
+        }
+
+        let headers = this.defaultHeaders;
+
+        // to determine the Accept header
+        let httpHeaderAccepts: string[] = [
+            '*/*'
+        ];
+        const httpHeaderAcceptSelected: string | undefined = this.configuration.selectHeaderAccept(httpHeaderAccepts);
+        if (httpHeaderAcceptSelected != undefined) {
+            headers = headers.set('Accept', httpHeaderAcceptSelected);
+        }
+
+        // to determine the Content-Type header
+        const consumes: string[] = [
+        ];
+
+        return this.httpClient.request<any>('get',`${this.basePath}/api/departments/${encodeURIComponent(String(departmentName))}/employees`,
             {
                 withCredentials: this.configuration.withCredentials,
                 headers: headers,
