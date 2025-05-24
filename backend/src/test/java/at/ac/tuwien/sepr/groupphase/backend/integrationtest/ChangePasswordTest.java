@@ -19,7 +19,9 @@ import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.web.servlet.MockMvc;
 
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @ExtendWith(SpringExtension.class)
@@ -36,6 +38,7 @@ public class ChangePasswordTest implements TestData {
 
     @Autowired
     private PasswordEncoder passwordEncoder;
+
     @Autowired
     private ApplicationRoleRepository roleRepository;
 
@@ -63,42 +66,65 @@ public class ChangePasswordTest implements TestData {
         userRepository.deleteById(ADMIN_USER_EMAIL);
     }
 
-
+    /**
+     * Tests that a valid password change as a normal user succeeds and updates the password.
+     */
     @Test
     @WithMockUser(username = TestData.NORMAL_USER_EMAIL, roles = {"USER"})
-    public void whenValidPasswordAsUser_thenReturns200() throws Exception {
+    public void whenValidPasswordAsUser_thenPasswordIsUpdated() throws Exception {
+        String newPassword = "StrongPass1";
+
         mockMvc.perform(put("/api/users/me/password")
                 .contentType(MediaType.APPLICATION_JSON)
-                .content("{\"newPassword\": \"StrongPass1\"}"))
+                .content("{\"newPassword\": \"" + newPassword + "\"}"))
             .andExpect(status().isOk());
+
+        ApplicationUser updatedUser = userRepository.findById(NORMAL_USER_EMAIL).orElseThrow();
+        assertTrue(passwordEncoder.matches(newPassword, updatedUser.getPasswordHash()));
     }
 
+    /**
+     * Tests that using a weak password results in a 400 response with validation message.
+     */
     @Test
     @WithMockUser(username = TestData.NORMAL_USER_EMAIL, roles = {"USER"})
-    public void whenWeakPasswordAsUser_thenReturns400() throws Exception {
+    public void whenWeakPasswordAsUser_thenReturnsValidationError() throws Exception {
         mockMvc.perform(put("/api/users/me/password")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content("{\"newPassword\": \"abc\"}"))
-            .andExpect(status().isBadRequest());
+            .andExpect(status().isBadRequest())
+            .andExpect(content().string(org.hamcrest.Matchers.containsString(
+                "New password must be at least 8 characters long and include uppercase, lowercase and a digit")));
     }
 
+    /**
+     * Tests that omitting the password field results in a 400 response.
+     */
     @Test
     @WithMockUser(username = TestData.NORMAL_USER_EMAIL, roles = {"USER"})
     public void whenMissingPasswordAsUser_thenReturns400() throws Exception {
         mockMvc.perform(put("/api/users/me/password")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content("{}"))
-            .andExpect(status().isBadRequest());
+            .andExpect(status().isBadRequest())
+            .andExpect(content().string(org.hamcrest.Matchers.containsString("New password must not be blank")));
     }
 
+    /**
+     * Tests that unauthenticated users cannot change their password and receive 403.
+     */
     @Test
     public void whenNotAuthenticated_thenReturns403() throws Exception {
         mockMvc.perform(put("/api/users/me/password")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content("{\"newPassword\": \"StrongPass1\"}"))
-            .andExpect(status().isForbidden());
+            .andExpect(status().isForbidden())
+            .andExpect(content().string(org.hamcrest.Matchers.containsString("Access Denied")));
     }
 
+    /**
+     * Tests that an admin user is forbidden from changing their password.
+     */
     @Test
     @WithMockUser(username = ADMIN_USER_EMAIL, roles = {"ADMIN"})
     public void whenAdminTriesToChangePassword_thenReturns403() throws Exception {
