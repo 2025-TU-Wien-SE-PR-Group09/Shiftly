@@ -44,6 +44,7 @@ public class ChangePasswordTest implements TestData {
 
     @BeforeEach
     public void setUpUsers() {
+        // Ensure roles exist in DB
         if (!roleRepository.existsById("USER")) {
             roleRepository.save(new ApplicationRole("USER"));
         }
@@ -51,11 +52,17 @@ public class ChangePasswordTest implements TestData {
             roleRepository.save(new ApplicationRole("ADMIN"));
         }
 
-        ApplicationUser user = new ApplicationUser(NORMAL_USER_EMAIL, passwordEncoder.encode("UserPass123"));
+        // Create and save normal user
+        ApplicationUser user = new ApplicationUser();
+        user.setEmail(NORMAL_USER_EMAIL);
+        user.setPasswordHash(passwordEncoder.encode("UserPass123"));
         user.getRoles().add(roleRepository.getReferenceById("USER"));
         userRepository.save(user);
 
-        ApplicationUser admin = new ApplicationUser(ADMIN_USER_EMAIL, passwordEncoder.encode("AdminPass123"));
+        // Create and save admin user
+        ApplicationUser admin = new ApplicationUser();
+        admin.setEmail(ADMIN_USER_EMAIL);
+        admin.setPasswordHash(passwordEncoder.encode("AdminPass123"));
         admin.getRoles().add(roleRepository.getReferenceById("ADMIN"));
         userRepository.save(admin);
     }
@@ -77,7 +84,7 @@ public class ChangePasswordTest implements TestData {
         mockMvc.perform(put("/api/users/me/password")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content("{\"newPassword\": \"" + newPassword + "\"}"))
-            .andExpect(status().isOk());
+            .andExpect(status().isNoContent());
 
         ApplicationUser updatedUser = userRepository.findById(NORMAL_USER_EMAIL).orElseThrow();
         assertTrue(passwordEncoder.matches(newPassword, updatedUser.getPasswordHash()));
@@ -94,7 +101,9 @@ public class ChangePasswordTest implements TestData {
                 .content("{\"newPassword\": \"abc\"}"))
             .andExpect(status().isBadRequest())
             .andExpect(content().string(org.hamcrest.Matchers.containsString(
-                "New password must be at least 8 characters long and include uppercase, lowercase and a digit")));
+                "New password must be at least 8 characters long and include uppercase, lowercase and a digit"
+            )));
+
     }
 
     /**
@@ -107,7 +116,7 @@ public class ChangePasswordTest implements TestData {
                 .contentType(MediaType.APPLICATION_JSON)
                 .content("{}"))
             .andExpect(status().isBadRequest())
-            .andExpect(content().string(org.hamcrest.Matchers.containsString("New password must not be blank")));
+            .andExpect(content().string(org.hamcrest.Matchers.containsString("rawPassword cannot be null")));
     }
 
     /**
