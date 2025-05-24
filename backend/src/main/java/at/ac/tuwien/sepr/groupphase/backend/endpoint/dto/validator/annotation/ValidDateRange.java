@@ -11,10 +11,12 @@ import java.lang.annotation.Target;
 
 @Documented
 @Constraint(validatedBy = DateRangeValidator.class)
-@Target( { ElementType.TYPE })
+@Target({ElementType.TYPE})
 @Retention(RetentionPolicy.RUNTIME)
 public @interface ValidDateRange {
     String message() default "End date must be after start date";
+
     Class<?>[] groups() default {};
+
     Class<? extends Payload>[] payload() default {};
 }

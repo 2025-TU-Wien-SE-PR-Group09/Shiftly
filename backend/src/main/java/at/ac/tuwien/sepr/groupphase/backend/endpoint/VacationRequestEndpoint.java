@@ -1,8 +1,10 @@
 package at.ac.tuwien.sepr.groupphase.backend.endpoint;
 
+import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.VacationRequestResponseRestDto;
 import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.VacationRequestRestDto;
 import at.ac.tuwien.sepr.groupphase.backend.service.VacationRequestService;
 import at.ac.tuwien.sepr.groupphase.backend.service.dto.VacationRequestDto;
+import at.ac.tuwien.sepr.groupphase.backend.service.dto.VacationRequestResponseDto;
 import jakarta.annotation.security.RolesAllowed;
 import jakarta.transaction.Transactional;
 import jakarta.validation.Valid;
@@ -29,13 +31,14 @@ public class VacationRequestEndpoint {
         this.vacationRequestService = vacationRequestService;
     }
 
-   @PostMapping(produces = MediaType.APPLICATION_JSON_VALUE,
-       consumes = MediaType.APPLICATION_JSON_VALUE)
-   @Transactional
-   @RolesAllowed({"EMPLOYEE"})
-   public ResponseEntity<VacationRequestRestDto> createVacationRequest(@Valid @RequestBody VacationRequestRestDto restDto) {
-       VacationRequestDto dto = VacationRequestDto.from(restDto);
-       VacationRequestDto created = vacationRequestService.createVacationRequest(dto);
-       return ResponseEntity.status(HttpStatus.CREATED).body(VacationRequestRestDto.from(created));
-   }
+
+    @PostMapping(produces = MediaType.APPLICATION_JSON_VALUE,
+        consumes = MediaType.APPLICATION_JSON_VALUE)
+    @Transactional
+    @RolesAllowed({"EMPLOYEE"})
+    public ResponseEntity<VacationRequestResponseRestDto> createVacationRequest(@Valid @RequestBody VacationRequestRestDto restDto) {
+        VacationRequestDto dto = VacationRequestDto.from(restDto);
+        VacationRequestResponseDto created = vacationRequestService.createVacationRequest(dto);
+        return ResponseEntity.status(HttpStatus.CREATED).body(VacationRequestResponseRestDto.from(created));
+    }
 }

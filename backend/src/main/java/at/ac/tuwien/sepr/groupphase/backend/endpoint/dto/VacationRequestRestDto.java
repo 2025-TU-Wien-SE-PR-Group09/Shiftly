@@ -21,8 +21,6 @@ public class VacationRequestRestDto {
     @Size(min = 1, max = 20, message = "Status must be between 1 and 20 characters")
     private String status;
 
-    private Long id;
-
 
     public VacationRequestRestDto() {
     }
@@ -52,19 +50,8 @@ public class VacationRequestRestDto {
     }
 
 
-    public Long getId() {
-        return id;
-    }
-
-    public void setId(Long id) {
-        this.id = id;
-    }
-
-
-
     public static VacationRequestRestDto from(VacationRequestDto dto) {
         VacationRequestRestDto restDto = new VacationRequestRestDto();
-        restDto.setId(dto.getId());
         restDto.setStartDate(dto.getStartDate());
         restDto.setEndDate(dto.getEndDate());
         restDto.setStatus(dto.getStatus());

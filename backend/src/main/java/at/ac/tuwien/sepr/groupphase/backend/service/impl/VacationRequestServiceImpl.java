@@ -6,6 +6,7 @@ import at.ac.tuwien.sepr.groupphase.backend.repository.UserRepository;
 import at.ac.tuwien.sepr.groupphase.backend.repository.VacationRequestRepository;
 import at.ac.tuwien.sepr.groupphase.backend.service.VacationRequestService;
 import at.ac.tuwien.sepr.groupphase.backend.service.dto.VacationRequestDto;
+import at.ac.tuwien.sepr.groupphase.backend.service.dto.VacationRequestResponseDto;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
@@ -25,11 +26,9 @@ public class VacationRequestServiceImpl implements VacationRequestService {
     }
 
     @Override
-    public VacationRequestDto createVacationRequest(VacationRequestDto vacationRequestDto) {
+    public VacationRequestResponseDto createVacationRequest(VacationRequestDto vacationRequestDto) {
         LocalDate start = vacationRequestDto.getStartDate();
         LocalDate end = vacationRequestDto.getEndDate();
-
-
 
         String userEmail = getCurrentUserEmail();
         ApplicationUser employee = userRepository.findByEmail(userEmail)
@@ -37,15 +36,15 @@ public class VacationRequestServiceImpl implements VacationRequestService {
 
         VacationRequest vacationRequest = new VacationRequest();
         vacationRequest.setEmployee(employee);
-        vacationRequest.setStartDate(start);
-        vacationRequest.setEndDate(end);
-        vacationRequest.setStatus("PENDING");
+        vacationRequest.setStartDate(vacationRequestDto.getStartDate());
+        vacationRequest.setEndDate(vacationRequestDto.getEndDate());
+        vacationRequest.setStatus(vacationRequestDto.getStatus());
 
         VacationRequest saved = vacationRequestRepository.save(vacationRequest);
 
-        return new VacationRequestDto(
+        return new VacationRequestResponseDto(
             saved.getId(),
-            userEmail,
+            employee.getEmail(),
             saved.getStartDate(),
             saved.getEndDate(),
             saved.getStatus()

@@ -1,6 +1,5 @@
 package at.ac.tuwien.sepr.groupphase.backend.entity;
 
-
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -19,26 +18,21 @@ public class VacationRequest {
     @ManyToOne(optional = false)
     private ApplicationUser employee;
 
-    @Column(nullable = false)
+    @Column(nullable = false, length = 20)
     private LocalDate startDate;
 
-    @Column(nullable = false)
+    @Column(nullable = false, length = 20)
     private LocalDate endDate;
 
-    @Column(nullable = false)
+    @Column(nullable = false, length = 20)
     private String status;
 
     public VacationRequest() {
     }
 
 
-
     public Long getId() {
         return id;
-    }
-
-    public ApplicationUser getEmployee() {
-        return employee;
     }
 
     public void setEmployee(ApplicationUser employee) {
