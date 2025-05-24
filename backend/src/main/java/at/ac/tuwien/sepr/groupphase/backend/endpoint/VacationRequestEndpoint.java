@@ -4,6 +4,10 @@ import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.VacationRequestRestDto;
 import at.ac.tuwien.sepr.groupphase.backend.service.VacationRequestService;
 import at.ac.tuwien.sepr.groupphase.backend.service.dto.VacationRequestDto;
 import jakarta.annotation.security.RolesAllowed;
+import jakarta.transaction.Transactional;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -24,28 +28,13 @@ public class VacationRequestEndpoint {
         this.vacationRequestService = vacationRequestService;
     }
 
-    @PostMapping
-    @RolesAllowed({"EMPLOYEE"})
-    public VacationRequestRestDto createVacationRequest(@RequestBody VacationRequestRestDto vacationRequestRestDto) {
-
-        VacationRequestDto vacationRequestDto = new VacationRequestDto(
-            null,
-             null,
-            vacationRequestRestDto.getStartDate(),
-            vacationRequestRestDto.getEndDate(),
-            "PENDING"
-        );
-
-
-        VacationRequestDto created = vacationRequestService.createVacationRequest(vacationRequestDto);
-
-
-        VacationRequestRestDto response = new VacationRequestRestDto();
-        response.setStartDate(created.getStartDate());
-        response.setEndDate(created.getEndDate());
-        response.setStatus(created.getStatus());
-
-
-        return response;
-    }
+   @PostMapping(produces = MediaType.APPLICATION_JSON_VALUE,
+       consumes = MediaType.APPLICATION_JSON_VALUE)
+   @Transactional
+   @RolesAllowed({"EMPLOYEE"})
+   public ResponseEntity<VacationRequestRestDto> createVacationRequest(@RequestBody VacationRequestRestDto restDto) {
+       VacationRequestDto dto = VacationRequestDto.from(restDto);
+       VacationRequestDto created = vacationRequestService.createVacationRequest(dto);
+       return ResponseEntity.status(HttpStatus.CREATED).body(VacationRequestRestDto.from(created));
+   }
 }
