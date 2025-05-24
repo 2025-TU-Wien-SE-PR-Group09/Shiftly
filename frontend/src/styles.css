@@ -3,8 +3,27 @@
 @import 'tailwindcss';
 
 
-/** Plugins **/
+/** Toastr, make colors match the template **/
 @import 'ngx-toastr/toastr';
+
+.ngx-toastr {
+  background-color: #030303;
+  pointer-events: auto;
+}
+.bg-green-500 {
+  background-color: rgba(34, 197, 94, 0.9);
+}
+.toast-error {
+  background-color: rgba(239, 68, 68, 0.9);
+}
+.toast-info {
+  background-color: rgba(139, 92, 246, 0.9);
+}
+.toast-warning {
+  background-color: rgba(234, 179, 8, 0.9);
+}
+
+/** Plugins **/
 @import './assets/styles/apexchart.css';
 
 @plugin "@tailwindcss/forms";

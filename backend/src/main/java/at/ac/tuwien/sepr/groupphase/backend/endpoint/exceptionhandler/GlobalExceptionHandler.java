@@ -9,14 +9,19 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.HttpStatusCode;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.authentication.BadCredentialsException;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
+import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.context.request.WebRequest;
 import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler;
 import org.springframework.security.access.AccessDeniedException;
 
 import java.lang.invoke.MethodHandles;
+import java.util.Arrays;
+import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -33,18 +38,28 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
     private static final Logger LOGGER = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
 
     /**
-     * Use the @ExceptionHandler annotation to write handler for custom exceptions.
+     * Handles exceptions that only have one message.
      */
-    @ExceptionHandler(value = {NotFoundException.class})
-    protected ResponseEntity<Object> handleNotFound(RuntimeException ex, WebRequest request) {
+    @ExceptionHandler(value = {NotFoundException.class, BadCredentialsException.class, UsernameNotFoundException.class})
+    protected ResponseEntity<Object> handleNotFound(Exception ex, WebRequest request) {
         LOGGER.warn(ex.getMessage());
-        return handleExceptionInternal(ex, ex.getMessage(), new HttpHeaders(), HttpStatus.NOT_FOUND, request);
+        Map<String, Object> body = new LinkedHashMap<>();
+
+        //Get all errors
+        body.put("errors", Collections.singletonList(ex.getMessage()));
+
+        return handleExceptionInternal(ex, body, new HttpHeaders(), HttpStatus.NOT_FOUND, request);
     }
 
     @ExceptionHandler(value = {ConflictException.class})
-    protected ResponseEntity<Object> handleConflict(RuntimeException ex, WebRequest request) {
-        LOGGER.warn(ex.getMessage());
-        return handleExceptionInternal(ex, ex.getMessage(), new HttpHeaders(), HttpStatus.CONFLICT, request);
+    protected ResponseEntity<Object> handleConflict(ConflictException ex, WebRequest request) {
+        LOGGER.warn("Conflict exception: {}", ex.getMessage());
+        Map<String, Object> body = new LinkedHashMap<>();
+
+        //Get all errors
+        body.put("errors", ex.getErrors());
+
+        return handleExceptionInternal(ex, body, new HttpHeaders(), HttpStatus.CONFLICT, request);
     }
 
     /**
@@ -62,10 +77,11 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
             .stream()
             .map(DefaultMessageSourceResolvable::getDefaultMessage)
             .collect(Collectors.toList());
-        body.put("validation_errors", errors);
+        body.put("errors", errors);
+
+        LOGGER.warn("Argument not valid exception: {}", String.join(", ", errors));
 
         return new ResponseEntity<>(body, headers, status);
-
     }
 
     /**
@@ -79,7 +95,11 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
     @ExceptionHandler(value = {AccessDeniedException.class})
     protected ResponseEntity<Object> handleAccessDenied(RuntimeException ex, WebRequest request) {
         LOGGER.warn("Access denied: {}", ex.getMessage());
-        Map<String, String> body = Map.of("message", ex.getMessage());
+        Map<String, Object> body = new LinkedHashMap<>();
+
+        //Get all errors
+        body.put("errors", Collections.singletonList(ex.getMessage()));
+
         return handleExceptionInternal(ex, body, new HttpHeaders(), HttpStatus.FORBIDDEN, request);
     }
 
@@ -94,7 +114,11 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
     @ExceptionHandler(value = {IllegalArgumentException.class})
     protected ResponseEntity<Object> handleIllegalArgument(RuntimeException ex, WebRequest request) {
         LOGGER.warn("Illegal argument: {}", ex.getMessage());
-        Map<String, String> body = Map.of("message", ex.getMessage());
+        Map<String, Object> body = new LinkedHashMap<>();
+
+        //Get all errors
+        body.put("errors", Collections.singletonList(ex.getMessage()));
+
         return handleExceptionInternal(ex, body, new HttpHeaders(), HttpStatus.BAD_REQUEST, request);
     }
 }

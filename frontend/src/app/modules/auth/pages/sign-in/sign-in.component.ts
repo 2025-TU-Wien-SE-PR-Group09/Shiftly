@@ -30,6 +30,9 @@ export class SignInComponent implements OnInit {
   }
 
   ngOnInit(): void {
+    // When user browses to sign-in, he will be logged out
+    this._authService.logoutUser();
+
     this.form = this._formBuilder.group({
       email: ['', [Validators.required, Validators.email]],
       password: ['', Validators.required],
@@ -54,22 +57,8 @@ export class SignInComponent implements OnInit {
 
     this._authService.loginUser({ email, password }).subscribe({
       next: (resp) => {
-        const roles = this._authService.getUserRoles();
-
-        if (roles.includes("ADMIN")) {
-          this._router.navigateByUrl('/home/admin').then();
-        } else if (roles.includes("EMPLOYEE")) {
-          this._router.navigateByUrl('/home/employee').then();
-        } else if (roles.includes("SUPERVISOR")) {
-          this._router.navigateByUrl('/home/supervisor').then();
-        } else {
-          this._router.navigateByUrl('/no-role').then();
-        }
-        //todo remove this ^^^^^^
-      },
-      error: (error) => {
-        this._toastr.error('Login Failed');
-      },
+        this._router.navigateByUrl('/home').then();
+      }
     });
   }
 }

@@ -32,8 +32,8 @@ security:
     type: JWT
     issuer: secure-backend
     audience: secure-app
-    # 12 hours in milliseconds
-    expiration-time: 43200000
+    # 3 hours in milliseconds
+    expiration-time: 10800000
 
 management:
   server:

@@ -60,7 +60,6 @@ export class SignUpComponent implements OnInit {
         this._router.navigateByUrl('/auth/sign-in').then();
       },
       error: (error) => {
-        this._toastr.error('Registration failed');
       },
     })
 
