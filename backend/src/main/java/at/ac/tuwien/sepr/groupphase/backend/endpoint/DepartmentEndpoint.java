@@ -12,6 +12,8 @@ import at.ac.tuwien.sepr.groupphase.backend.exception.NotFoundException;
 import at.ac.tuwien.sepr.groupphase.backend.service.DepartmentService;
 import at.ac.tuwien.sepr.groupphase.backend.service.EmployeeService;
 import at.ac.tuwien.sepr.groupphase.backend.service.ShiftPlanningService;
+import at.ac.tuwien.sepr.groupphase.backend.service.dto.DepartmentCreateDto;
+import at.ac.tuwien.sepr.groupphase.backend.service.dto.DepartmentDto;
 import at.ac.tuwien.sepr.groupphase.backend.service.dto.DepartmentNameDto;
 import at.ac.tuwien.sepr.groupphase.backend.service.dto.EmployeeDto;
 import at.ac.tuwien.sepr.groupphase.backend.service.dto.EmployeeListItemDto;
@@ -20,8 +22,6 @@ import at.ac.tuwien.sepr.groupphase.backend.service.dto.shift.PlanBlueprintDto;
 import at.ac.tuwien.sepr.groupphase.backend.service.dto.shift.ShiftDayDto;
 import at.ac.tuwien.sepr.groupphase.backend.service.dto.shift.ShiftWeekBlueprintDto;
 import at.ac.tuwien.sepr.groupphase.backend.service.mapper.ShiftPlanningMapper;
-import at.ac.tuwien.sepr.groupphase.backend.service.dto.DepartmentCreateDto;
-import at.ac.tuwien.sepr.groupphase.backend.service.dto.DepartmentDto;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -29,6 +29,7 @@ import jakarta.annotation.security.RolesAllowed;
 import jakarta.transaction.Transactional;
 import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -60,7 +61,7 @@ public class DepartmentEndpoint {
     @RolesAllowed({"ADMIN"})
     @Operation(summary = "Get all departments")
     @ApiResponse(responseCode = "200", description = "List of all departments")
-    @GetMapping
+    @GetMapping(produces = MediaType.APPLICATION_JSON_VALUE)
     public List<DepartmentDetailRestDto> getAllDepartments() {
         return departmentService.getAllDepartments();
     }
@@ -69,7 +70,8 @@ public class DepartmentEndpoint {
     @RolesAllowed({"ADMIN"})
     @Operation(summary = "Create a new department")
     @ApiResponse(responseCode = "201", description = "New department created")
-    @PostMapping
+    @PostMapping(produces = MediaType.APPLICATION_JSON_VALUE,
+        consumes = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<Void> createDepartment(@RequestBody @Valid DepartmentCreateRestDto restDto) {
         DepartmentCreateDto serviceDto = new DepartmentCreateDto(
             restDto.getName(),
@@ -82,7 +84,9 @@ public class DepartmentEndpoint {
     @RolesAllowed({"ADMIN"})
     @Operation(summary = "Create shift plan(Blueprint) for a department")
     @ApiResponse(responseCode = "201", description = "Shiftplan for the department")
-    @PostMapping("/{departmentName}/shiftplanBlueprint")
+    @PostMapping(path = "/{departmentName}/shiftplanBlueprint",
+        produces = MediaType.APPLICATION_JSON_VALUE,
+        consumes = MediaType.APPLICATION_JSON_VALUE)
     public List<PlanBlueprintResponse> createShiftplanBlueprint(
         @PathVariable(name = "departmentName") String departmentName,
         @RequestBody @Valid CreatePlanBlueprintDto blueprintDto) {
@@ -127,7 +131,7 @@ public class DepartmentEndpoint {
     @RolesAllowed({"ADMIN"})
     @Operation(summary = "Get shift plan for a department")
     @ApiResponse(responseCode = "200", description = "Shiftplan for the department")
-    @GetMapping("/{departmentName}/shiftplanBlueprint")
+    @GetMapping(path = "/{departmentName}/shiftplanBlueprint", produces = MediaType.APPLICATION_JSON_VALUE)
     public List<PlanBlueprintResponse> getShiftplanBlueprints(
         @PathVariable(name = "departmentName") String departmentName) {
 
@@ -141,7 +145,7 @@ public class DepartmentEndpoint {
     @RolesAllowed({"SUPERVISOR"})
     @Operation(summary = "Add an employee to a department")
     @ApiResponse(responseCode = "200", description = "Successfully added employee to department")
-    @PostMapping("/{departmentName}/addEmployee/{employeeEmail}")
+    @PostMapping(path = "/{departmentName}/addEmployee/{employeeEmail}", produces = MediaType.APPLICATION_JSON_VALUE)
     public EmployeeRestResponseDto addEmployeeToDepartment(
         @PathVariable(name = "departmentName") String departmentName,
         @PathVariable(name = "employeeEmail") String employeeEmail) {
@@ -163,7 +167,7 @@ public class DepartmentEndpoint {
     @RolesAllowed({"SUPERVISOR"})
     @Operation(summary = "List all employees of a department")
     @ApiResponse(responseCode = "200", description = "List all employees of a department")
-    @GetMapping("/{departmentName}/employees")
+    @GetMapping(path = "/{departmentName}/employees", produces = MediaType.APPLICATION_JSON_VALUE)
     @Transactional
     public List<EmployeeListItemResponseDto> getEmployeesOfDepartment(
         @PathVariable(name = "departmentName") String departmentName) {
@@ -184,7 +188,8 @@ public class DepartmentEndpoint {
     @Transactional
     @Operation(summary = "Generate concrete shift plan for the given department and return the scheduled shifts")
     @ApiResponse(responseCode = "201", description = "Concrete shift plan generated and returned")
-    @PostMapping("/{id}/generate-concrete-plan")
+    @PostMapping(path = "/{id}/generate-concrete-plan",
+        produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<List<ScheduledShiftResponseDto>> generateConcretePlan(@PathVariable("id") Long id) {
         ConcreteShiftPlan plan = shiftPlanningService.generateConcreteQuarterlyPlan(id);
         List<ScheduledShiftResponseDto> response = plan.getScheduledShifts().stream()
@@ -202,7 +207,7 @@ public class DepartmentEndpoint {
     @Transactional
     @Operation(summary = "Get detailed scheduled shifts for a department")
     @ApiResponse(responseCode = "200", description = "Detailed shifts returned")
-    @GetMapping("/{departmentId}/concrete-plan-details")
+    @GetMapping(path = "/{departmentId}/concrete-plan-details", produces = MediaType.APPLICATION_JSON_VALUE)
     public List<ScheduledShiftDetailDto> getDetailedConcretePlan(
         @PathVariable("departmentId") Long departmentId
     ) {

@@ -22,7 +22,7 @@ export class DepartmentDetailSupervisorComponent implements OnInit {
   ngOnInit(): void {
     this.userService.getCurrentUserProfile().subscribe({
       next: (data: UserProfileRestDto) => {
-        this.departmentName = data.department;
+        this.departmentName = data.department!;
       },
       error: () => {
         this.toastrService.error('Failed to get Current User Profile!');

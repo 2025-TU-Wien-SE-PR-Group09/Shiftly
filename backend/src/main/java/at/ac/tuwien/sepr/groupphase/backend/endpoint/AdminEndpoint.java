@@ -26,7 +26,7 @@ import static at.ac.tuwien.sepr.groupphase.backend.config.Constants.AUTH_CODE;
 @RequestMapping(value = "/api/v1/admin")
 public class AdminEndpoint {
 
-    @GetMapping(value = "/authCode")
+    @GetMapping(path = "/authCode", produces = MediaType.APPLICATION_JSON_VALUE)
     @RolesAllowed({"ADMIN"})
     @ResponseStatus(HttpStatus.OK)
     public AdminAuthCodeRestDto authCode() { // todo use a dto instead

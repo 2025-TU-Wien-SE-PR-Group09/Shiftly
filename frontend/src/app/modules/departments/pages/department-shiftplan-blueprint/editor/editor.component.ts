@@ -100,7 +100,7 @@ export class EditorComponent {
 
     const dto = this.blueprintForm.value;
 
-    this.departmentService.createShiftplanBlueprint(dto, this.departmentName).subscribe({
+    this.departmentService.createShiftplanBlueprint(this.departmentName, dto).subscribe({
       next: () => {
         this.toastr.success('Plan gespeichert!');
         this.blueprintSaved.emit();
