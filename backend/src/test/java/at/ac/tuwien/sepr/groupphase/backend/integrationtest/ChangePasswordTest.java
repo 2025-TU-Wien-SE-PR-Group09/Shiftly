@@ -19,6 +19,7 @@ import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.web.servlet.MockMvc;
 
+import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
@@ -52,20 +53,18 @@ public class ChangePasswordTest implements TestData {
             roleRepository.save(new ApplicationRole("ADMIN"));
         }
 
-        // Create and save normal user
-        ApplicationUser user = new ApplicationUser();
-        user.setEmail(NORMAL_USER_EMAIL);
-        user.setPasswordHash(passwordEncoder.encode("UserPass123"));
-        user.getRoles().add(roleRepository.getReferenceById("USER"));
-        userRepository.save(user);
-
-        // Create and save admin user
-        ApplicationUser admin = new ApplicationUser();
-        admin.setEmail(ADMIN_USER_EMAIL);
-        admin.setPasswordHash(passwordEncoder.encode("AdminPass123"));
-        admin.getRoles().add(roleRepository.getReferenceById("ADMIN"));
-        userRepository.save(admin);
+        createUser(NORMAL_USER_EMAIL, "UserPass123", "USER");
+        createUser(ADMIN_USER_EMAIL, "AdminPass123", "ADMIN");
     }
+
+    private void createUser(String email, String password, String role) {
+        ApplicationUser user = new ApplicationUser();
+        user.setEmail(email);
+        user.setPasswordHash(passwordEncoder.encode(password));
+        user.getRoles().add(roleRepository.getReferenceById(role));
+        userRepository.save(user);
+    }
+
 
     @AfterEach
     public void cleanUpUsers() {
@@ -78,16 +77,18 @@ public class ChangePasswordTest implements TestData {
      */
     @Test
     @WithMockUser(username = TestData.NORMAL_USER_EMAIL, roles = {"USER"})
-    public void whenValidPasswordAsUser_thenPasswordIsUpdated() throws Exception {
+    public void whenValidPasswordAsUser_thenPasswordIsUpdated() {
         String newPassword = "StrongPass1";
 
-        mockMvc.perform(put("/api/users/me/password")
-                .contentType(MediaType.APPLICATION_JSON)
-                .content("{\"newPassword\": \"" + newPassword + "\"}"))
-            .andExpect(status().isNoContent());
+        assertDoesNotThrow(() -> {
+            mockMvc.perform(put("/api/users/me/password")
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .content("{\"newPassword\": \"" + newPassword + "\"}"))
+                .andExpect(status().isNoContent());
 
-        ApplicationUser updatedUser = userRepository.findById(NORMAL_USER_EMAIL).orElseThrow();
-        assertTrue(passwordEncoder.matches(newPassword, updatedUser.getPasswordHash()));
+            ApplicationUser updatedUser = userRepository.findById(NORMAL_USER_EMAIL).orElseThrow();
+            assertTrue(passwordEncoder.matches(newPassword, updatedUser.getPasswordHash()));
+        });
     }
 
     /**
@@ -95,14 +96,16 @@ public class ChangePasswordTest implements TestData {
      */
     @Test
     @WithMockUser(username = TestData.NORMAL_USER_EMAIL, roles = {"USER"})
-    public void whenWeakPasswordAsUser_thenReturnsValidationError() throws Exception {
-        mockMvc.perform(put("/api/users/me/password")
-                .contentType(MediaType.APPLICATION_JSON)
-                .content("{\"newPassword\": \"abc\"}"))
-            .andExpect(status().isBadRequest())
-            .andExpect(content().string(org.hamcrest.Matchers.containsString(
-                "New password must be at least 8 characters long and include uppercase, lowercase and a digit"
-            )));
+    public void whenWeakPasswordAsUser_thenReturnsValidationError() {
+        assertDoesNotThrow(() -> {
+            mockMvc.perform(put("/api/users/me/password")
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .content("{\"newPassword\": \"abc\"}"))
+                .andExpect(status().isBadRequest())
+                .andExpect(content().string(org.hamcrest.Matchers.containsString(
+                    "New password must be at least 8 characters long and include uppercase, lowercase and a digit"
+                )));
+        });
 
     }
 
@@ -111,24 +114,28 @@ public class ChangePasswordTest implements TestData {
      */
     @Test
     @WithMockUser(username = TestData.NORMAL_USER_EMAIL, roles = {"USER"})
-    public void whenMissingPasswordAsUser_thenReturns400() throws Exception {
-        mockMvc.perform(put("/api/users/me/password")
-                .contentType(MediaType.APPLICATION_JSON)
-                .content("{}"))
-            .andExpect(status().isBadRequest())
-            .andExpect(content().string(org.hamcrest.Matchers.containsString("rawPassword cannot be null")));
+    public void whenMissingPasswordAsUser_thenReturns400() {
+        assertDoesNotThrow(() -> {
+            mockMvc.perform(put("/api/users/me/password")
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .content("{}"))
+                .andExpect(status().isBadRequest())
+                .andExpect(content().string(org.hamcrest.Matchers.containsString("rawPassword cannot be null")));
+        });
     }
 
     /**
      * Tests that unauthenticated users cannot change their password and receive 403.
      */
     @Test
-    public void whenNotAuthenticated_thenReturns403() throws Exception {
-        mockMvc.perform(put("/api/users/me/password")
-                .contentType(MediaType.APPLICATION_JSON)
-                .content("{\"newPassword\": \"StrongPass1\"}"))
-            .andExpect(status().isForbidden())
-            .andExpect(content().string(org.hamcrest.Matchers.containsString("Access Denied")));
+    public void whenNotAuthenticated_thenReturns403() {
+        assertDoesNotThrow(() -> {
+            mockMvc.perform(put("/api/users/me/password")
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .content("{\"newPassword\": \"StrongPass1\"}"))
+                .andExpect(status().isForbidden())
+                .andExpect(content().string(org.hamcrest.Matchers.containsString("Access Denied")));
+        });
     }
 
     /**
@@ -136,10 +143,12 @@ public class ChangePasswordTest implements TestData {
      */
     @Test
     @WithMockUser(username = ADMIN_USER_EMAIL, roles = {"ADMIN"})
-    public void whenAdminTriesToChangePassword_thenReturns403() throws Exception {
-        mockMvc.perform(put("/api/users/me/password")
-                .contentType(MediaType.APPLICATION_JSON)
-                .content("{\"newPassword\": \"StrongPass1\"}"))
-            .andExpect(status().isForbidden());
+    public void whenAdminTriesToChangePassword_thenReturns403() {
+        assertDoesNotThrow(() -> {
+            mockMvc.perform(put("/api/users/me/password")
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .content("{\"newPassword\": \"StrongPass1\"}"))
+                .andExpect(status().isForbidden());
+        });
     }
 }
