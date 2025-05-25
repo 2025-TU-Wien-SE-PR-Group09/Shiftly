@@ -119,6 +119,20 @@ public class ShiftPlanningMapper {
      */
     public static class ShiftDays {
 
+        public static CreateShiftDayDto toDto(ShiftDayCreateDto shiftDayCreateDto) {
+
+            var dayOfWeek = ofThrowable(() -> DayOfWeek.valueOf(shiftDayCreateDto.getDay()));
+            var startTime = ofThrowable(() -> LocalTime.parse(shiftDayCreateDto.getStartTime()));
+            var endTime = ofThrowable(() -> LocalTime.parse(shiftDayCreateDto.getEndTime()));
+
+            Optional<Duration> duration = startTime.flatMap(st -> endTime.map(et -> Duration.between(st, et)));
+
+            return new CreateShiftDayDto(
+                dayOfWeek,
+                startTime,
+                duration
+            );
+        }
 
         /**
          * Converts a ShiftDay(DAO) entity to a ShiftDayDto(Service DTO).
