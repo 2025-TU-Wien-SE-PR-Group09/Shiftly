@@ -2,8 +2,7 @@ import { Component , OnInit} from '@angular/core';
 import {
   AdminEndpointService,
   DepartmentDetailRestDto,
-  DepartmentService,
-  PlanBlueprintResponse, ScheduledShiftDetailDto, ScheduledShiftResponseDto, ShiftDayDetailDto,
+  DepartmentService, DepartmentShiftplanCalendarResponse,
 } from '../../../../rest_client';
 import { ToastrService } from 'ngx-toastr';
 import { CommonModule } from '@angular/common';
@@ -26,7 +25,7 @@ export class AdminHomeComponent implements OnInit {
 
   protected departments: DepartmentDetailRestDto[] = [];
   protected selectedDepartment: DepartmentDetailRestDto | undefined;
-  protected scheduledShift: ScheduledShiftDetailDto[] = [];
+  protected shiftPlan: DepartmentShiftplanCalendarResponse | undefined;
   code: string = 'test';
 
   view: CalendarView = CalendarView.Month;
@@ -74,37 +73,57 @@ export class AdminHomeComponent implements OnInit {
     if (this.selectedDepartment) {
       this.loadScheduledShifts();
     }
-    if(this.scheduledShift) {
-      this.calculateEvents();
-    }
   }
+
+  private shiftColors = new Map<string, { primary: string; secondary: string }>();
+  private colorPalette = [
+    { primary: '#1e90ff', secondary: '#D1E8FF' }, // Blau
+    { primary: '#ff6b6b', secondary: '#ffd4d4' }, // Rot
+    { primary: '#32CD32', secondary: '#d4ffd4' }, // Grün
+    { primary: '#ffd700', secondary: '#fff4b3' }, // Gold
+    { primary: '#9370db', secondary: '#e6d5ff' }, // Lila
+    { primary: '#ff8c00', secondary: '#ffe4b3' }, // Orange
+    { primary: '#20b2aa', secondary: '#b3e6e4' }  // Türkis
+  ];
+
+  private getColorForShiftType(shiftType: string): { primary: string; secondary: string } {
+    if (!this.shiftColors.has(shiftType)) {
+      //todo delete this comment
+      // Nimm die nächste verfügbare Farbe oder starte von vorne wenn alle verwendet wurden
+      const colorIndex = this.shiftColors.size % this.colorPalette.length;
+      this.shiftColors.set(shiftType, this.colorPalette[colorIndex]);
+    }
+    return this.shiftColors.get(shiftType)!;
+  }
+
 
   calculateEvents() {
-    for (const shift of this.scheduledShift) {
-      if (shift.days) {
-        for (const day of shift.days) {
-          const weekDay = day.day;
-          //todo create new event to push on this.events
-        }
-      }
+    if (!this.shiftPlan || !this.shiftPlan.shifts) {
+      return;
     }
-  }
 
-  addEvent(title: string, startDate: Date, endDate: Date): void {
-    this.events = [
-      ...this.events,
-      {
-        title: title,
+    this.events = [];
+
+    for (const shift of this.shiftPlan.shifts) {
+      if (!shift.day?.start || !shift.day?.end) {
+        continue;
+      }
+
+      const startDate = new Date(shift.day.start);
+      const endDate = new Date(shift.day.end);
+      const shiftTitle = shift.shiftDescription ?? 'Schicht';
+
+      this.events.push({
+        title: shiftTitle,
         start: startDate,
         end: endDate,
-        color: { primary: '#cc99ff', secondary: '#ccccff' },
-        draggable: true,
-        resizable: {
-          beforeStart: true,
-          afterEnd: true,
-        },
-      },
-    ];
+        color: this.getColorForShiftType(shiftTitle),
+        meta: {
+          workers: shift.workers
+        }
+      });
+    }
+
   }
 
   loadDepartments() {
@@ -125,11 +144,18 @@ export class AdminHomeComponent implements OnInit {
 
   loadScheduledShifts() {
     if (this.selectedDepartment?.id) {
-      this._departmentService.getDetailedConcretePlan(this.selectedDepartment.id).subscribe({
+      this._departmentService.getConcreteShiftplan(this.selectedDepartment.id).subscribe({
         next: (data) => {
-          this.scheduledShift = data;
+          if (data.shifts) {
+            this.shiftPlan = data;
+            this.calculateEvents();
+          }
         },
       })
     }
+  }
+
+  onDepartmentChanged() {
+    this.loadScheduledShifts();
   }
 }

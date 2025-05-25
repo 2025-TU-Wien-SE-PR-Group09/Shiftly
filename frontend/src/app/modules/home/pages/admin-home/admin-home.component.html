@@ -4,7 +4,8 @@
 
 <div class="mb-4">
   <label for="departmentSelect" class="block text-sm font-medium text-foreground">Select Department:</label>
-  <select id="departmentSelect" [(ngModel)]="selectedDepartment" class="mt-1 block w-auto max-w-xs pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm rounded-md text-background bg-foreground">
+  <select id="departmentSelect" [(ngModel)]="selectedDepartment"   (ngModelChange)="onDepartmentChanged()"
+          class="mt-1 block w-auto max-w-xs pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm rounded-md text-background bg-foreground">
     <option [ngValue]="undefined" disabled selected>-- Select a Department --</option>
     <option *ngFor="let department of departments" [ngValue]="department">
       {{ department.name }}
