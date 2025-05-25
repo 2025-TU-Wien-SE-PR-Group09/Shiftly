@@ -1,4 +1,5 @@
 export * from './adminAuthCodeRestDto';
+export * from './applicationUserResponseDto';
 export * from './changePasswordRestDto';
 export * from './createPlanBlueprintDto';
 export * from './departmentCreateRestDto';

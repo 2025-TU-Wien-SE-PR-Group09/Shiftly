@@ -16,6 +16,7 @@ encoder.ts
 git_push.sh
 index.ts
 model/adminAuthCodeRestDto.ts
+model/applicationUserResponseDto.ts
 model/changePasswordRestDto.ts
 model/createPlanBlueprintDto.ts
 model/departmentCreateRestDto.ts

@@ -75,7 +75,7 @@ public class DepartmentEndpoint {
     @RolesAllowed({"ADMIN"})
     @Operation(summary = "Get all supervisors")
     @ApiResponse(responseCode = "200", description = "List of all supervisors")
-    @GetMapping(produces = MediaType.APPLICATION_JSON_VALUE)
+    @GetMapping(value = "/api/departments/supervisors", produces = MediaType.APPLICATION_JSON_VALUE)
     public List<ApplicationUserResponseDto> getAllSupervisors() {
         return userService.getAllSupervisors();
     }

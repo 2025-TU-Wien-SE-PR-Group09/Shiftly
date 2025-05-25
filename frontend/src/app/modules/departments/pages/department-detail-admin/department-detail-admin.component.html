@@ -11,11 +11,15 @@
       placeholder="Department Name"
       [(ngModel)]="newDepartment.name" />
 
-    <input
-      type="email"
+    <!-- Supervisor Dropdown -->
+    <select
       class="mb-4 w-full rounded border p-2"
-      placeholder="Supervisor Email"
-      [(ngModel)]="newDepartment.supervisorEmail" />
+      [(ngModel)]="newDepartment.supervisorEmail">
+      <option value="" disabled selected>Select Supervisor</option>
+      <option *ngFor="let sup of supervisors" [value]="sup.email">
+        {{ sup.email }}
+      </option>
+    </select>
 
     <!-- Buttons -->
     <div class="flex justify-end space-x-2">

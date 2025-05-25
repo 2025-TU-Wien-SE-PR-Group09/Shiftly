@@ -1,6 +1,11 @@
-import { Component } from '@angular/core';
+import {Component, OnInit} from '@angular/core';
 import { RouterLink } from '@angular/router';
-import { DepartmentDetailRestDto, DepartmentCreateRestDto, DepartmentService } from '../../../../rest_client';
+import {
+  DepartmentDetailRestDto,
+  DepartmentCreateRestDto,
+  DepartmentService,
+  ApplicationUserResponseDto
+} from '../../../../rest_client';
 import { ButtonComponent } from '../../../../shared/components/button/button.component';
 import { FormsModule } from '@angular/forms';
 import { CommonModule } from '@angular/common';
@@ -12,13 +17,14 @@ import { ToastrService } from 'ngx-toastr';
   templateUrl: './department-detail-admin.component.html',
   styleUrl: './department-detail-admin.component.css',
 })
-export class DepartmentDetailAdminComponent {
+export class DepartmentDetailAdminComponent implements OnInit{
   protected showForm: boolean | undefined;
   protected newDepartment: DepartmentCreateRestDto = {
     name: '',
     supervisorEmail: '',
   };
   protected departments: DepartmentDetailRestDto[] = [];
+  protected supervisors: ApplicationUserResponseDto[] = [];
 
   constructor(private departmentService: DepartmentService, private toastr: ToastrService) {}
 
@@ -39,11 +45,19 @@ export class DepartmentDetailAdminComponent {
 
   ngOnInit(): void {
     this.loadDepartments();
+    this.loadSupervisors();
   }
 
   loadDepartments(): void {
     this.departmentService.getAllDepartments().subscribe({
       next: (data) => (this.departments = data),
+    });
+  }
+
+  loadSupervisors(): void {
+    this.departmentService.getAllSupervisors().subscribe({
+      next: (data) => this.supervisors = data,
+      error: (err) => console.error('Fehler beim Laden der Supervisoren', err)
     });
   }
 }
