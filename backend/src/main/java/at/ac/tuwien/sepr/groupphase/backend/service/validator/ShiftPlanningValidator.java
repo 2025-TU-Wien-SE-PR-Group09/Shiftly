@@ -1,10 +1,9 @@
 package at.ac.tuwien.sepr.groupphase.backend.service.validator;
 
-import java.util.Optional;
-
-import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.AddShiftToPlanBlueprintDto;
 import at.ac.tuwien.sepr.groupphase.backend.entity.ShiftDayBlueprint;
 import at.ac.tuwien.sepr.groupphase.backend.service.dto.shift.ShiftWeekBlueprintDto;
+
+import java.util.Optional;
 
 /**
  * Validator interface for ShiftWeek.

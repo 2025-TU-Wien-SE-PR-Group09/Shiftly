@@ -1,11 +1,22 @@
 package at.ac.tuwien.sepr.groupphase.backend.unittests;
 
-import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.CreatePlanBlueprintDto;
-import at.ac.tuwien.sepr.groupphase.backend.entity.*;
-import at.ac.tuwien.sepr.groupphase.backend.exception.ConflictException;
+import at.ac.tuwien.sepr.groupphase.backend.entity.Department;
+import at.ac.tuwien.sepr.groupphase.backend.entity.PlanBlueprint;
+import at.ac.tuwien.sepr.groupphase.backend.entity.ShiftBlueprint;
+import at.ac.tuwien.sepr.groupphase.backend.entity.ShiftDayBlueprint;
+import at.ac.tuwien.sepr.groupphase.backend.entity.ShiftWeekBlueprint;
 import at.ac.tuwien.sepr.groupphase.backend.exception.NotFoundException;
-import at.ac.tuwien.sepr.groupphase.backend.repository.*;
-import at.ac.tuwien.sepr.groupphase.backend.service.dto.shift.*;
+import at.ac.tuwien.sepr.groupphase.backend.repository.ConcreteShiftPlanRepository;
+import at.ac.tuwien.sepr.groupphase.backend.repository.DepartmentRepository;
+import at.ac.tuwien.sepr.groupphase.backend.repository.PlanBlueprintRepository;
+import at.ac.tuwien.sepr.groupphase.backend.repository.ScheduledShiftRepository;
+import at.ac.tuwien.sepr.groupphase.backend.repository.ShiftBlueprintRepository;
+import at.ac.tuwien.sepr.groupphase.backend.repository.ShiftDayBlueprintRepository;
+import at.ac.tuwien.sepr.groupphase.backend.repository.ShiftWeekBlueprintRepository;
+import at.ac.tuwien.sepr.groupphase.backend.repository.UserRepository;
+import at.ac.tuwien.sepr.groupphase.backend.service.dto.shift.PlanBlueprintCreationDto;
+import at.ac.tuwien.sepr.groupphase.backend.service.dto.shift.PlanBlueprintDto;
+import at.ac.tuwien.sepr.groupphase.backend.service.dto.shift.ShiftBlueprintDto;
 import at.ac.tuwien.sepr.groupphase.backend.service.impl.ShiftPlanningServiceImpl;
 import at.ac.tuwien.sepr.groupphase.backend.service.impl.TimeService;
 import at.ac.tuwien.sepr.groupphase.backend.service.validator.ShiftPlanningValidatorImpl;
@@ -16,7 +27,8 @@ import java.time.DayOfWeek;
 import java.time.Duration;
 import java.time.LocalDate;
 import java.time.LocalTime;
-import java.util.*;
+import java.util.List;
+import java.util.Optional;
 
 import static org.assertj.core.api.AssertionsForInterfaceTypes.assertThat;
 import static org.junit.jupiter.api.Assertions.*;
@@ -83,7 +95,7 @@ class ShiftPlanningServiceTest {
         var shift = new ShiftBlueprint.Builder()
             .withDescription("Frühschicht")
             .withManPower(3)
-            .addWeek(0,week)
+            .addWeek(0, week)
             .build();
         shift.setId(100L);
 

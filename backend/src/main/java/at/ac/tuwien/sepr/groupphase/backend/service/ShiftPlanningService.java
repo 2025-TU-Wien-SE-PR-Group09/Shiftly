@@ -5,9 +5,7 @@ import at.ac.tuwien.sepr.groupphase.backend.service.dto.shift.ConcretePlanGenera
 import at.ac.tuwien.sepr.groupphase.backend.service.dto.shift.PlanBlueprintAddShiftDto;
 import at.ac.tuwien.sepr.groupphase.backend.service.dto.shift.PlanBlueprintCreationDto;
 import at.ac.tuwien.sepr.groupphase.backend.service.dto.shift.PlanBlueprintDto;
-import at.ac.tuwien.sepr.groupphase.backend.service.dto.ScheduledShiftDetailDto;
 
-import java.util.List;
 
 /**
  * ShiftPlanningService is an interface that defines methods for creating and managing shifts.

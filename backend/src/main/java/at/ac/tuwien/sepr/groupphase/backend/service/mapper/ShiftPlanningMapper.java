@@ -1,11 +1,14 @@
 package at.ac.tuwien.sepr.groupphase.backend.service.mapper;
 
+import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.PlanBlueprintResponse;
 import at.ac.tuwien.sepr.groupphase.backend.entity.PlanBlueprint;
 import at.ac.tuwien.sepr.groupphase.backend.entity.ShiftBlueprint;
 import at.ac.tuwien.sepr.groupphase.backend.entity.ShiftDayBlueprint;
 import at.ac.tuwien.sepr.groupphase.backend.entity.ShiftWeekBlueprint;
-import at.ac.tuwien.sepr.groupphase.backend.service.dto.shift.*;
-import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.PlanBlueprintResponse;
+import at.ac.tuwien.sepr.groupphase.backend.service.dto.shift.PlanBlueprintDto;
+import at.ac.tuwien.sepr.groupphase.backend.service.dto.shift.ShiftBlueprintDto;
+import at.ac.tuwien.sepr.groupphase.backend.service.dto.shift.ShiftDayDto;
+import at.ac.tuwien.sepr.groupphase.backend.service.dto.shift.ShiftWeekBlueprintDto;
 
 /**
  * Mapper class for the Shift Planning.
@@ -118,22 +121,6 @@ public class ShiftPlanningMapper {
      * Mapper class for all classes related to ShiftDay.
      */
     public static class ShiftDays {
-
-        public static CreateShiftDayDto toDto(ShiftDayCreateDto shiftDayCreateDto) {
-
-            var dayOfWeek = ofThrowable(() -> DayOfWeek.valueOf(shiftDayCreateDto.getDay()));
-            var startTime = ofThrowable(() -> LocalTime.parse(shiftDayCreateDto.getStartTime()));
-            var endTime = ofThrowable(() -> LocalTime.parse(shiftDayCreateDto.getEndTime()));
-
-            Optional<Duration> duration = startTime.flatMap(st -> endTime.map(et -> Duration.between(st, et)));
-
-            return new CreateShiftDayDto(
-                dayOfWeek,
-                startTime,
-                duration
-            );
-        }
-
         /**
          * Converts a ShiftDay(DAO) entity to a ShiftDayDto(Service DTO).
          *
