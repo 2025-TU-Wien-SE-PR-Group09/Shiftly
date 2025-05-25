@@ -50,10 +50,14 @@ public class DepartmentCreateResponseDto {
 
     @Override
     public boolean equals(Object o) {
-        if (this == o) return true;
-        if (!(o instanceof DepartmentCreateResponseDto that)) return false;
-        return Objects.equals(name, that.name) &&
-            Objects.equals(supervisorEmail, that.supervisorEmail);
+        if (this == o) {
+            return true;
+        }
+        if (!(o instanceof DepartmentCreateResponseDto that)) {
+            return false;
+        }
+        return Objects.equals(name, that.name)
+            && Objects.equals(supervisorEmail, that.supervisorEmail);
     }
 
     @Override
@@ -63,9 +67,8 @@ public class DepartmentCreateResponseDto {
 
     @Override
     public String toString() {
-        return "DepartmentCreateResponseDto{" +
-            "name='" + name + '\'' +
-            ", supervisorEmail='" + supervisorEmail + '\'' +
-            '}';
+        return "DepartmentCreateResponseDto{"
+            + "name='" + name + '\''
+            + ", supervisorEmail='" + supervisorEmail + '\'' + '}';
     }
 }

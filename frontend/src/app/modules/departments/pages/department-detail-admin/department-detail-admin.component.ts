@@ -104,9 +104,4 @@ export class DepartmentDetailAdminComponent implements OnInit{
 
     return this.supervisors.filter(sup => !usedEmails.includes(<string>sup.email));
   }
-
-  hasExistingSupervisor(): boolean {
-    const dept = this.departments.find(d => d.name === this.editedDepartment.oldName);
-    return !!dept?.supervisorEmail && dept.supervisorEmail !== 'NONE';
-  }
 }

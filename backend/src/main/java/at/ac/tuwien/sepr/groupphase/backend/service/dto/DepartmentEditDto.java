@@ -45,6 +45,7 @@ public class DepartmentEditDto {
     public void setNewName(String newName) {
         this.newName = newName;
     }
+
     public String getSupervisorEmail() {
         return supervisorEmail;
     }
@@ -55,11 +56,15 @@ public class DepartmentEditDto {
 
     @Override
     public boolean equals(Object o) {
-        if (this == o) return true;
-        if (!(o instanceof DepartmentEditDto that)) return false;
-        return Objects.equals(oldName, that.oldName) &&
-            Objects.equals(newName, that.newName) &&
-            Objects.equals(supervisorEmail, that.supervisorEmail);
+        if (this == o) {
+            return true;
+        }
+        if (!(o instanceof DepartmentEditDto that)) {
+            return false;
+        }
+        return Objects.equals(oldName, that.oldName)
+            && Objects.equals(newName, that.newName)
+            && Objects.equals(supervisorEmail, that.supervisorEmail);
     }
 
     @Override
@@ -69,11 +74,10 @@ public class DepartmentEditDto {
 
     @Override
     public String toString() {
-        return "DepartmentEditRestDto{" +
-            "oldName='" + oldName + '\'' +
-            ", newName='" + newName + '\'' +
-            ", supervisorEmail='" + supervisorEmail + '\'' +
-            '}';
+        return "DepartmentEditRestDto{"
+            + "oldName='" + oldName + '\''
+            + ", newName='" + newName + '\''
+            + ", supervisorEmail='" + supervisorEmail + '\'' + '}';
     }
 }
 

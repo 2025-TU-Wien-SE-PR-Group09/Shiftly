@@ -57,11 +57,15 @@ public class DepartmentEditRestDto {
 
     @Override
     public boolean equals(Object o) {
-        if (this == o) return true;
-        if (!(o instanceof DepartmentEditRestDto that)) return false;
-        return Objects.equals(oldName, that.oldName) &&
-            Objects.equals(newName, that.newName) &&
-            Objects.equals(supervisorEmail, that.getSupervisorEmail());
+        if (this == o) {
+            return true;
+        }
+        if (!(o instanceof DepartmentEditRestDto that)) {
+            return false;
+        }
+        return Objects.equals(oldName, that.oldName)
+            && Objects.equals(newName, that.newName)
+            && Objects.equals(supervisorEmail, that.getSupervisorEmail());
     }
 
     @Override
@@ -71,11 +75,10 @@ public class DepartmentEditRestDto {
 
     @Override
     public String toString() {
-        return "DepartmentEditRestDto{" +
-            "oldName='" + oldName + '\'' +
-            ", newName='" + newName + '\'' +
-            ", supervisorEmail='" + supervisorEmail + '\'' +
-            '}';
+        return "DepartmentEditRestDto{"
+            + "oldName='" + oldName + '\''
+            + ", newName='" + newName + '\''
+            + ", supervisorEmail='" + supervisorEmail + '\'' + '}';
     }
 }
 

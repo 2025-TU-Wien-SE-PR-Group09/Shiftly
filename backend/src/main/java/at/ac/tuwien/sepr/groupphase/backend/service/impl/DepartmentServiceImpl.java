@@ -42,7 +42,6 @@ public class DepartmentServiceImpl implements DepartmentService {
     }
 
     @Override
-    // TODO: Darius Exception handling?
     public DepartmentCreateResponseDto createDepartment(DepartmentCreateDto dto) throws ConflictException {
         if (departmentRepository.existsByName(dto.getName())) {
             throw new ConflictException("Department with name '" + dto.getName() + "' already exists");

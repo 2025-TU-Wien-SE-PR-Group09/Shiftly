@@ -60,7 +60,6 @@
     <select
       class="mb-4 w-full rounded border p-2"
       [(ngModel)]="editedDepartment.supervisorEmail">
-      <option *ngIf="hasExistingSupervisor()" [value]="''">(No supervisor)</option>
 
       <ng-container *ngIf="getAvailableSupervisors().length > 0; else noSupervisors">
         <option *ngFor="let sup of getAvailableSupervisors()" [value]="sup.email">
