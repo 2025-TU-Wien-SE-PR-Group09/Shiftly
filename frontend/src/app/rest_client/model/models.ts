@@ -4,6 +4,7 @@ export * from './changePasswordRestDto';
 export * from './createPlanBlueprintDto';
 export * from './departmentCreateRestDto';
 export * from './departmentDetailRestDto';
+export * from './departmentEditRestDto';
 export * from './employeeListItemResponseDto';
 export * from './employeeRestResponseDto';
 export * from './loginResponseRestDto';

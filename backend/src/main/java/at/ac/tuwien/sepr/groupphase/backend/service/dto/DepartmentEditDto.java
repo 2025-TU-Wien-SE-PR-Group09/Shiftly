@@ -8,9 +8,13 @@ import java.util.Objects;
 
 public class DepartmentEditDto {
 
-    @NotBlank(message = "Department name must not be blank")
-    @Size(min = 1, max = 100, message = "Department name must be between 1 and 100 characters long")
-    private String name;
+    @NotBlank(message = "Old department name must not be blank")
+    @Size(min = 1, max = 100, message = "Old department name must be between 1 and 100 characters long")
+    private String oldName;
+
+    @NotBlank(message = "New department name must not be blank")
+    @Size(min = 1, max = 100, message = "New department name must be between 1 and 100 characters long")
+    private String newName;
 
     @NotBlank(message = "Supervisor email must not be blank")
     @Size(min = 6, max = 100, message = "Supervisor email must be between 6 and 100 characters long")
@@ -20,19 +24,27 @@ public class DepartmentEditDto {
     public DepartmentEditDto() {
     }
 
-    public DepartmentEditDto(String name, String supervisorEmail) {
-        this.name = name;
+    public DepartmentEditDto(String oldName, String newName, String supervisorEmail) {
+        this.oldName = oldName;
+        this.newName = newName;
         this.supervisorEmail = supervisorEmail;
     }
 
-    public String getName() {
-        return name;
+    public String getOldName() {
+        return oldName;
     }
 
-    public void setName(String name) {
-        this.name = name;
+    public void setOldName(String oldName) {
+        this.oldName = oldName;
     }
 
+    public String getNewName() {
+        return newName;
+    }
+
+    public void setNewName(String newName) {
+        this.newName = newName;
+    }
     public String getSupervisorEmail() {
         return supervisorEmail;
     }
@@ -45,20 +57,22 @@ public class DepartmentEditDto {
     public boolean equals(Object o) {
         if (this == o) return true;
         if (!(o instanceof DepartmentEditDto that)) return false;
-        return Objects.equals(name, that.name) &&
+        return Objects.equals(oldName, that.oldName) &&
+            Objects.equals(newName, that.newName) &&
             Objects.equals(supervisorEmail, that.supervisorEmail);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(name, supervisorEmail);
+        return Objects.hash(oldName, newName, supervisorEmail);
     }
 
     @Override
     public String toString() {
         return "DepartmentEditRestDto{" +
-            "name='" + name + '\'' +
-            ", newSupervisorEmail='" + supervisorEmail + '\'' +
+            "oldName='" + oldName + '\'' +
+            ", newName='" + newName + '\'' +
+            ", supervisorEmail='" + supervisorEmail + '\'' +
             '}';
     }
 }

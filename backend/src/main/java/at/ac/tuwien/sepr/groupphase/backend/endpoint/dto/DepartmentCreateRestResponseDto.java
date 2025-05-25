@@ -1,4 +1,4 @@
-package at.ac.tuwien.sepr.groupphase.backend.service.dto;
+package at.ac.tuwien.sepr.groupphase.backend.endpoint.dto;
 
 import jakarta.validation.constraints.Size;
 import jakarta.validation.constraints.NotBlank;
@@ -6,7 +6,7 @@ import jakarta.validation.constraints.Email;
 
 import java.util.Objects;
 
-public class DepartmentEditResponseDto {
+public class DepartmentCreateRestResponseDto {
 
     @NotBlank(message = "Department name must not be blank")
     @Size(min = 1, max = 100, message = "Department name must be between 1 and 100 characters long")
@@ -17,10 +17,10 @@ public class DepartmentEditResponseDto {
     @Email(message = "Supervisor email must be a valid email address")
     private String supervisorEmail;
 
-    public DepartmentEditResponseDto() {
+    public DepartmentCreateRestResponseDto() {
     }
 
-    public DepartmentEditResponseDto(String name, String supervisorEmail) {
+    public DepartmentCreateRestResponseDto(String name, String supervisorEmail) {
         this.name = name;
         this.supervisorEmail = supervisorEmail;
     }
@@ -44,7 +44,7 @@ public class DepartmentEditResponseDto {
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
-        if (!(o instanceof DepartmentEditResponseDto that)) return false;
+        if (!(o instanceof DepartmentCreateRestResponseDto that)) return false;
         return Objects.equals(name, that.name) &&
             Objects.equals(supervisorEmail, that.supervisorEmail);
     }
@@ -56,9 +56,10 @@ public class DepartmentEditResponseDto {
 
     @Override
     public String toString() {
-        return "DepartmentEditRestDto{" +
+        return "DepartmentCreateRestResponseDto{" +
             "name='" + name + '\'' +
             ", supervisorEmail='" + supervisorEmail + '\'' +
             '}';
     }
 }
+

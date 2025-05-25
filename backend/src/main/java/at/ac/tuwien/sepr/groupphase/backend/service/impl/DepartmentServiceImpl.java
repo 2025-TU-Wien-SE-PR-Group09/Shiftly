@@ -1,6 +1,8 @@
 package at.ac.tuwien.sepr.groupphase.backend.service.impl;
 
-import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.DepartmentDetailRestDto;
+import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.DepartmentDetailRestResponseDto;
+import at.ac.tuwien.sepr.groupphase.backend.service.dto.DepartmentCreateResponseDto;
+import at.ac.tuwien.sepr.groupphase.backend.service.dto.DepartmentDetailResponseDto;
 import at.ac.tuwien.sepr.groupphase.backend.service.dto.DepartmentEditDto;
 import at.ac.tuwien.sepr.groupphase.backend.service.dto.DepartmentEditResponseDto;
 import at.ac.tuwien.sepr.groupphase.backend.entity.ApplicationRole;
@@ -21,7 +23,6 @@ import at.ac.tuwien.sepr.groupphase.backend.service.mapper.DepartmentMapper;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
-import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
 
@@ -40,15 +41,19 @@ public class DepartmentServiceImpl implements DepartmentService {
         this.userService = userService;
     }
 
-    // Todo return service dto not rest
     @Override
-    public DepartmentDetailRestDto createDepartment(DepartmentCreateDto dto) throws ConflictException {
+    // TODO: Darius Exception handling?
+    public DepartmentCreateResponseDto createDepartment(DepartmentCreateDto dto) throws ConflictException {
         if (departmentRepository.existsByName(dto.getName())) {
             throw new ConflictException("Department with name '" + dto.getName() + "' already exists");
         }
 
         ApplicationUser supervisor = applicationUserRepository.findById(dto.getSupervisorEmail())
             .orElseThrow(() -> new NotFoundException("Supervisor not found"));
+
+        if (supervisor.getDepartment() != null) {
+            throw new ConflictException("Supervisor '" + supervisor.getEmail() + "' is already assigned to a department");
+        }
 
         Department department = new Department();
         department.setName(dto.getName());
@@ -62,7 +67,7 @@ public class DepartmentServiceImpl implements DepartmentService {
             Role.SUPERVISOR
         ));
 
-        return new DepartmentDetailRestDto(
+        return new DepartmentCreateResponseDto(
             department.getId(),
             department.getName(),
             getSupervisorByDepartmentName(department.getName()).map(UserEmailDto::email).orElse("NONE"));
@@ -70,22 +75,36 @@ public class DepartmentServiceImpl implements DepartmentService {
 
     @Override
     public DepartmentEditResponseDto editDepartment(DepartmentEditDto dto) {
-        Department department = departmentRepository.findByName(dto.getName())
-            .orElseThrow(() -> new NotFoundException("Department with name '" + dto.getName() + "' not found"));
+        Department department = departmentRepository.findByName(dto.getOldName())
+            .orElseThrow(() -> new NotFoundException("Department with name '" + dto.getOldName() + "' not found"));
+
+        if (!dto.getOldName().equals(dto.getNewName())
+            && departmentRepository.existsByName(dto.getNewName())) {
+            throw new ConflictException("Department name '" + dto.getNewName() + "' is already in use");
+        }
 
         ApplicationUser newSupervisor = applicationUserRepository.findById(dto.getSupervisorEmail())
             .orElseThrow(() -> new NotFoundException("User with email '" + dto.getSupervisorEmail() + "' not found"));
 
-        Optional<UserEmailDto> optionalOldSup = getSupervisorByDepartmentName(department.getName());
-
-        if (optionalOldSup.isPresent() && !optionalOldSup.get().email().equals(newSupervisor.getEmail())) {
-            ApplicationUser oldSupervisor = applicationUserRepository.findById(optionalOldSup.get().email())
-                .orElseThrow(() -> new IllegalStateException("Expected old supervisor not found in DB"));
-
-            oldSupervisor.setDepartment(null);
-            oldSupervisor.getRoles().removeIf(role -> role.getName().equals("SUPERVISOR"));
-            applicationUserRepository.save(oldSupervisor);
+        if (newSupervisor.getDepartment() != null
+            && !newSupervisor.getDepartment().getName().equals(department.getName())) {
+            throw new ConflictException("Supervisor '" + newSupervisor.getEmail()
+                + "' is already assigned to another department");
         }
+
+        getSupervisorByDepartmentName(department.getName())
+            .filter(oldSup -> !oldSup.email().equals(newSupervisor.getEmail()))
+            .ifPresent(oldSupDto -> {
+                ApplicationUser oldSupervisor = applicationUserRepository.findById(oldSupDto.email())
+                    .orElseThrow(() -> new IllegalStateException("Old supervisor '" + oldSupDto.email() + "' not found in DB"));
+
+                oldSupervisor.setDepartment(null);
+                oldSupervisor.getRoles().removeIf(role -> role.getName().equals("SUPERVISOR"));
+                applicationUserRepository.save(oldSupervisor);
+            });
+
+        department.setName(dto.getNewName());
+        departmentRepository.save(department);
 
         newSupervisor.setDepartment(department);
         newSupervisor.getRoles().clear();
@@ -102,10 +121,11 @@ public class DepartmentServiceImpl implements DepartmentService {
         );
     }
 
+
     @Override
-    public List<DepartmentDetailRestDto> getAllDepartments() {
+    public List<DepartmentDetailResponseDto> getAllDepartments() {
         return departmentRepository.findAll().stream()
-            .map(dept -> new DepartmentDetailRestDto(
+            .map(dept -> new DepartmentDetailResponseDto(
                 dept.getId(),
                 dept.getName(),
                 getSupervisorByDepartmentName(dept.getName()).map(UserEmailDto::email).orElse("NONE")))

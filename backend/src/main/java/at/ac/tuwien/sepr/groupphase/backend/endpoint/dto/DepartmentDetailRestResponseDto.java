@@ -1,28 +1,41 @@
-package at.ac.tuwien.sepr.groupphase.backend.service.dto;
+package at.ac.tuwien.sepr.groupphase.backend.endpoint.dto;
 
-import jakarta.validation.constraints.Size;
-import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Email;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Size;
 
 import java.util.Objects;
 
-public class DepartmentEditResponseDto {
+public class DepartmentDetailRestResponseDto {
+
+    private Long id;
 
     @NotBlank(message = "Department name must not be blank")
     @Size(min = 1, max = 100, message = "Department name must be between 1 and 100 characters long")
     private String name;
 
     @NotBlank(message = "Supervisor email must not be blank")
+    @NotNull(message = "Supervisor email must not be null")
     @Size(min = 6, max = 100, message = "Supervisor email must be between 6 and 100 characters long")
     @Email(message = "Supervisor email must be a valid email address")
     private String supervisorEmail;
 
-    public DepartmentEditResponseDto() {
+    public DepartmentDetailRestResponseDto() {
     }
 
-    public DepartmentEditResponseDto(String name, String supervisorEmail) {
+    public DepartmentDetailRestResponseDto(Long id, String name, String supervisorEmail) {
+        this.id = id;
         this.name = name;
         this.supervisorEmail = supervisorEmail;
+    }
+
+    public Long getId() {
+        return id;
+    }
+
+    public void setId(Long id) {
+        this.id = id;
     }
 
     public String getName() {
@@ -43,10 +56,14 @@ public class DepartmentEditResponseDto {
 
     @Override
     public boolean equals(Object o) {
-        if (this == o) return true;
-        if (!(o instanceof DepartmentEditResponseDto that)) return false;
-        return Objects.equals(name, that.name) &&
-            Objects.equals(supervisorEmail, that.supervisorEmail);
+        if (this == o) {
+            return true;
+        }
+        if (!(o instanceof DepartmentDetailRestResponseDto that)) {
+            return false;
+        }
+        return Objects.equals(name, that.name)
+            && Objects.equals(supervisorEmail, that.supervisorEmail);
     }
 
     @Override
@@ -56,9 +73,8 @@ public class DepartmentEditResponseDto {
 
     @Override
     public String toString() {
-        return "DepartmentEditRestDto{" +
-            "name='" + name + '\'' +
-            ", supervisorEmail='" + supervisorEmail + '\'' +
-            '}';
+        return "DepartmentDetailRestResponseDto{"
+            + "name='" + name + '\''
+            + ", supervisorEmail='" + supervisorEmail + '\'' + '}';
     }
 }

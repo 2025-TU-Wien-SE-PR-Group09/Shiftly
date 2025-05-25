@@ -4,7 +4,7 @@ import {
   DepartmentDetailRestDto,
   DepartmentCreateRestDto,
   DepartmentService,
-  ApplicationUserResponseDto
+  ApplicationUserResponseDto, DepartmentEditRestDto
 } from '../../../../rest_client';
 import { ButtonComponent } from '../../../../shared/components/button/button.component';
 import { FormsModule } from '@angular/forms';
@@ -18,27 +18,63 @@ import { ToastrService } from 'ngx-toastr';
   styleUrl: './department-detail-admin.component.css',
 })
 export class DepartmentDetailAdminComponent implements OnInit{
-  protected showForm: boolean | undefined;
+  protected showFormCreate: boolean | undefined;
+  protected showFormEdit: boolean | undefined;
   protected newDepartment: DepartmentCreateRestDto = {
     name: '',
     supervisorEmail: '',
   };
+  protected editedDepartment: DepartmentEditRestDto = {
+    oldName: '',
+    newName: '',
+    supervisorEmail: '',
+  }
   protected departments: DepartmentDetailRestDto[] = [];
   protected supervisors: ApplicationUserResponseDto[] = [];
 
   constructor(private departmentService: DepartmentService, private toastr: ToastrService) {}
 
-  toggleForm(): void {
-    this.showForm = !this.showForm;
+  toggleFormCreate(): void {
+    this.showFormCreate = !this.showFormCreate;
   }
 
-  submitDepartment(): void {
+  openFormEdit(oldName: string | undefined): void {
+    const dept = this.departments.find(d => d.name === oldName);
+
+    this.editedDepartment.oldName = oldName as string;
+    this.editedDepartment.newName = oldName as string;
+    if (dept?.supervisorEmail) {
+      this.editedDepartment.supervisorEmail = dept.supervisorEmail;
+    } else {
+      this.editedDepartment.supervisorEmail = '';
+    }
+
+    this.showFormEdit = !this.showFormEdit;
+  }
+
+  closeFormEdit(): void {
+    this.editedDepartment = { oldName: '', newName: '', supervisorEmail: '' };
+    this.showFormEdit = !this.showFormEdit;
+  }
+
+  submitDepartmentCreate(): void {
     this.departmentService.createDepartment(this.newDepartment).subscribe({
       next: () => {
         this.newDepartment = { name: '', supervisorEmail: '' };
-        this.showForm = false;
+        this.showFormCreate = false;
         this.loadDepartments();
         this.toastr.success('Department created successfully', 'Success');
+      }
+    });
+  }
+
+  submitDepartmentEdit(): void {
+    this.departmentService.editDepartment(this.editedDepartment).subscribe({
+      next: () => {
+        this.editedDepartment = { oldName: '', newName: '', supervisorEmail: '' };
+        this.showFormEdit = false;
+        this.loadDepartments();
+        this.toastr.success('Department edited successfully', 'Success');
       }
     });
   }
@@ -61,7 +97,16 @@ export class DepartmentDetailAdminComponent implements OnInit{
     });
   }
 
-  editDepartment(name: string | undefined) {
-    
+  getAvailableSupervisors(): ApplicationUserResponseDto[] {
+    const usedEmails = this.departments
+      .filter(dept => dept.name !== this.editedDepartment.oldName)
+      .map(dept => dept.supervisorEmail);
+
+    return this.supervisors.filter(sup => !usedEmails.includes(<string>sup.email));
+  }
+
+  hasExistingSupervisor(): boolean {
+    const dept = this.departments.find(d => d.name === this.editedDepartment.oldName);
+    return !!dept?.supervisorEmail && dept.supervisorEmail !== 'NONE';
   }
 }

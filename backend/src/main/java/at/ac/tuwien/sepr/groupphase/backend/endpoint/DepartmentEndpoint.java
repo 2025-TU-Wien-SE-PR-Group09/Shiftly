@@ -2,7 +2,7 @@ package at.ac.tuwien.sepr.groupphase.backend.endpoint;
 
 import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.ApplicationUserResponseDto;
 import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.DepartmentCreateRestDto;
-import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.DepartmentDetailRestDto;
+import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.DepartmentDetailRestResponseDto;
 import at.ac.tuwien.sepr.groupphase.backend.service.dto.DepartmentEditDto;
 import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.DepartmentEditRestDto;
 import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.EmployeeListItemResponseDto;
@@ -70,8 +70,13 @@ public class DepartmentEndpoint {
     @Operation(summary = "Get all departments")
     @ApiResponse(responseCode = "200", description = "List of all departments")
     @GetMapping(produces = MediaType.APPLICATION_JSON_VALUE)
-    public List<DepartmentDetailRestDto> getAllDepartments() {
-        return departmentService.getAllDepartments();
+    public List<DepartmentDetailRestResponseDto> getAllDepartments() {
+        return departmentService.getAllDepartments().stream()
+            .map(dept -> new DepartmentDetailRestResponseDto(
+                dept.getId(),
+                dept.getName(),
+                dept.getSupervisorEmail()))
+            .toList();
     }
 
     @RolesAllowed({"ADMIN"})
@@ -94,6 +99,7 @@ public class DepartmentEndpoint {
             restDto.getSupervisorEmail());
         departmentService.createDepartment(serviceDto);
         return ResponseEntity.status(HttpStatus.CREATED).build();
+        //TODO: DARIUS DTO zurückgeben?
     }
 
     @Transactional
@@ -104,10 +110,12 @@ public class DepartmentEndpoint {
         consumes = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<Void> editDepartment(@RequestBody @Valid DepartmentEditRestDto restDto) {
         DepartmentEditDto serviceDto = new DepartmentEditDto(
-            restDto.getName(),
+            restDto.getOldName(),
+            restDto.getNewName(),
             restDto.getSupervisorEmail());
         departmentService.editDepartment(serviceDto);
         return ResponseEntity.status(HttpStatus.OK).build();
+        //TODO: DARIUS DTO zurückgeben?
     }
 
     @Transactional
