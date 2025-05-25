@@ -3,12 +3,13 @@ package at.ac.tuwien.sepr.groupphase.backend.endpoint;
 import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.ApplicationUserResponseDto;
 import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.DepartmentCreateRestDto;
 import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.DepartmentDetailRestDto;
+import at.ac.tuwien.sepr.groupphase.backend.service.dto.DepartmentEditDto;
+import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.DepartmentEditRestDto;
 import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.EmployeeListItemResponseDto;
 import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.EmployeeRestResponseDto;
 import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.ScheduledShiftResponseDto;
 import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.createplanblueprint.CreatePlanBlueprintDto;
 import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.getplanblueprint.PlanBlueprintResponse;
-import at.ac.tuwien.sepr.groupphase.backend.entity.ApplicationUser;
 import at.ac.tuwien.sepr.groupphase.backend.entity.ConcreteShiftPlan;
 import at.ac.tuwien.sepr.groupphase.backend.exception.NotFoundException;
 import at.ac.tuwien.sepr.groupphase.backend.service.DepartmentService;
@@ -37,6 +38,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -92,6 +94,20 @@ public class DepartmentEndpoint {
             restDto.getSupervisorEmail());
         departmentService.createDepartment(serviceDto);
         return ResponseEntity.status(HttpStatus.CREATED).build();
+    }
+
+    @Transactional
+    @RolesAllowed({"ADMIN"})
+    @Operation(summary = "Edit existing department")
+    @ApiResponse(responseCode = "200", description = "Department edited")
+    @PutMapping(produces = MediaType.APPLICATION_JSON_VALUE,
+        consumes = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<Void> editDepartment(@RequestBody @Valid DepartmentEditRestDto restDto) {
+        DepartmentEditDto serviceDto = new DepartmentEditDto(
+            restDto.getName(),
+            restDto.getSupervisorEmail());
+        departmentService.editDepartment(serviceDto);
+        return ResponseEntity.status(HttpStatus.OK).build();
     }
 
     @Transactional

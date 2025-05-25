@@ -60,4 +60,8 @@ export class DepartmentDetailAdminComponent implements OnInit{
       error: (err) => console.error('Fehler beim Laden der Supervisoren', err)
     });
   }
+
+  editDepartment(name: string | undefined) {
+    
+  }
 }

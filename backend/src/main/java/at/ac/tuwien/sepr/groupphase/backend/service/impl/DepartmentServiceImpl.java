@@ -1,6 +1,8 @@
 package at.ac.tuwien.sepr.groupphase.backend.service.impl;
 
 import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.DepartmentDetailRestDto;
+import at.ac.tuwien.sepr.groupphase.backend.service.dto.DepartmentEditDto;
+import at.ac.tuwien.sepr.groupphase.backend.service.dto.DepartmentEditResponseDto;
 import at.ac.tuwien.sepr.groupphase.backend.entity.ApplicationRole;
 import at.ac.tuwien.sepr.groupphase.backend.entity.ApplicationUser;
 import at.ac.tuwien.sepr.groupphase.backend.entity.Department;
@@ -19,6 +21,7 @@ import at.ac.tuwien.sepr.groupphase.backend.service.mapper.DepartmentMapper;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
 
@@ -63,6 +66,40 @@ public class DepartmentServiceImpl implements DepartmentService {
             department.getId(),
             department.getName(),
             getSupervisorByDepartmentName(department.getName()).map(UserEmailDto::email).orElse("NONE"));
+    }
+
+    @Override
+    public DepartmentEditResponseDto editDepartment(DepartmentEditDto dto) {
+        Department department = departmentRepository.findByName(dto.getName())
+            .orElseThrow(() -> new NotFoundException("Department with name '" + dto.getName() + "' not found"));
+
+        ApplicationUser newSupervisor = applicationUserRepository.findById(dto.getSupervisorEmail())
+            .orElseThrow(() -> new NotFoundException("User with email '" + dto.getSupervisorEmail() + "' not found"));
+
+        Optional<UserEmailDto> optionalOldSup = getSupervisorByDepartmentName(department.getName());
+
+        if (optionalOldSup.isPresent() && !optionalOldSup.get().email().equals(newSupervisor.getEmail())) {
+            ApplicationUser oldSupervisor = applicationUserRepository.findById(optionalOldSup.get().email())
+                .orElseThrow(() -> new IllegalStateException("Expected old supervisor not found in DB"));
+
+            oldSupervisor.setDepartment(null);
+            oldSupervisor.getRoles().removeIf(role -> role.getName().equals("SUPERVISOR"));
+            applicationUserRepository.save(oldSupervisor);
+        }
+
+        newSupervisor.setDepartment(department);
+        newSupervisor.getRoles().clear();
+        applicationUserRepository.save(newSupervisor);
+
+        userService.assignRoleToUser(new UserRoleDto(
+            newSupervisor.getEmail(),
+            Role.SUPERVISOR
+        ));
+
+        return new DepartmentEditResponseDto(
+            department.getName(),
+            newSupervisor.getEmail()
+        );
     }
 
     @Override

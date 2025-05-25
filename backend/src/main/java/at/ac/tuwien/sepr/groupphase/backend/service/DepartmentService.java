@@ -1,7 +1,10 @@
 package at.ac.tuwien.sepr.groupphase.backend.service;
 
 import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.DepartmentDetailRestDto;
+import at.ac.tuwien.sepr.groupphase.backend.service.dto.DepartmentEditDto;
+import at.ac.tuwien.sepr.groupphase.backend.service.dto.DepartmentEditResponseDto;
 import at.ac.tuwien.sepr.groupphase.backend.exception.ConflictException;
+import at.ac.tuwien.sepr.groupphase.backend.exception.NotFoundException;
 import at.ac.tuwien.sepr.groupphase.backend.service.dto.DepartmentCreateDto;
 import at.ac.tuwien.sepr.groupphase.backend.service.dto.DepartmentDto;
 import at.ac.tuwien.sepr.groupphase.backend.service.dto.UserEmailDto;
@@ -19,6 +22,15 @@ public interface DepartmentService {
      * @throws ConflictException if a department with the same name already exists
      */
     DepartmentDetailRestDto createDepartment(DepartmentCreateDto dto) throws ConflictException;
+
+    /**
+     * Edits an existing department.
+     *
+     * @param dto the department edit data transfer object containing the details of the department to be edited
+     * @return the response containing the details of the edited department
+     * @throws NotFoundException if the department to be edited does not exist
+     */
+    DepartmentEditResponseDto editDepartment(DepartmentEditDto dto) throws NotFoundException;
 
     /**
      * Retrieves all departments.
