@@ -1,6 +1,6 @@
 import {Component, OnInit} from '@angular/core';
 import {
-  VacationRequestEndpointService,
+  VacationEndpointService,
   VacationRequestResponseRestDto,
   VacationRequestRestDto
 } from "../../../../rest_client";
@@ -24,7 +24,7 @@ export class EmployeeVacationsComponent implements OnInit {
   vacationRequests: VacationRequestResponseRestDto[] = [];
 
   constructor(
-    private vacationService: VacationRequestEndpointService,
+    private vacationService: VacationEndpointService,
     private toastr: ToastrService
   ) {}
 
@@ -49,10 +49,6 @@ export class EmployeeVacationsComponent implements OnInit {
         this.startDate = '';
         this.endDate = '';
         this.loadVacationRequests();
-      },
-      error: (err) => {
-        this.toastr.error('Failed to submit vacation request.');
-        console.error(err);
       }
     });
   }

@@ -9,7 +9,7 @@ api/department.service.ts
 api/loginEndpoint.service.ts
 api/registrationEndpoint.service.ts
 api/userEndpoint.service.ts
-api/vacationRequestEndpoint.service.ts
+api/vacationEndpoint.service.ts
 configuration.ts
 encoder.ts
 git_push.sh

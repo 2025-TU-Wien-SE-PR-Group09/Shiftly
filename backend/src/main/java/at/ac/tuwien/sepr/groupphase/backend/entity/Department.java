@@ -30,6 +30,9 @@ public class Department {
     @OneToMany(fetch = FetchType.EAGER, mappedBy = "department")
     private Set<ApplicationUser> users = new HashSet<>();
 
+    @OneToMany(fetch = FetchType.EAGER, mappedBy = "department", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<ConcreteShiftPlan> ShiftPlans;
+
     public Long getId() {
         return id;
     }
@@ -63,5 +66,13 @@ public class Department {
 
     public void setUsers(Set<ApplicationUser> users) {
         this.users = users;
+    }
+
+    public List<ConcreteShiftPlan> getShiftPlans() {
+        return ShiftPlans;
+    }
+
+    public void setShiftPlans(List<ConcreteShiftPlan> shiftPlans) {
+        ShiftPlans = shiftPlans;
     }
 }

@@ -10,7 +10,7 @@
   background-color: #030303;
   pointer-events: auto;
 }
-.bg-green-500 {
+.toast-success {
   background-color: rgba(34, 197, 94, 0.9);
 }
 .toast-error {

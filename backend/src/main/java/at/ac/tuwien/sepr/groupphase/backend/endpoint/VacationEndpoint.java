@@ -3,8 +3,11 @@ package at.ac.tuwien.sepr.groupphase.backend.endpoint;
 import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.VacationRequestResponseRestDto;
 import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.VacationRequestRestDto;
 import at.ac.tuwien.sepr.groupphase.backend.service.VacationRequestService;
+import at.ac.tuwien.sepr.groupphase.backend.service.dto.UserEmailDto;
 import at.ac.tuwien.sepr.groupphase.backend.service.dto.VacationRequestDto;
 import at.ac.tuwien.sepr.groupphase.backend.service.dto.VacationRequestResponseDto;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import jakarta.annotation.security.RolesAllowed;
 import jakarta.transaction.Transactional;
 import jakarta.validation.Valid;
@@ -18,13 +21,11 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-import org.springframework.web.bind.annotation.GetMapping;
-import java.util.List;
 
 
 @RestController
 @RequestMapping(value = "/api/v1/vacation-request")
-public class VacationRequestEndpoint {
+public class VacationEndpoint {
 
     private final VacationRequestService vacationRequestService;
 
@@ -33,7 +34,7 @@ public class VacationRequestEndpoint {
      *
      * @param vacationRequestService the service to handle vacation requests
      */
-    public VacationRequestEndpoint(VacationRequestService vacationRequestService) {
+    public VacationEndpoint(VacationRequestService vacationRequestService) {
         this.vacationRequestService = vacationRequestService;
     }
 
@@ -48,8 +49,11 @@ public class VacationRequestEndpoint {
     @PostMapping(produces = MediaType.APPLICATION_JSON_VALUE,
         consumes = MediaType.APPLICATION_JSON_VALUE)
     @Transactional
+    @ApiResponse(responseCode = "201", description = "Vacation request created successfully")
+    @Operation(summary = "Create a new vacation request")
     @RolesAllowed({"EMPLOYEE"})
-    public ResponseEntity<VacationRequestResponseRestDto> createVacationRequest(@Valid @RequestBody VacationRequestRestDto restDto, Principal principal) {
+    public ResponseEntity<VacationRequestResponseRestDto> createVacationRequest(
+        @Valid @RequestBody VacationRequestRestDto restDto, Principal principal) {
         VacationRequestDto dto = VacationRequestDto.from(restDto);
         dto.setEmployeeEmail(principal.getName());
         VacationRequestResponseDto created = vacationRequestService.createVacationRequest(dto);
@@ -60,12 +64,13 @@ public class VacationRequestEndpoint {
 
     @GetMapping(produces = MediaType.APPLICATION_JSON_VALUE)
     @RolesAllowed({"EMPLOYEE"})
-    public ResponseEntity<List<VacationRequestResponseRestDto>> getOwnVacationRequests(Principal principal) {
-        List<VacationRequestResponseDto> dtos = vacationRequestService.getVacationRequestsForUser(principal.getName());
-        List<VacationRequestResponseRestDto> restDtos = dtos.stream()
+    public List<VacationRequestResponseRestDto> getOwnVacationRequests(Principal principal) {
+
+        return vacationRequestService
+            .getVacationRequestsForUser(new UserEmailDto(principal.getName()))
+            .stream()
             .map(VacationRequestResponseRestDto::from)
             .toList();
-        return ResponseEntity.ok(restDtos);
     }
 
 }

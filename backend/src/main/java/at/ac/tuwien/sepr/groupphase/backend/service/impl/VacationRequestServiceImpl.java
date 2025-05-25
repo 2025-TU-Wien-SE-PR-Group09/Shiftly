@@ -1,17 +1,22 @@
 package at.ac.tuwien.sepr.groupphase.backend.service.impl;
 
 import at.ac.tuwien.sepr.groupphase.backend.entity.ApplicationUser;
+import at.ac.tuwien.sepr.groupphase.backend.entity.ConcreteShiftPlan;
 import at.ac.tuwien.sepr.groupphase.backend.entity.VacationRequest;
+import at.ac.tuwien.sepr.groupphase.backend.exception.ConflictException;
 import at.ac.tuwien.sepr.groupphase.backend.exception.NotFoundException;
 import at.ac.tuwien.sepr.groupphase.backend.repository.UserRepository;
 import at.ac.tuwien.sepr.groupphase.backend.repository.VacationRequestRepository;
 import at.ac.tuwien.sepr.groupphase.backend.service.VacationRequestService;
+import at.ac.tuwien.sepr.groupphase.backend.service.dto.UserEmailDto;
 import at.ac.tuwien.sepr.groupphase.backend.service.dto.VacationRequestDto;
 import at.ac.tuwien.sepr.groupphase.backend.service.dto.VacationRequestResponseDto;
 import at.ac.tuwien.sepr.groupphase.backend.type.VacationStatus;
+import java.time.format.DateTimeFormatter;
+import java.util.Comparator;
 import java.util.List;
+import java.util.Optional;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
@@ -21,6 +26,7 @@ public class VacationRequestServiceImpl implements VacationRequestService {
 
     private final VacationRequestRepository vacationRequestRepository;
     private final UserRepository userRepository;
+    private static DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd.MM.yyyy");
 
     /**
      * Constructor for VacationRequestServiceImpl.
@@ -34,19 +40,29 @@ public class VacationRequestServiceImpl implements VacationRequestService {
         this.userRepository = userRepository;
     }
 
-    /**
-     * Creates a new vacation request.
-     *
-     * @param vacationRequestDto the DTO containing the vacation request details
-     * @return a DTO containing the created vacation request details
-     */
+
     @Override
     public VacationRequestResponseDto createVacationRequest(VacationRequestDto vacationRequestDto) {
         LocalDate start = vacationRequestDto.getStartDate();
         LocalDate end = vacationRequestDto.getEndDate();
 
+
+
+
+
         ApplicationUser employee = userRepository.findByEmail(vacationRequestDto.getEmployeeEmail())
             .orElseThrow(() -> new NotFoundException("Logged in user not found"));
+
+
+        Optional<ConcreteShiftPlan> shiftStartDate = employee.getDepartment().getShiftPlans().stream()
+            .min(Comparator.comparing(ConcreteShiftPlan::getStartDate));
+        if (shiftStartDate.isPresent() && start.isBefore(shiftStartDate.get().getStartDate()
+            .plusWeeks(12).minusDays(1))) {
+            throw new ConflictException("Vacation request can only be in next shift rotation, also after "
+                + shiftStartDate.get().getStartDate().plusWeeks(12)
+                .minusDays(1).format(formatter) );
+        }
+
 
         VacationRequest vacationRequest = new VacationRequest();
         vacationRequest.setEmployee(employee);
@@ -66,15 +82,15 @@ public class VacationRequestServiceImpl implements VacationRequestService {
     }
 
     @Override
-    public List<VacationRequestResponseDto> getVacationRequestsForUser(String email) {
-        ApplicationUser user = userRepository.findByEmail(email)
+    public List<VacationRequestResponseDto> getVacationRequestsForUser(UserEmailDto email) {
+        ApplicationUser user = userRepository.findByEmail(email.email())
             .orElseThrow(() -> new NotFoundException("User not found"));
 
         List<VacationRequest> requests = vacationRequestRepository.findByEmployee(user);
         return requests.stream()
             .map(r -> new VacationRequestResponseDto(
                 r.getId(),
-                email,
+                email.email(),
                 r.getStartDate(),
                 r.getEndDate(),
                 r.getStatus()
