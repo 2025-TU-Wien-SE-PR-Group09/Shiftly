@@ -9,13 +9,18 @@ import jakarta.annotation.security.RolesAllowed;
 import jakarta.transaction.Transactional;
 import jakarta.validation.Valid;
 import java.security.Principal;
+import java.util.List;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.GetMapping;
+import java.util.List;
+
 
 @RestController
 @RequestMapping(value = "/api/v1/vacation-request")
@@ -50,4 +55,17 @@ public class VacationRequestEndpoint {
         VacationRequestResponseDto created = vacationRequestService.createVacationRequest(dto);
         return ResponseEntity.status(HttpStatus.CREATED).body(VacationRequestResponseRestDto.from(created));
     }
+
+
+
+    @GetMapping(produces = MediaType.APPLICATION_JSON_VALUE)
+    @RolesAllowed({"EMPLOYEE"})
+    public ResponseEntity<List<VacationRequestResponseRestDto>> getOwnVacationRequests(Principal principal) {
+        List<VacationRequestResponseDto> dtos = vacationRequestService.getVacationRequestsForUser(principal.getName());
+        List<VacationRequestResponseRestDto> restDtos = dtos.stream()
+            .map(VacationRequestResponseRestDto::from)
+            .toList();
+        return ResponseEntity.ok(restDtos);
+    }
+
 }

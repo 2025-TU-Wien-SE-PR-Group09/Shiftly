@@ -10,4 +10,6 @@ export * from './registrationEndpoint.service';
 import { RegistrationEndpointService } from './registrationEndpoint.service';
 export * from './userEndpoint.service';
 import { UserEndpointService } from './userEndpoint.service';
-export const APIS = [AdminEndpointService, CustomHealthEndpointService, DepartmentService, LoginEndpointService, RegistrationEndpointService, UserEndpointService];
+export * from './vacationRequestEndpoint.service';
+import { VacationRequestEndpointService } from './vacationRequestEndpoint.service';
+export const APIS = [AdminEndpointService, CustomHealthEndpointService, DepartmentService, LoginEndpointService, RegistrationEndpointService, UserEndpointService, VacationRequestEndpointService];

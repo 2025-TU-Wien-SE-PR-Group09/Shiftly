@@ -9,6 +9,7 @@ import at.ac.tuwien.sepr.groupphase.backend.service.VacationRequestService;
 import at.ac.tuwien.sepr.groupphase.backend.service.dto.VacationRequestDto;
 import at.ac.tuwien.sepr.groupphase.backend.service.dto.VacationRequestResponseDto;
 import at.ac.tuwien.sepr.groupphase.backend.type.VacationStatus;
+import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
@@ -62,6 +63,23 @@ public class VacationRequestServiceImpl implements VacationRequestService {
             saved.getEndDate(),
             saved.getStatus()
         );
+    }
+
+    @Override
+    public List<VacationRequestResponseDto> getVacationRequestsForUser(String email) {
+        ApplicationUser user = userRepository.findByEmail(email)
+            .orElseThrow(() -> new NotFoundException("User not found"));
+
+        List<VacationRequest> requests = vacationRequestRepository.findByEmployee(user);
+        return requests.stream()
+            .map(r -> new VacationRequestResponseDto(
+                r.getId(),
+                email,
+                r.getStartDate(),
+                r.getEndDate(),
+                r.getStatus()
+            ))
+            .toList();
     }
 
 

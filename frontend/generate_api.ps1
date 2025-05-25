@@ -6,4 +6,4 @@ docker run --rm -v ${PWD}:/local openapitools/openapi-generator-cli generate `
     -i /local/tmp/spec.json `
     -g typescript-angular `
     -o /local/src/app/rest_client/ `
-    --additional-properties ngVersion=19.1.4, providedInRoot=true, useOverride=true
+    --additional-properties=ngVersion=19.1.4,providedInRoot=true,useOverride=true
