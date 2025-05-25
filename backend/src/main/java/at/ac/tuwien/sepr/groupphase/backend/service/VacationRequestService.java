@@ -9,6 +9,8 @@ public interface VacationRequestService {
     VacationRequestResponseDto createVacationRequest(VacationRequestDto dto);
 
     List<VacationRequestResponseDto> getVacationRequestsForUser(UserEmailDto email);
+
+    void deletePendingRequest(Long requestId, String userEmail);
 }
 
 

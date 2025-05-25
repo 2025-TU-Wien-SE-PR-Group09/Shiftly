@@ -7,6 +7,7 @@ import at.ac.tuwien.sepr.groupphase.backend.service.AuthService;
 import jakarta.annotation.security.PermitAll;
 import jakarta.annotation.security.RolesAllowed;
 import jakarta.transaction.Transactional;
+import jakarta.validation.Valid;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -28,7 +29,7 @@ public class LoginEndpoint {
     @PostMapping(produces = MediaType.APPLICATION_JSON_VALUE,
         consumes = MediaType.APPLICATION_JSON_VALUE)
     @Transactional
-    public LoginResponseRestDto login(@RequestBody UserDataRestDto userLoginRestDto) {
+    public LoginResponseRestDto login(@Valid @RequestBody UserDataRestDto userLoginRestDto) {
         UserDataDto userLoginDto = UserDataDto.from(userLoginRestDto);
         return LoginResponseRestDto.from(authService.login(userLoginDto));
     }

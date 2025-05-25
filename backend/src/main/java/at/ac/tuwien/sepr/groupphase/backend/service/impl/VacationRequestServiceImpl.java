@@ -12,6 +12,7 @@ import at.ac.tuwien.sepr.groupphase.backend.service.dto.UserEmailDto;
 import at.ac.tuwien.sepr.groupphase.backend.service.dto.VacationRequestDto;
 import at.ac.tuwien.sepr.groupphase.backend.service.dto.VacationRequestResponseDto;
 import at.ac.tuwien.sepr.groupphase.backend.type.VacationStatus;
+import io.micrometer.core.instrument.config.validate.ValidationException;
 import java.time.format.DateTimeFormatter;
 import java.util.Comparator;
 import java.util.List;
@@ -53,14 +54,29 @@ public class VacationRequestServiceImpl implements VacationRequestService {
         ApplicationUser employee = userRepository.findByEmail(vacationRequestDto.getEmployeeEmail())
             .orElseThrow(() -> new NotFoundException("Logged in user not found"));
 
+        List<VacationRequest> existingRequests = vacationRequestRepository.findByEmployee(employee);
+
+        LocalDate newStart = vacationRequestDto.getStartDate();
+        LocalDate newEnd = vacationRequestDto.getEndDate();
+
+        boolean overlaps = existingRequests.stream()
+            .filter(req -> req.getStatus() == VacationStatus.PENDING)
+            .anyMatch(req ->
+                !(newEnd.isBefore(req.getStartDate()) || newStart.isAfter(req.getEndDate()))
+            );
+
+        if (overlaps) {
+            throw new ConflictException("Vacation request overlaps with existing request");
+        }
+
 
         Optional<ConcreteShiftPlan> shiftStartDate = employee.getDepartment().getShiftPlans().stream()
             .min(Comparator.comparing(ConcreteShiftPlan::getStartDate));
         if (shiftStartDate.isPresent() && start.isBefore(shiftStartDate.get().getStartDate()
             .plusWeeks(12).minusDays(1))) {
-            throw new ConflictException("Vacation request can only be in next shift rotation, also after "
+            throw new ConflictException("Vacation request are only allowed starting from the next shift cycle on"
                 + shiftStartDate.get().getStartDate().plusWeeks(12)
-                .minusDays(1).format(formatter) );
+                .minusDays(1).format(formatter));
         }
 
 
@@ -97,6 +113,24 @@ public class VacationRequestServiceImpl implements VacationRequestService {
             ))
             .toList();
     }
+
+    @Override
+    public void deletePendingRequest(Long requestId, String userEmail) {
+        VacationRequest request = vacationRequestRepository.findById(requestId)
+            .orElseThrow(() -> new NotFoundException("Vacation request not found"));
+
+        if (!request.getEmployee().getEmail().equals(userEmail)) {
+            throw new ConflictException("User is not the owner of this request");
+        }
+
+        if (request.getStatus() != VacationStatus.PENDING) {
+            throw new IllegalStateException("Only pending requests can be deleted");
+        }
+
+        vacationRequestRepository.delete(request);
+    }
+
+
 
 
 }

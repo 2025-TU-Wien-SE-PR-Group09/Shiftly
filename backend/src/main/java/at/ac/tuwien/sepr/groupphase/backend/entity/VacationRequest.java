@@ -43,6 +43,10 @@ public class VacationRequest {
         this.employee = employee;
     }
 
+    public ApplicationUser getEmployee() {
+        return employee;
+    }
+
     public LocalDate getStartDate() {
         return startDate;
     }

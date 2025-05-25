@@ -1,11 +1,13 @@
 package at.ac.tuwien.sepr.groupphase.backend.service.dto;
 
 import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.VacationRequestRestDto;
+import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.validator.annotation.ValidDateRange;
 import at.ac.tuwien.sepr.groupphase.backend.type.VacationStatus;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotNull;
 import java.time.LocalDate;
 
+@ValidDateRange
 public class VacationRequestDto {
 
     @Email
