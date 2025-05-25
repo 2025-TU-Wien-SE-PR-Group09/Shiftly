@@ -1,19 +1,32 @@
 import { Component , OnInit} from '@angular/core';
-import { AdminEndpointService } from '../../../../rest_client';
+import {
+  AdminEndpointService,
+  DepartmentDetailRestDto,
+  DepartmentService,
+  PlanBlueprintResponse, ScheduledShiftDetailDto, ScheduledShiftResponseDto, ShiftDayDetailDto,
+} from '../../../../rest_client';
 import { ToastrService } from 'ngx-toastr';
 import { CommonModule } from '@angular/common';
 import { CalendarEvent, CalendarModule, CalendarView } from 'angular-calendar';
 import { ButtonComponent } from '../../../../shared/components/button/button.component';
+import { FormsModule } from '@angular/forms';
 
 @Component({
   selector: 'app-admin-home',
-  imports: [CommonModule, CalendarModule, ButtonComponent],
+  imports: [CommonModule, CalendarModule, ButtonComponent, FormsModule],
   templateUrl: './admin-home.component.html',
   styleUrl: './admin-home.component.css',
 })
 export class AdminHomeComponent implements OnInit {
-  constructor(private _adminService: AdminEndpointService, private readonly _toastr: ToastrService) {}
+  constructor(
+    private _adminService: AdminEndpointService,
+    private _departmentService: DepartmentService,
+    private readonly _toastr: ToastrService,
+  ) {}
 
+  protected departments: DepartmentDetailRestDto[] = [];
+  protected selectedDepartment: DepartmentDetailRestDto | undefined;
+  protected scheduledShift: ScheduledShiftDetailDto[] = [];
   code: string = 'test';
 
   view: CalendarView = CalendarView.Month;
@@ -55,12 +68,68 @@ export class AdminHomeComponent implements OnInit {
     this.activeDayIsOpen = false;
   }
 
-
   ngOnInit(): void {
+    this.loadDepartments();
+    this.loadAuthCode();
+    if (this.selectedDepartment) {
+      this.loadScheduledShifts();
+    }
+    if(this.scheduledShift) {
+      this.calculateEvents();
+    }
+  }
+
+  calculateEvents() {
+    for (const shift of this.scheduledShift) {
+      if (shift.days) {
+        for (const day of shift.days) {
+          const weekDay = day.day;
+          //todo create new event to push on this.events
+        }
+      }
+    }
+  }
+
+  addEvent(title: string, startDate: Date, endDate: Date): void {
+    this.events = [
+      ...this.events,
+      {
+        title: title,
+        start: startDate,
+        end: endDate,
+        color: { primary: '#cc99ff', secondary: '#ccccff' },
+        draggable: true,
+        resizable: {
+          beforeStart: true,
+          afterEnd: true,
+        },
+      },
+    ];
+  }
+
+  loadDepartments() {
+    this._departmentService.getAllDepartments().subscribe({
+      next: (data) => {
+        this.departments = data;
+      },
+    });
+  }
+
+  loadAuthCode() {
     this._adminService.authCode().subscribe({
       next: (data) => {
         this.code = data.code!;
-      }
-    })
+      },
+    });
+  }
+
+  loadScheduledShifts() {
+    if (this.selectedDepartment?.id) {
+      this._departmentService.getDetailedConcretePlan(this.selectedDepartment.id).subscribe({
+        next: (data) => {
+          this.scheduledShift = data;
+        },
+      })
+    }
   }
 }
