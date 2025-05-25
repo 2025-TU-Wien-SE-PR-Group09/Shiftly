@@ -1,5 +1,6 @@
 package at.ac.tuwien.sepr.groupphase.backend.endpoint;
 
+import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.ApplicationUserResponseDto;
 import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.DepartmentCreateRestDto;
 import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.DepartmentDetailRestDto;
 import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.EmployeeListItemResponseDto;
@@ -7,11 +8,13 @@ import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.EmployeeRestResponseDto
 import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.ScheduledShiftResponseDto;
 import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.createplanblueprint.CreatePlanBlueprintDto;
 import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.getplanblueprint.PlanBlueprintResponse;
+import at.ac.tuwien.sepr.groupphase.backend.entity.ApplicationUser;
 import at.ac.tuwien.sepr.groupphase.backend.entity.ConcreteShiftPlan;
 import at.ac.tuwien.sepr.groupphase.backend.exception.NotFoundException;
 import at.ac.tuwien.sepr.groupphase.backend.service.DepartmentService;
 import at.ac.tuwien.sepr.groupphase.backend.service.EmployeeService;
 import at.ac.tuwien.sepr.groupphase.backend.service.ShiftPlanningService;
+import at.ac.tuwien.sepr.groupphase.backend.service.UserService;
 import at.ac.tuwien.sepr.groupphase.backend.service.dto.DepartmentCreateDto;
 import at.ac.tuwien.sepr.groupphase.backend.service.dto.DepartmentDto;
 import at.ac.tuwien.sepr.groupphase.backend.service.dto.DepartmentNameDto;
@@ -49,13 +52,16 @@ public class DepartmentEndpoint {
     private final EmployeeService employeeService;
 
     private final ShiftPlanningService shiftPlanningService;
+    private final UserService userService;
 
     public DepartmentEndpoint(DepartmentService departmentService,
                               ShiftPlanningService shiftPlanningService,
-                              EmployeeService employeeService) {
+                              EmployeeService employeeService,
+                              UserService userService) {
         this.departmentService = departmentService;
         this.shiftPlanningService = shiftPlanningService;
         this.employeeService = employeeService;
+        this.userService = userService;
     }
 
     @RolesAllowed({"ADMIN"})
@@ -64,6 +70,14 @@ public class DepartmentEndpoint {
     @GetMapping(produces = MediaType.APPLICATION_JSON_VALUE)
     public List<DepartmentDetailRestDto> getAllDepartments() {
         return departmentService.getAllDepartments();
+    }
+
+    @RolesAllowed({"ADMIN"})
+    @Operation(summary = "Get all supervisors")
+    @ApiResponse(responseCode = "200", description = "List of all supervisors")
+    @GetMapping(produces = MediaType.APPLICATION_JSON_VALUE)
+    public List<ApplicationUserResponseDto> getAllSupervisors() {
+        return userService.getAllSupervisors();
     }
 
     @Transactional

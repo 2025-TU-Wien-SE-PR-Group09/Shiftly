@@ -1,5 +1,6 @@
 package at.ac.tuwien.sepr.groupphase.backend.service.impl;
 
+import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.ApplicationUserResponseDto;
 import at.ac.tuwien.sepr.groupphase.backend.service.dto.UserDataDto;
 import at.ac.tuwien.sepr.groupphase.backend.service.dto.UserEmailDto;
 import at.ac.tuwien.sepr.groupphase.backend.service.dto.UserProfileDto;
@@ -19,8 +20,10 @@ import org.springframework.stereotype.Service;
 import at.ac.tuwien.sepr.groupphase.backend.service.dto.ChangePasswordDto;
 
 import java.lang.invoke.MethodHandles;
+import java.util.List;
 import java.util.Optional;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 import static at.ac.tuwien.sepr.groupphase.backend.config.Constants.ADMIN_EMAIL;
 
@@ -158,5 +161,10 @@ public class UserServiceImpl implements UserService {
         );
     }
 
-
+    @Override
+    public List<ApplicationUserResponseDto> getAllSupervisors() {
+        return userRepository.findAllByRoleName("SUPERVISOR").stream()
+            .map(user -> new ApplicationUserResponseDto(user.getEmail()))
+            .collect(Collectors.toList());
+    }
 }
