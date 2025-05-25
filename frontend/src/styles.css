@@ -23,6 +23,26 @@
   background-color: rgba(234, 179, 8, 0.9);
 }
 
+/**
+todo
+.cal-month-view .cal-cell-row:hover {
+  background-color: var(--color-background) !important;
+}
+
+.cal-month-view .cal-cell:hover {
+  background-color: var(--color-background) !important;
+}
+
+.cal-weekend .cal-day-number{
+  color: var(--color-primary) !important;
+}
+
+.cal-month-view, .cal-week-view, .cal-day-view {
+  background-color: initial;
+}
+
+ */
+
 /** Plugins **/
 @import './assets/styles/apexchart.css';
 
