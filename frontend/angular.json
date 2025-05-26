@@ -3,7 +3,7 @@
   "version": 1,
   "newProjectRoot": "projects",
   "projects": {
-    "angular-tailwind": {
+    "sepr-group-phase": {
       "projectType": "application",
       "schematics": {
         "@schematics/angular:component": {
@@ -21,7 +21,7 @@
           "builder": "@angular-devkit/build-angular:application",
           "options": {
             "outputPath": {
-              "base": "dist/angular-tailwind"
+              "base": "dist/sepr-group-phase"
             },
             "index": "src/index.html",
             "polyfills": [
@@ -80,10 +80,10 @@
           "builder": "@angular-devkit/build-angular:dev-server",
           "configurations": {
             "production": {
-              "buildTarget": "angular-tailwind:build:production"
+              "buildTarget": "sepr-group-phase:build:production"
             },
             "development": {
-              "buildTarget": "angular-tailwind:build:development"
+              "buildTarget": "sepr-group-phase:build:development"
             }
           },
           "defaultConfiguration": "development"
@@ -91,7 +91,7 @@
         "extract-i18n": {
           "builder": "@angular-devkit/build-angular:extract-i18n",
           "options": {
-            "buildTarget": "angular-tailwind:build"
+            "buildTarget": "sepr-group-phase:build"
           }
         },
         "test": {
