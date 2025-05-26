@@ -6,18 +6,23 @@
       class="border-border bg-muted rounded-lg border p-4">
       <div class="mb-4 flex items-center justify-between">
         <div class="flex items-center gap-2">
-          <input
-            formControlName="description"
-            type="text"
-            placeholder="Schichtname"
-            class="text-primary w-40 border-b border-gray-400 bg-transparent font-semibold placeholder-gray-400 outline-none" />
-
-          <input
-            formControlName="manPower"
-            type="number"
-            min="1"
-            placeholder="2"
-            class="w-10 border-b border-gray-400 bg-transparent text-center text-sm outline-none" />
+          <label>
+            Description
+            <input
+              formControlName="description"
+              type="text"
+              placeholder="Shift-Description"
+              class="text-primary w-40 border-b border-gray-400 bg-transparent font-semibold placeholder-gray-400 outline-none" />
+          </label>
+          <label>
+            Manpower
+            <input
+              formControlName="manPower"
+              type="number"
+              min="1"
+              placeholder="2"
+              class="w-10 border-b border-gray-400 bg-transparent text-center text-sm outline-none" />
+          </label>
         </div>
         <button type="button" (click)="removeShift(i)" class="text-gray-500 hover:text-red-500">
           <svg
@@ -35,7 +40,10 @@
         </button>
       </div>
 
-      <div formArrayName="shiftWeeks" class="space-y-4">
+      <div
+        formArrayName="shiftWeeks"
+        class="space-y-4"
+        [class.border-red-500]="getWeeks(i).errors?.['minLengthArray'] && getWeeks(i).touched">
         <div
           *ngFor="let week of getWeeks(i).controls; let j = index; trackBy: trackByIndex"
           [formGroupName]="j"
@@ -79,7 +87,7 @@
               </ng-container>
               <ng-template #empty>
                 <div
-                  class="flex min-w-[120px] cursor-pointer flex-col items-center justify-center rounded-md border border-dashed border-gray-400 p-3 text-xs italic"
+                  class="hover:border-primary hover:bg-accent flex min-w-[120px] cursor-pointer flex-col items-center justify-center rounded-md border border-dashed border-gray-400 p-3 text-xs italic transition hover:shadow-md"
                   (click)="addDay(i, j, weekday)">
                   {{ weekday }}
                 </div>

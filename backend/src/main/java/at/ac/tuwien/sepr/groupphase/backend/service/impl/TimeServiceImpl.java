@@ -21,7 +21,7 @@ public class TimeServiceImpl implements TimeService {
     }
 
     @Override
-    public LocalDate nextMonday() {
-        return currentDate().with(TemporalAdjusters.next(DayOfWeek.MONDAY));
+    public LocalDate nextMondayInMonth(LocalDate month) {
+        return month.with(TemporalAdjusters.next(DayOfWeek.MONDAY));
     }
 }

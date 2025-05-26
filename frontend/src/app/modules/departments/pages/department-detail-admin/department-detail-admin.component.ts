@@ -1,10 +1,9 @@
 import {Component, OnInit} from '@angular/core';
 import { RouterLink } from '@angular/router';
 import {
-  DepartmentDetailRestDto,
   DepartmentCreateRestDto,
   DepartmentService,
-  ApplicationUserResponseDto, DepartmentEditRestDto
+  ApplicationUserResponseDto, DepartmentEditRestDto, DepartmentDetailRestResponseDto,
 } from '../../../../rest_client';
 import { ButtonComponent } from '../../../../shared/components/button/button.component';
 import { FormsModule } from '@angular/forms';
@@ -29,7 +28,7 @@ export class DepartmentDetailAdminComponent implements OnInit{
     newName: '',
     supervisorEmail: '',
   }
-  protected departments: DepartmentDetailRestDto[] = [];
+  protected departments: DepartmentDetailRestResponseDto[] = [];
   protected supervisors: ApplicationUserResponseDto[] = [];
 
   constructor(private departmentService: DepartmentService, private toastr: ToastrService) {}

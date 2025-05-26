@@ -1,7 +1,7 @@
 import { Component, Input, Output, EventEmitter } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ActivatedRoute, Router } from '@angular/router';
-import { DepartmentService, ScheduledShiftDetailDto } from 'src/app/rest_client';
+import { DepartmentService } from 'src/app/rest_client';
 import { ToastrService } from 'ngx-toastr';
 @Component({
   selector: 'app-department-concrete-shiftplan',
@@ -37,44 +37,6 @@ export class DepartmentConcreteShiftplanComponent {
       duration: string;
       assignedUsers: any[];
     }
-
-    this.departmentService.getDetailedConcretePlan(this.departmentId).subscribe({
-      next: (data: ScheduledShiftDetailDto[]) => {
-        this.shiftDetails = data
-          .reduce((acc: any[], entry: any) => {
-            const existingWeek = acc.find((w) => w.weekStart === entry.weekStart);
-
-            if (existingWeek) {
-              existingWeek.shifts.push({
-                description: entry.shiftDescription,
-                days: entry.days,
-              });
-            } else {
-              acc.push({
-                weekStart: entry.weekStart,
-                shifts: [
-                  {
-                    description: entry.shiftDescription,
-                    days: entry.days,
-                  },
-                ],
-              });
-            }
-
-            return acc;
-          }, [])
-          .sort((a, b) => new Date(a.weekStart).getTime() - new Date(b.weekStart).getTime());
-
-        this.isLoading = false;
-        if (this.shiftDetails.length !== 0) {
-          this.hasConcretePlan.emit(true);
-        }
-      },
-      error: (err) => {
-        this.isLoading = false;
-        this.hasConcretePlan.emit(false);
-      },
-    });
   }
   readonly weekdays = ['MONDAY', 'TUESDAY', 'WEDNESDAY', 'THURSDAY', 'FRIDAY', 'SATURDAY', 'SUNDAY'];
 

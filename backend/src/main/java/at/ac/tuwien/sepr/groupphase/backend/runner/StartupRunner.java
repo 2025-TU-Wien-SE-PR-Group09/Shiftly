@@ -1,7 +1,8 @@
 package at.ac.tuwien.sepr.groupphase.backend.runner;
 
-import at.ac.tuwien.sepr.groupphase.backend.entity.ApplicationUser;
+import at.ac.tuwien.sepr.groupphase.backend.entity.*;
 import at.ac.tuwien.sepr.groupphase.backend.repository.DepartmentRepository;
+import at.ac.tuwien.sepr.groupphase.backend.repository.PlanBlueprintRepository;
 import at.ac.tuwien.sepr.groupphase.backend.repository.UserRepository;
 import at.ac.tuwien.sepr.groupphase.backend.service.DepartmentService;
 import at.ac.tuwien.sepr.groupphase.backend.service.ShiftPlanningService;
@@ -10,9 +11,7 @@ import at.ac.tuwien.sepr.groupphase.backend.service.dto.Role;
 import at.ac.tuwien.sepr.groupphase.backend.service.dto.UserDataDto;
 import at.ac.tuwien.sepr.groupphase.backend.service.dto.UserRoleDto;
 import at.ac.tuwien.sepr.groupphase.backend.service.UserService;
-import at.ac.tuwien.sepr.groupphase.backend.service.dto.shift.CreateShiftBlueprintDto;
 import at.ac.tuwien.sepr.groupphase.backend.service.dto.shift.ShiftDayDto;
-import at.ac.tuwien.sepr.groupphase.backend.service.dto.shift.ShiftWeekBlueprintDto;
 import jakarta.transaction.Transactional;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -33,6 +32,7 @@ public class StartupRunner implements CommandLineRunner {
     private final UserService userService;
     private final ShiftPlanningService shiftPlanningService;
     private final DepartmentService departmentService;
+    private final PlanBlueprintRepository planBlueprintRepository;
 
     private final UserRepository userRepository;
     private final DepartmentRepository departmentRepository;
@@ -43,10 +43,11 @@ public class StartupRunner implements CommandLineRunner {
     private String adminUserPassword;
 
     public StartupRunner(UserService userService, ShiftPlanningService shiftPlanningService,
-                         DepartmentService departmentService, UserRepository userRepository, DepartmentRepository departmentRepository) {
+                         DepartmentService departmentService, PlanBlueprintRepository planBlueprintRepository, UserRepository userRepository, DepartmentRepository departmentRepository) {
         this.userService = userService;
         this.shiftPlanningService = shiftPlanningService;
         this.departmentService = departmentService;
+        this.planBlueprintRepository = planBlueprintRepository;
         this.userRepository = userRepository;
         this.departmentRepository = departmentRepository;
     }
@@ -60,7 +61,8 @@ public class StartupRunner implements CommandLineRunner {
             new UserDataDto(ADMIN_EMAIL, adminUserPassword));
         this.userService.assignRoleToUser(new UserRoleDto(ADMIN_EMAIL, Role.ADMIN));
 
-        var production = this.departmentService.getDepartmentByName("Produktion");
+        var production = this.departmentService.getDepartmentByName("Produktion")
+            .flatMap(d -> departmentRepository.findById(d.id()));
 
         if (production.isEmpty()) {
             this.userService.createUser(new UserDataDto(
@@ -68,17 +70,20 @@ public class StartupRunner implements CommandLineRunner {
                 "password"
             ));
 
-            LOGGER.info("Department not found, creating department.");
+            LOGGER.info("Department not found, creating department!");
             var dep = this.departmentService.createDepartment(new DepartmentCreateDto("Produktion", "supervisor@shyft.local"));
-            createPlan(dep.getId());
+            var actDep = this.departmentRepository.findById(dep.getId()).orElseThrow(() -> new RuntimeException("Department not found"));
+            createPlan(actDep);
+            createSecondPlan(actDep);
             createUsers();
         } else {
-            LOGGER.info("Department found: {}", production.get().name());
-            if (production.get().plans().isEmpty()) {
-                LOGGER.info("Department does not have a plan.");
-                createPlan(production.get().id());
+            LOGGER.info("Department found: {}", production.get().getName());
+            if (production.get().getPlans().isEmpty()) {
+                LOGGER.info("Department does not have a plan!");
+                createPlan(production.get());
+                createSecondPlan(production.get());
             } else {
-                LOGGER.info("Department has a plan.");
+                LOGGER.info("Department has a plan!");
             }
         }
     }
@@ -109,35 +114,118 @@ public class StartupRunner implements CommandLineRunner {
         );
     }
 
-    private void createPlan(Long departmentId) {
-        // === Tagschicht: 07:00 – 15:00 ===
+    private void createPlan(Department department) {
         var monDay = new ShiftDayDto(DayOfWeek.MONDAY, LocalTime.of(7, 0), Duration.ofHours(8));
         var tuesDay = new ShiftDayDto(DayOfWeek.TUESDAY, LocalTime.of(7, 0), Duration.ofHours(8));
         var wedDay = new ShiftDayDto(DayOfWeek.WEDNESDAY, LocalTime.of(7, 0), Duration.ofHours(8));
         var thurDay = new ShiftDayDto(DayOfWeek.THURSDAY, LocalTime.of(7, 0), Duration.ofHours(8));
         var fridayDay = new ShiftDayDto(DayOfWeek.FRIDAY, LocalTime.of(7, 0), Duration.ofHours(8));
 
-        var dayShift = shiftPlanningService.createShiftBlueprint(
-            new CreateShiftBlueprintDto(departmentId, "Tagschicht", 4)
+        List<ShiftDayBlueprint> days = List.of(
+            new ShiftDayBlueprint.Builder().withDay(DayOfWeek.MONDAY)
+                .withStartTime(LocalTime.of(7, 0))
+                .withDuration(Duration.ofHours(8))
+                .build(),
+            new ShiftDayBlueprint.Builder().withDay(DayOfWeek.TUESDAY)
+                .withStartTime(LocalTime.of(7, 0))
+                .withDuration(Duration.ofHours(8))
+                .build(),
+            new ShiftDayBlueprint.Builder().withDay(DayOfWeek.WEDNESDAY)
+                .withStartTime(LocalTime.of(7, 0))
+                .withDuration(Duration.ofHours(8))
+                .build(),
+            new ShiftDayBlueprint.Builder().withDay(DayOfWeek.THURSDAY)
+                .withStartTime(LocalTime.of(7, 0))
+                .withDuration(Duration.ofHours(8))
+                .build(),
+            new ShiftDayBlueprint.Builder()
+                .withDay(DayOfWeek.FRIDAY)
+                .withStartTime(LocalTime.of(7, 0))
+                .withDuration(Duration.ofHours(8))
+                .build()
         );
-        var a = List.of(new ShiftWeekBlueprintDto(List.of(monDay, tuesDay, wedDay, thurDay, fridayDay)));
-        shiftPlanningService.addWeeksToShift(dayShift.id(), a);
 
-        // === Nachtschicht: 18:00 – 02:00 bzw. 6.5h Fr ===
-        var monNight = new ShiftDayDto(DayOfWeek.MONDAY, LocalTime.of(18, 0), Duration.ofHours(8));
-        var tuesNight = new ShiftDayDto(DayOfWeek.TUESDAY, LocalTime.of(18, 0), Duration.ofHours(8));
-        var wedNight = new ShiftDayDto(DayOfWeek.WEDNESDAY, LocalTime.of(18, 0), Duration.ofHours(8));
-        var thurNight = new ShiftDayDto(DayOfWeek.THURSDAY, LocalTime.of(18, 0), Duration.ofHours(8));
-        var saturdayNight = new ShiftDayDto(DayOfWeek.SATURDAY, LocalTime.of(18, 0), Duration.ofHours(6).plusMinutes(30));
+        var plan = new PlanBlueprint.Builder()
+            .withDepartment(department)
+            .withDescription("Standard-plan for Production (1-1 Day/Night Rotation)")
+            .addShift(shiftBuilder -> {
+                shiftBuilder.withDescription("Dayshift")
+                    .withManPower(4)
+                    .addWeek(0, weekBuilder -> {
+                        weekBuilder.withDays(days);
+                    });
+            })
+            .build();
+        plan = this.planBlueprintRepository.save(plan);
 
-        var nightShift = shiftPlanningService.createShiftBlueprint(
-            new CreateShiftBlueprintDto(departmentId, "Nachtschicht", 4)
-        );
 
-        shiftPlanningService.addWeeksToShift(nightShift.id(),
-            List.of(new ShiftWeekBlueprintDto(List.of(monNight, tuesNight, wedNight, thurNight, saturdayNight))));
-
-        shiftPlanningService.createPlanBlueprint(departmentId, List.of(dayShift.id(), nightShift.id()));
     }
+
+    private void createSecondPlan(Department department) {
+        List<ShiftDayBlueprint> earlyShiftDays = List.of(
+            new ShiftDayBlueprint.Builder().withDay(DayOfWeek.MONDAY)
+                .withStartTime(LocalTime.of(5, 30))
+                .withDuration(Duration.ofHours(8))
+                .build(),
+            new ShiftDayBlueprint.Builder().withDay(DayOfWeek.TUESDAY)
+                .withStartTime(LocalTime.of(5, 30))
+                .withDuration(Duration.ofHours(8))
+                .build(),
+            new ShiftDayBlueprint.Builder().withDay(DayOfWeek.WEDNESDAY)
+                .withStartTime(LocalTime.of(5, 30))
+                .withDuration(Duration.ofHours(8))
+                .build(),
+            new ShiftDayBlueprint.Builder().withDay(DayOfWeek.THURSDAY)
+                .withStartTime(LocalTime.of(5, 30))
+                .withDuration(Duration.ofHours(8))
+                .build(),
+            new ShiftDayBlueprint.Builder().withDay(DayOfWeek.FRIDAY)
+                .withStartTime(LocalTime.of(5, 30))
+                .withDuration(Duration.ofHours(8))
+                .build()
+        );
+
+        List<ShiftDayBlueprint> lateShiftDays = List.of(
+            new ShiftDayBlueprint.Builder().withDay(DayOfWeek.MONDAY)
+                .withStartTime(LocalTime.of(14, 0))
+                .withDuration(Duration.ofHours(8))
+                .build(),
+            new ShiftDayBlueprint.Builder().withDay(DayOfWeek.TUESDAY)
+                .withStartTime(LocalTime.of(14, 0))
+                .withDuration(Duration.ofHours(8))
+                .build(),
+            new ShiftDayBlueprint.Builder().withDay(DayOfWeek.WEDNESDAY)
+                .withStartTime(LocalTime.of(14, 0))
+                .withDuration(Duration.ofHours(8))
+                .build(),
+            new ShiftDayBlueprint.Builder().withDay(DayOfWeek.THURSDAY)
+                .withStartTime(LocalTime.of(14, 0))
+                .withDuration(Duration.ofHours(8))
+                .build(),
+            new ShiftDayBlueprint.Builder().withDay(DayOfWeek.FRIDAY)
+                .withStartTime(LocalTime.of(14, 0))
+                .withDuration(Duration.ofHours(8))
+                .build()
+        );
+
+
+        var plan = new PlanBlueprint.Builder()
+            .withDepartment(department)
+            .withDescription("Second plan: Early/Late Shift Schedule")
+            .addShift(shiftBuilder -> {
+                shiftBuilder.withDescription("Early Shift")
+                    .withManPower(3)
+                    .addWeek(0, weekBuilder -> weekBuilder.withDays(earlyShiftDays));
+            })
+            .addShift(shiftBuilder -> {
+                shiftBuilder.withDescription("Late Shift")
+                    .withManPower(3)
+                    .addWeek(0, weekBuilder -> weekBuilder.withDays(lateShiftDays));
+            })
+            .build();
+
+        plan = this.planBlueprintRepository.save(plan);
+    }
+
 
 }

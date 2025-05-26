@@ -61,7 +61,38 @@ public class ConcreteShiftPlan {
         return scheduledShifts;
     }
 
-    public void setScheduledShifts(List<ScheduledShift> scheduledShifts) {
+    public void addScheduledShifts(List<ScheduledShift> scheduledShifts) {
         this.scheduledShifts = scheduledShifts;
+        scheduledShifts.forEach(scheduledShift -> scheduledShift.setPlan(this));
     }
+
+    public static class Builder {
+        private final ConcreteShiftPlan plan = new ConcreteShiftPlan();
+
+        public Builder withDepartment(Department department) {
+            plan.setDepartment(department);
+            return this;
+        }
+
+        public Builder withStartDate(LocalDate startDate) {
+            plan.setStartDate(startDate);
+            return this;
+        }
+
+        public Builder withEndDate(LocalDate endDate) {
+            plan.setEndDate(endDate);
+            return this;
+        }
+
+        public Builder addScheduledShift(ScheduledShift shift) {
+            plan.getScheduledShifts().add(shift);
+            shift.setPlan(plan);
+            return this;
+        }
+
+        public ConcreteShiftPlan build() {
+            return plan;
+        }
+    }
+
 }

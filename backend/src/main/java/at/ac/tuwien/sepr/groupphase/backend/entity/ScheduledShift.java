@@ -74,7 +74,50 @@ public class ScheduledShift {
         return assignments;
     }
 
+    public void addAssignment(ScheduledShiftAssignment assignment) {
+        assignments.add(assignment);
+        assignment.setScheduledShift(this);
+    }
+
     public void setAssignments(Set<ScheduledShiftAssignment> assignments) {
         this.assignments = assignments;
+    }
+
+    public static class Builder {
+        private final ScheduledShift shift = new ScheduledShift();
+
+        public Builder withId(ScheduledShiftId id) {
+            shift.setId(id);
+            return this;
+        }
+
+        public Builder withDepartment(Department department) {
+            shift.setDepartment(department);
+            return this;
+        }
+
+        public Builder withShiftBlueprint(ShiftBlueprint blueprint) {
+            shift.setShift(blueprint);
+            return this;
+        }
+
+        public Builder withWeekStartDate(LocalDate date) {
+            shift.setWeekStartDate(date);
+            return this;
+        }
+
+        public Builder withPlan(ConcreteShiftPlan plan) {
+            shift.setPlan(plan);
+            return this;
+        }
+
+        public Builder addAssignment(ScheduledShiftAssignment assignment) {
+            shift.addAssignment(assignment);
+            return this;
+        }
+
+        public ScheduledShift build() {
+            return shift;
+        }
     }
 }

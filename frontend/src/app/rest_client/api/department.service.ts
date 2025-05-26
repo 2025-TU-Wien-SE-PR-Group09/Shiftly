@@ -17,25 +17,27 @@ import { CustomHttpParameterCodec }                          from '../encoder';
 import { Observable }                                        from 'rxjs';
 
 // @ts-ignore
+import { AddShiftToPlanBlueprintDto } from '../model/addShiftToPlanBlueprintDto';
+// @ts-ignore
 import { ApplicationUserResponseDto } from '../model/applicationUserResponseDto';
 // @ts-ignore
 import { CreatePlanBlueprintDto } from '../model/createPlanBlueprintDto';
 // @ts-ignore
 import { DepartmentCreateRestDto } from '../model/departmentCreateRestDto';
 // @ts-ignore
-import { DepartmentDetailRestDto } from '../model/departmentDetailRestDto';
+import { DepartmentDetailRestResponseDto } from '../model/departmentDetailRestResponseDto';
 // @ts-ignore
 import { DepartmentEditRestDto } from '../model/departmentEditRestDto';
+// @ts-ignore
+import { DepartmentShiftplanCalendarResponse } from '../model/departmentShiftplanCalendarResponse';
 // @ts-ignore
 import { EmployeeListItemResponseDto } from '../model/employeeListItemResponseDto';
 // @ts-ignore
 import { EmployeeRestResponseDto } from '../model/employeeRestResponseDto';
 // @ts-ignore
+import { GenerateConcretePlanDto } from '../model/generateConcretePlanDto';
+// @ts-ignore
 import { PlanBlueprintResponse } from '../model/planBlueprintResponse';
-// @ts-ignore
-import { ScheduledShiftDetailDto } from '../model/scheduledShiftDetailDto';
-// @ts-ignore
-import { ScheduledShiftResponseDto } from '../model/scheduledShiftResponseDto';
 
 // @ts-ignore
 import { BASE_PATH, COLLECTION_FORMATS }                     from '../variables';
@@ -101,6 +103,74 @@ export class DepartmentService extends BaseService {
         return this.httpClient.request<EmployeeRestResponseDto>('post', `${basePath}${localVarPath}`,
             {
                 context: localVarHttpContext,
+                responseType: <any>responseType_,
+                ...(withCredentials ? { withCredentials } : {}),
+                headers: localVarHeaders,
+                observe: observe,
+                transferCache: localVarTransferCache,
+                reportProgress: reportProgress
+            }
+        );
+    }
+
+    /**
+     * Add shift to existing plan(Blueprint) for a department
+     * @param departmentName 
+     * @param addShiftToPlanBlueprintDto 
+     * @param observe set whether or not to return the data Observable as the body, response or events. defaults to returning the body.
+     * @param reportProgress flag to report request and response progress.
+     */
+    public addShiftToPlanBlueprint(departmentName: string, addShiftToPlanBlueprintDto: AddShiftToPlanBlueprintDto, observe?: 'body', reportProgress?: boolean, options?: {httpHeaderAccept?: 'application/json', context?: HttpContext, transferCache?: boolean}): Observable<PlanBlueprintResponse>;
+    public addShiftToPlanBlueprint(departmentName: string, addShiftToPlanBlueprintDto: AddShiftToPlanBlueprintDto, observe?: 'response', reportProgress?: boolean, options?: {httpHeaderAccept?: 'application/json', context?: HttpContext, transferCache?: boolean}): Observable<HttpResponse<PlanBlueprintResponse>>;
+    public addShiftToPlanBlueprint(departmentName: string, addShiftToPlanBlueprintDto: AddShiftToPlanBlueprintDto, observe?: 'events', reportProgress?: boolean, options?: {httpHeaderAccept?: 'application/json', context?: HttpContext, transferCache?: boolean}): Observable<HttpEvent<PlanBlueprintResponse>>;
+    public addShiftToPlanBlueprint(departmentName: string, addShiftToPlanBlueprintDto: AddShiftToPlanBlueprintDto, observe: any = 'body', reportProgress: boolean = false, options?: {httpHeaderAccept?: 'application/json', context?: HttpContext, transferCache?: boolean}): Observable<any> {
+        if (departmentName === null || departmentName === undefined) {
+            throw new Error('Required parameter departmentName was null or undefined when calling addShiftToPlanBlueprint.');
+        }
+        if (addShiftToPlanBlueprintDto === null || addShiftToPlanBlueprintDto === undefined) {
+            throw new Error('Required parameter addShiftToPlanBlueprintDto was null or undefined when calling addShiftToPlanBlueprint.');
+        }
+
+        let localVarHeaders = this.defaultHeaders;
+
+        const localVarHttpHeaderAcceptSelected: string | undefined = options?.httpHeaderAccept ?? this.configuration.selectHeaderAccept([
+            'application/json'
+        ]);
+        if (localVarHttpHeaderAcceptSelected !== undefined) {
+            localVarHeaders = localVarHeaders.set('Accept', localVarHttpHeaderAcceptSelected);
+        }
+
+        const localVarHttpContext: HttpContext = options?.context ?? new HttpContext();
+
+        const localVarTransferCache: boolean = options?.transferCache ?? true;
+
+
+        // to determine the Content-Type header
+        const consumes: string[] = [
+            'application/json'
+        ];
+        const httpContentTypeSelected: string | undefined = this.configuration.selectHeaderContentType(consumes);
+        if (httpContentTypeSelected !== undefined) {
+            localVarHeaders = localVarHeaders.set('Content-Type', httpContentTypeSelected);
+        }
+
+        let responseType_: 'text' | 'json' | 'blob' = 'json';
+        if (localVarHttpHeaderAcceptSelected) {
+            if (localVarHttpHeaderAcceptSelected.startsWith('text')) {
+                responseType_ = 'text';
+            } else if (this.configuration.isJsonMime(localVarHttpHeaderAcceptSelected)) {
+                responseType_ = 'json';
+            } else {
+                responseType_ = 'blob';
+            }
+        }
+
+        let localVarPath = `/api/departments/${this.configuration.encodeParam({name: "departmentName", value: departmentName, in: "path", style: "simple", explode: false, dataType: "string", dataFormat: undefined})}/shiftplanBlueprint/add`;
+        const { basePath, withCredentials } = this.configuration;
+        return this.httpClient.request<PlanBlueprintResponse>('post', `${basePath}${localVarPath}`,
+            {
+                context: localVarHttpContext,
+                body: addShiftToPlanBlueprintDto,
                 responseType: <any>responseType_,
                 ...(withCredentials ? { withCredentials } : {}),
                 headers: localVarHeaders,
@@ -181,9 +251,9 @@ export class DepartmentService extends BaseService {
      * @param observe set whether or not to return the data Observable as the body, response or events. defaults to returning the body.
      * @param reportProgress flag to report request and response progress.
      */
-    public createShiftplanBlueprint(departmentName: string, createPlanBlueprintDto: CreatePlanBlueprintDto, observe?: 'body', reportProgress?: boolean, options?: {httpHeaderAccept?: 'application/json', context?: HttpContext, transferCache?: boolean}): Observable<Array<PlanBlueprintResponse>>;
-    public createShiftplanBlueprint(departmentName: string, createPlanBlueprintDto: CreatePlanBlueprintDto, observe?: 'response', reportProgress?: boolean, options?: {httpHeaderAccept?: 'application/json', context?: HttpContext, transferCache?: boolean}): Observable<HttpResponse<Array<PlanBlueprintResponse>>>;
-    public createShiftplanBlueprint(departmentName: string, createPlanBlueprintDto: CreatePlanBlueprintDto, observe?: 'events', reportProgress?: boolean, options?: {httpHeaderAccept?: 'application/json', context?: HttpContext, transferCache?: boolean}): Observable<HttpEvent<Array<PlanBlueprintResponse>>>;
+    public createShiftplanBlueprint(departmentName: string, createPlanBlueprintDto: CreatePlanBlueprintDto, observe?: 'body', reportProgress?: boolean, options?: {httpHeaderAccept?: 'application/json', context?: HttpContext, transferCache?: boolean}): Observable<PlanBlueprintResponse>;
+    public createShiftplanBlueprint(departmentName: string, createPlanBlueprintDto: CreatePlanBlueprintDto, observe?: 'response', reportProgress?: boolean, options?: {httpHeaderAccept?: 'application/json', context?: HttpContext, transferCache?: boolean}): Observable<HttpResponse<PlanBlueprintResponse>>;
+    public createShiftplanBlueprint(departmentName: string, createPlanBlueprintDto: CreatePlanBlueprintDto, observe?: 'events', reportProgress?: boolean, options?: {httpHeaderAccept?: 'application/json', context?: HttpContext, transferCache?: boolean}): Observable<HttpEvent<PlanBlueprintResponse>>;
     public createShiftplanBlueprint(departmentName: string, createPlanBlueprintDto: CreatePlanBlueprintDto, observe: any = 'body', reportProgress: boolean = false, options?: {httpHeaderAccept?: 'application/json', context?: HttpContext, transferCache?: boolean}): Observable<any> {
         if (departmentName === null || departmentName === undefined) {
             throw new Error('Required parameter departmentName was null or undefined when calling createShiftplanBlueprint.');
@@ -228,7 +298,7 @@ export class DepartmentService extends BaseService {
 
         let localVarPath = `/api/departments/${this.configuration.encodeParam({name: "departmentName", value: departmentName, in: "path", style: "simple", explode: false, dataType: "string", dataFormat: undefined})}/shiftplanBlueprint`;
         const { basePath, withCredentials } = this.configuration;
-        return this.httpClient.request<Array<PlanBlueprintResponse>>('post', `${basePath}${localVarPath}`,
+        return this.httpClient.request<PlanBlueprintResponse>('post', `${basePath}${localVarPath}`,
             {
                 context: localVarHttpContext,
                 body: createPlanBlueprintDto,
@@ -308,21 +378,24 @@ export class DepartmentService extends BaseService {
     /**
      * Generate concrete shift plan for the given department and return the scheduled shifts
      * @param id 
+     * @param generateConcretePlanDto 
      * @param observe set whether or not to return the data Observable as the body, response or events. defaults to returning the body.
      * @param reportProgress flag to report request and response progress.
      */
-    public generateConcretePlan(id: number, observe?: 'body', reportProgress?: boolean, options?: {httpHeaderAccept?: 'application/json', context?: HttpContext, transferCache?: boolean}): Observable<Array<ScheduledShiftResponseDto>>;
-    public generateConcretePlan(id: number, observe?: 'response', reportProgress?: boolean, options?: {httpHeaderAccept?: 'application/json', context?: HttpContext, transferCache?: boolean}): Observable<HttpResponse<Array<ScheduledShiftResponseDto>>>;
-    public generateConcretePlan(id: number, observe?: 'events', reportProgress?: boolean, options?: {httpHeaderAccept?: 'application/json', context?: HttpContext, transferCache?: boolean}): Observable<HttpEvent<Array<ScheduledShiftResponseDto>>>;
-    public generateConcretePlan(id: number, observe: any = 'body', reportProgress: boolean = false, options?: {httpHeaderAccept?: 'application/json', context?: HttpContext, transferCache?: boolean}): Observable<any> {
+    public generateConcretePlan(id: number, generateConcretePlanDto: GenerateConcretePlanDto, observe?: 'body', reportProgress?: boolean, options?: {httpHeaderAccept?: undefined, context?: HttpContext, transferCache?: boolean}): Observable<any>;
+    public generateConcretePlan(id: number, generateConcretePlanDto: GenerateConcretePlanDto, observe?: 'response', reportProgress?: boolean, options?: {httpHeaderAccept?: undefined, context?: HttpContext, transferCache?: boolean}): Observable<HttpResponse<any>>;
+    public generateConcretePlan(id: number, generateConcretePlanDto: GenerateConcretePlanDto, observe?: 'events', reportProgress?: boolean, options?: {httpHeaderAccept?: undefined, context?: HttpContext, transferCache?: boolean}): Observable<HttpEvent<any>>;
+    public generateConcretePlan(id: number, generateConcretePlanDto: GenerateConcretePlanDto, observe: any = 'body', reportProgress: boolean = false, options?: {httpHeaderAccept?: undefined, context?: HttpContext, transferCache?: boolean}): Observable<any> {
         if (id === null || id === undefined) {
             throw new Error('Required parameter id was null or undefined when calling generateConcretePlan.');
+        }
+        if (generateConcretePlanDto === null || generateConcretePlanDto === undefined) {
+            throw new Error('Required parameter generateConcretePlanDto was null or undefined when calling generateConcretePlan.');
         }
 
         let localVarHeaders = this.defaultHeaders;
 
         const localVarHttpHeaderAcceptSelected: string | undefined = options?.httpHeaderAccept ?? this.configuration.selectHeaderAccept([
-            'application/json'
         ]);
         if (localVarHttpHeaderAcceptSelected !== undefined) {
             localVarHeaders = localVarHeaders.set('Accept', localVarHttpHeaderAcceptSelected);
@@ -332,6 +405,15 @@ export class DepartmentService extends BaseService {
 
         const localVarTransferCache: boolean = options?.transferCache ?? true;
 
+
+        // to determine the Content-Type header
+        const consumes: string[] = [
+            'application/json'
+        ];
+        const httpContentTypeSelected: string | undefined = this.configuration.selectHeaderContentType(consumes);
+        if (httpContentTypeSelected !== undefined) {
+            localVarHeaders = localVarHeaders.set('Content-Type', httpContentTypeSelected);
+        }
 
         let responseType_: 'text' | 'json' | 'blob' = 'json';
         if (localVarHttpHeaderAcceptSelected) {
@@ -346,9 +428,10 @@ export class DepartmentService extends BaseService {
 
         let localVarPath = `/api/departments/${this.configuration.encodeParam({name: "id", value: id, in: "path", style: "simple", explode: false, dataType: "number", dataFormat: "int64"})}/generate-concrete-plan`;
         const { basePath, withCredentials } = this.configuration;
-        return this.httpClient.request<Array<ScheduledShiftResponseDto>>('post', `${basePath}${localVarPath}`,
+        return this.httpClient.request<any>('post', `${basePath}${localVarPath}`,
             {
                 context: localVarHttpContext,
+                body: generateConcretePlanDto,
                 responseType: <any>responseType_,
                 ...(withCredentials ? { withCredentials } : {}),
                 headers: localVarHeaders,
@@ -364,9 +447,9 @@ export class DepartmentService extends BaseService {
      * @param observe set whether or not to return the data Observable as the body, response or events. defaults to returning the body.
      * @param reportProgress flag to report request and response progress.
      */
-    public getAllDepartments(observe?: 'body', reportProgress?: boolean, options?: {httpHeaderAccept?: 'application/json', context?: HttpContext, transferCache?: boolean}): Observable<Array<DepartmentDetailRestDto>>;
-    public getAllDepartments(observe?: 'response', reportProgress?: boolean, options?: {httpHeaderAccept?: 'application/json', context?: HttpContext, transferCache?: boolean}): Observable<HttpResponse<Array<DepartmentDetailRestDto>>>;
-    public getAllDepartments(observe?: 'events', reportProgress?: boolean, options?: {httpHeaderAccept?: 'application/json', context?: HttpContext, transferCache?: boolean}): Observable<HttpEvent<Array<DepartmentDetailRestDto>>>;
+    public getAllDepartments(observe?: 'body', reportProgress?: boolean, options?: {httpHeaderAccept?: 'application/json', context?: HttpContext, transferCache?: boolean}): Observable<Array<DepartmentDetailRestResponseDto>>;
+    public getAllDepartments(observe?: 'response', reportProgress?: boolean, options?: {httpHeaderAccept?: 'application/json', context?: HttpContext, transferCache?: boolean}): Observable<HttpResponse<Array<DepartmentDetailRestResponseDto>>>;
+    public getAllDepartments(observe?: 'events', reportProgress?: boolean, options?: {httpHeaderAccept?: 'application/json', context?: HttpContext, transferCache?: boolean}): Observable<HttpEvent<Array<DepartmentDetailRestResponseDto>>>;
     public getAllDepartments(observe: any = 'body', reportProgress: boolean = false, options?: {httpHeaderAccept?: 'application/json', context?: HttpContext, transferCache?: boolean}): Observable<any> {
 
         let localVarHeaders = this.defaultHeaders;
@@ -396,7 +479,7 @@ export class DepartmentService extends BaseService {
 
         let localVarPath = `/api/departments`;
         const { basePath, withCredentials } = this.configuration;
-        return this.httpClient.request<Array<DepartmentDetailRestDto>>('get', `${basePath}${localVarPath}`,
+        return this.httpClient.request<Array<DepartmentDetailRestResponseDto>>('get', `${basePath}${localVarPath}`,
             {
                 context: localVarHttpContext,
                 responseType: <any>responseType_,
@@ -460,17 +543,17 @@ export class DepartmentService extends BaseService {
     }
 
     /**
-     * Get detailed scheduled shifts for a department
+     * Get the concrete shift plan for the given department and return the scheduled shifts in suitable calendar format
      * @param departmentId 
      * @param observe set whether or not to return the data Observable as the body, response or events. defaults to returning the body.
      * @param reportProgress flag to report request and response progress.
      */
-    public getDetailedConcretePlan(departmentId: number, observe?: 'body', reportProgress?: boolean, options?: {httpHeaderAccept?: 'application/json', context?: HttpContext, transferCache?: boolean}): Observable<Array<ScheduledShiftDetailDto>>;
-    public getDetailedConcretePlan(departmentId: number, observe?: 'response', reportProgress?: boolean, options?: {httpHeaderAccept?: 'application/json', context?: HttpContext, transferCache?: boolean}): Observable<HttpResponse<Array<ScheduledShiftDetailDto>>>;
-    public getDetailedConcretePlan(departmentId: number, observe?: 'events', reportProgress?: boolean, options?: {httpHeaderAccept?: 'application/json', context?: HttpContext, transferCache?: boolean}): Observable<HttpEvent<Array<ScheduledShiftDetailDto>>>;
-    public getDetailedConcretePlan(departmentId: number, observe: any = 'body', reportProgress: boolean = false, options?: {httpHeaderAccept?: 'application/json', context?: HttpContext, transferCache?: boolean}): Observable<any> {
+    public getConcreteShiftplan(departmentId: number, observe?: 'body', reportProgress?: boolean, options?: {httpHeaderAccept?: 'application/json', context?: HttpContext, transferCache?: boolean}): Observable<DepartmentShiftplanCalendarResponse>;
+    public getConcreteShiftplan(departmentId: number, observe?: 'response', reportProgress?: boolean, options?: {httpHeaderAccept?: 'application/json', context?: HttpContext, transferCache?: boolean}): Observable<HttpResponse<DepartmentShiftplanCalendarResponse>>;
+    public getConcreteShiftplan(departmentId: number, observe?: 'events', reportProgress?: boolean, options?: {httpHeaderAccept?: 'application/json', context?: HttpContext, transferCache?: boolean}): Observable<HttpEvent<DepartmentShiftplanCalendarResponse>>;
+    public getConcreteShiftplan(departmentId: number, observe: any = 'body', reportProgress: boolean = false, options?: {httpHeaderAccept?: 'application/json', context?: HttpContext, transferCache?: boolean}): Observable<any> {
         if (departmentId === null || departmentId === undefined) {
-            throw new Error('Required parameter departmentId was null or undefined when calling getDetailedConcretePlan.');
+            throw new Error('Required parameter departmentId was null or undefined when calling getConcreteShiftplan.');
         }
 
         let localVarHeaders = this.defaultHeaders;
@@ -498,9 +581,63 @@ export class DepartmentService extends BaseService {
             }
         }
 
-        let localVarPath = `/api/departments/${this.configuration.encodeParam({name: "departmentId", value: departmentId, in: "path", style: "simple", explode: false, dataType: "number", dataFormat: "int64"})}/concrete-plan-details`;
+        let localVarPath = `/api/departments/${this.configuration.encodeParam({name: "departmentId", value: departmentId, in: "path", style: "simple", explode: false, dataType: "number", dataFormat: "int64"})}/shiftplan`;
         const { basePath, withCredentials } = this.configuration;
-        return this.httpClient.request<Array<ScheduledShiftDetailDto>>('get', `${basePath}${localVarPath}`,
+        return this.httpClient.request<DepartmentShiftplanCalendarResponse>('get', `${basePath}${localVarPath}`,
+            {
+                context: localVarHttpContext,
+                responseType: <any>responseType_,
+                ...(withCredentials ? { withCredentials } : {}),
+                headers: localVarHeaders,
+                observe: observe,
+                transferCache: localVarTransferCache,
+                reportProgress: reportProgress
+            }
+        );
+    }
+
+    /**
+     * Get department by name
+     * @param departmentName 
+     * @param observe set whether or not to return the data Observable as the body, response or events. defaults to returning the body.
+     * @param reportProgress flag to report request and response progress.
+     */
+    public getDepartmentByName(departmentName: string, observe?: 'body', reportProgress?: boolean, options?: {httpHeaderAccept?: 'application/json', context?: HttpContext, transferCache?: boolean}): Observable<DepartmentDetailRestResponseDto>;
+    public getDepartmentByName(departmentName: string, observe?: 'response', reportProgress?: boolean, options?: {httpHeaderAccept?: 'application/json', context?: HttpContext, transferCache?: boolean}): Observable<HttpResponse<DepartmentDetailRestResponseDto>>;
+    public getDepartmentByName(departmentName: string, observe?: 'events', reportProgress?: boolean, options?: {httpHeaderAccept?: 'application/json', context?: HttpContext, transferCache?: boolean}): Observable<HttpEvent<DepartmentDetailRestResponseDto>>;
+    public getDepartmentByName(departmentName: string, observe: any = 'body', reportProgress: boolean = false, options?: {httpHeaderAccept?: 'application/json', context?: HttpContext, transferCache?: boolean}): Observable<any> {
+        if (departmentName === null || departmentName === undefined) {
+            throw new Error('Required parameter departmentName was null or undefined when calling getDepartmentByName.');
+        }
+
+        let localVarHeaders = this.defaultHeaders;
+
+        const localVarHttpHeaderAcceptSelected: string | undefined = options?.httpHeaderAccept ?? this.configuration.selectHeaderAccept([
+            'application/json'
+        ]);
+        if (localVarHttpHeaderAcceptSelected !== undefined) {
+            localVarHeaders = localVarHeaders.set('Accept', localVarHttpHeaderAcceptSelected);
+        }
+
+        const localVarHttpContext: HttpContext = options?.context ?? new HttpContext();
+
+        const localVarTransferCache: boolean = options?.transferCache ?? true;
+
+
+        let responseType_: 'text' | 'json' | 'blob' = 'json';
+        if (localVarHttpHeaderAcceptSelected) {
+            if (localVarHttpHeaderAcceptSelected.startsWith('text')) {
+                responseType_ = 'text';
+            } else if (this.configuration.isJsonMime(localVarHttpHeaderAcceptSelected)) {
+                responseType_ = 'json';
+            } else {
+                responseType_ = 'blob';
+            }
+        }
+
+        let localVarPath = `/api/departments/${this.configuration.encodeParam({name: "departmentName", value: departmentName, in: "path", style: "simple", explode: false, dataType: "string", dataFormat: undefined})}`;
+        const { basePath, withCredentials } = this.configuration;
+        return this.httpClient.request<DepartmentDetailRestResponseDto>('get', `${basePath}${localVarPath}`,
             {
                 context: localVarHttpContext,
                 responseType: <any>responseType_,

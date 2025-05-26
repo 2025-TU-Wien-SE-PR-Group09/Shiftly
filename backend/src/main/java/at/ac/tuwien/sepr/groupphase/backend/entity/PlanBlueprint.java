@@ -4,8 +4,11 @@ import jakarta.persistence.*;
 
 import java.time.LocalDate;
 import java.time.Month;
+import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
+import java.util.function.Consumer;
 
 /**
  * Represents a blueprint for a plan, which includes the department and the shifts
@@ -15,34 +18,36 @@ import java.util.Set;
 @Table(name = "plan_blueprint")
 public class PlanBlueprint {
 
-    @EmbeddedId
-    private PlanBlueprintId id;
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
 
-    @MapsId("departmentId")
     @ManyToOne
     @JoinColumn(name = "department_id")
     private Department department;
 
-    @ManyToMany
-    @JoinTable(name = "plan_shift", joinColumns = {
-        @JoinColumn(name = "plan_startdate", referencedColumnName = "plan_startdate"),
-        @JoinColumn(name = "department_id", referencedColumnName = "department_id")
-    }, inverseJoinColumns = @JoinColumn(name = "shift_blueprint_id"))
-    private Set<ShiftBlueprint> shiftBlueprints = new HashSet<>();
+    @Column(nullable = false, length = 255)
+    private String description;
+
+    public String getDescription() {
+        return description;
+    }
+
+    @OneToMany(mappedBy = "planBlueprint", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<ShiftBlueprint> shiftBlueprints = new ArrayList<>();
 
     public PlanBlueprint() {
     }
 
-    public PlanBlueprint(LocalDate firstMondayInQuart, Department department) {
-        this.id = new PlanBlueprintId(firstMondayInQuart, department.getId());
-        this.department = department;
+    public void setDescription(String description) {
+        this.description = description;
     }
 
-    public PlanBlueprintId getId() {
+    public Long getId() {
         return id;
     }
 
-    public void setId(PlanBlueprintId id) {
+    public void setId(Long id) {
         this.id = id;
     }
 
@@ -52,21 +57,66 @@ public class PlanBlueprint {
 
     public void setDepartment(Department department) {
         this.department = department;
-        if (this.id == null) {
-            this.id = new PlanBlueprintId();
-        }
-        this.id.setDepartmentId(department.getId());
     }
 
-    public Set<ShiftBlueprint> getShifts() {
+    public void addShiftBlueprint(ShiftBlueprint shiftBlueprint) {
+        shiftBlueprints.add(shiftBlueprint);
+        shiftBlueprint.setPlan(this);
+    }
+
+    public void removeShiftBlueprint(ShiftBlueprint shiftBlueprint) {
+        shiftBlueprints.remove(shiftBlueprint);
+        shiftBlueprint.setPlan(null);
+    }
+
+    public List<ShiftBlueprint> getShifts() {
         return shiftBlueprints;
     }
 
-    public void setShifts(Set<ShiftBlueprint> shiftBlueprints) {
+    public void setShifts(List<ShiftBlueprint> shiftBlueprints) {
         this.shiftBlueprints = shiftBlueprints;
     }
 
-    public Month getMonth() {
-        return this.id != null ? this.id.getStartDate().getMonth() : null;
+    public static class Builder {
+        private final PlanBlueprint plan = new PlanBlueprint();
+
+        public Builder withDepartment(Department department) {
+            plan.setDepartment(department);
+            return this;
+        }
+
+        public Builder withDescription(String description) {
+            plan.setDescription(description);
+            return this;
+        }
+
+        public Builder addShift(Consumer<ShiftBlueprint.Builder> shiftConfig) {
+            var shiftBuilder = new ShiftBlueprint.Builder();
+            shiftConfig.accept(shiftBuilder);
+            ShiftBlueprint shift = shiftBuilder.build();
+
+            this.plan.addShiftBlueprint(shift);
+            return this;
+        }
+
+        public Builder addShift(ShiftBlueprint shift) {
+            this.plan.addShiftBlueprint(shift);
+            shift.setPlan(plan);
+            return this;
+        }
+
+        public Builder addShift(String description, int manpower, Consumer<ShiftBlueprint> config) {
+            ShiftBlueprint shift = new ShiftBlueprint();
+            shift.setDescription(description);
+            shift.setManPower(manpower);
+            shift.setPlan(plan);
+            config.accept(shift);
+            plan.getShifts().add(shift);
+            return this;
+        }
+
+        public PlanBlueprint build() {
+            return plan;
+        }
     }
 }

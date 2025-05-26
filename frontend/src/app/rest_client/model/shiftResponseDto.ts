@@ -15,6 +15,10 @@ import { ShiftWeekResponseDto } from './shiftWeekResponseDto';
  */
 export interface ShiftResponseDto { 
     /**
+     * Unique identifier of the shift
+     */
+    id?: number;
+    /**
      * Name of the department
      */
     description?: string;
@@ -23,7 +27,7 @@ export interface ShiftResponseDto {
      */
     manPower?: number;
     /**
-     * List of shift weeks
+     * List of shift shiftWeeks
      */
     shiftWeeks?: Array<ShiftWeekResponseDto>;
 }

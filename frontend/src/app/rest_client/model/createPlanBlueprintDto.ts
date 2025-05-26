@@ -7,10 +7,11 @@
  * https://openapi-generator.tech
  * Do not edit the class manually.
  */
-import { ShiftCreateDto } from './shiftCreateDto';
+import { CreateShiftBlueprintDto } from './createShiftBlueprintDto';
 
 
 export interface CreatePlanBlueprintDto { 
-    shifts: Array<ShiftCreateDto>;
+    description?: string;
+    shifts?: Array<CreateShiftBlueprintDto>;
 }
 
