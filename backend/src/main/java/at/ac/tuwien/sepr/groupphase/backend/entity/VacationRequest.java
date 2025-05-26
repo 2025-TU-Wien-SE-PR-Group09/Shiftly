@@ -70,4 +70,8 @@ public class VacationRequest {
     public void setStatus(VacationStatus status) {
         this.status = status;
     }
+
+    public void setId(Long id) {
+        this.id = id;
+    }
 }

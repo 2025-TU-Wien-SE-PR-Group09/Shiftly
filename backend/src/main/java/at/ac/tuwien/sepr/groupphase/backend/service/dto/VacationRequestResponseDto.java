@@ -34,4 +34,6 @@ public class VacationRequestResponseDto {
     public VacationStatus getStatus() {
         return status;
     }
+
+
 }
