@@ -1,7 +1,7 @@
 import { Component , OnInit} from '@angular/core';
 import {
   AdminEndpointService,
-  DepartmentDetailRestDto,
+  DepartmentDetailRestResponseDto,
   DepartmentService, DepartmentShiftplanCalendarResponse,
 } from '../../../../rest_client';
 import { ToastrService } from 'ngx-toastr';
@@ -23,8 +23,8 @@ export class AdminHomeComponent implements OnInit {
     private readonly _toastr: ToastrService,
   ) {}
 
-  protected departments: DepartmentDetailRestDto[] = [];
-  protected selectedDepartment: DepartmentDetailRestDto | undefined;
+  protected departments: DepartmentDetailRestResponseDto[] = [];
+  protected selectedDepartment: DepartmentDetailRestResponseDto | undefined;
   protected shiftPlan: DepartmentShiftplanCalendarResponse | undefined;
   code: string = 'test';
 

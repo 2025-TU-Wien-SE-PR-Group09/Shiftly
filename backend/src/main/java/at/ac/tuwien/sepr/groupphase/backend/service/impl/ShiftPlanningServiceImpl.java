@@ -154,8 +154,6 @@ public class ShiftPlanningServiceImpl implements ShiftPlanningService {
 
         var month = concretePlanGenerateDto.startDate().orElseThrow(() -> new ConflictException("Start date is required"));
         LocalDate startDate = timeService.nextMondayInMonth(month);
-        LocalDate endDate = startDate.plusWeeks(11); // 12 Wochen
-
 
         concreteShiftPlanRepository.findByDepartmentId(department.getId()).stream()
             .min((a, b) -> b.getEndDate().compareTo(a.getEndDate())).ifPresent(concreteShiftPlan -> {
@@ -163,6 +161,8 @@ public class ShiftPlanningServiceImpl implements ShiftPlanningService {
                     throw new ConflictException("A concrete plan for this department already exists for the specified period.");
                 }
             });
+
+        LocalDate endDate = startDate.plusWeeks(11); // 12 Wochen
 
         ConcreteShiftPlan plan = new ConcreteShiftPlan();
         plan.setDepartment(department);

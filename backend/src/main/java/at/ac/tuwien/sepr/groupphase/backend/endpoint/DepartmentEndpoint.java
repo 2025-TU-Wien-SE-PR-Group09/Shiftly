@@ -172,16 +172,6 @@ public class DepartmentEndpoint {
         return ShiftPlanningMapper.Plans.toResponse(shiftPlanningService.addShiftToPlan(mapped));
     }
 
-        shift = shiftPlanningService.addWeeksToShift(shift.id(), mappedWeeks);
-
-        PlanBlueprintDto planBlueprintDto;
-        if (hasPlan) {
-            planBlueprintDto = shiftPlanningService.addShiftToCurrentPlan(department.id(), shift);
-        } else {
-            planBlueprintDto = shiftPlanningService.createPlanBlueprint(department.id(), List.of(shift.id()));
-        }
-        return List.of(ShiftPlanningMapper.Plans.toResponse(planBlueprintDto));
-    }
 
     @Transactional
     @RolesAllowed({"ADMIN"})

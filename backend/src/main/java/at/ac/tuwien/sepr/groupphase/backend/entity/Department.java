@@ -11,6 +11,7 @@ import jakarta.persistence.OneToMany;
 import jakarta.validation.constraints.NotBlank;
 
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 @Entity
