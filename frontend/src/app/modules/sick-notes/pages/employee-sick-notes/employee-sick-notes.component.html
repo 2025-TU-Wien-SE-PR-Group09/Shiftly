@@ -1,0 +1,108 @@
+<div class="my-10 space-y-10">
+  <!-- Header -->
+  <div class="text-center">
+    <h2 class="text-foreground mb-1 text-3xl font-semibold">
+      My Sick Leave Certificates
+    </h2>
+    <p class="text-muted-foreground text-sm">
+      Upload your doctor-issued certificate to validate a sick leave request.
+    </p>
+  </div>
+
+  <!-- Upload Form -->
+  <form
+    (ngSubmit)="uploadFile()"
+    class="space-y-4 rounded-xl border border-border bg-background p-6 shadow-md"
+  >
+    <div>
+      <label for="file" class="mb-1 block font-medium text-foreground">
+        Upload Certificate (PDF, JPG, PNG)
+      </label>
+      <input
+        type="file"
+        id="file"
+        accept=".pdf,.jpg,.jpeg,.png"
+        (change)="onFileSelected($event)"
+        class="w-full rounded border border-border bg-muted text-foreground p-2"
+        [disabled]="loading"
+        aria-label="Choose certificate file"
+      />
+      <p class="text-sm text-muted-foreground mt-1">
+        Selected file: {{ selectedFileName }}
+      </p>
+    </div>
+
+    <div *ngIf="uploadSuccess" class="text-sm text-green-600">
+      ✅ Upload successful!
+    </div>
+    <div *ngIf="loading" class="text-sm text-blue-600">
+      ⏳ Uploading...
+    </div>
+
+    <div class="flex justify-end space-x-2 pt-2">
+      <app-button
+        type="button"
+        tone="light"
+        impact="bold"
+        shape="rounded"
+        size="medium"
+        (click)="cancelUpload()"
+        [disabled]="loading"
+      >
+        Cancel
+      </app-button>
+
+      <app-button
+        type="submit"
+        tone="primary"
+        impact="bold"
+        shape="rounded"
+        size="medium"
+        [disabled]="loading || !selectedFile"
+      >
+        {{ loading ? 'Uploading...' : 'Upload' }}
+      </app-button>
+    </div>
+  </form>
+
+  <!-- Uploaded Certificates -->
+  <div class="rounded-xl border border-border bg-background p-6 shadow-sm">
+    <h3 class="mb-4 text-xl font-semibold text-foreground">
+      Uploaded Certificates
+    </h3>
+
+    <table class="w-full text-left text-sm text-foreground">
+      <thead>
+      <tr>
+        <th class="px-2 py-2">Date</th>
+        <th class="px-2 py-2">Filename</th>
+        <th class="px-2 py-2">Action</th>
+      </tr>
+      </thead>
+      <tbody>
+      <tr *ngFor="let note of sickNotes" class="hover:bg-muted/30 transition">
+        <td class="px-2 py-2">
+          {{ note.uploadedAt | date: 'dd.MM.yyyy' }}
+        </td>
+        <td class="px-2 py-2">{{ note.fileName }}</td>
+        <td class="px-2 py-2">
+          <app-button
+            tone="primary"
+            impact="bold"
+            size="small"
+            shape="rounded"
+            (click)="downloadFile(note)"
+          >
+            Download
+          </app-button>
+        </td>
+      </tr>
+      <tr *ngIf="sickNotes.length === 0">
+        <td colspan="3" class="text-center py-4 text-muted-foreground">
+          No sick leave certificates uploaded yet.
+        </td>
+      </tr>
+      </tbody>
+    </table>
+  </div>
+</div>

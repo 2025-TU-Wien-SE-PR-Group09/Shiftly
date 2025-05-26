@@ -7,6 +7,10 @@ logging:
     level: r=%X{r} ip=%X{ip} u=%X{u} %5p
 
 spring:
+  servlet:
+    multipart:
+      max-file-size: 5MB
+      max-request-size: 5MB
   datasource:
     url: jdbc:h2:file:./database/db;AUTO_SERVER=TRUE;DB_CLOSE_DELAY=-1
     driver-class-name: org.h2.Driver
@@ -16,7 +20,7 @@ spring:
     # Set this property to true if you want to see the executed queries
     show-sql: false
     hibernate:
-      ddl-auto: update
+      ddl-auto: create # todo: set this to update
     # Allows to fetch lazy properties outside of the original transaction. Although this sounds helpful, the property
     # is disabled since it breaks the principle of least astonishment and leads to bad performance. To learn more,
     # follow this link: https://bit.ly/2LaX9ku
@@ -32,19 +36,19 @@ security:
     type: JWT
     issuer: secure-backend
     audience: secure-app
-    # 12 hours in milliseconds
-    expiration-time: 43200000
+    # 3 hours in milliseconds
+    expiration-time: 10800000
 
 management:
   server:
     port: 8081
   endpoint:
     shutdown:
-      enabled: true
+      access: read_only
     metrics:
-      enabled: true
+      access: read_only
     prometheus:
-      enabled: true
+      access: read_only
     health:
       probes:
         enabled: true
@@ -61,7 +65,6 @@ management:
     metrics:
       export:
         enabled: true
-
 ---
 spring:
   config:
@@ -71,3 +74,7 @@ spring:
     timeout-per-shutdown-phase: 30s
 server:
   shutdown: graceful
+---
+admin:
+  user:
+    password: "password"

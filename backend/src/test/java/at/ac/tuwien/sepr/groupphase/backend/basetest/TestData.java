@@ -1,5 +1,10 @@
 package at.ac.tuwien.sepr.groupphase.backend.basetest;
 
+import at.ac.tuwien.sepr.groupphase.backend.entity.ApplicationUser;
+import at.ac.tuwien.sepr.groupphase.backend.entity.Department;
+import at.ac.tuwien.sepr.groupphase.backend.entity.VacationRequest;
+import at.ac.tuwien.sepr.groupphase.backend.type.VacationStatus;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -16,7 +21,9 @@ public interface TestData {
     String BASE_URI = "/api/v1";
     String MESSAGE_BASE_URI = BASE_URI + "/messages";
 
-    String ADMIN_USER = "admin@email.com";
+    String ADMIN_USER_EMAIL = "admin@email.com";
+    String NORMAL_USER_EMAIL = "user@email.com";
+
     List<String> ADMIN_ROLES = new ArrayList<>() {
         {
             add("ROLE_ADMIN");
@@ -29,5 +36,28 @@ public interface TestData {
             add("ROLE_USER");
         }
     };
+
+    String ADMIN_PW = "pass123";
+
+    Long VACATION_ID = 1L;
+    Long OVERLAPPING_ID = 2L;
+    String EMPLOYEE_EMAIL = "user@example.com";
+
+    LocalDate START_DATE = LocalDate.of(2025, 8, 1);
+    LocalDate END_DATE = LocalDate.of(2025, 8, 10);
+
+    LocalDate OVERLAPPING_START = LocalDate.of(2025, 8, 5);
+    LocalDate OVERLAPPING_END = LocalDate.of(2025, 8, 15);
+
+    Department DEPARTMENT = new Department();
+
+    String SUPERVISOR_EMAIL = "supervisor@shyft.local";
+    String DEPARTMENT_NAME = "TestDept";
+
+
+
+
+
+    String NORMAL_USER_PW = "userPass123";
 
 }

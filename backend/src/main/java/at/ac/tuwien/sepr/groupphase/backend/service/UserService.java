@@ -1,40 +1,59 @@
 package at.ac.tuwien.sepr.groupphase.backend.service;
 
-import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.UserLoginDto;
+import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.ApplicationUserResponseDto;
 import at.ac.tuwien.sepr.groupphase.backend.entity.ApplicationUser;
-import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.security.core.userdetails.UserDetailsService;
-import org.springframework.security.core.userdetails.UsernameNotFoundException;
+import at.ac.tuwien.sepr.groupphase.backend.service.dto.ChangePasswordDto;
+import at.ac.tuwien.sepr.groupphase.backend.service.dto.UserDataDto;
+import at.ac.tuwien.sepr.groupphase.backend.service.dto.UserEmailDto;
+import at.ac.tuwien.sepr.groupphase.backend.service.dto.UserProfileDto;
+import at.ac.tuwien.sepr.groupphase.backend.service.dto.UserRoleDto;
+import at.ac.tuwien.sepr.groupphase.backend.exception.NotFoundException;
 
-public interface UserService extends UserDetailsService {
+import java.util.List;
+
+public interface UserService {
+    /**
+     * Create a user with a given email and password. If the user already exists, the password will be updated.
+     * Will mostly be used to change/add the admin user.
+     *
+     * @param userData {@link UserDataDto} object containing the username and password
+     */
+    void createOrChangePassword(UserDataDto userData);
 
     /**
-     * Find a user in the context of Spring Security based on the email address.
-     * <br>
-     * For more information have a look at this tutorial:
-     * https://www.baeldung.com/spring-security-authentication-with-a-database
+     * Assign a role to a user. If the role does not exist, it is created by this method.
      *
-     * @param email the email address
-     * @return a Spring Security user
-     * @throws UsernameNotFoundException is thrown if the specified user does not exists
+     * @param userRole {@link UserRoleDto} object containing the email and role of the user
+     * @throws NotFoundException when the user does not exist
      */
-    @Override
-    UserDetails loadUserByUsername(String email) throws UsernameNotFoundException;
+    void assignRoleToUser(UserRoleDto userRole) throws NotFoundException;
 
     /**
-     * Find an application user based on the email address.
+     * Change the password of the currently authenticated user.
      *
-     * @param email the email address
-     * @return a application user
+     * @param dto contains the old and new password
      */
-    ApplicationUser findApplicationUserByEmail(String email);
+    void changePasswordOfCurrentUser(ChangePasswordDto dto);
 
     /**
-     * Log in a user.
+     * Retrieves the profile information of the currently authenticated user.
      *
-     * @param userLoginDto login credentials
-     * @return the JWT, if successful
-     * @throws org.springframework.security.authentication.BadCredentialsException if credentials are bad
+     * @return a {@link UserProfileDto} containing user name, email, role, and department
      */
-    String login(UserLoginDto userLoginDto);
+    UserProfileDto getCurrentUserProfile();
+
+
+    /**
+     * Create a new user with a given email and password. The email must not be used by any other user yet.
+     *
+     * @param userData {@link UserDataDto} object containing the username and password
+     */
+    void createUser(UserDataDto userData);
+
+    /**
+     * Retrieves all users who are supervisors.
+     *
+     * @return a {@link ApplicationUser} list containing all supervisors
+     */
+    List<ApplicationUserResponseDto> getAllSupervisors();
 }

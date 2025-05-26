@@ -1,0 +1,27 @@
+### Login as admin
+POST http://localhost:8080/api/v1/authentication
+Content-Type: application/json
+
+{
+    "email": "supervisor@shyft.local",
+    "password": "password"
+}
+
+> {%
+    client.global.set("auth_token", response.body.jwt);
+%}
+
+### Test admin endpoint
+GET http://localhost:8080/api/departments/Produktion/employees
+Content-Type: application/json
+Authorization: {{auth_token}}
+
+### Test admin endpoint
+POST http://localhost:8080/api/departments/Produktion/addEmployee/new_account@shyft.local
+Content-Type: application/json
+Authorization: {{auth_token}}
+
+### Test shiftplan
+GET http://localhost:8080/api/departments/1/shiftplan
+Content-Type: application/json
+Authorization: {{auth_token}}

@@ -1,0 +1,100 @@
+<form class="my-10 space-y-6" [formGroup]="form" (ngSubmit)="onSubmit()">
+  <div class="text-center">
+    <h2 class="text-foreground mb-1 text-3xl font-semibold">Sign Up <span class="text-primary">!</span></h2>
+  </div>
+
+  <div
+    class="before:border-muted after:border-muted my-4 flex items-center before:mt-0.5 before:flex-1 before:border-t after:mt-0.5 after:flex-1 after:border-t">
+    <p class="text-muted-foreground mx-4 mb-0 text-center text-sm">or</p>
+  </div>
+
+  <div class="space-y-3 text-left">
+    <div class="form__group">
+      <div class="relative">
+        <input type="text"
+               id="email"
+               formControlName="email"
+               [ngClass]="{ 'is__invalid-input': submitted && f['email'].errors }"
+               class="peer block"
+               placeholder=" "
+        />
+        <label
+          for="email"
+          [ngClass]="{ 'peer-focus:text-destructive!': submitted && f['email'].errors }"
+          class="bg-background text-muted-foreground peer-focus:text-primary absolute top-2 z-10 origin-[0] -translate-y-4 scale-95 transform px-2 text-sm duration-300 peer-placeholder-shown:top-1/2 peer-placeholder-shown:-translate-y-1/2 peer-placeholder-shown:scale-100 peer-focus:top-2 peer-focus:-translate-y-4 peer-focus:scale-95 peer-focus:px-2 ltr:left-1 rtl:right-1">
+          Email address
+        </label>
+      </div>
+      <div *ngIf="submitted && f['email'].errors" class="is__invalid-error">
+        <div *ngIf="f['email'].errors['required']">Required field</div>
+        <div *ngIf="f['email'].errors['email']">Email must be an email address valid</div>
+      </div>
+    </div>
+    <div class="form__group">
+      <div class="relative">
+        <input
+          [type]="passwordTextType ? 'text' : 'password'"
+          id="password"
+          [ngClass]="{ 'is__invalid-input': submitted && f['password'].errors }"
+          placeholder=" "
+          formControlName="password" />
+        <label
+          for="password"
+          [ngClass]="{ 'peer-focus:text-destructive!': submitted && f['password'].errors }"
+          class="bg-background text-muted-foreground peer-focus:text-primary absolute top-2 z-10 origin-[0] -translate-y-4 scale-95 transform px-2 text-sm duration-300 peer-placeholder-shown:top-1/2 peer-placeholder-shown:-translate-y-1/2 peer-placeholder-shown:scale-100 peer-focus:top-2 peer-focus:-translate-y-4 peer-focus:scale-95 peer-focus:px-2 ltr:left-1 rtl:right-1">
+          Password
+        </label>
+        <span
+          class="text-muted-foreground absolute top-2 cursor-pointer ltr:right-3 rtl:left-3"
+          (click)="togglePasswordTextType()">
+          <svg-icon
+            [src]="
+              !passwordTextType
+                ? 'assets/icons/heroicons/outline/eye-off.svg'
+                : 'assets/icons/heroicons/outline/eye.svg'
+            "
+            [svgClass]="'h-5 w-5'">
+          </svg-icon>
+        </span>
+      </div>
+    </div>
+
+    <div class="relative">
+      <input
+        type="text"
+        id="auth-code"
+        maxlength="6"
+        formControlName="authCode"
+        [ngClass]="{ 'is__invalid-input': submitted && f['authCode'].errors }"
+        class="peer block"
+        placeholder=" "
+        />
+      <label
+        for="auth-code"
+        [ngClass]="{ 'peer-focus:text-destructive!': submitted && f['authCode'].errors }"
+        class="bg-background text-muted-foreground peer-focus:text-primary absolute top-2 z-10 origin-[0] -translate-y-4 scale-95 transform px-2 text-sm duration-300 peer-placeholder-shown:top-1/2 peer-placeholder-shown:-translate-y-1/2 peer-placeholder-shown:scale-100 peer-focus:top-2 peer-focus:-translate-y-4 peer-focus:scale-95 peer-focus:px-2 ltr:left-1 rtl:right-1">
+        Auth-Code
+      </label>
+    </div>
+    <div *ngIf="submitted && f['authCode'].errors" class="is__invalid-error">
+      <div *ngIf="f['authCode'].errors['required']">Required field</div>
+      <div *ngIf="f['authCode'].errors['minlength'] || f['authCode'].errors['maxlength']">Auth-Code must be 6
+        characters
+      </div>
+    </div>
+
+
+    <!-- Submit Button -->
+    <div>
+      <app-button full impact="bold" tone="primary" shape="rounded" size="medium">Sign up</app-button>
+    </div>
+
+    <!-- Sign-in -->
+    <div class="text-muted-foreground flex items-center text-sm">
+      Already have an Account?
+      <app-button routerLink="/auth/sign-in" impact="none" tone="primary" shape="rounded" size="small">
+        Sign in
+      </app-button>
+    </div>
+  </div>
+</form>

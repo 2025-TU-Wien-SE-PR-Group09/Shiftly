@@ -1,0 +1,58 @@
+<div class="grid grid-cols-4 gap-4">
+  <!-- Linke Spalte: Shiftplans (jetzt breiter durch grid-cols) -->
+  <div class="bg-card text-foreground font-[var(--font-poppins)] rounded-xl p-6 shadow-sm col-span-4 3xl:col-span-3">
+    <div class="flex justify-between mb-2">
+      <h2 class="mb-4 flex items-center text-xl font-semibold">
+        <svg class="text-primary mr-2 h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            stroke-width="1.5"
+            d="M8 7V3m8 4V3m-9 8h10M5.25 21h13.5a2.25 2.25 0 0 0 2.25-2.25V7.5A2.25 2.25 0 0 0 18.75 5.25H5.25A2.25 2.25 0 0 0 3 7.5v11.25A2.25 2.25 0 0 0 5.25 21z" />
+        </svg>
+        Shiftplan Blueprints
+      </h2>
+
+      <div class="w-xs">
+        <app-button full impact="bold" tone="primary" shape="rounded" size="medium" (click)="showForm = !showForm">Generate Plan</app-button>
+      </div>
+    </div>
+
+    <div class="h-[600px] space-y-4 overflow-y-auto pr-2">
+      <div
+        *ngFor="let plan of shiftplans; let i = index"
+        class="border-border bg-card text-foreground rounded-xl border shadow-sm">
+        <!-- Toggle Header -->
+        <div
+          class="border-border bg-muted hover:bg-muted/70 flex cursor-pointer items-center justify-between rounded-t-xl border-b px-4 py-3"
+          (click)="expanded[i] = !expanded[i]">
+          <span class="text-base font-medium">
+            {{ plan.description || 'Plan ' + (i + 1) }}
+          </span>
+          <span class="text-primary text-xl font-semibold">
+            {{ expanded[i] ? '−' : '+' }}
+          </span>
+        </div>
+
+        <!-- Inhalt -->
+        <div *ngIf="expanded[i]" class="px-4 py-4">
+          <app-plan-blueprint [department]="department" (planChanged)="loadBlueprints()" [plan]="plan">
+          </app-plan-blueprint>
+        </div>
+      </div>
+    </div>
+  </div>
+  <!-- <app-department-concrete-shiftplan [departmentId]="this.department.id!"></app-department-concrete-shiftplan> -->
+</div>
+
+<!-- Modal Overlay -->
+<div *ngIf="showForm" class="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50">
+  <!-- Modal Box -->
+  <div class="relative w-full max-w-md rounded bg-white p-6 shadow-lg dark:bg-gray-900">
+    <h2 class="mb-4 text-xl font-bold text-gray-900 dark:text-white">Generate Shiftplan</h2>
+
+    <!-- Form fields -->
+    <app-create-concrete-plan (onCancel)="showForm = false" [plans]="this.shiftplans"></app-create-concrete-plan>
+
+  </div>
+</div>

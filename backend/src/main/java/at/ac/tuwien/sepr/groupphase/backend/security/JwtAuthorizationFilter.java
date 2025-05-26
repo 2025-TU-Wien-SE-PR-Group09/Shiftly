@@ -5,9 +5,6 @@ import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.JwtException;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.security.Keys;
-import java.io.IOException;
-import java.lang.invoke.MethodHandles;
-import java.util.List;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -22,6 +19,10 @@ import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.web.filter.OncePerRequestFilter;
+
+import java.io.IOException;
+import java.lang.invoke.MethodHandles;
+import java.util.List;
 
 @Service
 @Order(Ordered.LOWEST_PRECEDENCE - 1)
@@ -73,9 +74,11 @@ public class JwtAuthorizationFilter extends OncePerRequestFilter {
 
         String username = claims.getSubject();
 
+        // The name of the role must start with ROLE_ (requirement of spring boot)
+        // We only use roles, and not simple authority grants.
         List<SimpleGrantedAuthority> authorities = ((List<?>) claims
             .get("rol")).stream()
-            .map(authority -> new SimpleGrantedAuthority((String) authority))
+            .map(authority -> new SimpleGrantedAuthority("ROLE_" + authority))
             .toList();
 
         if (username == null || username.isEmpty()) {

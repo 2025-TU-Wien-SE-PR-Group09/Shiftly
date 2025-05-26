@@ -1,0 +1,17 @@
+export * from './adminEndpoint.service';
+import { AdminEndpointService } from './adminEndpoint.service';
+export * from './customHealthEndpoint.service';
+import { CustomHealthEndpointService } from './customHealthEndpoint.service';
+export * from './department.service';
+import { DepartmentService } from './department.service';
+export * from './loginEndpoint.service';
+import { LoginEndpointService } from './loginEndpoint.service';
+export * from './registrationEndpoint.service';
+import { RegistrationEndpointService } from './registrationEndpoint.service';
+export * from './sickLeaveCertificateEndpoint.service';
+import { SickLeaveCertificateEndpointService } from './sickLeaveCertificateEndpoint.service';
+export * from './userEndpoint.service';
+import { UserEndpointService } from './userEndpoint.service';
+export * from './vacationEndpoint.service';
+import { VacationEndpointService } from './vacationEndpoint.service';
+export const APIS = [AdminEndpointService, CustomHealthEndpointService, DepartmentService, LoginEndpointService, RegistrationEndpointService, SickLeaveCertificateEndpointService, UserEndpointService, VacationEndpointService];

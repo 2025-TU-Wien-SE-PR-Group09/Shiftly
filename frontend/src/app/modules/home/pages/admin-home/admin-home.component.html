@@ -1,0 +1,98 @@
+<div class="code-display">
+  <h1 class="text-foreground" style="font-size: 2rem;">Your Auth Code: {{ code }}</h1>
+</div>
+
+<div class="mb-4">
+  <label for="departmentSelect" class="block text-sm font-medium text-foreground">Select Department:</label>
+  <select id="departmentSelect" [(ngModel)]="selectedDepartment"   (ngModelChange)="onDepartmentChanged()"
+          class="mt-1 block w-auto max-w-xs pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm rounded-md text-background bg-foreground">
+    <option [ngValue]="undefined" disabled selected>-- Select a Department --</option>
+    <option *ngFor="let department of departments" [ngValue]="department">
+      {{ department.name }}
+    </option>
+  </select>
+</div>
+
+
+<div class="mb-4 flex justify-between">
+  <div class="btn-group">
+    <app-button
+      tone="primary"
+      impact="bold"
+      mwlCalendarPreviousView
+      [view]="view"
+      [(viewDate)]="viewDate"
+      (viewDateChange)="closeOpenMonthViewDay()"
+    >Previous
+    </app-button>
+
+    <app-button
+      tone="primary"
+      mwlCalendarToday
+      [(viewDate)]="viewDate"
+    >Today
+    </app-button>
+
+    <app-button
+      tone="primary"
+      impact="bold"
+      mwlCalendarNextView
+      [view]="view"
+      [(viewDate)]="viewDate"
+      (viewDateChange)="closeOpenMonthViewDay()"
+    >Next
+    </app-button>
+  </div>
+
+  <div class="col-md-4">
+    <h3 class="text-foreground">{{ viewDate | calendarDate:(view + 'ViewTitle'):'en' }}</h3>
+  </div>
+
+  <div class="btn-group ml-4">
+    <app-button
+      tone="primary"
+      shape="rounded"
+      impact="bold"
+      size="medium"
+      (click)="setView(CalendarView.Month)"
+    >
+      Month
+    </app-button>
+
+    <app-button
+      tone="primary"
+      shape="rounded"
+      impact="bold"
+      size="medium"
+      (click)="setView(CalendarView.Week)"
+    >
+      Week
+    </app-button>
+  </div>
+
+</div>
+
+<ng-template #eventTemplate let-event="event">
+  <span>{{ event.title }}</span>
+</ng-template>
+
+<ng-container *ngIf="view === CalendarView.Month">
+  <mwl-calendar-month-view
+    [viewDate]="viewDate"
+    [events]="events">
+  </mwl-calendar-month-view>
+</ng-container>
+
+<ng-container *ngIf="view === CalendarView.Week">
+  <mwl-calendar-week-view
+    [viewDate]="viewDate"
+    [events]="events">
+  </mwl-calendar-week-view>
+</ng-container>
+
+<ng-container *ngIf="view === CalendarView.Day">
+  <mwl-calendar-day-view
+    [viewDate]="viewDate"
+    [events]="events">
+  </mwl-calendar-day-view>
+</ng-container>

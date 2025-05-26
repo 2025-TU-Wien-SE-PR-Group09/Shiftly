@@ -1,0 +1,15 @@
+<div class="flex h-screen w-screen">
+  <div class="auth-bg bg-primary hidden flex-1 items-center justify-center bg-cover lg:flex">
+    <div class="max-w-2xl space-y-4 p-8 text-center text-white">
+      <img src="./assets/images/auth-screens.png" alt="dashboard widget" class="mb-6" />
+      <div class="flex justify-center items-center space-x-2 w-full">
+        <svg-icon src="assets/icons/heroicons/outline/lock.svg" svgClass="w-[50px] h-[50px] text-white"> </svg-icon>
+        <h1 class="text-4xl font-bold">Account inactive</h1>
+      </div>
+      <p class="text-md font-light">
+        You must wait until a supervisor invites you to a department.
+      </p>
+        <app-button [routerLink]="['/auth/sign-in']" class="max-w-xl" full impact="bold" tone="light" shape="rounded" size="medium">Back to Login</app-button>
+    </div>
+  </div>
+</div>

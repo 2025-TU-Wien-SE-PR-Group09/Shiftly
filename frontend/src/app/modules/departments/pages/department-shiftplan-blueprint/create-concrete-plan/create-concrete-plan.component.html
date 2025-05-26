@@ -1,0 +1,32 @@
+<div class="font-[var(--font-poppins)] space-y-4">
+  <!-- Autocomplete zur Auswahl des Plans -->
+  <div>
+    <label for="shiftplan" class="text-foreground mb-1 block text-sm font-medium">Shiftplan blueprint</label>
+    <app-autocomplete id="shiftplan" [options]="shiftPlanDescriptions" (selected)="onShiftplanSelected($event)"> </app-autocomplete>
+  </div>
+
+  <!-- Monat auswählen -->
+  <div>
+    <label for="month" class="text-foreground mb-1 block text-sm font-medium">Start month</label>
+    <input
+      required
+      id="month"
+      type="date"
+      class="border-border bg-background text-foreground focus:border-primary focus:ring-primary w-full rounded-md border px-3 py-2 text-sm shadow-sm focus:outline-none focus:ring-1"
+      [(ngModel)]="selectedMonth" />
+  </div>
+
+  <!-- Button -->
+  <div class="flex justify-end space-x-2">
+  <button
+    [disabled]="!selectedPlan || !selectedMonth"
+    class="bg-primary hover:bg-primary/90 w-full rounded-md px-4 py-2 text-sm font-medium text-white shadow-sm transition-colors disabled:bg-gray-300 disabled:text-gray-500 hover:cursor-pointer"
+    (click)="generatePlan()">
+    Generate Plan!
+  </button>
+
+  <app-button tone="warning" shape="rounded" impact="light" size="medium" (click)="onCancel.emit()">
+    Cancel
+  </app-button>
+  </div>
+</div>
