@@ -6,8 +6,8 @@ import { environment } from '../../../environments/environment';
 
 @Injectable()
 export class AuthInterceptor implements HttpInterceptor {
-  private authUri = environment.apiBaseUrl + '/authentication';
-  private registerUri = environment.apiBaseUrl + '/registration';
+  private authUri = environment.basePath + '/authentication';
+  private registerUri = environment.basePath + '/registration';
 
 
   constructor(private authService: AuthService) {
