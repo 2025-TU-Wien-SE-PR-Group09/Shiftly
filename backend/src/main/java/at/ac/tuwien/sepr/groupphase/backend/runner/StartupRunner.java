@@ -101,6 +101,10 @@ public class StartupRunner implements CommandLineRunner {
             "new_account@shyft.local",
             "password"
         ));
+        this.userService.createUser(new UserDataDto(
+            "new_supervisor@shyft.local",
+            "password"
+        ));
 
         ApplicationUser supervisor = this.userRepository.findByEmail("supervisor@shyft.local").get();
         supervisor.setDepartment(this.departmentRepository.findByName("Produktion").get());
@@ -114,6 +118,10 @@ public class StartupRunner implements CommandLineRunner {
         this.userRepository.save(employee);
         this.userService.assignRoleToUser(
             new UserRoleDto("employee@shyft.local", Role.EMPLOYEE)
+        );
+
+        this.userService.assignRoleToUser(
+            new UserRoleDto("new_supervisor@shyft.local", Role.SUPERVISOR)
         );
     }
 
