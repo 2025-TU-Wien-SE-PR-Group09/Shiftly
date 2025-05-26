@@ -1,7 +1,7 @@
 import { Component, Input, Output, EventEmitter } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ActivatedRoute, Router } from '@angular/router';
-import { DepartmentService } from 'src/app/rest_client';
+import { DepartmentService} from 'src/app/rest_client';
 import { ToastrService } from 'ngx-toastr';
 @Component({
   selector: 'app-department-concrete-shiftplan',

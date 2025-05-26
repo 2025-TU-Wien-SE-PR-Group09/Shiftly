@@ -1,20 +1,28 @@
 package at.ac.tuwien.sepr.groupphase.backend.service.impl;
 
-import at.ac.tuwien.sepr.groupphase.backend.entity.*;
+import at.ac.tuwien.sepr.groupphase.backend.entity.ApplicationUser;
+import at.ac.tuwien.sepr.groupphase.backend.entity.ConcreteShiftPlan;
+import at.ac.tuwien.sepr.groupphase.backend.entity.Department;
+import at.ac.tuwien.sepr.groupphase.backend.entity.PlanBlueprint;
+import at.ac.tuwien.sepr.groupphase.backend.entity.ScheduledShift;
+import at.ac.tuwien.sepr.groupphase.backend.entity.ScheduledShiftAssignment;
+import at.ac.tuwien.sepr.groupphase.backend.entity.ScheduledShiftId;
+import at.ac.tuwien.sepr.groupphase.backend.entity.ShiftBlueprint;
+import at.ac.tuwien.sepr.groupphase.backend.entity.ShiftDayBlueprint;
+import at.ac.tuwien.sepr.groupphase.backend.entity.ShiftWeekBlueprint;
 import at.ac.tuwien.sepr.groupphase.backend.exception.ConflictException;
 import at.ac.tuwien.sepr.groupphase.backend.exception.NotFoundException;
 import at.ac.tuwien.sepr.groupphase.backend.repository.ConcreteShiftPlanRepository;
+import at.ac.tuwien.sepr.groupphase.backend.repository.DepartmentRepository;
 import at.ac.tuwien.sepr.groupphase.backend.repository.PlanBlueprintRepository;
 import at.ac.tuwien.sepr.groupphase.backend.repository.ScheduledShiftRepository;
-import at.ac.tuwien.sepr.groupphase.backend.repository.DepartmentRepository;
 import at.ac.tuwien.sepr.groupphase.backend.repository.UserRepository;
-import at.ac.tuwien.sepr.groupphase.backend.entity.ShiftBlueprint;
-import at.ac.tuwien.sepr.groupphase.backend.service.dto.shift.ConcretePlanGenerateDto;
-import at.ac.tuwien.sepr.groupphase.backend.service.dto.shift.PlanBlueprintAddShiftDto;
-import at.ac.tuwien.sepr.groupphase.backend.service.dto.shift.PlanBlueprintCreationDto;
 import at.ac.tuwien.sepr.groupphase.backend.service.ShiftPlanningService;
 import at.ac.tuwien.sepr.groupphase.backend.service.dto.ScheduledShiftDetailDto;
 import at.ac.tuwien.sepr.groupphase.backend.service.dto.ShiftDayDetailDto;
+import at.ac.tuwien.sepr.groupphase.backend.service.dto.shift.ConcretePlanGenerateDto;
+import at.ac.tuwien.sepr.groupphase.backend.service.dto.shift.PlanBlueprintAddShiftDto;
+import at.ac.tuwien.sepr.groupphase.backend.service.dto.shift.PlanBlueprintCreationDto;
 import at.ac.tuwien.sepr.groupphase.backend.service.dto.shift.PlanBlueprintDto;
 import at.ac.tuwien.sepr.groupphase.backend.service.mapper.ShiftPlanningMapper;
 import at.ac.tuwien.sepr.groupphase.backend.service.validator.ShiftPlanningValidator;
@@ -146,8 +154,6 @@ public class ShiftPlanningServiceImpl implements ShiftPlanningService {
 
         var month = concretePlanGenerateDto.startDate().orElseThrow(() -> new ConflictException("Start date is required"));
         LocalDate startDate = timeService.nextMondayInMonth(month);
-        LocalDate endDate = startDate.plusWeeks(11); // 12 Wochen
-
 
         concreteShiftPlanRepository.findByDepartmentId(department.getId()).stream()
             .min((a, b) -> b.getEndDate().compareTo(a.getEndDate())).ifPresent(concreteShiftPlan -> {
@@ -155,6 +161,8 @@ public class ShiftPlanningServiceImpl implements ShiftPlanningService {
                     throw new ConflictException("A concrete plan for this department already exists for the specified period.");
                 }
             });
+
+        LocalDate endDate = startDate.plusWeeks(11); // 12 Wochen
 
         ConcreteShiftPlan plan = new ConcreteShiftPlan();
         plan.setDepartment(department);

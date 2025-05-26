@@ -1,7 +1,6 @@
 package at.ac.tuwien.sepr.groupphase.backend.service.dto;
 
 import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.ChangePasswordRestDto;
-import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Pattern;
 
 
