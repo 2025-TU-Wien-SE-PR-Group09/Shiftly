@@ -1,4 +1,5 @@
 package at.ac.tuwien.sepr.groupphase.backend.endpoint;
+
 import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.VacationRequestResponseRestDto;
 import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.VacationRequestRestDto;
 import at.ac.tuwien.sepr.groupphase.backend.service.VacationRequestService;

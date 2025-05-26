@@ -2,10 +2,8 @@ package at.ac.tuwien.sepr.groupphase.backend.endpoint.dto;
 
 import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.validator.annotation.ValidDateRange;
 import at.ac.tuwien.sepr.groupphase.backend.service.dto.VacationRequestDto;
-import at.ac.tuwien.sepr.groupphase.backend.type.VacationStatus;
 import jakarta.validation.constraints.Future;
 import jakarta.validation.constraints.NotNull;
-import jakarta.validation.constraints.Size;
 import java.time.LocalDate;
 
 @ValidDateRange

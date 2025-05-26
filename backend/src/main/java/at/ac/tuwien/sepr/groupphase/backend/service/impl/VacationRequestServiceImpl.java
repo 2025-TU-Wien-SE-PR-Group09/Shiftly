@@ -1,4 +1,5 @@
 package at.ac.tuwien.sepr.groupphase.backend.service.impl;
+
 import at.ac.tuwien.sepr.groupphase.backend.entity.ApplicationUser;
 import at.ac.tuwien.sepr.groupphase.backend.entity.ConcreteShiftPlan;
 import at.ac.tuwien.sepr.groupphase.backend.entity.VacationRequest;

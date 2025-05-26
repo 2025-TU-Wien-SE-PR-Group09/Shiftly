@@ -1,7 +1,5 @@
 package at.ac.tuwien.sepr.groupphase.backend.endpoint.dto;
 
-import at.ac.tuwien.sepr.groupphase.backend.service.dto.VacationRequestDto;
-
 import at.ac.tuwien.sepr.groupphase.backend.service.dto.VacationRequestResponseDto;
 import at.ac.tuwien.sepr.groupphase.backend.type.VacationStatus;
 import java.time.LocalDate;
