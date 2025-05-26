@@ -58,6 +58,10 @@ export class DepartmentDetailAdminComponent implements OnInit{
   }
 
   submitDepartmentCreate(): void {
+    if (this.newDepartment.supervisorEmail === '') {
+      this.toastr.error('No supervisor selected.', 'Creating department failed.')
+      return;
+    }
     this.departmentService.createDepartment(this.newDepartment).subscribe({
       next: () => {
         this.newDepartment = { name: '', supervisorEmail: '' };
