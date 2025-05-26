@@ -1,5 +1,4 @@
 package at.ac.tuwien.sepr.groupphase.backend.endpoint;
-
 import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.VacationRequestResponseRestDto;
 import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.VacationRequestRestDto;
 import at.ac.tuwien.sepr.groupphase.backend.service.VacationRequestService;
@@ -41,13 +40,7 @@ public class VacationEndpoint {
     }
 
 
-    /**
-     * Endpoint to create a new vacation request.
-     *
-     * @param restDto   the vacation request data transfer object
-     * @param principal the authenticated user principal
-     * @return a response entity containing the created vacation request
-     */
+
     @PostMapping(produces = MediaType.APPLICATION_JSON_VALUE,
         consumes = MediaType.APPLICATION_JSON_VALUE)
     @Transactional
@@ -64,7 +57,9 @@ public class VacationEndpoint {
 
 
 
+
     @GetMapping(produces = MediaType.APPLICATION_JSON_VALUE)
+    @ApiResponse(responseCode = "200", description = "List of vacation requests retrieved")
     @RolesAllowed({"EMPLOYEE"})
     public List<VacationRequestResponseRestDto> getOwnVacationRequests(Principal principal) {
 
@@ -76,6 +71,7 @@ public class VacationEndpoint {
     }
 
     @DeleteMapping(path = "/{id}")
+    @ApiResponse(responseCode = "204", description = "Vacation request deleted")
     @RolesAllowed("EMPLOYEE")
     @Transactional
     public ResponseEntity<Void> deleteVacationRequest(@PathVariable(name = "id") Long id, Principal principal) {

@@ -1,5 +1,4 @@
 package at.ac.tuwien.sepr.groupphase.backend.service.impl;
-
 import at.ac.tuwien.sepr.groupphase.backend.entity.ApplicationUser;
 import at.ac.tuwien.sepr.groupphase.backend.entity.ConcreteShiftPlan;
 import at.ac.tuwien.sepr.groupphase.backend.entity.VacationRequest;
@@ -12,7 +11,6 @@ import at.ac.tuwien.sepr.groupphase.backend.service.dto.UserEmailDto;
 import at.ac.tuwien.sepr.groupphase.backend.service.dto.VacationRequestDto;
 import at.ac.tuwien.sepr.groupphase.backend.service.dto.VacationRequestResponseDto;
 import at.ac.tuwien.sepr.groupphase.backend.type.VacationStatus;
-import io.micrometer.core.instrument.config.validate.ValidationException;
 import java.time.format.DateTimeFormatter;
 import java.util.Comparator;
 import java.util.List;
