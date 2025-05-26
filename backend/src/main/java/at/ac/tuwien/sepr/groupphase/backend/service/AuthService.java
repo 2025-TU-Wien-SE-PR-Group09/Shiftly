@@ -1,5 +1,6 @@
 package at.ac.tuwien.sepr.groupphase.backend.service;
 
+import at.ac.tuwien.sepr.groupphase.backend.entity.ApplicationUser;
 import at.ac.tuwien.sepr.groupphase.backend.service.dto.LoginResponseDto;
 import at.ac.tuwien.sepr.groupphase.backend.service.dto.UserDataDto;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -28,4 +29,13 @@ public interface AuthService extends UserDetailsService {
      * @throws org.springframework.security.authentication.BadCredentialsException if credentials are bad
      */
     LoginResponseDto login(UserDataDto userLoginDto);
+
+    /**
+     * Retrieve the currently authenticated user from the security context.
+     *
+     * @return the authenticated {@link ApplicationUser}
+     * @throws org.springframework.security.core.userdetails.UsernameNotFoundException if the user cannot be found
+     */
+    ApplicationUser getCurrentUser();
+
 }

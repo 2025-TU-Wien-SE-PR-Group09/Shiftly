@@ -32,6 +32,10 @@ export class ExceptionInterceptor implements HttpInterceptor {
           this.router.navigate(['/auth/sign-in']).then();
           return EMPTY;
         }
+        if (error.status===413){
+          this.toastr.error("File Size can not exceed 5MB","Error occurred")
+          return EMPTY;
+        }
 
         if (error.error?.errors) {
           // If errors is an object or array, iterate and show each message

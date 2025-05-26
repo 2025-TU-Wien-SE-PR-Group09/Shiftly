@@ -1,7 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
 import { ButtonComponent } from '../../../../shared/components/button/button.component';
-import { AuthService } from '../../../../core/services/auth.service';
 import { UserEndpointService, UserProfileRestDto } from '../../../../rest_client';
 import { NgIf } from '@angular/common';
 
