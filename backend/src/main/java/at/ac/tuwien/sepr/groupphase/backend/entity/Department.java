@@ -7,8 +7,6 @@ import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToMany;
 import jakarta.validation.constraints.NotBlank;
 
@@ -29,6 +27,9 @@ public class Department {
 
     @OneToMany(fetch = FetchType.EAGER, mappedBy = "department")
     private Set<ApplicationUser> users = new HashSet<>();
+
+    @OneToMany(fetch = FetchType.EAGER, mappedBy = "department", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<ConcreteShiftPlan> shiftPlans;
 
     public Long getId() {
         return id;
@@ -63,5 +64,13 @@ public class Department {
 
     public void setUsers(Set<ApplicationUser> users) {
         this.users = users;
+    }
+
+    public List<ConcreteShiftPlan> getShiftPlans() {
+        return shiftPlans;
+    }
+
+    public void setShiftPlans(List<ConcreteShiftPlan> shiftPlans) {
+        this.shiftPlans = shiftPlans;
     }
 }

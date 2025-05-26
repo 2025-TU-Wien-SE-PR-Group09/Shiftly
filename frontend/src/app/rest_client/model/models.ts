@@ -20,3 +20,5 @@ export * from './shiftWeekCreateDto';
 export * from './shiftWeekResponseDto';
 export * from './userDataRestDto';
 export * from './userProfileRestDto';
+export * from './vacationRequestResponseRestDto';
+export * from './vacationRequestRestDto';

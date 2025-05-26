@@ -9,6 +9,7 @@ api/department.service.ts
 api/loginEndpoint.service.ts
 api/registrationEndpoint.service.ts
 api/userEndpoint.service.ts
+api/vacationEndpoint.service.ts
 configuration.ts
 encoder.ts
 git_push.sh
@@ -36,5 +37,7 @@ model/shiftWeekCreateDto.ts
 model/shiftWeekResponseDto.ts
 model/userDataRestDto.ts
 model/userProfileRestDto.ts
+model/vacationRequestResponseRestDto.ts
+model/vacationRequestRestDto.ts
 param.ts
 variables.ts
