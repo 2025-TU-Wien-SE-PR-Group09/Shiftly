@@ -1,7 +1,11 @@
 package at.ac.tuwien.sepr.groupphase.backend.endpoint;
 
+import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.ApplicationUserResponseDto;
 import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.DepartmentCreateRestDto;
-import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.DepartmentDetailRestDto;
+import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.DepartmentDetailRestResponseDto;
+import at.ac.tuwien.sepr.groupphase.backend.exception.ConflictException;
+import at.ac.tuwien.sepr.groupphase.backend.service.dto.DepartmentEditDto;
+import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.DepartmentEditRestDto;
 import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.EmployeeListItemResponseDto;
 import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.EmployeeRestResponseDto;
 import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.ScheduledShiftResponseDto;
@@ -12,6 +16,7 @@ import at.ac.tuwien.sepr.groupphase.backend.exception.NotFoundException;
 import at.ac.tuwien.sepr.groupphase.backend.service.DepartmentService;
 import at.ac.tuwien.sepr.groupphase.backend.service.EmployeeService;
 import at.ac.tuwien.sepr.groupphase.backend.service.ShiftPlanningService;
+import at.ac.tuwien.sepr.groupphase.backend.service.UserService;
 import at.ac.tuwien.sepr.groupphase.backend.service.dto.DepartmentCreateDto;
 import at.ac.tuwien.sepr.groupphase.backend.service.dto.DepartmentDto;
 import at.ac.tuwien.sepr.groupphase.backend.service.dto.DepartmentNameDto;
@@ -34,6 +39,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -49,21 +55,37 @@ public class DepartmentEndpoint {
     private final EmployeeService employeeService;
 
     private final ShiftPlanningService shiftPlanningService;
+    private final UserService userService;
 
     public DepartmentEndpoint(DepartmentService departmentService,
                               ShiftPlanningService shiftPlanningService,
-                              EmployeeService employeeService) {
+                              EmployeeService employeeService,
+                              UserService userService) {
         this.departmentService = departmentService;
         this.shiftPlanningService = shiftPlanningService;
         this.employeeService = employeeService;
+        this.userService = userService;
     }
 
     @RolesAllowed({"ADMIN"})
     @Operation(summary = "Get all departments")
     @ApiResponse(responseCode = "200", description = "List of all departments")
     @GetMapping(produces = MediaType.APPLICATION_JSON_VALUE)
-    public List<DepartmentDetailRestDto> getAllDepartments() {
-        return departmentService.getAllDepartments();
+    public List<DepartmentDetailRestResponseDto> getAllDepartments() {
+        return departmentService.getAllDepartments().stream()
+            .map(dept -> new DepartmentDetailRestResponseDto(
+                dept.getId(),
+                dept.getName(),
+                dept.getSupervisorEmail()))
+            .toList();
+    }
+
+    @RolesAllowed({"ADMIN"})
+    @Operation(summary = "Get all supervisors")
+    @ApiResponse(responseCode = "200", description = "List of all supervisors")
+    @GetMapping(value = "/api/departments/supervisors", produces = MediaType.APPLICATION_JSON_VALUE)
+    public List<ApplicationUserResponseDto> getAllSupervisors() {
+        return userService.getAllSupervisors();
     }
 
     @Transactional
@@ -72,12 +94,27 @@ public class DepartmentEndpoint {
     @ApiResponse(responseCode = "201", description = "New department created")
     @PostMapping(produces = MediaType.APPLICATION_JSON_VALUE,
         consumes = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<Void> createDepartment(@RequestBody @Valid DepartmentCreateRestDto restDto) {
+    public ResponseEntity<Void> createDepartment(@RequestBody @Valid DepartmentCreateRestDto restDto) throws ConflictException {
         DepartmentCreateDto serviceDto = new DepartmentCreateDto(
             restDto.getName(),
             restDto.getSupervisorEmail());
         departmentService.createDepartment(serviceDto);
         return ResponseEntity.status(HttpStatus.CREATED).build();
+    }
+
+    @Transactional
+    @RolesAllowed({"ADMIN"})
+    @Operation(summary = "Edit existing department")
+    @ApiResponse(responseCode = "200", description = "Department edited")
+    @PutMapping(produces = MediaType.APPLICATION_JSON_VALUE,
+        consumes = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<Void> editDepartment(@RequestBody @Valid DepartmentEditRestDto restDto) throws NotFoundException {
+        DepartmentEditDto serviceDto = new DepartmentEditDto(
+            restDto.getOldName(),
+            restDto.getNewName(),
+            restDto.getSupervisorEmail());
+        departmentService.editDepartment(serviceDto);
+        return ResponseEntity.status(HttpStatus.OK).build();
     }
 
     @Transactional

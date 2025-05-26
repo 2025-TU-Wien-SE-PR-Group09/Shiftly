@@ -1,11 +1,15 @@
 package at.ac.tuwien.sepr.groupphase.backend.service;
 
+import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.ApplicationUserResponseDto;
+import at.ac.tuwien.sepr.groupphase.backend.entity.ApplicationUser;
 import at.ac.tuwien.sepr.groupphase.backend.service.dto.ChangePasswordDto;
 import at.ac.tuwien.sepr.groupphase.backend.service.dto.UserDataDto;
 import at.ac.tuwien.sepr.groupphase.backend.service.dto.UserEmailDto;
 import at.ac.tuwien.sepr.groupphase.backend.service.dto.UserProfileDto;
 import at.ac.tuwien.sepr.groupphase.backend.service.dto.UserRoleDto;
 import at.ac.tuwien.sepr.groupphase.backend.exception.NotFoundException;
+
+import java.util.List;
 
 public interface UserService {
     /**
@@ -45,4 +49,11 @@ public interface UserService {
      * @param userData {@link UserDataDto} object containing the username and password
      */
     void createUser(UserDataDto userData);
+
+    /**
+     * Retrieves all users who are supervisors.
+     *
+     * @return a {@link ApplicationUser} list containing all supervisors
+     */
+    List<ApplicationUserResponseDto> getAllSupervisors();
 }

@@ -16,10 +16,12 @@ encoder.ts
 git_push.sh
 index.ts
 model/adminAuthCodeRestDto.ts
+model/applicationUserResponseDto.ts
 model/changePasswordRestDto.ts
 model/createPlanBlueprintDto.ts
 model/departmentCreateRestDto.ts
 model/departmentDetailRestDto.ts
+model/departmentEditRestDto.ts
 model/employeeListItemResponseDto.ts
 model/employeeRestResponseDto.ts
 model/loginResponseRestDto.ts

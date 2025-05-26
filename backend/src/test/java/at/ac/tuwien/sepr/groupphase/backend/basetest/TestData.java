@@ -51,7 +51,8 @@ public interface TestData {
 
     Department DEPARTMENT = new Department();
 
-
+    String SUPERVISOR_EMAIL = "supervisor@shyft.local";
+    String DEPARTMENT_NAME = "TestDept";
 
 
 
