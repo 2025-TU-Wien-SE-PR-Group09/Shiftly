@@ -4,7 +4,6 @@ import { Router, RouterLink } from '@angular/router';
 import { AngularSvgIconModule } from 'angular-svg-icon';
 import { ButtonComponent } from 'src/app/shared/components/button/button.component';
 import { UserEndpointService } from '../../../../rest_client';
-import { NgIf } from '@angular/common';
 import { ToastrService } from 'ngx-toastr';
 
 @Component({

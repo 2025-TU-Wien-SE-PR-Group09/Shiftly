@@ -13,6 +13,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.AuthorityUtils;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
@@ -70,6 +71,19 @@ public class AuthServiceImpl implements AuthService {
         List<GrantedAuthority> grantedAuthorities = AuthorityUtils.createAuthorityList(roles);
 
         return new User(applicationUser.getEmail(), applicationUser.getPasswordHash(), grantedAuthorities);
+    }
+
+    @Override
+    public ApplicationUser getCurrentUser() {
+        var authentication = SecurityContextHolder.getContext().getAuthentication();
+        if (authentication == null || !authentication.isAuthenticated()) {
+            throw new UsernameNotFoundException("No authentication found");
+        }
+
+        String email = (String) authentication.getPrincipal();
+
+        return userRepository.findByEmail(email)
+            .orElseThrow(() -> new UsernameNotFoundException("User not found with email: " + email));
     }
 
 }
