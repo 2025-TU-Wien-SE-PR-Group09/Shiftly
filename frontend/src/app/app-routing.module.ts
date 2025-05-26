@@ -1,6 +1,8 @@
 import { NgModule } from '@angular/core';
 import { RouterModule, Routes } from '@angular/router';
 import { AuthGuard } from './core/guards/auth.guard';
+import { ApiModule, Configuration } from './rest_client';
+import { environment } from '../environments/environment';
 
 const routes: Routes = [
   {
@@ -29,7 +31,11 @@ const routes: Routes = [
 ];
 
 @NgModule({
-  imports: [RouterModule.forRoot(routes)],
+  imports: [RouterModule.forRoot(routes),    ApiModule.forRoot(() => {
+    return new Configuration({
+      basePath: environment.basePath,
+    });
+  }),],
   exports: [RouterModule],
 })
 export class AppRoutingModule {}

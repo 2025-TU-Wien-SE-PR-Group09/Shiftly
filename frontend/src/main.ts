@@ -9,6 +9,7 @@ import { provideAnimations } from '@angular/platform-browser/animations';
 import { httpInterceptorProviders } from './app/core/interceptor';
 import { provideHttpClient, withInterceptorsFromDi } from '@angular/common/http';
 import { provideToastr } from 'ngx-toastr';
+import { ApiModule } from './app/rest_client';
 
 if (environment.production) {
   enableProdMode();
