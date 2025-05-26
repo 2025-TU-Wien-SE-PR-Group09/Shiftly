@@ -28,6 +28,6 @@ public interface TimeService {
      *
      * @return next Monday as LocalDate
      */
-    LocalDate nextMonday();
+    LocalDate nextMondayInMonth(LocalDate month);
 
 }

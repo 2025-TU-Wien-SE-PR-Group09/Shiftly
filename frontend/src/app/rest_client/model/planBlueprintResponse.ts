@@ -15,6 +15,14 @@ import { ShiftResponseDto } from './shiftResponseDto';
  */
 export interface PlanBlueprintResponse { 
     /**
+     * ID of the plan blueprint
+     */
+    id?: number;
+    /**
+     * Description of the plan blueprint
+     */
+    description?: string;
+    /**
      * Name of  department
      */
     department?: string;

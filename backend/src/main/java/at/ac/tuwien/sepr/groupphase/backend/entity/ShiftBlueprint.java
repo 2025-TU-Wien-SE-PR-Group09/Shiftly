@@ -4,12 +4,12 @@ import jakarta.persistence.*;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Set;
+import java.util.function.Consumer;
 
 /**
  * Represents a shift in the system.
- * A shift has a description and a required manpower.
- * It can be associated with multiple plans and can have multiple weeks.
+ * A shift has a description and a required manPower.
+ * It can be associated with multiple plans and can have multiple shiftWeeks.
  */
 @Entity
 @Table(name = "shift_blueprint")
@@ -25,22 +25,14 @@ public class ShiftBlueprint {
     @Column(nullable = false)
     private int manPower;
 
-    @ManyToMany(mappedBy = "shiftBlueprints")
-    private Set<PlanBlueprint> plans;
+    @ManyToOne(optional = false)
+    @JoinColumn(name = "plan_blueprint_id")
+    private PlanBlueprint planBlueprint;
 
     @OneToMany(mappedBy = "shiftBlueprint", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<ShiftWeekBlueprint> weeks = new ArrayList<ShiftWeekBlueprint>();
+    private List<ShiftWeekBlueprint> weeks = new ArrayList<>();
 
     public ShiftBlueprint() {
-    }
-
-    public ShiftBlueprint(String description, int manPower) {
-        this.description = description;
-        this.manPower = manPower;
-    }
-
-    public ShiftBlueprint(String description) {
-        this.description = description;
     }
 
     public Long getId() {
@@ -51,27 +43,75 @@ public class ShiftBlueprint {
         return description;
     }
 
-    public void setDescription(String description) {
-        this.description = description;
-    }
-
-    public Set<PlanBlueprint> getPlans() {
-        return plans;
-    }
-
-    public void setPlans(Set<PlanBlueprint> plans) {
-        this.plans = plans;
+    public PlanBlueprint getPlan() {
+        return planBlueprint;
     }
 
     public int getManPower() {
         return this.manPower;
     }
 
+    public void setDescription(String description) {
+        this.description = description;
+    }
+
+    public void setPlan(PlanBlueprint plan) {
+        this.planBlueprint = plan;
+    }
+
+    public void setId(Long id) {
+        this.id = id;
+    }
+
+    public void addWeeks(List<ShiftWeekBlueprint> weeks) {
+        this.weeks.addAll(weeks);
+        for (ShiftWeekBlueprint week : weeks) {
+            week.setShiftBlueprint(this);
+        }
+    }
+
+    public void setWeeks(List<ShiftWeekBlueprint> weeks) {
+        this.weeks = weeks;
+    }
+
+    public void setManPower(int manPower) {
+        this.manPower = manPower;
+    }
+
     public List<ShiftWeekBlueprint> getShiftWeeks() {
         return weeks;
     }
 
-    public void setId(long id) {
-        this.id = id;
+    public static class Builder {
+        private final ShiftBlueprint shift = new ShiftBlueprint();
+
+        public Builder withDescription(String description) {
+            shift.setDescription(description);
+            return this;
+        }
+
+        public Builder withManPower(int manPower) {
+            shift.setManPower(manPower);
+            return this;
+        }
+
+        public ShiftBlueprint.Builder addWeek(int index, Consumer<ShiftWeekBlueprint.Builder> weekConfig) {
+            var weekBuilder = new ShiftWeekBlueprint.Builder()
+                .withIndex(index);
+            weekConfig.accept(weekBuilder);
+            ShiftWeekBlueprint week = weekBuilder.build();
+
+            this.shift.addWeeks(List.of(week));
+            return this;
+        }
+
+        public ShiftBlueprint.Builder addWeek(int index, ShiftWeekBlueprint week) {
+            this.shift.addWeeks(List.of(week));
+            return this;
+        }
+
+        public ShiftBlueprint build() {
+            return shift;
+        }
     }
 }

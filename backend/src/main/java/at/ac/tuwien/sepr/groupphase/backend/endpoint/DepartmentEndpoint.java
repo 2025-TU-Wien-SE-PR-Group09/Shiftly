@@ -1,31 +1,30 @@
 package at.ac.tuwien.sepr.groupphase.backend.endpoint;
 
+import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.*;
+import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.CreatePlanBlueprintDto;
+import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.PlanBlueprintResponse;
+import at.ac.tuwien.sepr.groupphase.backend.endpoint.mapper.ShiftRestMapper;
+import at.ac.tuwien.sepr.groupphase.backend.entity.*;
 import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.ApplicationUserResponseDto;
 import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.DepartmentCreateRestDto;
 import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.DepartmentDetailRestResponseDto;
-import at.ac.tuwien.sepr.groupphase.backend.exception.ConflictException;
 import at.ac.tuwien.sepr.groupphase.backend.service.dto.DepartmentEditDto;
 import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.DepartmentEditRestDto;
 import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.EmployeeListItemResponseDto;
 import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.EmployeeRestResponseDto;
-import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.ScheduledShiftResponseDto;
-import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.createplanblueprint.CreatePlanBlueprintDto;
-import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.getplanblueprint.PlanBlueprintResponse;
 import at.ac.tuwien.sepr.groupphase.backend.entity.ConcreteShiftPlan;
 import at.ac.tuwien.sepr.groupphase.backend.exception.NotFoundException;
 import at.ac.tuwien.sepr.groupphase.backend.service.DepartmentService;
 import at.ac.tuwien.sepr.groupphase.backend.service.EmployeeService;
 import at.ac.tuwien.sepr.groupphase.backend.service.ShiftPlanningService;
+import at.ac.tuwien.sepr.groupphase.backend.service.dto.*;
+import at.ac.tuwien.sepr.groupphase.backend.service.dto.shift.ConcretePlanGenerateDto;
 import at.ac.tuwien.sepr.groupphase.backend.service.UserService;
 import at.ac.tuwien.sepr.groupphase.backend.service.dto.DepartmentCreateDto;
 import at.ac.tuwien.sepr.groupphase.backend.service.dto.DepartmentDto;
 import at.ac.tuwien.sepr.groupphase.backend.service.dto.DepartmentNameDto;
 import at.ac.tuwien.sepr.groupphase.backend.service.dto.EmployeeDto;
 import at.ac.tuwien.sepr.groupphase.backend.service.dto.EmployeeListItemDto;
-import at.ac.tuwien.sepr.groupphase.backend.service.dto.ScheduledShiftDetailDto;
-import at.ac.tuwien.sepr.groupphase.backend.service.dto.shift.PlanBlueprintDto;
-import at.ac.tuwien.sepr.groupphase.backend.service.dto.shift.ShiftDayDto;
-import at.ac.tuwien.sepr.groupphase.backend.service.dto.shift.ShiftWeekBlueprintDto;
 import at.ac.tuwien.sepr.groupphase.backend.service.mapper.ShiftPlanningMapper;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
@@ -44,6 +43,8 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 
 @Tag(name = "Department")
@@ -90,11 +91,29 @@ public class DepartmentEndpoint {
 
     @Transactional
     @RolesAllowed({"ADMIN"})
+    @Operation(summary = "Get department by name")
+    @ApiResponse(responseCode = "200", description = "Get department by name")
+    @GetMapping(path = "/{departmentName}", produces = MediaType.APPLICATION_JSON_VALUE)
+    public DepartmentDetailRestResponseDto getDepartmentByName(@PathVariable(name = "departmentName") String departmentName) {
+        return departmentService.getDepartmentByName(departmentName).map(d ->
+            new DepartmentDetailRestResponseDto(
+                d.id(),
+                d.name(),
+                departmentService.getSupervisorByDepartmentName(d.name())
+                    .map(UserEmailDto::email)
+                    .orElse("NONE")
+            )
+        ).orElseThrow(() -> new NotFoundException("Department not found!"));
+    }
+
+
+    @Transactional
+    @RolesAllowed({"ADMIN"})
     @Operation(summary = "Create a new department")
     @ApiResponse(responseCode = "201", description = "New department created")
     @PostMapping(produces = MediaType.APPLICATION_JSON_VALUE,
         consumes = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<Void> createDepartment(@RequestBody @Valid DepartmentCreateRestDto restDto) throws ConflictException {
+    public ResponseEntity<Void> createDepartment(@RequestBody @Valid DepartmentCreateRestDto restDto) {
         DepartmentCreateDto serviceDto = new DepartmentCreateDto(
             restDto.getName(),
             restDto.getSupervisorEmail());
@@ -118,51 +137,41 @@ public class DepartmentEndpoint {
     }
 
     @Transactional
-    @RolesAllowed({"ADMIN"})
+    @RolesAllowed({"ADMIN", "SUPERVISOR"})
     @Operation(summary = "Create shift plan(Blueprint) for a department")
     @ApiResponse(responseCode = "201", description = "Shiftplan for the department")
     @PostMapping(path = "/{departmentName}/shiftplanBlueprint",
         produces = MediaType.APPLICATION_JSON_VALUE,
         consumes = MediaType.APPLICATION_JSON_VALUE)
-    public List<PlanBlueprintResponse> createShiftplanBlueprint(
+    public PlanBlueprintResponse createShiftplanBlueprint(
         @PathVariable(name = "departmentName") String departmentName,
         @RequestBody @Valid CreatePlanBlueprintDto blueprintDto) {
 
         DepartmentDto department = departmentService.getDepartmentByName(departmentName)
             .orElseThrow(() -> new NotFoundException("Department not found!"));
 
-        boolean hasPlan = !department.plans().isEmpty();
-
-
-        //TODO: add all shifts to the plan
-        var mappedShift = ShiftPlanningMapper.Shifts.toDto(department.id(), blueprintDto.getShifts().getFirst());
-        var shift = shiftPlanningService.createShiftBlueprint(mappedShift);
-
-        //TODO: add validation in service instead of filtering invalid shifts
-        var mappedWeeks = blueprintDto.getShifts().getFirst().getShiftWeeks().stream().map(sw ->
-            new ShiftWeekBlueprintDto(
-                sw.getShiftDays()
-                    .stream().map(ShiftPlanningMapper.ShiftDays::toDto)
-                    .filter(x -> !(x.day().isEmpty() || x.duration().isEmpty() || x.startTime().isEmpty()))
-                    .map(x -> new ShiftDayDto(
-                            x.day().get(),
-                            x.startTime().get(),
-                            x.duration().get()
-                        )
-                    ).toList()
-            )
-        ).toList();
-
-        shift = shiftPlanningService.addWeeksToShift(shift.id(), mappedWeeks);
-
-        PlanBlueprintDto planBlueprintDto;
-        if (hasPlan) {
-            planBlueprintDto = shiftPlanningService.addShiftToCurrentPlan(department.id(), shift);
-        } else {
-            planBlueprintDto = shiftPlanningService.createPlanBlueprint(department.id(), List.of(shift.id()));
-        }
-        return List.of(ShiftPlanningMapper.Plans.toResponse(planBlueprintDto));
+        var mapped = ShiftRestMapper.mapFromRequest(department.id(), blueprintDto);
+        return ShiftPlanningMapper.Plans.toResponse(shiftPlanningService.createPlanBlueprint(mapped));
     }
+
+    @Transactional
+    @RolesAllowed({"ADMIN", "SUPERVISOR"})
+    @Operation(summary = "Add shift to existing plan(Blueprint) for a department")
+    @ApiResponse(responseCode = "201", description = "Add shift to existing plan(Blueprint) for a department")
+    @PostMapping(path = "/{departmentName}/shiftplanBlueprint/add",
+        produces = MediaType.APPLICATION_JSON_VALUE,
+        consumes = MediaType.APPLICATION_JSON_VALUE)
+    public PlanBlueprintResponse addShiftToPlanBlueprint(
+        @PathVariable(name = "departmentName") String departmentName,
+        @RequestBody @Valid AddShiftToPlanBlueprintDto blueprintDto) {
+
+        DepartmentDto department = departmentService.getDepartmentByName(departmentName)
+            .orElseThrow(() -> new NotFoundException("Department not found!"));
+
+        var mapped = ShiftRestMapper.mapFromRequest(blueprintDto);
+        return ShiftPlanningMapper.Plans.toResponse(shiftPlanningService.addShiftToPlan(mapped));
+    }
+
 
     @Transactional
     @RolesAllowed({"ADMIN"})
@@ -176,6 +185,19 @@ public class DepartmentEndpoint {
             .orElseThrow(() -> new NotFoundException("Department not found!"));
 
         return department.plans().stream().map(ShiftPlanningMapper.Plans::toResponse).toList();
+    }
+
+    @RolesAllowed({"ADMIN", "SUPERVISOR"})
+    @Transactional
+    @Operation(summary = "Generate concrete shift plan for the given department and return the scheduled shifts")
+    @ApiResponse(responseCode = "201", description = "Concrete shift plan generated and returned")
+    @PostMapping(path = "/{id}/generate-concrete-plan", consumes = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<Void> generateConcretePlan(@RequestBody @Valid GenerateConcretePlanDto generateConcretePlanDto, @PathVariable("id") Long id) {
+        ConcretePlanGenerateDto mapped = ShiftRestMapper.mapFromRequest(id, generateConcretePlanDto);
+
+        ConcreteShiftPlan plan = shiftPlanningService.generateConcreteQuarterlyPlan(mapped);
+
+        return ResponseEntity.status(HttpStatus.CREATED).build();
     }
 
     @Transactional
@@ -221,33 +243,45 @@ public class DepartmentEndpoint {
         return employees.stream().map(EmployeeListItemResponseDto::from).toList();
     }
 
-
+    @RolesAllowed({"ADMIN", "SUPERVISOR"})
     @Transactional
-    @Operation(summary = "Generate concrete shift plan for the given department and return the scheduled shifts")
-    @ApiResponse(responseCode = "201", description = "Concrete shift plan generated and returned")
-    @PostMapping(path = "/{id}/generate-concrete-plan",
+    @Operation(summary = "Get the concrete shift plan for the given department and return the scheduled shifts in suitable calendar format")
+    @ApiResponse(responseCode = "201", description = "Concrete shift plan in calendar format.")
+    @GetMapping(path = "/{departmentId}/shiftplan",
         produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<List<ScheduledShiftResponseDto>> generateConcretePlan(@PathVariable("id") Long id) {
-        ConcreteShiftPlan plan = shiftPlanningService.generateConcreteQuarterlyPlan(id);
-        List<ScheduledShiftResponseDto> response = plan.getScheduledShifts().stream()
-            .map(s -> new ScheduledShiftResponseDto(
-                s.getId().getCalendarWeek(),
-                s.getId().getCalendarYear(),
-                s.getShift().getDescription(),
-                s.getWeekStartDate()
-            ))
-            .toList();
+    public ResponseEntity<DepartmentShiftplanCalendarResponse> getConcreteShiftplan(@PathVariable("departmentId") Long id) {
 
-        return ResponseEntity.status(HttpStatus.CREATED).body(response);
-    }
+        var plan = shiftPlanningService.getCurrentConcretePlan(id);
+        List<DepartmentShiftplanCalendarResponse.ScheduledShift> result = new ArrayList<>();
 
-    @Transactional
-    @Operation(summary = "Get detailed scheduled shifts for a department")
-    @ApiResponse(responseCode = "200", description = "Detailed shifts returned")
-    @GetMapping(path = "/{departmentId}/concrete-plan-details", produces = MediaType.APPLICATION_JSON_VALUE)
-    public List<ScheduledShiftDetailDto> getDetailedConcretePlan(
-        @PathVariable("departmentId") Long departmentId
-    ) {
-        return shiftPlanningService.getCurrentConcretePlan(departmentId);
+        //TODO: move to service/mapper
+        for (ScheduledShift shift : plan.getScheduledShifts()) {
+            ShiftBlueprint blueprint = shift.getShift();
+
+            for (ShiftWeekBlueprint week : blueprint.getShiftWeeks()) {
+                for (ShiftDayBlueprint dayBlueprint : week.getDays()) {
+                    LocalDateTime start = shift.getWeekStartDate()
+                        .with(dayBlueprint.getDay())
+                        .atTime(dayBlueprint.getStartTime());
+
+                    LocalDateTime end = start.plus(dayBlueprint.getDuration());
+
+                    List<String> workers = shift.getAssignments().stream()
+                        .map(a -> a.getUser().getEmail())
+                        .toList();
+
+                    DepartmentShiftplanCalendarResponse.ScheduledShift shiftDto =
+                        new DepartmentShiftplanCalendarResponse.ScheduledShift(
+                            blueprint.getDescription(),
+                            new DepartmentShiftplanCalendarResponse.Day(start, end),
+                            workers
+                        );
+
+                    result.add(shiftDto);
+                }
+            }
+        }
+
+        return ResponseEntity.status(HttpStatus.CREATED).body(new DepartmentShiftplanCalendarResponse(result));
     }
 }

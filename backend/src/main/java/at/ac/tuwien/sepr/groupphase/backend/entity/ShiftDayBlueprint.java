@@ -24,21 +24,36 @@ public class ShiftDayBlueprint {
     @Column(name = "weekday", nullable = false)
     private DayOfWeek day;
 
+    @Column(name = "start_time", nullable = false)
     private LocalTime startTime;
 
+    @Column(name = "duration", nullable = false)
     private Duration duration;
 
-    @ManyToOne
+    @ManyToOne(optional = false)
     @JoinColumn(name = "shift_week_id")
     private ShiftWeekBlueprint shiftWeekBlueprint;
 
     public ShiftDayBlueprint() {
     }
 
-    public ShiftDayBlueprint(DayOfWeek day, LocalTime startTime, Duration duration, ShiftWeekBlueprint shiftWeekBlueprint) {
-        this.day = day;
+    public void setId(Long id) {
+        this.id = id;
+    }
+
+    public void setStartTime(LocalTime startTime) {
         this.startTime = startTime;
+    }
+
+    public void setDay(DayOfWeek day) {
+        this.day = day;
+    }
+
+    public void setDuration(Duration duration) {
         this.duration = duration;
+    }
+
+    public void setShiftWeekBlueprint(ShiftWeekBlueprint shiftWeekBlueprint) {
         this.shiftWeekBlueprint = shiftWeekBlueprint;
     }
 
@@ -52,5 +67,28 @@ public class ShiftDayBlueprint {
 
     public DayOfWeek getDay() {
         return day;
+    }
+
+    public static class Builder {
+        private final ShiftDayBlueprint day = new ShiftDayBlueprint();
+
+        public Builder withDay(DayOfWeek dayOfWeek) {
+            day.setDay(dayOfWeek);
+            return this;
+        }
+
+        public Builder withStartTime(LocalTime time) {
+            day.setStartTime(time);
+            return this;
+        }
+
+        public Builder withDuration(Duration duration) {
+            day.setDuration(duration);
+            return this;
+        }
+
+        public ShiftDayBlueprint build() {
+            return day;
+        }
     }
 }

@@ -20,3 +20,8 @@ Authorization: {{auth_token}}
 POST http://localhost:8080/api/departments/Produktion/addEmployee/new_account@shyft.local
 Content-Type: application/json
 Authorization: {{auth_token}}
+
+### Test shiftplan
+GET http://localhost:8080/api/departments/1/shiftplan
+Content-Type: application/json
+Authorization: {{auth_token}}

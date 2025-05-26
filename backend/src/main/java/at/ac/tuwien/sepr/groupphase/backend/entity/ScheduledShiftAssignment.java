@@ -57,4 +57,29 @@ public class ScheduledShiftAssignment {
     public void setUser(ApplicationUser user) {
         this.user = user;
     }
+
+    public static class Builder {
+        private final ScheduledShiftAssignment assignment = new ScheduledShiftAssignment();
+
+        public Builder withId(ScheduledShiftAssignmentId id) {
+            assignment.setId(id);
+            return this;
+        }
+
+        public Builder withUser(ApplicationUser user) {
+            assignment.setUser(user);
+            return this;
+        }
+
+        public Builder withShift(ScheduledShift shift) {
+            assignment.setScheduledShift(shift);
+            shift.getAssignments().add(assignment);
+            return this;
+        }
+
+        public ScheduledShiftAssignment build() {
+            return assignment;
+        }
+    }
+
 }

@@ -62,6 +62,11 @@ public class Department {
         return users;
     }
 
+    public void addPlan(PlanBlueprint plan) {
+        plans.add(plan);
+        plan.setDepartment(this);
+    }
+
     public void setUsers(Set<ApplicationUser> users) {
         this.users = users;
     }
