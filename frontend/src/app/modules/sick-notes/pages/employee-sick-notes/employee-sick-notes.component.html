@@ -1,7 +1,13 @@
-<div class="p-6 flex flex-col lg:flex-row gap-6">
-  <!-- Left: Upload Form -->
-  <div class="w-full lg:w-1/2">
-    <h2 class="text-2xl font-bold mb-4 text-foreground">Submit Sick Note</h2>
+<div class="my-10 space-y-10">
+  <!-- Header -->
+  <div class="text-center">
+    <h2 class="text-foreground mb-1 text-3xl font-semibold">
+      My Sick Leave Certificates
+    </h2>
+    <p class="text-muted-foreground text-sm">
+      Upload your doctor-issued certificate to validate a sick leave request.
+    </p>
+  </div>
 
     <form
       (ngSubmit)="uploadFile()"
@@ -36,6 +42,7 @@
         <input
           type="file"
           id="file"
+          #fileInput
           accept=".pdf,.jpg,.jpeg,.png"
           (change)="onFileSelected($event)"
           class="w-full rounded border border-border bg-muted text-foreground p-2"
