@@ -28,7 +28,7 @@
   </div>
 
   <!-- Change Password -->
-  <div class="pt-6 text-center">
+  <div class="pt-6 text-center" *ngIf="!isAdmin()">
     <app-button
       (click)="changePassword()"
       impact="bold"

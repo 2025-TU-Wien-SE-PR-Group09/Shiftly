@@ -4,6 +4,7 @@ import { ProfileComponent } from './profile.component';
 
 import { NewPasswordComponent } from './pages/new-password/new-password.component';
 import { YourProfileComponent } from './pages/your-profile/your-profile.component';
+import { nonAdminGuard } from '../../core/guards/non-admin.guard';
 
 const routes: Routes = [
   {
@@ -11,7 +12,7 @@ const routes: Routes = [
     component: ProfileComponent,
     children: [
       { path: '', redirectTo: 'your-profile', pathMatch: 'full' },
-      { path: 'new-password', component: NewPasswordComponent },
+      { path: 'new-password', component: NewPasswordComponent, canActivate: [nonAdminGuard] },
       { path: 'your-profile', component: YourProfileComponent },
       { path: '**', redirectTo: 'your-profile', pathMatch: 'full' },
     ],
