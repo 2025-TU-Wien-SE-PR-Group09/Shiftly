@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, ElementRef, OnInit, ViewChild } from '@angular/core';
 import { CommonModule, DatePipe, NgIf } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import {
@@ -13,10 +13,13 @@ import { Observable } from 'rxjs';
   selector: 'app-employee-sick-notes',
   standalone: true,
   imports: [DatePipe, FormsModule, CommonModule, NgIf, ButtonComponent],
+  providers: [DatePipe],
   templateUrl: './employee-sick-notes.component.html',
   styleUrl: './employee-sick-notes.component.css',
 })
 export class EmployeeSickNotesComponent implements OnInit {
+  @ViewChild('fileInput') fileInputRef!: ElementRef<HTMLInputElement>;
+
   sickNotes: SickLeaveCertificateRestDto[] = [];
   selectedFile: File | null = null;
   loading = false;
@@ -59,7 +62,7 @@ export class EmployeeSickNotesComponent implements OnInit {
     this.uploadSuccess = false;
 
     this.sickLeaveService.upload(this.selectedFile).subscribe({
-      next: (newCert) => {
+      next: () => {
         this.toastr.success('File uploaded successfully.');
         this.selectedFile = null;
         this.uploadSuccess = true;
@@ -99,6 +102,11 @@ export class EmployeeSickNotesComponent implements OnInit {
 
   cancelUpload(): void {
     this.selectedFile = null;
+
+    if (this.fileInputRef) {
+      this.fileInputRef.nativeElement.value = '';
+    }
+
     this.toastr.info('File selection cleared.');
   }
 
