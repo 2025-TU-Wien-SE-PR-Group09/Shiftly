@@ -1,16 +1,14 @@
 package at.ac.tuwien.sepr.groupphase.backend.unittests;
 import at.ac.tuwien.sepr.groupphase.backend.entity.ApplicationUser;
-import at.ac.tuwien.sepr.groupphase.backend.entity.ConcreteShiftPlan;
 import at.ac.tuwien.sepr.groupphase.backend.entity.VacationRequest;
 import at.ac.tuwien.sepr.groupphase.backend.exception.ConflictException;
 import at.ac.tuwien.sepr.groupphase.backend.exception.NotFoundException;
 import at.ac.tuwien.sepr.groupphase.backend.repository.UserRepository;
 import at.ac.tuwien.sepr.groupphase.backend.repository.VacationRequestRepository;
-import at.ac.tuwien.sepr.groupphase.backend.service.dto.UserEmailDto;
-import at.ac.tuwien.sepr.groupphase.backend.service.dto.VacationRequestDto;
+import at.ac.tuwien.sepr.groupphase.backend.service.dto.user.UserEmailDto;
+import at.ac.tuwien.sepr.groupphase.backend.service.dto.vacation.VacationRequestDto;
 import at.ac.tuwien.sepr.groupphase.backend.service.impl.VacationRequestServiceImpl;
 import at.ac.tuwien.sepr.groupphase.backend.type.VacationStatus;
-import java.time.LocalDate;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import java.util.List;
@@ -22,7 +20,6 @@ import static at.ac.tuwien.sepr.groupphase.backend.basetest.TestData.OVERLAPPING
 import static at.ac.tuwien.sepr.groupphase.backend.basetest.TestData.OVERLAPPING_START;
 import static at.ac.tuwien.sepr.groupphase.backend.basetest.TestData.START_DATE;
 import static at.ac.tuwien.sepr.groupphase.backend.basetest.TestData.VACATION_ID;
-import static at.ac.tuwien.sepr.groupphase.backend.basetest.TestData.*;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 

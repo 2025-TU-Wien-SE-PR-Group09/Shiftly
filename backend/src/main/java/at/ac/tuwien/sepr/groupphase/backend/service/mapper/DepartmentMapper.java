@@ -1,7 +1,7 @@
 package at.ac.tuwien.sepr.groupphase.backend.service.mapper;
 
 import at.ac.tuwien.sepr.groupphase.backend.entity.Department;
-import at.ac.tuwien.sepr.groupphase.backend.service.dto.DepartmentDto;
+import at.ac.tuwien.sepr.groupphase.backend.service.dto.department.DepartmentDto;
 
 /**
  * Mapper class for the Department.

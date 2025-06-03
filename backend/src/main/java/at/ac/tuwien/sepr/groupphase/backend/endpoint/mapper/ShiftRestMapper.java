@@ -1,15 +1,14 @@
 package at.ac.tuwien.sepr.groupphase.backend.endpoint.mapper;
 
-import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.AddShiftToPlanBlueprintDto;
-import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.CreatePlanBlueprintDto;
-import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.GenerateConcretePlanDto;
+import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.shift.AddShiftToPlanBlueprintDto;
+import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.shift.CreatePlanBlueprintDto;
+import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.shift.GenerateConcretePlanDto;
 import at.ac.tuwien.sepr.groupphase.backend.service.dto.shift.ConcretePlanGenerateDto;
 import at.ac.tuwien.sepr.groupphase.backend.service.dto.shift.PlanBlueprintAddShiftDto;
 import at.ac.tuwien.sepr.groupphase.backend.service.dto.shift.PlanBlueprintCreationDto;
 
 import java.time.DayOfWeek;
 import java.time.Duration;
-import java.time.LocalDate;
 import java.time.LocalTime;
 import java.util.Optional;
 

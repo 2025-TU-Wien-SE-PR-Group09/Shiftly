@@ -1,6 +1,6 @@
 package at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.validator;
 
-import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.VacationRequestRestDto;
+import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.vacation.VacationRequestRestDto;
 import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.validator.annotation.ValidDateRange;
 import jakarta.validation.ConstraintValidator;
 

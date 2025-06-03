@@ -1,7 +1,7 @@
 package at.ac.tuwien.sepr.groupphase.backend.service;
 
 import at.ac.tuwien.sepr.groupphase.backend.entity.SickLeaveCertificate;
-import at.ac.tuwien.sepr.groupphase.backend.service.dto.SickLeaveCertificateDto;
+import at.ac.tuwien.sepr.groupphase.backend.service.dto.sickleave.SickLeaveCertificateDto;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;

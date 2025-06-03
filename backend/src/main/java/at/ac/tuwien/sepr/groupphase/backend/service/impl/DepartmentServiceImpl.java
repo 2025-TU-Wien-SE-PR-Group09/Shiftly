@@ -1,10 +1,9 @@
 package at.ac.tuwien.sepr.groupphase.backend.service.impl;
 
-import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.DepartmentDetailRestResponseDto;
-import at.ac.tuwien.sepr.groupphase.backend.service.dto.DepartmentCreateResponseDto;
-import at.ac.tuwien.sepr.groupphase.backend.service.dto.DepartmentDetailResponseDto;
-import at.ac.tuwien.sepr.groupphase.backend.service.dto.DepartmentEditDto;
-import at.ac.tuwien.sepr.groupphase.backend.service.dto.DepartmentEditResponseDto;
+import at.ac.tuwien.sepr.groupphase.backend.service.dto.department.DepartmentCreateResponseDto;
+import at.ac.tuwien.sepr.groupphase.backend.service.dto.department.DepartmentDetailResponseDto;
+import at.ac.tuwien.sepr.groupphase.backend.service.dto.department.DepartmentEditDto;
+import at.ac.tuwien.sepr.groupphase.backend.service.dto.department.DepartmentEditResponseDto;
 import at.ac.tuwien.sepr.groupphase.backend.entity.ApplicationRole;
 import at.ac.tuwien.sepr.groupphase.backend.entity.ApplicationUser;
 import at.ac.tuwien.sepr.groupphase.backend.entity.Department;
@@ -14,11 +13,11 @@ import at.ac.tuwien.sepr.groupphase.backend.repository.DepartmentRepository;
 import at.ac.tuwien.sepr.groupphase.backend.repository.UserRepository;
 import at.ac.tuwien.sepr.groupphase.backend.service.DepartmentService;
 import at.ac.tuwien.sepr.groupphase.backend.service.UserService;
-import at.ac.tuwien.sepr.groupphase.backend.service.dto.DepartmentCreateDto;
-import at.ac.tuwien.sepr.groupphase.backend.service.dto.DepartmentDto;
+import at.ac.tuwien.sepr.groupphase.backend.service.dto.department.DepartmentCreateDto;
+import at.ac.tuwien.sepr.groupphase.backend.service.dto.department.DepartmentDto;
 import at.ac.tuwien.sepr.groupphase.backend.service.dto.Role;
-import at.ac.tuwien.sepr.groupphase.backend.service.dto.UserEmailDto;
-import at.ac.tuwien.sepr.groupphase.backend.service.dto.UserRoleDto;
+import at.ac.tuwien.sepr.groupphase.backend.service.dto.user.UserEmailDto;
+import at.ac.tuwien.sepr.groupphase.backend.service.dto.user.UserRoleDto;
 import at.ac.tuwien.sepr.groupphase.backend.service.mapper.DepartmentMapper;
 import org.springframework.stereotype.Service;
 

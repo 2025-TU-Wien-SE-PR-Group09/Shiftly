@@ -1,15 +1,14 @@
 package at.ac.tuwien.sepr.groupphase.backend.service;
 
-import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.DepartmentDetailRestResponseDto;
-import at.ac.tuwien.sepr.groupphase.backend.service.dto.DepartmentCreateResponseDto;
-import at.ac.tuwien.sepr.groupphase.backend.service.dto.DepartmentDetailResponseDto;
-import at.ac.tuwien.sepr.groupphase.backend.service.dto.DepartmentEditDto;
-import at.ac.tuwien.sepr.groupphase.backend.service.dto.DepartmentEditResponseDto;
+import at.ac.tuwien.sepr.groupphase.backend.service.dto.department.DepartmentCreateResponseDto;
+import at.ac.tuwien.sepr.groupphase.backend.service.dto.department.DepartmentDetailResponseDto;
+import at.ac.tuwien.sepr.groupphase.backend.service.dto.department.DepartmentEditDto;
+import at.ac.tuwien.sepr.groupphase.backend.service.dto.department.DepartmentEditResponseDto;
 import at.ac.tuwien.sepr.groupphase.backend.exception.ConflictException;
 import at.ac.tuwien.sepr.groupphase.backend.exception.NotFoundException;
-import at.ac.tuwien.sepr.groupphase.backend.service.dto.DepartmentCreateDto;
-import at.ac.tuwien.sepr.groupphase.backend.service.dto.DepartmentDto;
-import at.ac.tuwien.sepr.groupphase.backend.service.dto.UserEmailDto;
+import at.ac.tuwien.sepr.groupphase.backend.service.dto.department.DepartmentCreateDto;
+import at.ac.tuwien.sepr.groupphase.backend.service.dto.department.DepartmentDto;
+import at.ac.tuwien.sepr.groupphase.backend.service.dto.user.UserEmailDto;
 
 import java.util.List;
 import java.util.Optional;

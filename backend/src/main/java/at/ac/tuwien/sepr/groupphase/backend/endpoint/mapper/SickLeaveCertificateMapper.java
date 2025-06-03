@@ -1,7 +1,7 @@
 package at.ac.tuwien.sepr.groupphase.backend.endpoint.mapper;
 
-import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.SickLeaveCertificateRestDto;
-import at.ac.tuwien.sepr.groupphase.backend.service.dto.SickLeaveCertificateDto;
+import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.sickleave.SickLeaveCertificateRestDto;
+import at.ac.tuwien.sepr.groupphase.backend.service.dto.sickleave.SickLeaveCertificateDto;
 import org.springframework.stereotype.Component;
 
 /**

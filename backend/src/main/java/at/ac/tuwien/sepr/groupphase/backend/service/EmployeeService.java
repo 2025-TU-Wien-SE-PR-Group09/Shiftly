@@ -2,9 +2,9 @@ package at.ac.tuwien.sepr.groupphase.backend.service;
 
 import at.ac.tuwien.sepr.groupphase.backend.exception.ConflictException;
 import at.ac.tuwien.sepr.groupphase.backend.exception.NotFoundException;
-import at.ac.tuwien.sepr.groupphase.backend.service.dto.DepartmentNameDto;
-import at.ac.tuwien.sepr.groupphase.backend.service.dto.EmployeeDto;
-import at.ac.tuwien.sepr.groupphase.backend.service.dto.EmployeeListItemDto;
+import at.ac.tuwien.sepr.groupphase.backend.service.dto.department.DepartmentNameDto;
+import at.ac.tuwien.sepr.groupphase.backend.service.dto.employee.EmployeeDto;
+import at.ac.tuwien.sepr.groupphase.backend.service.dto.employee.EmployeeListItemDto;
 
 import java.util.List;
 

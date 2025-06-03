@@ -1,10 +1,9 @@
 package at.ac.tuwien.sepr.groupphase.backend.service.impl;
 
-import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.ApplicationUserResponseDto;
-import at.ac.tuwien.sepr.groupphase.backend.service.dto.UserDataDto;
-import at.ac.tuwien.sepr.groupphase.backend.service.dto.UserEmailDto;
-import at.ac.tuwien.sepr.groupphase.backend.service.dto.UserProfileDto;
-import at.ac.tuwien.sepr.groupphase.backend.service.dto.UserRoleDto;
+import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.user.ApplicationUserResponseDto;
+import at.ac.tuwien.sepr.groupphase.backend.service.dto.user.UserDataDto;
+import at.ac.tuwien.sepr.groupphase.backend.service.dto.user.UserProfileDto;
+import at.ac.tuwien.sepr.groupphase.backend.service.dto.user.UserRoleDto;
 import at.ac.tuwien.sepr.groupphase.backend.entity.ApplicationRole;
 import at.ac.tuwien.sepr.groupphase.backend.entity.ApplicationUser;
 import at.ac.tuwien.sepr.groupphase.backend.exception.NotFoundException;
@@ -17,12 +16,11 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
-import at.ac.tuwien.sepr.groupphase.backend.service.dto.ChangePasswordDto;
+import at.ac.tuwien.sepr.groupphase.backend.service.dto.user.ChangePasswordDto;
 
 import java.lang.invoke.MethodHandles;
 import java.util.List;
 import java.util.Optional;
-import java.util.Set;
 import java.util.stream.Collectors;
 
 import static at.ac.tuwien.sepr.groupphase.backend.config.Constants.ADMIN_EMAIL;
