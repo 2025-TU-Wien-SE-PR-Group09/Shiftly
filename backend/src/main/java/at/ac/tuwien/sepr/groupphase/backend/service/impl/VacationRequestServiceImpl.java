@@ -58,13 +58,13 @@ public class VacationRequestServiceImpl implements VacationRequestService {
         LocalDate newEnd = vacationRequestDto.getEndDate();
 
         boolean overlaps = existingRequests.stream()
-            .filter(req -> req.getStatus() == VacationStatus.PENDING)
+            .filter(req -> req.getStatus() != VacationStatus.REJECTED)
             .anyMatch(req ->
                 !(newEnd.isBefore(req.getStartDate()) || newStart.isAfter(req.getEndDate()))
             );
 
         if (overlaps) {
-            throw new ConflictException("Vacation request overlaps with existing request");
+            throw new ConflictException("Vacation request overlaps with existing approved or pending request");
         }
 
 
@@ -127,6 +127,53 @@ public class VacationRequestServiceImpl implements VacationRequestService {
 
         vacationRequestRepository.delete(request);
     }
+
+    @Override
+    public List<VacationRequestResponseDto> getAllPendingRequests() {
+        return vacationRequestRepository.findAll().stream()
+            .filter(r -> r.getStatus() == VacationStatus.PENDING)
+            .map(r -> new VacationRequestResponseDto(
+                r.getId(),
+                r.getEmployee().getEmail(),
+                r.getStartDate(),
+                r.getEndDate(),
+                r.getStatus()))
+            .toList();
+    }
+
+    @Override
+    public void updateVacationRequestStatus(Long id, VacationStatus newStatus) {
+        VacationRequest request = vacationRequestRepository.findById(id)
+            .orElseThrow(() -> new NotFoundException("Vacation request not found"));
+
+        if (request.getStatus() != VacationStatus.PENDING) {
+            throw new ConflictException("Only pending requests can be updated");
+        }
+
+        if (newStatus != VacationStatus.APPROVED && newStatus != VacationStatus.REJECTED) {
+            throw new ConflictException("Invalid status transition");
+        }
+
+        request.setStatus(newStatus);
+        vacationRequestRepository.save(request);
+    }
+
+    @Override
+    public List<VacationRequestResponseDto> getVacationRequestsByStatus(VacationStatus status) {
+        return vacationRequestRepository.findAll().stream()
+            .filter(r -> r.getStatus() == status)
+            .map(r -> new VacationRequestResponseDto(
+                r.getId(),
+                r.getEmployee().getEmail(),
+                r.getStartDate(),
+                r.getEndDate(),
+                r.getStatus()
+            ))
+            .toList();
+    }
+
+
+
 
 
 }

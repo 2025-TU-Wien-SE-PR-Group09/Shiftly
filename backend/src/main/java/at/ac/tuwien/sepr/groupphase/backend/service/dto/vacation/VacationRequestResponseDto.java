@@ -36,5 +36,9 @@ public class VacationRequestResponseDto {
         return status;
     }
 
+    public String getEmployeeEmail() {
+        return employeeEmail;
+    }
+
 
 }

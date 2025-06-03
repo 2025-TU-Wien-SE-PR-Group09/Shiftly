@@ -11,6 +11,15 @@ public class VacationRequestResponseRestDto {
     private LocalDate startDate;
     private LocalDate endDate;
     private VacationStatus status;
+    private String employeeEmail;
+
+    public String getEmployeeEmail() {
+        return employeeEmail;
+    }
+
+    public void setEmployeeEmail(String employeeEmail) {
+        this.employeeEmail = employeeEmail;
+    }
 
     public Long getId() {
         return id;
@@ -50,6 +59,7 @@ public class VacationRequestResponseRestDto {
         response.setStartDate(dto.getStartDate());
         response.setEndDate(dto.getEndDate());
         response.setStatus(dto.getStatus());
+        response.setEmployeeEmail(dto.getEmployeeEmail());
         return response;
     }
 }

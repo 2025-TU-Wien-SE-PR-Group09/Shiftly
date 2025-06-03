@@ -1,5 +1,6 @@
 package at.ac.tuwien.sepr.groupphase.backend.service;
 
+import at.ac.tuwien.sepr.groupphase.backend.type.VacationStatus;
 import at.ac.tuwien.sepr.groupphase.backend.service.dto.user.UserEmailDto;
 import at.ac.tuwien.sepr.groupphase.backend.service.dto.vacation.VacationRequestDto;
 import at.ac.tuwien.sepr.groupphase.backend.service.dto.vacation.VacationRequestResponseDto;
@@ -31,6 +32,15 @@ public interface VacationRequestService {
      * @param userEmail the email of the user who owns the vacation request
      */
     void deletePendingRequest(Long requestId, String userEmail);
+
+    List<VacationRequestResponseDto> getAllPendingRequests();
+
+    void updateVacationRequestStatus(Long id, VacationStatus newStatus);
+
+    List<VacationRequestResponseDto> getVacationRequestsByStatus(VacationStatus status);
+
+
+
 }
 
 
