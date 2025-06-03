@@ -1,17 +1,14 @@
 import { Component, ElementRef, OnInit, ViewChild } from '@angular/core';
 import { CommonModule, DatePipe, NgIf } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import {
-  SickLeaveCertificateRestDto,
-  SickLeaveCertificateEndpointService
-} from '../../../../rest_client';
+import { SickLeaveCertificateRestDto, SickLeaveCertificateEndpointService } from '../../../../rest_client';
 import { ToastrService } from 'ngx-toastr';
 import { ButtonComponent } from '../../../../shared/components/button/button.component';
 import { Observable } from 'rxjs';
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-employee-sick-notes',
-  standalone: true,
   imports: [DatePipe, FormsModule, CommonModule, NgIf, ButtonComponent],
   providers: [DatePipe],
   templateUrl: './employee-sick-notes.component.html',
@@ -24,10 +21,14 @@ export class EmployeeSickNotesComponent implements OnInit {
   selectedFile: File | null = null;
   loading = false;
   uploadSuccess = false;
+  startDate: string = '';
+  endDate: string = '';
+  confirmingDeleteId: number | null = null;
 
   constructor(
     private sickLeaveService: SickLeaveCertificateEndpointService,
-    private toastr: ToastrService
+    private toastr: ToastrService,
+    private router: Router,
   ) {}
 
   ngOnInit(): void {
@@ -41,7 +42,7 @@ export class EmployeeSickNotesComponent implements OnInit {
       },
       error: () => {
         this.showError('Could not load sick leave certificates.');
-      }
+      },
     });
   }
 
@@ -58,13 +59,26 @@ export class EmployeeSickNotesComponent implements OnInit {
       return;
     }
 
+    if (!this.startDate || !this.endDate) {
+      this.toastr.warning('Please provide both start and end dates.');
+      return;
+    }
+    const start = new Date(this.startDate);
+    const end = new Date(this.endDate);
+    if (start > end) {
+      this.toastr.error('Start date cannot be after end date.');
+      return;
+    }
+
     this.loading = true;
     this.uploadSuccess = false;
 
-    this.sickLeaveService.upload(this.selectedFile).subscribe({
-      next: () => {
+    this.sickLeaveService.upload(this.startDate, this.endDate, this.selectedFile!).subscribe({
+      next: (newCert) => {
         this.toastr.success('File uploaded successfully.');
         this.selectedFile = null;
+        this.startDate = '';
+        this.endDate = '';
         this.uploadSuccess = true;
         this.loadSickNotes();
 
@@ -78,14 +92,16 @@ export class EmployeeSickNotesComponent implements OnInit {
       },
       complete: () => {
         this.loading = false;
-      }
+      },
     });
   }
 
   downloadFile(note: SickLeaveCertificateRestDto): void {
-    (this.sickLeaveService.download(note.id!, 'body', false, {
-      httpHeaderAccept: 'application/octet-stream'
-    }) as unknown as Observable<Blob>).subscribe({
+    (
+      this.sickLeaveService.download(note.id!, 'body', false, {
+        httpHeaderAccept: 'application/octet-stream',
+      }) as unknown as Observable<Blob>
+    ).subscribe({
       next: (blob: Blob) => {
         const url = window.URL.createObjectURL(blob);
         const a = document.createElement('a');
@@ -96,7 +112,7 @@ export class EmployeeSickNotesComponent implements OnInit {
       },
       error: () => {
         this.showError('Failed to download the file.');
-      }
+      },
     });
   }
 
@@ -117,7 +133,26 @@ export class EmployeeSickNotesComponent implements OnInit {
   private showError(message: string): void {
     this.toastr.error(message, '', {
       timeOut: 8000,
-      progressBar: true
+      progressBar: true,
+    });
+  }
+
+  toggleConfirmDelete(id: number): void {
+    this.confirmingDeleteId = id;
+  }
+
+  cancelDelete(): void {
+    this.confirmingDeleteId = null;
+  }
+
+  confirmDelete(id: number): void {
+    this.sickLeaveService.deleteSickLeaveCertificate(id).subscribe({
+      next: () => {
+        this.toastr.success('Certificate deleted');
+        this.sickNotes = this.sickNotes.filter((note) => note.id !== id);
+        this.confirmingDeleteId = null;
+      },
+      error: () => this.toastr.error('Failed to delete certificate'),
     });
   }
 }

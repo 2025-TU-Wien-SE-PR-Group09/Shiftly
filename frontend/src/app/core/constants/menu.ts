@@ -16,6 +16,11 @@ export class Menu {
           label: 'Departments',
           route: '/departments/admin',
         },
+        {
+          icon: 'assets/icons/heroicons/outline/heart.svg',
+          label: 'Sick Notes',
+          route: '/sick-notes/admin',
+        },
       ],
       role: "ADMIN"
     },

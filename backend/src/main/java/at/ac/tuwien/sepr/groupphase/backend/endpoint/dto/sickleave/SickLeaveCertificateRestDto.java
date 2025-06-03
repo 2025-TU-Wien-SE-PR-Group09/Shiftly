@@ -1,5 +1,6 @@
 package at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.sickleave;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 /**
@@ -12,17 +13,19 @@ public class SickLeaveCertificateRestDto {
     private String fileType;
     private LocalDateTime uploadedAt;
     private String employeeEmail;
+    private LocalDate startDate;
+    private LocalDate endDate;
 
-    public SickLeaveCertificateRestDto(Long id, String fileName, String fileType, LocalDateTime uploadedAt, String employeeEmail) {
+    public SickLeaveCertificateRestDto(Long id, String fileName, String fileType, LocalDateTime uploadedAt, String employeeEmail, LocalDate startDate, LocalDate endDate) {
         this.id = id;
         this.fileName = fileName;
         this.fileType = fileType;
         this.uploadedAt = uploadedAt;
         this.employeeEmail = employeeEmail;
+        this.startDate = startDate;
+        this.endDate = endDate;
     }
 
-    public SickLeaveCertificateRestDto() {
-    }
 
     public Long getId() {
         return id;
@@ -62,5 +65,21 @@ public class SickLeaveCertificateRestDto {
 
     public void setEmployeeEmail(String employeeEmail) {
         this.employeeEmail = employeeEmail;
+    }
+
+    public LocalDate getStartDate() {
+        return startDate;
+    }
+
+    public void setStartDate(LocalDate startDate) {
+        this.startDate = startDate;
+    }
+
+    public LocalDate getEndDate() {
+        return endDate;
+    }
+
+    public void setEndDate(LocalDate endDate) {
+        this.endDate = endDate;
     }
 }

@@ -12,6 +12,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
 
@@ -42,7 +43,7 @@ public class SickLeaveCertificateServiceImpl implements SickLeaveCertificateServ
      * @return metadata of the uploaded certificate
      */
     @Override
-    public SickLeaveCertificateDto upload(MultipartFile file, String email) {
+    public SickLeaveCertificateDto upload(MultipartFile file, String email, LocalDate startDate, LocalDate endDate) {
         ApplicationUser user = userRepository.findByEmail(email)
             .orElseThrow(() -> new NotFoundException("User not found"));
 
@@ -51,6 +52,8 @@ public class SickLeaveCertificateServiceImpl implements SickLeaveCertificateServ
         cert.setFileType(file.getContentType());
         cert.setUploadedAt(LocalDateTime.now());
         cert.setEmployee(user);
+        cert.setStartDate(startDate);
+        cert.setEndDate(endDate);
 
         try {
             cert.setData(file.getBytes());
@@ -65,7 +68,9 @@ public class SickLeaveCertificateServiceImpl implements SickLeaveCertificateServ
             cert.getFileName(),
             cert.getFileType(),
             cert.getUploadedAt(),
-            user.getEmail()
+            user.getEmail(),
+            cert.getStartDate(),
+            cert.getEndDate()
         );
     }
 
@@ -106,7 +111,9 @@ public class SickLeaveCertificateServiceImpl implements SickLeaveCertificateServ
                 cert.getFileName(),
                 cert.getFileType(),
                 cert.getUploadedAt(),
-                cert.getEmployee().getEmail()
+                cert.getEmployee().getEmail(),
+                cert.getStartDate(),
+                cert.getEndDate()
             ))
             .toList();
     }
@@ -124,8 +131,36 @@ public class SickLeaveCertificateServiceImpl implements SickLeaveCertificateServ
                 cert.getFileName(),
                 cert.getFileType(),
                 cert.getUploadedAt(),
-                cert.getEmployee().getEmail()
+                cert.getEmployee().getEmail(),
+                cert.getStartDate(),
+                cert.getEndDate()
             ))
             .toList();
     }
+
+    /**
+     * Deletes a sick leave certificate by its ID, if the current user
+     * is either the owner or has admin privileges.
+     *
+     * @param id the ID of the certificate to delete
+     * @throws NotFoundException if the certificate is not found
+     * @throws SecurityException if the user is not allowed to delete it
+     */
+    @Override
+    public void deleteSickLeaveCertificate(Long id) {
+        ApplicationUser currentUser = authService.getCurrentUser();
+        SickLeaveCertificate cert = certificateRepository.findById(id)
+            .orElseThrow(() -> new NotFoundException("Certificate not found"));
+
+        boolean isOwner = currentUser.getEmail().equals(cert.getEmployee().getEmail());
+        boolean isAdmin = currentUser.getRoles().stream()
+            .anyMatch(role -> role.getName().equalsIgnoreCase("ADMIN"));
+
+        if (!isOwner && !isAdmin) {
+            throw new SecurityException("You are not authorized to delete this certificate");
+        }
+
+        certificateRepository.delete(cert);
+    }
+
 }

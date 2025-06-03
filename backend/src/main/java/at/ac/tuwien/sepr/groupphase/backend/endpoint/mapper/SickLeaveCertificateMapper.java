@@ -15,7 +15,9 @@ public class SickLeaveCertificateMapper {
             dto.getFileName(),
             dto.getFileType(),
             dto.getUploadedAt(),
-            dto.getEmployeeEmail()
+            dto.getEmployeeEmail(),
+            dto.getStartDate(),
+            dto.getEndDate()
         );
     }
 }

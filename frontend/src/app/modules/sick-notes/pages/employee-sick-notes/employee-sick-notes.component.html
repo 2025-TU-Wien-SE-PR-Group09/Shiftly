@@ -1,109 +1,165 @@
-<div class="my-10 space-y-10">
-  <!-- Header -->
-  <div class="text-center">
-    <h2 class="text-foreground mb-1 text-3xl font-semibold">
-      My Sick Leave Certificates
-    </h2>
-    <p class="text-muted-foreground text-sm">
-      Upload your doctor-issued certificate to validate a sick leave request.
-    </p>
+<div class="p-6 flex flex-col lg:flex-row gap-6">
+  <!-- Left: Upload Form -->
+  <div class="w-full lg:w-1/2">
+    <h2 class="text-2xl font-bold mb-4 text-foreground">Submit Sick Note</h2>
+
+    <form
+      (ngSubmit)="uploadFile()"
+      class="space-y-4 rounded-xl border border-border bg-background p-6 shadow-md"
+    >
+      <div>
+        <label for="startDate" class="block mb-1 font-medium text-foreground">Start Date</label>
+        <input
+          type="date"
+          id="startDate"
+          name="startDate"
+          [(ngModel)]="startDate"
+          class="w-full rounded border border-border bg-muted text-foreground p-2"
+          required
+        />
+      </div>
+
+      <div>
+        <label for="endDate" class="block mb-1 font-medium text-foreground">End Date</label>
+        <input
+          type="date"
+          id="endDate"
+          name="endDate"
+          [(ngModel)]="endDate"
+          class="w-full rounded border border-border bg-muted text-foreground p-2"
+          required
+        />
+      </div>
+
+      <div>
+        <label for="file" class="block mb-1 font-medium text-foreground">Upload Certificate</label>
+        <input
+          type="file"
+          id="file"
+          accept=".pdf,.jpg,.jpeg,.png"
+          (change)="onFileSelected($event)"
+          class="w-full rounded border border-border bg-muted text-foreground p-2"
+          [disabled]="loading"
+        />
+        <p class="text-sm text-muted-foreground mt-1">
+          Selected file: {{ selectedFileName }}
+        </p>
+      </div>
+
+      <div *ngIf="loading" class="text-sm text-blue-600">⏳ Uploading...</div>
+
+      <div class="flex justify-end space-x-2 pt-2">
+        <app-button
+          type="button"
+          tone="light"
+          impact="bold"
+          shape="rounded"
+          size="medium"
+          (click)="cancelUpload()"
+          [disabled]="loading"
+        >
+          Cancel
+        </app-button>
+        <app-button
+          type="submit"
+          tone="primary"
+          impact="bold"
+          shape="rounded"
+          size="medium"
+          [disabled]="loading || !selectedFile"
+        >
+          {{ loading ? 'Uploading...' : 'Upload' }}
+        </app-button>
+      </div>
+    </form>
   </div>
 
-  <!-- Upload Form -->
-  <form
-    (ngSubmit)="uploadFile()"
-    class="space-y-4 rounded-xl border border-border bg-background p-6 shadow-md"
-  >
-    <div>
-      <label for="file" class="mb-1 block font-medium text-foreground">
-        Upload Certificate (PDF, JPG, PNG)
-      </label>
-      <input
-        type="file"
-        id="file"
-        #fileInput
-        accept=".pdf,.jpg,.jpeg,.png"
-        (change)="onFileSelected($event)"
-        class="w-full rounded border border-border bg-muted text-foreground p-2"
-        [disabled]="loading"
-        aria-label="Choose certificate file"
-      />
-      <p class="text-sm text-muted-foreground mt-1">
-        Selected file: {{ selectedFileName }}
-      </p>
-    </div>
+  <!-- Right: Uploaded Certificates -->
+  <div class="w-full lg:w-1/2">
+    <h2 class="text-2xl font-bold mb-4 text-foreground">Uploaded Certificates</h2>
 
-    <div *ngIf="uploadSuccess" class="text-sm text-green-600">
-      ✅ Upload successful!
+    <div class="border rounded border-border bg-background p-4 shadow-sm">
+      <table class="w-full text-left text-sm text-foreground">
+        <thead>
+        <tr>
+          <th class="px-2 py-2">Uploaded</th>
+          <th class="px-2 py-2">Start</th>
+          <th class="px-2 py-2">End</th>
+          <th class="px-2 py-2">File</th>
+          <th class="px-2 py-2">Action</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr *ngFor="let note of sickNotes" class="hover:bg-muted/30 transition">
+          <td class="px-2 py-2">{{ note.uploadedAt | date:'dd.MM.yyyy' }}</td>
+          <td class="px-2 py-2">{{ note.startDate | date:'dd.MM.yyyy' }}</td>
+          <td class="px-2 py-2">{{ note.endDate | date:'dd.MM.yyyy' }}</td>
+          <td class="px-2 py-2">{{ note.fileName }}</td>
+          <td class="px-2 py-2">
+            <div class="flex flex-wrap justify-end gap-2">
+              <app-button
+                tone="primary"
+                impact="bold"
+                size="small"
+                shape="rounded"
+                (click)="downloadFile(note)"
+              >
+                Download
+              </app-button>
+              <app-button
+                tone="danger"
+                impact="bold"
+                size="small"
+                shape="rounded"
+                (click)="toggleConfirmDelete(note.id!)"
+              >
+                Delete
+              </app-button>
+            </div>
+          </td>
+        </tr>
+        <tr *ngIf="sickNotes.length === 0">
+          <td colspan="5" class="text-center py-4 text-muted-foreground">
+            No sick leave certificates uploaded yet.
+          </td>
+        </tr>
+        </tbody>
+      </table>
     </div>
-    <div *ngIf="loading" class="text-sm text-blue-600">
-      ⏳ Uploading...
-    </div>
+  </div>
+</div>
 
-    <div class="flex justify-end space-x-2 pt-2">
+<!-- Module for delete confirmation -->
+<div
+  *ngIf="confirmingDeleteId !== null"
+  class="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50"
+>
+  <div class="bg-background border border-border rounded-lg p-6 shadow-lg w-full max-w-md">
+    <h2 class="text-xl font-bold text-foreground mb-4">Delete Certificate</h2>
+    <p class="text-foreground mb-6">
+      Are you sure you want to delete this certificate? This action cannot be undone.
+    </p>
+    <div class="flex justify-end space-x-2">
       <app-button
-        type="button"
-        tone="light"
-        impact="bold"
+        tone="warning"
         shape="rounded"
+        impact="bold"
         size="medium"
-        (click)="cancelUpload()"
-        [disabled]="loading"
+        (click)="cancelDelete()"
       >
         Cancel
       </app-button>
-
       <app-button
-        type="submit"
-        tone="primary"
-        impact="bold"
+        tone="danger"
         shape="rounded"
+        impact="bold"
         size="medium"
-        [disabled]="loading || !selectedFile"
+        (click)="confirmDelete(confirmingDeleteId!)"
       >
-        {{ loading ? 'Uploading...' : 'Upload' }}
+        Delete
       </app-button>
     </div>
-  </form>
-
-  <!-- Uploaded Certificates -->
-  <div class="rounded-xl border border-border bg-background p-6 shadow-sm">
-    <h3 class="mb-4 text-xl font-semibold text-foreground">
-      Uploaded Certificates
-    </h3>
-
-    <table class="w-full text-left text-sm text-foreground">
-      <thead>
-      <tr>
-        <th class="px-2 py-2">Date</th>
-        <th class="px-2 py-2">Filename</th>
-        <th class="px-2 py-2">Action</th>
-      </tr>
-      </thead>
-      <tbody>
-      <tr *ngFor="let note of sickNotes" class="hover:bg-muted/30 transition">
-        <td class="px-2 py-2">
-          {{ note.uploadedAt | date: 'dd.MM.yyyy' }}
-        </td>
-        <td class="px-2 py-2">{{ note.fileName }}</td>
-        <td class="px-2 py-2">
-          <app-button
-            tone="primary"
-            impact="bold"
-            size="small"
-            shape="rounded"
-            (click)="downloadFile(note)"
-          >
-            Download
-          </app-button>
-        </td>
-      </tr>
-      <tr *ngIf="sickNotes.length === 0">
-        <td colspan="3" class="text-center py-4 text-muted-foreground">
-          No sick leave certificates uploaded yet.
-        </td>
-      </tr>
-      </tbody>
-    </table>
   </div>
 </div>
+
+

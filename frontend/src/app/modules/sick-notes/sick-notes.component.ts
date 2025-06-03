@@ -18,7 +18,9 @@ export class SickNotesComponent implements OnInit {
   ngOnInit(): void {
     const roles = this._authService.getUserRoles();
 
-    if (roles.includes("SUPERVISOR")) {
+    if (roles.includes("ADMIN")) {
+      this._router.navigateByUrl('/sick-notes/admin').then();
+    } else if (roles.includes("SUPERVISOR")) {
       this._router.navigateByUrl('/sick-notes/supervisor').then();
     } else if (roles.includes("EMPLOYEE")) {
       this._router.navigateByUrl('/sick-notes/employee').then();

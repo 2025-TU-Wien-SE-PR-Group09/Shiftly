@@ -4,10 +4,12 @@ import at.ac.tuwien.sepr.groupphase.backend.entity.SickLeaveCertificate;
 import at.ac.tuwien.sepr.groupphase.backend.service.dto.sickleave.SickLeaveCertificateDto;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.time.LocalDate;
 import java.util.List;
 
 public interface SickLeaveCertificateService {
-    SickLeaveCertificateDto upload(MultipartFile file, String email);
+    SickLeaveCertificateDto upload(MultipartFile file, String email, LocalDate startDate, LocalDate endDate);
+
 
     SickLeaveCertificate findById(Long id);
 
@@ -18,5 +20,8 @@ public interface SickLeaveCertificateService {
     List<SickLeaveCertificateDto> getAllForCurrentUser();
 
     List<SickLeaveCertificateDto> getAllForAdmin();
+
+    void deleteSickLeaveCertificate(Long id);
+
 }
 
