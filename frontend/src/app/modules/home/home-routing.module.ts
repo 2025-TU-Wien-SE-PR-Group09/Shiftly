@@ -4,6 +4,7 @@ import { HomeComponent } from './home.component';
 import { AdminHomeComponent } from './pages/admin-home/admin-home.component';
 import { SupervisorHomeComponent } from './pages/supervisor-home/supervisor-home.component';
 import { EmployeeHomeComponent } from './pages/employee-home/employee-home.component';
+import { RoleGuard } from 'src/app/core/guards/role.guard';
 
 const routes: Routes = [
   {
@@ -13,16 +14,28 @@ const routes: Routes = [
       {
         path: 'admin',
         component: AdminHomeComponent,
+        canActivate: [RoleGuard],
+        data: {
+          roles: ['ADMIN'],
+        },
       },
       {
         path: 'supervisor',
         component: SupervisorHomeComponent,
+        canActivate: [RoleGuard],
+        data: {
+          roles: ['SUPERVISOR'],
+        },
       },
       {
         path: 'employee',
         component: EmployeeHomeComponent,
+        canActivate: [RoleGuard],
+        data: {
+          roles: ['EMPLOYEE'],
+        },
       },
-    ]
+    ],
   },
 ];
 

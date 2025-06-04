@@ -6,6 +6,8 @@ import { DepartmentDetailAdminComponent } from './pages/department-detail-admin/
 import { DepartmentShiftplanBlueprintComponent } from './pages/department-shiftplan-blueprint/department-shiftplan-blueprint.component';
 import { DepartmentResolver } from './resolvers/department.resolver';
 import { BlueprintsResolver } from './resolvers/blueprints.resolver';
+import { RoleGuard } from 'src/app/core/guards/role.guard';
+
 const routes: Routes = [
   {
     path: '',
@@ -14,10 +16,18 @@ const routes: Routes = [
       {
         path: 'admin',
         component: DepartmentDetailAdminComponent,
+        canActivate: [RoleGuard],
+        data: {
+          roles: ['ADMIN'],
+        },
       },
       {
         path: 'supervisor',
         component: DepartmentDetailSupervisorComponent,
+        canActivate: [RoleGuard],
+        data: {
+          roles: ['SUPERVISOR'],
+        },
       },
       {
         path: ':name/shiftplan-editor',
@@ -25,8 +35,12 @@ const routes: Routes = [
         resolve: {
           department: DepartmentResolver,
           blueprints: BlueprintsResolver,
+          canActivate: [RoleGuard],
+          data: {
+            roles: ['ADMIN', 'SUPERVISOR'],
+          },
         },
-      },
+      }
     ],
   },
 ];
