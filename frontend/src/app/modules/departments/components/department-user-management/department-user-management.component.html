@@ -1,19 +1,16 @@
 <!-- Modal Overlay -->
-<div *ngIf="showForm" class="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50">
+<div *ngIf="showForm" class="fixed inset-0 z-50 flex items-center justify-center bg-black/50 bg-opacity-50">
   <!-- Modal Box -->
   <div class="relative w-full max-w-md rounded bg-white p-6 shadow-lg dark:bg-gray-900">
     <h2 class="mb-4 text-xl font-bold text-gray-900 dark:text-white">Invite Employee</h2>
 
     <!-- Form fields -->
+    <p class="mb-2 ml-1 text-foreground">E-Mail</p>
+    <app-autocomplete class="mb-2" id="supervisor" [options]="possibleEmployeeMails" (selected)="newEmployeeMail = $event"> </app-autocomplete>
 
-    <input
-      type="email"
-      class="mb-4 w-full rounded border p-2"
-      placeholder="Email"
-      [(ngModel)]="newEmployeeMail" />
 
     <!-- Buttons -->
-    <div class="flex justify-end space-x-2">
+    <div class="flex justify-end space-x-2 mt-5">
       <app-button tone="warning" shape="rounded" impact="bold" size="medium" (click)="showForm = !showForm">
         Cancel
       </app-button>

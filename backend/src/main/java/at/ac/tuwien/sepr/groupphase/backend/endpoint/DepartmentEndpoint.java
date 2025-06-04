@@ -85,8 +85,18 @@ public class DepartmentEndpoint {
     @Operation(summary = "Get all supervisors")
     @ApiResponse(responseCode = "200", description = "List of all supervisors")
     @GetMapping(value = "/api/departments/supervisors", produces = MediaType.APPLICATION_JSON_VALUE)
-    public List<ApplicationUserResponseDto> getAllSupervisors() {
-        return userService.getAllSupervisors();
+    public List<ApplicationUserResponseDto> getAllAvailableSupervisors() {
+        List<ApplicationUserResponseDto> availableUsers = userService.getAllAvailableUsers();
+        availableUsers.addAll(userService.getAllSupervisors());
+        return availableUsers;
+    }
+
+    @RolesAllowed({"ADMIN", "SUPERVISOR"})
+    @Operation(summary = "Get all available employees")
+    @ApiResponse(responseCode = "200", description = "List of all employees that can be invited to department")
+    @GetMapping(value = "/api/departments/employees", produces = MediaType.APPLICATION_JSON_VALUE)
+    public List<ApplicationUserResponseDto> getAllAvailableEmployees() {
+        return userService.getAllAvailableUsers();
     }
 
     @Transactional

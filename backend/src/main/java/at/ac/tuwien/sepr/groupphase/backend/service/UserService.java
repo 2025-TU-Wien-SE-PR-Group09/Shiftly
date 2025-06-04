@@ -56,4 +56,11 @@ public interface UserService {
      * @return a {@link ApplicationUser} list containing all supervisors
      */
     List<ApplicationUserResponseDto> getAllSupervisors();
+
+    /**
+     * Retrieves all users who are available, also who do not have a role.
+     *
+     * @return a {@link List<ApplicationUser>} containing all available users
+     */
+    List<ApplicationUserResponseDto> getAllAvailableUsers();
 }

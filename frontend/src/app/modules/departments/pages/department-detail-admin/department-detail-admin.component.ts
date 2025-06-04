@@ -9,14 +9,15 @@ import { ButtonComponent } from '../../../../shared/components/button/button.com
 import { FormsModule } from '@angular/forms';
 import { CommonModule } from '@angular/common';
 import { ToastrService } from 'ngx-toastr';
+import { AutocompleteComponent } from '../../../../shared/components/autocomplete/autocomplete.component';
 
 @Component({
   selector: 'app-department-detail-admin',
-  imports: [ButtonComponent, FormsModule, CommonModule, RouterLink],
+  imports: [ButtonComponent, FormsModule, CommonModule, RouterLink, AutocompleteComponent],
   templateUrl: './department-detail-admin.component.html',
   styleUrl: './department-detail-admin.component.css',
 })
-export class DepartmentDetailAdminComponent implements OnInit{
+export class DepartmentDetailAdminComponent implements OnInit {
   protected showFormCreate: boolean | undefined;
   protected showFormEdit: boolean | undefined;
   protected newDepartment: DepartmentCreateRestDto = {
@@ -27,9 +28,9 @@ export class DepartmentDetailAdminComponent implements OnInit{
     oldName: '',
     newName: '',
     supervisorEmail: '',
-  }
+  };
   protected departments: DepartmentDetailRestResponseDto[] = [];
-  protected supervisors: ApplicationUserResponseDto[] = [];
+  protected supervisorEmails: string[] = [];
 
   constructor(private departmentService: DepartmentService, private toastr: ToastrService) {}
 
@@ -38,7 +39,7 @@ export class DepartmentDetailAdminComponent implements OnInit{
   }
 
   openFormEdit(oldName: string | undefined): void {
-    const dept = this.departments.find(d => d.name === oldName);
+    const dept = this.departments.find((d) => d.name === oldName);
 
     this.editedDepartment.oldName = oldName as string;
     this.editedDepartment.newName = oldName as string;
@@ -58,7 +59,7 @@ export class DepartmentDetailAdminComponent implements OnInit{
 
   submitDepartmentCreate(): void {
     if (this.newDepartment.supervisorEmail === '') {
-      this.toastr.error('No supervisor selected.', 'Creating department failed.')
+      this.toastr.error('No supervisor selected.', 'Creating department failed.');
       return;
     }
     this.departmentService.createDepartment(this.newDepartment).subscribe({
@@ -67,7 +68,7 @@ export class DepartmentDetailAdminComponent implements OnInit{
         this.showFormCreate = false;
         this.loadDepartments();
         this.toastr.success('Department created successfully', 'Success');
-      }
+      },
     });
   }
 
@@ -78,33 +79,39 @@ export class DepartmentDetailAdminComponent implements OnInit{
         this.showFormEdit = false;
         this.loadDepartments();
         this.toastr.success('Department edited successfully', 'Success');
-      }
+      },
     });
   }
 
   ngOnInit(): void {
     this.loadDepartments();
-    this.loadSupervisors();
   }
 
   loadDepartments(): void {
     this.departmentService.getAllDepartments().subscribe({
-      next: (data) => (this.departments = data),
+      next: (data) => {
+        this.departments = data;
+
+        this.departmentService.getAllAvailableSupervisors().subscribe({
+          next: (data) => {
+            const usedEmails = this.departments
+              .filter((dept) => dept.name !== this.editedDepartment.oldName)
+              .map((dept) => dept.supervisorEmail);
+
+            this.supervisorEmails = data.filter((sup) => !usedEmails.includes(<string>sup.email)).map(s => s.email!);
+          },
+          error: (err) => console.error('Fehler beim Laden der Supervisoren', err),
+        });
+    },
     });
+
   }
 
-  loadSupervisors(): void {
-    this.departmentService.getAllSupervisors().subscribe({
-      next: (data) => this.supervisors = data,
-      error: (err) => console.error('Fehler beim Laden der Supervisoren', err)
-    });
+  onSupervisorSelected(email: string) {
+    this.newDepartment.supervisorEmail = email;
   }
 
-  getAvailableSupervisors(): ApplicationUserResponseDto[] {
-    const usedEmails = this.departments
-      .filter(dept => dept.name !== this.editedDepartment.oldName)
-      .map(dept => dept.supervisorEmail);
-
-    return this.supervisors.filter(sup => !usedEmails.includes(<string>sup.email));
+  onSupervisorSelectedEdit(email: string) {
+    this.editedDepartment.supervisorEmail = email;
   }
 }

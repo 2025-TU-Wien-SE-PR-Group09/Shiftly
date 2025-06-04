@@ -1,5 +1,5 @@
 <!-- Modal Overlay Create -->
-<div *ngIf="showFormCreate" class="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50">
+<div *ngIf="showFormCreate" class="fixed inset-0 z-50 flex items-center justify-center bg-black/50 bg-opacity-50">
   <!-- Modal Box -->
   <div class="relative w-full max-w-md rounded bg-white p-6 shadow-lg dark:bg-gray-900">
     <h2 class="mb-4 text-3xl font-bold text-gray-900 dark:text-white">Create Department</h2>
@@ -14,22 +14,16 @@
 
     <!-- Supervisor Dropdown -->
     <h2 class="mb-1 text-l font-bold text-gray-900 dark:text-white">Supervisor</h2>
-    <select
-      class="mb-4 w-full rounded border p-2"
-      [(ngModel)]="newDepartment.supervisorEmail">
-      <ng-container *ngIf="getAvailableSupervisors().length > 0; else noSupervisors">
-        <option *ngFor="let sup of getAvailableSupervisors()" [value]="sup.email">
-          {{ sup.email }}
-        </option>
-      </ng-container>
+    <ng-container *ngIf="supervisorEmails.length > 0; else noSupervisors">
+      <app-autocomplete class="mb-2" id="supervisor" [options]="supervisorEmails" (selected)="onSupervisorSelected($event)"> </app-autocomplete>
+    </ng-container>
 
-      <ng-template #noSupervisors>
-        <option disabled selected>No supervisors available</option>
-      </ng-template>
-    </select>
+    <ng-template #noSupervisors>
+      <p>No supervisors available</p>
+    </ng-template>
 
     <!-- Buttons -->
-    <div class="flex justify-end space-x-2">
+    <div class="flex justify-end space-x-2 mt-5">
       <app-button tone="warning" shape="rounded" impact="bold" size="medium" (click)="toggleFormCreate()">
         Cancel
       </app-button>
@@ -42,7 +36,7 @@
 </div>
 
 <!-- Modal Overlay Edit -->
-<div *ngIf="showFormEdit" class="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50">
+<div *ngIf="showFormEdit" class="fixed inset-0 z-50 flex items-center justify-center bg-black/50 bg-opacity-50">
   <!-- Modal Box -->
   <div class="relative w-full max-w-md rounded bg-white p-6 shadow-lg dark:bg-gray-900">
     <h2 class="mb-4 text-3xl font-bold text-gray-900 dark:text-white">Edit Department</h2>
@@ -57,23 +51,16 @@
 
     <!-- Supervisor Dropdown -->
     <h2 class="mb-1 text-l font-bold text-gray-900 dark:text-white">Supervisor</h2>
-    <select
-      class="mb-4 w-full rounded border p-2"
-      [(ngModel)]="editedDepartment.supervisorEmail">
+    <ng-container *ngIf="supervisorEmails.length > 0; else noSupervisors">
+      <app-autocomplete class="mb-2" id="supervisorEdit" [options]="supervisorEmails" (selected)="onSupervisorSelectedEdit($event)"> </app-autocomplete>
+    </ng-container>
 
-      <ng-container *ngIf="getAvailableSupervisors().length > 0; else noSupervisors">
-        <option *ngFor="let sup of getAvailableSupervisors()" [value]="sup.email">
-          {{ sup.email }}
-        </option>
-      </ng-container>
-
-      <ng-template #noSupervisors>
-        <option disabled selected>No supervisors available</option>
-      </ng-template>
-    </select>
+    <ng-template #noSupervisors>
+      <p>No supervisors available</p>
+    </ng-template>
 
     <!-- Buttons -->
-    <div class="flex justify-end space-x-2">
+    <div class="flex justify-end space-x-2 mt-5">
       <app-button tone="warning" shape="rounded" impact="bold" size="medium" (click)="closeFormEdit()">
         Cancel
       </app-button>
@@ -115,7 +102,7 @@
         <tr *ngFor="let dept of departments; let i = index" class="hover:bg-card/50">
           <td class="px-2 py-3">{{ dept.name }}</td>
           <td class="px-2 py-3">{{ dept.supervisorEmail }}</td>
-          <td class="px-2 py-3" [routerLink]="['/departments', dept.name, 'shiftplan-editor']">
+          <td class="px-2 py-3  hover:cursor-pointer" [routerLink]="['/departments', dept.name, 'shiftplan-editor']">
             <div class="flex items-center space-x-2">
               <svg
                 xmlns="http://www.w3.org/2000/svg"
@@ -129,7 +116,7 @@
                   stroke-linejoin="round"
                   d="M8 7V3m8 4V3m-9 8h10M5.25 21h13.5a2.25 2.25 0 0 0 2.25-2.25V7.5A2.25 2.25 0 0 0 18.75 5.25H5.25A2.25 2.25 0 0 0 3 7.5v11.25A2.25 2.25 0 0 0 5.25 21z" />
               </svg>
-              <span class="text-sm font-medium text-foreground hover:cursor-pointer">Shiftplan</span>
+              <span class="text-sm font-medium text-foreground">Shiftplan</span>
             </div>
           </td>
           <td class="px-2 py-3">

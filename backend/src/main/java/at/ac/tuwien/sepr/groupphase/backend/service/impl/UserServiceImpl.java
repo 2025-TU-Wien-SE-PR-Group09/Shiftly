@@ -162,6 +162,13 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
+    public List<ApplicationUserResponseDto> getAllAvailableUsers() {
+        return userRepository.findAllWithNoRole().stream()
+            .map(user -> new ApplicationUserResponseDto(user.getEmail()))
+            .collect(Collectors.toList());
+    }
+
+    @Override
     public List<ApplicationUserResponseDto> getAllSupervisors() {
         return userRepository.findAllByRoleName("SUPERVISOR").stream()
             .map(user -> new ApplicationUserResponseDto(user.getEmail()))
