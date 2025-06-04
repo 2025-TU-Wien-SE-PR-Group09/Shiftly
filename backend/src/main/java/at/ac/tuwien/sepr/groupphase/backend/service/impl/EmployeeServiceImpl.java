@@ -65,7 +65,7 @@ public class EmployeeServiceImpl implements EmployeeService {
 
         if (employees != null) {
             return employees.stream()
-                .map(e -> new EmployeeListItemDto(e.getEmail()))
+                .map(e -> new EmployeeListItemDto(e.getEmail(), e.getFirstName(), e.getLastName()))
                 .toList();
         }
 

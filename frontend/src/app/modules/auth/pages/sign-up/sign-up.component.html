@@ -3,12 +3,47 @@
     <h2 class="text-foreground mb-1 text-3xl font-semibold">Sign Up <span class="text-primary">!</span></h2>
   </div>
 
-  <div
-    class="before:border-muted after:border-muted my-4 flex items-center before:mt-0.5 before:flex-1 before:border-t after:mt-0.5 after:flex-1 after:border-t">
-    <p class="text-muted-foreground mx-4 mb-0 text-center text-sm">or</p>
-  </div>
-
   <div class="space-y-3 text-left">
+    <div class="form__group">
+      <div class="relative">
+        <input type="text"
+               id="firstName"
+               formControlName="firstName"
+               [ngClass]="{ 'is__invalid-input': submitted && f['firstName'].errors }"
+               class="peer block"
+               placeholder=" "
+        />
+        <label
+          for="firstName"
+          [ngClass]="{ 'peer-focus:text-destructive!': submitted && f['firstName'].errors }"
+          class="bg-background text-muted-foreground peer-focus:text-primary absolute top-2 z-10 origin-[0] -translate-y-4 scale-95 transform px-2 text-sm duration-300 peer-placeholder-shown:top-1/2 peer-placeholder-shown:-translate-y-1/2 peer-placeholder-shown:scale-100 peer-focus:top-2 peer-focus:-translate-y-4 peer-focus:scale-95 peer-focus:px-2 ltr:left-1 rtl:right-1">
+          First name
+        </label>
+      </div>
+      <div *ngIf="submitted && f['firstName'].errors" class="is__invalid-error">
+        <p class="text-red-500" *ngIf="f['firstName'].errors['required']">Required field</p>
+      </div>
+    </div>
+    <div class="form__group">
+      <div class="relative">
+        <input type="text"
+               id="lastName"
+               formControlName="lastName"
+               [ngClass]="{ 'is__invalid-input': submitted && f['lastName'].errors }"
+               class="peer block"
+               placeholder=" "
+        />
+        <label
+          for="lastName"
+          [ngClass]="{ 'peer-focus:text-destructive!': submitted && f['lastName'].errors }"
+          class="bg-background text-muted-foreground peer-focus:text-primary absolute top-2 z-10 origin-[0] -translate-y-4 scale-95 transform px-2 text-sm duration-300 peer-placeholder-shown:top-1/2 peer-placeholder-shown:-translate-y-1/2 peer-placeholder-shown:scale-100 peer-focus:top-2 peer-focus:-translate-y-4 peer-focus:scale-95 peer-focus:px-2 ltr:left-1 rtl:right-1">
+          Last name
+        </label>
+      </div>
+      <div *ngIf="submitted && f['lastName'].errors" class="is__invalid-error">
+        <p class="text-red-500" *ngIf="f['lastName'].errors['required']">Required field</p>
+      </div>
+    </div>
     <div class="form__group">
       <div class="relative">
         <input type="text"
@@ -26,7 +61,7 @@
         </label>
       </div>
       <div *ngIf="submitted && f['email'].errors" class="is__invalid-error">
-        <div *ngIf="f['email'].errors['required']">Required field</div>
+        <p class="text-red-500" *ngIf="f['email'].errors['required']">Required field</p>
         <div *ngIf="f['email'].errors['email']">Email must be an email address valid</div>
       </div>
     </div>
@@ -35,9 +70,10 @@
         <input
           [type]="passwordTextType ? 'text' : 'password'"
           id="password"
-          [ngClass]="{ 'is__invalid-input': submitted && f['password'].errors }"
+          [ngClass]="{  'is__invalid-input': submitted && f['password'].errors }"
           placeholder=" "
-          formControlName="password" />
+          formControlName="password"
+          class="peer block"/>
         <label
           for="password"
           [ngClass]="{ 'peer-focus:text-destructive!': submitted && f['password'].errors }"
@@ -57,7 +93,15 @@
           </svg-icon>
         </span>
       </div>
+      <div *ngIf="submitted && f['authCode'].errors" class="is__invalid-error">
+        <p class="text-red-500" *ngIf="f['authCode'].errors['required']">Required field</p>
+        <div *ngIf="f['authCode'].errors['minlength'] || f['authCode'].errors['maxlength']">Auth-Code must be 6
+          characters
+        </div>
+      </div>
     </div>
+
+    <div class="form__group">
 
     <div class="relative">
       <input
@@ -77,10 +121,11 @@
       </label>
     </div>
     <div *ngIf="submitted && f['authCode'].errors" class="is__invalid-error">
-      <div *ngIf="f['authCode'].errors['required']">Required field</div>
+      <p class="text-red-500" *ngIf="f['authCode'].errors['required']">Required field</p>
       <div *ngIf="f['authCode'].errors['minlength'] || f['authCode'].errors['maxlength']">Auth-Code must be 6
         characters
       </div>
+    </div>
     </div>
 
 

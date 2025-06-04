@@ -19,7 +19,7 @@ import { Observable }                                        from 'rxjs';
 // @ts-ignore
 import { LoginResponseRestDto } from '../model/loginResponseRestDto';
 // @ts-ignore
-import { UserDataRestDto } from '../model/userDataRestDto';
+import { UserDataLoginDto } from '../model/userDataLoginDto';
 
 // @ts-ignore
 import { BASE_PATH, COLLECTION_FORMATS }                     from '../variables';
@@ -38,16 +38,16 @@ export class LoginEndpointService extends BaseService {
     }
 
     /**
-     * @param userDataRestDto 
+     * @param userDataLoginDto 
      * @param observe set whether or not to return the data Observable as the body, response or events. defaults to returning the body.
      * @param reportProgress flag to report request and response progress.
      */
-    public login(userDataRestDto: UserDataRestDto, observe?: 'body', reportProgress?: boolean, options?: {httpHeaderAccept?: 'application/json', context?: HttpContext, transferCache?: boolean}): Observable<LoginResponseRestDto>;
-    public login(userDataRestDto: UserDataRestDto, observe?: 'response', reportProgress?: boolean, options?: {httpHeaderAccept?: 'application/json', context?: HttpContext, transferCache?: boolean}): Observable<HttpResponse<LoginResponseRestDto>>;
-    public login(userDataRestDto: UserDataRestDto, observe?: 'events', reportProgress?: boolean, options?: {httpHeaderAccept?: 'application/json', context?: HttpContext, transferCache?: boolean}): Observable<HttpEvent<LoginResponseRestDto>>;
-    public login(userDataRestDto: UserDataRestDto, observe: any = 'body', reportProgress: boolean = false, options?: {httpHeaderAccept?: 'application/json', context?: HttpContext, transferCache?: boolean}): Observable<any> {
-        if (userDataRestDto === null || userDataRestDto === undefined) {
-            throw new Error('Required parameter userDataRestDto was null or undefined when calling login.');
+    public login(userDataLoginDto: UserDataLoginDto, observe?: 'body', reportProgress?: boolean, options?: {httpHeaderAccept?: 'application/json', context?: HttpContext, transferCache?: boolean}): Observable<LoginResponseRestDto>;
+    public login(userDataLoginDto: UserDataLoginDto, observe?: 'response', reportProgress?: boolean, options?: {httpHeaderAccept?: 'application/json', context?: HttpContext, transferCache?: boolean}): Observable<HttpResponse<LoginResponseRestDto>>;
+    public login(userDataLoginDto: UserDataLoginDto, observe?: 'events', reportProgress?: boolean, options?: {httpHeaderAccept?: 'application/json', context?: HttpContext, transferCache?: boolean}): Observable<HttpEvent<LoginResponseRestDto>>;
+    public login(userDataLoginDto: UserDataLoginDto, observe: any = 'body', reportProgress: boolean = false, options?: {httpHeaderAccept?: 'application/json', context?: HttpContext, transferCache?: boolean}): Observable<any> {
+        if (userDataLoginDto === null || userDataLoginDto === undefined) {
+            throw new Error('Required parameter userDataLoginDto was null or undefined when calling login.');
         }
 
         let localVarHeaders = this.defaultHeaders;
@@ -89,7 +89,7 @@ export class LoginEndpointService extends BaseService {
         return this.httpClient.request<LoginResponseRestDto>('post', `${basePath}${localVarPath}`,
             {
                 context: localVarHttpContext,
-                body: userDataRestDto,
+                body: userDataLoginDto,
                 responseType: <any>responseType_,
                 ...(withCredentials ? { withCredentials } : {}),
                 headers: localVarHeaders,

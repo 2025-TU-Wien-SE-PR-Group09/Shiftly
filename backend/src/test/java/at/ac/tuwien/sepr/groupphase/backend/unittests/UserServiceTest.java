@@ -42,23 +42,27 @@ class UserServiceTest {
 
     @Test
     public void createOrChangePasswordUserDoesNotExistOK() {
-        UserDataDto toUpdate = new UserDataDto(TestData.ADMIN_USER_EMAIL, TestData.ADMIN_PW);
+        UserDataDto toUpdate = new UserDataDto(TestData.ADMIN_USER_EMAIL, TestData.ADMIN_PW, "Admin",
+            "Test");
         userService.createOrChangePassword(toUpdate);
         assertUserExists(toUpdate);
     }
 
     @Test
     public void createOrChangePasswordUserExistsOK() {
-        userService.createOrChangePassword(new UserDataDto(TestData.ADMIN_USER_EMAIL, "empty_pw"));
+        userService.createOrChangePassword(new UserDataDto(TestData.ADMIN_USER_EMAIL, "empty_pw",
+            "Admin", "Test"));
 
-        UserDataDto toUpdate = new UserDataDto(TestData.ADMIN_USER_EMAIL, TestData.ADMIN_PW);
+        UserDataDto toUpdate = new UserDataDto(TestData.ADMIN_USER_EMAIL, TestData.ADMIN_PW, "Admin",
+            "Test");
         userService.createOrChangePassword(toUpdate);
         assertUserExists(toUpdate);
     }
 
     @Test
     public void assignRoleToUserOK() {
-        userService.createOrChangePassword(new UserDataDto(TestData.ADMIN_USER_EMAIL, TestData.ADMIN_PW));
+        userService.createOrChangePassword(new UserDataDto(TestData.ADMIN_USER_EMAIL, TestData.ADMIN_PW,
+            "Admin", "Test"));
         userService.assignRoleToUser(new UserRoleDto(TestData.ADMIN_USER_EMAIL, Role.ADMIN));
 
         UserDetails applicationUser = authService.loadUserByUsername(TestData.ADMIN_USER_EMAIL);

@@ -61,7 +61,7 @@ public class StartupRunner implements CommandLineRunner {
         LOGGER.trace("run({})", String.join(", ", args));
 
         this.userService.createOrChangePassword(
-            new UserDataDto(ADMIN_EMAIL, adminUserPassword));
+            new UserDataDto(ADMIN_EMAIL, adminUserPassword, "Admin", "Shyft"));
         this.userService.assignRoleToUser(new UserRoleDto(ADMIN_EMAIL, Role.ADMIN));
 
         var production = this.departmentService.getDepartmentByName("Produktion")
@@ -70,7 +70,9 @@ public class StartupRunner implements CommandLineRunner {
         if (production.isEmpty()) {
             this.userService.createUser(new UserDataDto(
                 "supervisor@shyft.local",
-                "password"
+                "password",
+                "Supervisor",
+                "Shyft"
             ));
 
             LOGGER.info("Department not found, creating department!");
@@ -95,15 +97,21 @@ public class StartupRunner implements CommandLineRunner {
         LOGGER.info("Creating default users");
         this.userService.createUser(new UserDataDto(
             "employee@shyft.local",
-            "password"
+            "password",
+            "Employee",
+            "Shyft"
         ));
         this.userService.createUser(new UserDataDto(
             "new_account@shyft.local",
-            "password"
+            "password",
+            "NewAccount",
+            "Shyft"
         ));
         this.userService.createUser(new UserDataDto(
             "new_supervisor@shyft.local",
-            "password"
+            "password",
+            "NewSupervisor",
+            "Shyft"
         ));
 
         ApplicationUser supervisor = this.userRepository.findByEmail("supervisor@shyft.local").get();

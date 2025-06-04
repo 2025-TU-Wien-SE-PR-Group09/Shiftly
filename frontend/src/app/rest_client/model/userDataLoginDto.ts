@@ -9,9 +9,8 @@
  */
 
 
-export interface EmployeeListItemResponseDto { 
-    email?: string;
-    firstName?: string;
-    lastName?: string;
+export interface UserDataLoginDto { 
+    email: string;
+    password: string;
 }
 

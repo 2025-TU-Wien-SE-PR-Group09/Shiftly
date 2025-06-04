@@ -2,7 +2,8 @@ import {Injectable} from '@angular/core';
 import {Observable} from 'rxjs';
 import {tap} from 'rxjs/operators';
 import {jwtDecode} from 'jwt-decode';
-import { LoginEndpointService, LoginResponseRestDto, UserDataRestDto } from '../../rest_client';
+import { LoginEndpointService, LoginResponseRestDto, UserDataLoginDto } from '../../rest_client';
+import { UserDataRestDto } from '../../rest_client/model/userDataRestDto';
 
 @Injectable({
   providedIn: 'root'
@@ -17,7 +18,7 @@ export class AuthService {
    *
    * @param authRequest User data
    */
-  loginUser(authRequest: UserDataRestDto): Observable<LoginResponseRestDto> {
+  loginUser(authRequest: UserDataLoginDto): Observable<LoginResponseRestDto> {
     return this.loginEndpoint.login(authRequest)
       .pipe(
         tap((authResponse: LoginResponseRestDto) => this.setToken(authResponse.jwt!))

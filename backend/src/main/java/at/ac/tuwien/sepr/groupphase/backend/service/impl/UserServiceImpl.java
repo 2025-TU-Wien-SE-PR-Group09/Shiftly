@@ -53,6 +53,8 @@ public class UserServiceImpl implements UserService {
 
             applicationUser.setEmail(userData.getEmail());
             applicationUser.setPasswordHash(passwordEncoder.encode(userData.getPassword()));
+            applicationUser.setFirstName(userData.getFirstName());
+            applicationUser.setLastName(userData.getLastName());
             userRepository.save(applicationUser);
         } else {
             applicationUser = applicationUserOpt.get();
@@ -74,6 +76,8 @@ public class UserServiceImpl implements UserService {
             ApplicationUser applicationUser = new ApplicationUser();
             applicationUser.setEmail(userData.getEmail());
             applicationUser.setPasswordHash(passwordEncoder.encode(userData.getPassword()));
+            applicationUser.setFirstName(userData.getFirstName());
+            applicationUser.setLastName(userData.getLastName());
             userRepository.save(applicationUser);
         }
     }

@@ -34,6 +34,8 @@ export class SignUpComponent implements OnInit {
         Validators.minLength(6),
         Validators.maxLength(6)
       ]],
+      firstName: ['', Validators.required],
+      lastName: ['', Validators.required],
     });
   }
 
@@ -47,14 +49,13 @@ export class SignUpComponent implements OnInit {
 
   onSubmit() {
     this.submitted = true;
-    const { email, password, authCode } = this.form.value;
+    const { email, password, authCode, firstName, lastName } = this.form.value;
 
-    console.log(email, password, authCode);
     if (this.form.invalid) {
       return;
     }
 
-    this._registrationEndpoint.registerUser({email, password, code: authCode}).subscribe({
+    this._registrationEndpoint.registerUser({email, password, firstName, lastName, code: authCode}).subscribe({
       next: (resp) => {
         this._toastr.success('Registration successful');
         this._router.navigateByUrl('/auth/sign-in').then();

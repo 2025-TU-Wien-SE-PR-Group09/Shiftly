@@ -16,9 +16,17 @@ import java.util.Set;
 @Entity
 public class ApplicationUser {
     @Id
-    @Column(unique = true, nullable = false, length = 50)
-    @Size(max = 50)
+    @Column(unique = true, nullable = false, length = 200)
+    @Size(max = 200)
     private String email;
+
+    @Column(nullable = false, length = 50)
+    @Size(max = 50)
+    private String firstName;
+
+    @Column(nullable = false, length = 50)
+    @Size(max = 50)
+    private String lastName;
 
     @Column(nullable = false, length = 200)
     @Size(max = 200)
@@ -65,7 +73,25 @@ public class ApplicationUser {
             + "email='" + email + '\''
             + ", password='" + passwordHash + '\''
             + ", roles=" + roles
+            + ", firstName='" + firstName + '\''
+            + ", lastName='" + lastName + '\''
             + '}';
+    }
+
+    public String getFirstName() {
+        return firstName;
+    }
+
+    public void setFirstName(String firstName) {
+        this.firstName = firstName;
+    }
+
+    public String getLastName() {
+        return lastName;
+    }
+
+    public void setLastName(String lastName) {
+        this.lastName = lastName;
     }
 
     public Department getDepartment() {

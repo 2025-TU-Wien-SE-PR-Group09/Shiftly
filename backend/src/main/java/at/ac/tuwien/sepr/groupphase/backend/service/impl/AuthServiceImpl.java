@@ -1,5 +1,6 @@
 package at.ac.tuwien.sepr.groupphase.backend.service.impl;
 
+import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.user.UserDataLoginDto;
 import at.ac.tuwien.sepr.groupphase.backend.entity.ApplicationRole;
 import at.ac.tuwien.sepr.groupphase.backend.entity.ApplicationUser;
 import at.ac.tuwien.sepr.groupphase.backend.repository.UserRepository;
@@ -40,7 +41,7 @@ public class AuthServiceImpl implements AuthService {
     }
 
     @Override
-    public LoginResponseDto login(UserDataDto userLoginDto) {
+    public LoginResponseDto login(UserDataLoginDto userLoginDto) {
         LOGGER.trace("login({})", userLoginDto);
         UserDetails userDetails = loadUserByUsername(userLoginDto.getEmail());
         if (userDetails != null
