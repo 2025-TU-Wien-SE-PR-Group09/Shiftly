@@ -5,6 +5,7 @@ import {
   EmployeeVacationsComponent
 } from './pages/employee-vacations/employee-vacations.component';
 import { SupervisorVacationsComponent } from './pages/supervisor-vacations/supervisor-vacations.component';
+import { RoleGuard } from '../../core/guards/role.guard';
 
 const routes: Routes = [
   {
@@ -13,11 +14,19 @@ const routes: Routes = [
     children: [
       {
         path: 'employee',
-        component: EmployeeVacationsComponent
+        component: EmployeeVacationsComponent,
+        canActivate: [RoleGuard],
+        data: {
+          roles: ['EMPLOYEE'],
+        },
       },
       {
         path: 'supervisor',
-        component: SupervisorVacationsComponent
+        component: SupervisorVacationsComponent,
+        canActivate: [RoleGuard],
+        data: {
+          roles: ['SUPERVISOR'],
+        },
       },
     ]
   },
