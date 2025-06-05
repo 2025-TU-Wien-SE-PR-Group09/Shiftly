@@ -1,18 +1,30 @@
 package at.ac.tuwien.sepr.groupphase.backend.service.dto.sickleave;
 
+import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.validator.annotation.ValidSickLeaveDateRange;
+import jakarta.validation.constraints.Email;
+import jakarta.validation.constraints.NotNull;
+
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 /**
  * Internal DTO used in the service layer to represent sick leave certificate data.
  */
+@ValidSickLeaveDateRange
 public class SickLeaveCertificateDto {
     private Long id;
     private String fileName;
     private String fileType;
     private LocalDateTime uploadedAt;
+
+    @NotNull(message = "Email must not be null")
+    @Email(message = "Email must be a valid email address")
     private String employeeEmail;
+
+    @NotNull(message = "Start date must not be null")
     private LocalDate startDate;
+
+    @NotNull(message = "End date must not be null")
     private LocalDate endDate;
 
 

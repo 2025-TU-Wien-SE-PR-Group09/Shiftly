@@ -9,12 +9,7 @@
  */
 
 
-export interface SickLeaveCertificateRestDto { 
-    id?: number;
-    fileName?: string;
-    fileType?: string;
-    uploadedAt?: string;
-    employeeEmail: string;
+export interface SickLeaveCertificateUploadDto { 
     startDate: string;
     endDate: string;
 }

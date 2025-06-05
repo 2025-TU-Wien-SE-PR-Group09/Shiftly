@@ -1,8 +1,10 @@
 package at.ac.tuwien.sepr.groupphase.backend.endpoint;
 
+import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.SickLeaveCertificateUploadDto;
 import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.sickleave.SickLeaveCertificateRestDto;
 import at.ac.tuwien.sepr.groupphase.backend.endpoint.mapper.SickLeaveCertificateMapper;
 import at.ac.tuwien.sepr.groupphase.backend.entity.ApplicationUser;
+import at.ac.tuwien.sepr.groupphase.backend.entity.SickLeaveCertificate;
 import at.ac.tuwien.sepr.groupphase.backend.service.AuthService;
 import at.ac.tuwien.sepr.groupphase.backend.service.SickLeaveCertificateService;
 import at.ac.tuwien.sepr.groupphase.backend.service.dto.sickleave.SickLeaveCertificateDto;
@@ -12,7 +14,7 @@ import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import jakarta.annotation.security.RolesAllowed;
-import org.springframework.format.annotation.DateTimeFormat;
+import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -23,10 +25,10 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RequestPart;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.time.LocalDate;
 import java.util.List;
 
 /**
@@ -55,13 +57,12 @@ public class SickLeaveCertificateEndpoint {
      * @return metadata of the uploaded certificate
      */
     @PostMapping(path = "/upload", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-    public ResponseEntity<SickLeaveCertificateRestDto> upload(@RequestParam("file") MultipartFile file,
-                                                              @RequestParam("startDate") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate startDate,
-                                                              @RequestParam("endDate") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate endDate) {
+    public ResponseEntity<SickLeaveCertificateRestDto> upload(@RequestParam(name = "file") MultipartFile file,
+                                                              @RequestPart(name = "uploadDto") @Valid SickLeaveCertificateUploadDto dto) {
 
         ApplicationUser currentUser = authService.getCurrentUser();
         validateFile(file);
-        var serviceDto = certificateService.upload(file, currentUser.getEmail(), startDate, endDate);
+        var serviceDto = certificateService.upload(file, currentUser.getEmail(), dto.getStartDate(), dto.getEndDate());
         return ResponseEntity.ok(mapper.toRest(serviceDto));
     }
 
@@ -198,6 +199,13 @@ public class SickLeaveCertificateEndpoint {
     @DeleteMapping("/{id}")
     @RolesAllowed({"ADMIN", "EMPLOYEE"})
     public ResponseEntity<Void> deleteSickLeaveCertificate(@PathVariable(name = "id") Long id) {
+        ApplicationUser currentUser = authService.getCurrentUser();
+        SickLeaveCertificate cert = certificateService.findById(id);
+
+        if (!canAccess(currentUser, cert.getEmployee())) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
+        }
+
         certificateService.deleteSickLeaveCertificate(id);
         return ResponseEntity.noContent().build();
     }

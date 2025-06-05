@@ -40,6 +40,7 @@ export class ExceptionInterceptor implements HttpInterceptor {
         if (error.error?.errors) {
           // If errors is an object or array, iterate and show each message
           const errors = error.error.errors;
+          console.log(errors);
           if (Array.isArray(errors)) {
             errors.forEach(err => this.toastr.error(err, "Error occurred"));
           } else if (typeof errors === 'object') {

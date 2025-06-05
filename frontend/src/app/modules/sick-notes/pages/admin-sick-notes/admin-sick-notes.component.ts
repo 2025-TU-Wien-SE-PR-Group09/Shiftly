@@ -15,7 +15,6 @@ import { Router } from '@angular/router';
 })
 export class AdminSickNotesComponent implements OnInit {
   sickNotes: SickLeaveCertificateRestDto[] = [];
-  confirmingDeleteNote: SickLeaveCertificateRestDto | null = null;
   confirmingDeleteId: number | null = null;
 
   constructor(

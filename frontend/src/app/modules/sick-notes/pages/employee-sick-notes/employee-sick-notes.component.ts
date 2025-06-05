@@ -5,7 +5,6 @@ import { SickLeaveCertificateRestDto, SickLeaveCertificateEndpointService } from
 import { ToastrService } from 'ngx-toastr';
 import { ButtonComponent } from '../../../../shared/components/button/button.component';
 import { Observable } from 'rxjs';
-import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-employee-sick-notes',
@@ -25,11 +24,7 @@ export class EmployeeSickNotesComponent implements OnInit {
   endDate: string = '';
   confirmingDeleteId: number | null = null;
 
-  constructor(
-    private sickLeaveService: SickLeaveCertificateEndpointService,
-    private toastr: ToastrService,
-    private router: Router,
-  ) {}
+  constructor(private sickLeaveService: SickLeaveCertificateEndpointService, private toastr: ToastrService) {}
 
   ngOnInit(): void {
     this.loadSickNotes();
@@ -70,30 +65,42 @@ export class EmployeeSickNotesComponent implements OnInit {
       return;
     }
 
-    this.loading = true;
-    this.uploadSuccess = false;
 
-    this.sickLeaveService.upload(this.startDate, this.endDate, this.selectedFile!).subscribe({
-      next: (newCert) => {
-        this.toastr.success('File uploaded successfully.');
-        this.selectedFile = null;
-        this.startDate = '';
-        this.endDate = '';
-        this.uploadSuccess = true;
-        this.loadSickNotes();
 
-        setTimeout(() => {
-          this.uploadSuccess = false;
-        }, 5000);
-      },
-      error: (err) => {
-        const msg = err?.error?.errors?.[0] ?? 'Upload failed. Please try again.';
-        this.showError(msg);
-      },
-      complete: () => {
-        this.loading = false;
-      },
-    });
+    this.sickLeaveService
+      .upload(
+        this.selectedFile,
+        {
+          startDate: this.startDate,
+          endDate: this.endDate,
+        },
+        'body',
+        false,
+        {
+          httpHeaderAccept: '*/*',
+        },
+      )
+      .subscribe({
+        next: () => {
+          this.toastr.success('File uploaded successfully.');
+          this.selectedFile = null;
+          this.startDate = '';
+          this.endDate = '';
+          this.uploadSuccess = true;
+          this.loadSickNotes();
+
+          if (this.fileInputRef) {
+            this.fileInputRef.nativeElement.value = '';
+          }
+
+          setTimeout(() => {
+            this.uploadSuccess = false;
+          }, 5000);
+        },
+        complete: () => {
+          this.loading = false;
+        },
+      });
   }
 
   downloadFile(note: SickLeaveCertificateRestDto): void {
@@ -118,12 +125,14 @@ export class EmployeeSickNotesComponent implements OnInit {
 
   cancelUpload(): void {
     this.selectedFile = null;
+    this.startDate = '';
+    this.endDate = '';
 
     if (this.fileInputRef) {
       this.fileInputRef.nativeElement.value = '';
     }
 
-    this.toastr.info('File selection cleared.');
+    this.toastr.info('Selection cleared.');
   }
 
   get selectedFileName(): string {
