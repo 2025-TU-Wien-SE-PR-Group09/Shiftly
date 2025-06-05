@@ -37,7 +37,6 @@
           #fileInput
           type="file"
           id="file"
-          #fileInput
           accept=".pdf,.jpg,.jpeg,.png"
           (change)="onFileSelected($event)"
           class="w-full rounded border border-border bg-muted text-foreground p-2"
@@ -48,76 +47,6 @@
         </p>
       </div>
 
-      <div *ngIf="loading" class="text-sm text-blue-600">⏳ Uploading...</div>
-    <form
-      (ngSubmit)="uploadFile()"
-      class="space-y-4 rounded-xl border border-border bg-background p-6 shadow-md"
-    >
-      <div>
-        <label for="startDate" class="block mb-1 font-medium text-foreground">Start Date</label>
-        <input
-          type="date"
-          id="startDate"
-          name="startDate"
-          [(ngModel)]="startDate"
-          class="w-full rounded border border-border bg-muted text-foreground p-2"
-          required
-        />
-      </div>
-
-      <div>
-        <label for="endDate" class="block mb-1 font-medium text-foreground">End Date</label>
-        <input
-          type="date"
-          id="endDate"
-          name="endDate"
-          [(ngModel)]="endDate"
-          class="w-full rounded border border-border bg-muted text-foreground p-2"
-          required
-        />
-      </div>
-
-      <div>
-        <label for="file" class="block mb-1 font-medium text-foreground">Upload Certificate</label>
-        <input
-          type="file"
-          id="file"
-          #fileInput
-          accept=".pdf,.jpg,.jpeg,.png"
-          (change)="onFileSelected($event)"
-          class="w-full rounded border border-border bg-muted text-foreground p-2"
-          [disabled]="loading"
-        />
-        <p class="text-sm text-muted-foreground mt-1">
-          Selected file: {{ selectedFileName }}
-        </p>
-      </div>
-
-      <div class="flex justify-end space-x-2 pt-2">
-        <app-button
-          type="button"
-          tone="light"
-          impact="bold"
-          shape="rounded"
-          size="medium"
-          (click)="cancelUpload()"
-          [disabled]="loading"
-        >
-          Cancel
-        </app-button>
-        <app-button
-          type="submit"
-          tone="primary"
-          impact="bold"
-          shape="rounded"
-          size="medium"
-          [disabled]="loading || !selectedFile"
-        >
-          {{ loading ? 'Uploading...' : 'Upload' }}
-        </app-button>
-      </div>
-    </form>
-  </div>
       <div *ngIf="loading" class="text-sm text-blue-600">⏳ Uploading...</div>
 
       <div class="flex justify-end space-x-2 pt-2">
@@ -233,5 +162,3 @@
     </div>
   </div>
 </div>
-
-
