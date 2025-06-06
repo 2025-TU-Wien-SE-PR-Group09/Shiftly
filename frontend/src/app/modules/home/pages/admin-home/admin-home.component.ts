@@ -27,7 +27,7 @@ export class AdminHomeComponent implements OnInit {
     private _adminService: AdminEndpointService,
     private _departmentService: DepartmentService,
     private readonly _toastr: ToastrService,
-  ) {}
+  ) { }
 
   protected departments: DepartmentDetailRestResponseDto[] = [];
   protected selectedDepartment: DepartmentDetailRestResponseDto | undefined;
@@ -128,6 +128,7 @@ export class AdminHomeComponent implements OnInit {
       const startDate = new Date(shift.day.start);
       const endDate = new Date(shift.day.end);
       const shiftTitle = shift.shiftDescription ?? 'Schicht';
+      console.log(shift.workers)
 
       this.events.push({
         title: shiftTitle,

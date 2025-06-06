@@ -3,14 +3,15 @@ package at.ac.tuwien.sepr.groupphase.backend.entity;
 import jakarta.persistence.EmbeddedId;
 import jakarta.persistence.Entity;
 import jakarta.persistence.JoinColumn;
-import jakarta.persistence.JoinColumns;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.MapsId;
 import jakarta.persistence.Table;
-
+import jakarta.persistence.UniqueConstraint;
 
 @Entity
-@Table(name = "scheduled_shift_assignment")
+@Table(name = "scheduled_shift_assignment", uniqueConstraints = {
+        @UniqueConstraint(columnNames = { "scheduled_shift_id", "user_email" })
+})
 public class ScheduledShiftAssignment {
 
     @EmbeddedId
@@ -18,12 +19,7 @@ public class ScheduledShiftAssignment {
 
     @ManyToOne(optional = false)
     @MapsId("scheduledShiftId")
-    @JoinColumns({
-        @JoinColumn(name = "department_name", referencedColumnName = "department_name"),
-        @JoinColumn(name = "calendar_week", referencedColumnName = "calendar_week"),
-        @JoinColumn(name = "calendar_year", referencedColumnName = "calendar_year"),
-        @JoinColumn(name = "shift_blueprint_id", referencedColumnName = "shift_blueprint_id")
-    })
+    @JoinColumn(name = "scheduled_shift_id", referencedColumnName = "id")
     private ScheduledShift scheduledShift;
 
     @ManyToOne(optional = false)
@@ -62,6 +58,10 @@ public class ScheduledShiftAssignment {
 
     public void setUser(ApplicationUser user) {
         this.user = user;
+    }
+
+    public void setUserEmail(String email) {
+        this.id.setUserEmail(email);
     }
 
     public static class Builder {

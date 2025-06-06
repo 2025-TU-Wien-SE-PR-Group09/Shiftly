@@ -21,4 +21,7 @@ public interface UserRepository extends JpaRepository<ApplicationUser, String> {
 
     @Query("SELECT u FROM ApplicationUser u LEFT JOIN u.roles r WHERE r IS NULL")
     List<ApplicationUser> findAllWithNoRole();
+
+    @Query("SELECT u FROM ApplicationUser u WHERE u.department.id = :departmentId")
+    List<ApplicationUser> findByDepartmentId(@Param("departmentId") Long departmentId);
 }
