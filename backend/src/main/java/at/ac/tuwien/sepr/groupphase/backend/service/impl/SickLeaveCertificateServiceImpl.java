@@ -7,7 +7,7 @@ import at.ac.tuwien.sepr.groupphase.backend.repository.SickLeaveCertificateRepos
 import at.ac.tuwien.sepr.groupphase.backend.repository.UserRepository;
 import at.ac.tuwien.sepr.groupphase.backend.service.AuthService;
 import at.ac.tuwien.sepr.groupphase.backend.service.SickLeaveCertificateService;
-import at.ac.tuwien.sepr.groupphase.backend.service.dto.SickLeaveCertificateDto;
+import at.ac.tuwien.sepr.groupphase.backend.service.dto.sickleave.SickLeaveCertificateDto;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 

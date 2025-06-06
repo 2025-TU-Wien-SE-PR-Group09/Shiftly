@@ -1,10 +1,10 @@
 package at.ac.tuwien.sepr.groupphase.backend.endpoint;
 
-import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.ChangePasswordRestDto;
-import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.UserProfileRestDto;
+import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.user.ChangePasswordRestDto;
+import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.user.UserProfileRestDto;
 import at.ac.tuwien.sepr.groupphase.backend.service.UserService;
-import at.ac.tuwien.sepr.groupphase.backend.service.dto.ChangePasswordDto;
-import at.ac.tuwien.sepr.groupphase.backend.service.dto.UserProfileDto;
+import at.ac.tuwien.sepr.groupphase.backend.service.dto.user.ChangePasswordDto;
+import at.ac.tuwien.sepr.groupphase.backend.service.dto.user.UserProfileDto;
 import jakarta.validation.Valid;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;

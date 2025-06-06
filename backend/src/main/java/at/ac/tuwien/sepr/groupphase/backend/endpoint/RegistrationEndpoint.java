@@ -1,9 +1,9 @@
 package at.ac.tuwien.sepr.groupphase.backend.endpoint;
 
 import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.MessageResponseDto;
-import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.RegisterRestDto;
+import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.user.RegisterRestDto;
 import at.ac.tuwien.sepr.groupphase.backend.service.UserService;
-import at.ac.tuwien.sepr.groupphase.backend.service.dto.UserDataDto;
+import at.ac.tuwien.sepr.groupphase.backend.service.dto.user.UserDataDto;
 import jakarta.annotation.security.PermitAll;
 import jakarta.transaction.Transactional;
 import org.springframework.http.HttpStatus;

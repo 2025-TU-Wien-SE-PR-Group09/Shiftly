@@ -1,11 +1,11 @@
 package at.ac.tuwien.sepr.groupphase.backend.endpoint;
 
-import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.SickLeaveCertificateRestDto;
+import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.sickleave.SickLeaveCertificateRestDto;
 import at.ac.tuwien.sepr.groupphase.backend.endpoint.mapper.SickLeaveCertificateMapper;
 import at.ac.tuwien.sepr.groupphase.backend.entity.ApplicationUser;
 import at.ac.tuwien.sepr.groupphase.backend.service.AuthService;
 import at.ac.tuwien.sepr.groupphase.backend.service.SickLeaveCertificateService;
-import at.ac.tuwien.sepr.groupphase.backend.service.dto.SickLeaveCertificateDto;
+import at.ac.tuwien.sepr.groupphase.backend.service.dto.sickleave.SickLeaveCertificateDto;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.ArraySchema;
 import io.swagger.v3.oas.annotations.media.Content;

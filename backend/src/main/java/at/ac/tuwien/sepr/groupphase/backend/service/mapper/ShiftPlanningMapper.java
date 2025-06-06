@@ -1,6 +1,6 @@
 package at.ac.tuwien.sepr.groupphase.backend.service.mapper;
 
-import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.PlanBlueprintResponse;
+import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.shift.PlanBlueprintResponse;
 import at.ac.tuwien.sepr.groupphase.backend.entity.PlanBlueprint;
 import at.ac.tuwien.sepr.groupphase.backend.entity.ShiftBlueprint;
 import at.ac.tuwien.sepr.groupphase.backend.entity.ShiftDayBlueprint;

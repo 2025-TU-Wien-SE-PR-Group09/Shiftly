@@ -1,9 +1,9 @@
 package at.ac.tuwien.sepr.groupphase.backend.endpoint;
 
-import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.LoginResponseRestDto;
-import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.UserDataRestDto;
+import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.user.LoginResponseRestDto;
+import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.user.UserDataRestDto;
 import at.ac.tuwien.sepr.groupphase.backend.service.AuthService;
-import at.ac.tuwien.sepr.groupphase.backend.service.dto.UserDataDto;
+import at.ac.tuwien.sepr.groupphase.backend.service.dto.user.UserDataDto;
 import jakarta.annotation.security.PermitAll;
 import jakarta.transaction.Transactional;
 import jakarta.validation.Valid;

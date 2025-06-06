@@ -7,11 +7,11 @@ import at.ac.tuwien.sepr.groupphase.backend.exception.ConflictException;
 import at.ac.tuwien.sepr.groupphase.backend.repository.DepartmentRepository;
 import at.ac.tuwien.sepr.groupphase.backend.repository.UserRepository;
 import at.ac.tuwien.sepr.groupphase.backend.service.UserService;
-import at.ac.tuwien.sepr.groupphase.backend.service.dto.DepartmentCreateDto;
-import at.ac.tuwien.sepr.groupphase.backend.service.dto.DepartmentCreateResponseDto;
-import at.ac.tuwien.sepr.groupphase.backend.service.dto.DepartmentEditResponseDto;
+import at.ac.tuwien.sepr.groupphase.backend.service.dto.department.DepartmentCreateDto;
+import at.ac.tuwien.sepr.groupphase.backend.service.dto.department.DepartmentCreateResponseDto;
+import at.ac.tuwien.sepr.groupphase.backend.service.dto.department.DepartmentEditResponseDto;
 import at.ac.tuwien.sepr.groupphase.backend.service.impl.DepartmentServiceImpl;
-import at.ac.tuwien.sepr.groupphase.backend.service.dto.DepartmentEditDto;
+import at.ac.tuwien.sepr.groupphase.backend.service.dto.department.DepartmentEditDto;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 

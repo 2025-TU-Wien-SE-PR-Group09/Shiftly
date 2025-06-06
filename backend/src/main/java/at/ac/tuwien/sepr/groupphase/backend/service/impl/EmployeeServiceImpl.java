@@ -9,11 +9,11 @@ import at.ac.tuwien.sepr.groupphase.backend.repository.DepartmentRepository;
 import at.ac.tuwien.sepr.groupphase.backend.repository.UserRepository;
 import at.ac.tuwien.sepr.groupphase.backend.service.EmployeeService;
 import at.ac.tuwien.sepr.groupphase.backend.service.UserService;
-import at.ac.tuwien.sepr.groupphase.backend.service.dto.DepartmentNameDto;
-import at.ac.tuwien.sepr.groupphase.backend.service.dto.EmployeeDto;
-import at.ac.tuwien.sepr.groupphase.backend.service.dto.EmployeeListItemDto;
+import at.ac.tuwien.sepr.groupphase.backend.service.dto.department.DepartmentNameDto;
+import at.ac.tuwien.sepr.groupphase.backend.service.dto.employee.EmployeeDto;
+import at.ac.tuwien.sepr.groupphase.backend.service.dto.employee.EmployeeListItemDto;
 import at.ac.tuwien.sepr.groupphase.backend.service.dto.Role;
-import at.ac.tuwien.sepr.groupphase.backend.service.dto.UserRoleDto;
+import at.ac.tuwien.sepr.groupphase.backend.service.dto.user.UserRoleDto;
 import org.springframework.stereotype.Service;
 
 import java.util.List;

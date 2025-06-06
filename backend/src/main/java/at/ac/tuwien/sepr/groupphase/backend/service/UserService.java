@@ -1,12 +1,11 @@
 package at.ac.tuwien.sepr.groupphase.backend.service;
 
-import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.ApplicationUserResponseDto;
+import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.user.ApplicationUserResponseDto;
 import at.ac.tuwien.sepr.groupphase.backend.entity.ApplicationUser;
-import at.ac.tuwien.sepr.groupphase.backend.service.dto.ChangePasswordDto;
-import at.ac.tuwien.sepr.groupphase.backend.service.dto.UserDataDto;
-import at.ac.tuwien.sepr.groupphase.backend.service.dto.UserEmailDto;
-import at.ac.tuwien.sepr.groupphase.backend.service.dto.UserProfileDto;
-import at.ac.tuwien.sepr.groupphase.backend.service.dto.UserRoleDto;
+import at.ac.tuwien.sepr.groupphase.backend.service.dto.user.ChangePasswordDto;
+import at.ac.tuwien.sepr.groupphase.backend.service.dto.user.UserDataDto;
+import at.ac.tuwien.sepr.groupphase.backend.service.dto.user.UserProfileDto;
+import at.ac.tuwien.sepr.groupphase.backend.service.dto.user.UserRoleDto;
 import at.ac.tuwien.sepr.groupphase.backend.exception.NotFoundException;
 
 import java.util.List;
