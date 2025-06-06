@@ -44,6 +44,7 @@ model/shiftDayResponseDto.ts
 model/shiftResponseDto.ts
 model/shiftWeekResponseDto.ts
 model/sickLeaveCertificateRestDto.ts
+model/sickLeaveCertificateUploadDto.ts
 model/userDataLoginDto.ts
 model/userProfileRestDto.ts
 model/vacationRequestResponseRestDto.ts

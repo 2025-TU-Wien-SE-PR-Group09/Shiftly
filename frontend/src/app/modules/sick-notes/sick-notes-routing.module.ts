@@ -28,7 +28,7 @@ const routes: Routes = [
         component: EmployeeSickNotesComponent,
         canActivate: [RoleGuard],
         data: {
-          roles: ['SUPERVISOR'],
+          roles: ['EMPLOYEE'],
         },
       }
     ]
