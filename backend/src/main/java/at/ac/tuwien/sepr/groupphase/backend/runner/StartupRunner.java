@@ -47,8 +47,8 @@ public class StartupRunner implements CommandLineRunner {
     private String adminUserPassword;
 
     public StartupRunner(UserService userService, ShiftPlanningService shiftPlanningService,
-                         DepartmentService departmentService, PlanBlueprintRepository planBlueprintRepository,
-                         UserRepository userRepository, DepartmentRepository departmentRepository) {
+            DepartmentService departmentService, PlanBlueprintRepository planBlueprintRepository,
+            UserRepository userRepository, DepartmentRepository departmentRepository) {
         this.userService = userService;
         this.shiftPlanningService = shiftPlanningService;
         this.departmentService = departmentService;
@@ -185,16 +185,16 @@ public class StartupRunner implements CommandLineRunner {
                 .build());
 
         var plan = new PlanBlueprint.Builder()
-            .withDepartment(department)
-            .withDescription("Standard-plan for Production (1-1 Day/Night Rotation)")
-            .addShift(shiftBuilder -> {
-                shiftBuilder.withDescription("Dayshift")
-                    .withManPower(4)
-                    .addWeek(0, weekBuilder -> {
-                        weekBuilder.withDays(days);
-                    });
-            })
-            .build();
+                .withDepartment(department)
+                .withDescription("Standard-plan for Production (1-1 Day/Night Rotation)")
+                .addShift(shiftBuilder -> {
+                    shiftBuilder.withDescription("Dayshift")
+                            .withManPower(4)
+                            .addWeek(0, weekBuilder -> {
+                                weekBuilder.withDays(days);
+                            });
+                })
+                .build();
         plan = this.planBlueprintRepository.save(plan);
 
     }

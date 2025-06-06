@@ -29,10 +29,10 @@ public class ShiftPlanningMapper {
          */
         public static PlanBlueprintResponse toResponse(PlanBlueprintDto planBlueprintDto) {
             return new PlanBlueprintResponse(
-                planBlueprintDto.id(),
-                planBlueprintDto.description(),
-                planBlueprintDto.department(),
-                planBlueprintDto.shifts().stream().map(ShiftPlanningMapper.Shifts::toResponse).toList());
+                    planBlueprintDto.id(),
+                    planBlueprintDto.description(),
+                    planBlueprintDto.department(),
+                    planBlueprintDto.shifts().stream().map(ShiftPlanningMapper.Shifts::toResponse).toList());
         }
 
         /**
@@ -43,12 +43,12 @@ public class ShiftPlanningMapper {
          */
         public static PlanBlueprintDto fromEntity(PlanBlueprint plan) {
             return new PlanBlueprintDto(
-                plan.getId(),
-                plan.getDescription(),
-                plan.getDepartment().getName(),
-                plan.getShifts().stream()
-                    .map(ShiftPlanningMapper.Shifts::fromEntity)
-                    .toList());
+                    plan.getId(),
+                    plan.getDescription(),
+                    plan.getDepartment().getName(),
+                    plan.getShifts().stream()
+                            .map(ShiftPlanningMapper.Shifts::fromEntity)
+                            .toList());
         }
     }
 
@@ -65,11 +65,11 @@ public class ShiftPlanningMapper {
          */
         public static ShiftBlueprintDto fromEntity(ShiftBlueprint shiftBlueprint) {
             var shiftWeeks = shiftBlueprint.getShiftWeeks().stream()
-                .map(ShiftPlanningMapper.ShiftWeeks::fromEntity)
-                .toList();
+                    .map(ShiftPlanningMapper.ShiftWeeks::fromEntity)
+                    .toList();
 
             return new ShiftBlueprintDto(shiftBlueprint.getId(), shiftBlueprint.getDescription(),
-                shiftBlueprint.getManPower(), shiftWeeks);
+                    shiftBlueprint.getManPower(), shiftWeeks);
         }
 
         /**
@@ -80,10 +80,10 @@ public class ShiftPlanningMapper {
          */
         public static PlanBlueprintResponse.ShiftResponseDto toResponse(ShiftBlueprintDto shift) {
             return new PlanBlueprintResponse.ShiftResponseDto(
-                shift.id(),
-                shift.description(),
-                shift.manPower(),
-                shift.shiftWeeks().stream().map(ShiftPlanningMapper.ShiftWeeks::toResponse).toList());
+                    shift.id(),
+                    shift.description(),
+                    shift.manPower(),
+                    shift.shiftWeeks().stream().map(ShiftPlanningMapper.ShiftWeeks::toResponse).toList());
         }
     }
 
@@ -100,8 +100,8 @@ public class ShiftPlanningMapper {
          */
         public static ShiftWeekBlueprintDto fromEntity(ShiftWeekBlueprint shiftWeekBlueprint) {
             var shiftDays = shiftWeekBlueprint.getDays().stream()
-                .map(ShiftPlanningMapper.ShiftDays::fromEntity)
-                .toList();
+                    .map(ShiftPlanningMapper.ShiftDays::fromEntity)
+                    .toList();
             return new ShiftWeekBlueprintDto(shiftDays);
         }
 
@@ -113,7 +113,7 @@ public class ShiftPlanningMapper {
          */
         public static PlanBlueprintResponse.ShiftWeekResponseDto toResponse(ShiftWeekBlueprintDto shiftWeek) {
             return new PlanBlueprintResponse.ShiftWeekResponseDto(
-                shiftWeek.shiftDays().stream().map(ShiftPlanningMapper.ShiftDays::toResponse).toList());
+                    shiftWeek.shiftDays().stream().map(ShiftPlanningMapper.ShiftDays::toResponse).toList());
         }
     }
 
@@ -129,7 +129,7 @@ public class ShiftPlanningMapper {
          */
         public static ShiftDayDto fromEntity(ShiftDayBlueprint shiftDayBlueprint) {
             return new ShiftDayDto(shiftDayBlueprint.getDay(), shiftDayBlueprint.getStartTime(),
-                shiftDayBlueprint.getDuration());
+                    shiftDayBlueprint.getDuration());
         }
 
         /**
@@ -140,18 +140,18 @@ public class ShiftPlanningMapper {
          */
         public static PlanBlueprintResponse.ShiftDayResponseDto toResponse(ShiftDayDto shiftDayDto) {
             return new PlanBlueprintResponse.ShiftDayResponseDto(shiftDayDto.day(), shiftDayDto.startTime(),
-                shiftDayDto.duration());
+                    shiftDayDto.duration());
         }
     }
 
     public static class Calendar {
 
         public static DepartmentShiftplanCalendarResponse.ScheduledShift toResponse(
-            at.ac.tuwien.sepr.groupphase.backend.entity.ScheduledShift scheduledShift) {
+                at.ac.tuwien.sepr.groupphase.backend.entity.ScheduledShift scheduledShift) {
             return new DepartmentShiftplanCalendarResponse.ScheduledShift(
-                scheduledShift.getDescription(),
-                new DepartmentShiftplanCalendarResponse.Day(scheduledShift.getStart(), scheduledShift.getEnd()),
-                scheduledShift.getAssignments().stream().map(a -> a.getUser().getEmail()).toList());
+                    scheduledShift.getDescription(),
+                    new DepartmentShiftplanCalendarResponse.Day(scheduledShift.getStart(), scheduledShift.getEnd()),
+                    scheduledShift.getAssignments().stream().map(a -> a.getUser().getEmail()).toList());
         }
     }
 
