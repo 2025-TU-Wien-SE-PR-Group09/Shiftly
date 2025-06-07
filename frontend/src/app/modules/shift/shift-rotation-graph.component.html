@@ -1,0 +1,37 @@
+<ngx-graph
+  [nodes]="nodes"
+  [links]="links"
+  [curve]="curve"
+  [layout]="'dagre'"
+  [enableZoom]="true"
+  [autoZoom]="true"
+  [panOnZoom]="true"
+  [zoomSpeed]="0.2"
+  [draggingEnabled]="true"
+  class="bg-slate-100 h-[600px] rounded p-2"
+>
+  <!-- Optional: Custom Defs -->
+  <ng-template #defsTemplate></ng-template>
+
+  <!-- Custom Node Template -->
+  <ng-template #nodeTemplate let-node>
+    <svg:svg width="200" height="60">
+      <svg:rect
+        width="200"
+        height="60"
+        rx="10"
+        ry="10"
+        style="fill: white; stroke: #334155; stroke-width: 2;"
+      />
+      <svg:text x="10" y="20" font-size="12" font-weight="bold" fill="#000">
+        {{ node.data.label }}
+      </svg:text>
+      <svg:text x="10" y="40" font-size="10">
+        <svg:tspan *ngFor="let worker of node.data.workers" [attr.fill]="getWorkerColor(worker)">
+          {{ worker + ' ' }}
+        </svg:tspan>
+      </svg:text>
+    </svg:svg>
+  </ng-template>
+</ngx-graph>
+

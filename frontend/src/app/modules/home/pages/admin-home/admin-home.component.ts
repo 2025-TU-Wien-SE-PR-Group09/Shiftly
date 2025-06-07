@@ -15,8 +15,8 @@ import { SKIP_EXCEPTION_INTERCEPTOR } from '../../../../core/interceptor/skip-ex
 
 @Component({
   selector: 'app-admin-home',
-  standalone: true,
   imports: [CommonModule, CalendarModule, ButtonComponent, FormsModule],
+  standalone: true,
   templateUrl: './admin-home.component.html',
   styleUrl: './admin-home.component.css',
 
@@ -128,7 +128,6 @@ export class AdminHomeComponent implements OnInit {
       const startDate = new Date(shift.day.start);
       const endDate = new Date(shift.day.end);
       const shiftTitle = shift.shiftDescription ?? 'Schicht';
-      console.log(shift.workers)
 
       this.events.push({
         title: shiftTitle,
