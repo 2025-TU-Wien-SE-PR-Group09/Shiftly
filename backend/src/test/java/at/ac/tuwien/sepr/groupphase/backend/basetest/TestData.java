@@ -4,6 +4,7 @@ import at.ac.tuwien.sepr.groupphase.backend.entity.ApplicationUser;
 import at.ac.tuwien.sepr.groupphase.backend.entity.Department;
 import at.ac.tuwien.sepr.groupphase.backend.entity.VacationRequest;
 import at.ac.tuwien.sepr.groupphase.backend.type.VacationStatus;
+
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -53,9 +54,6 @@ public interface TestData {
 
     String SUPERVISOR_EMAIL = "supervisor@shyft.local";
     String DEPARTMENT_NAME = "TestDept";
-
-
-
 
 
     String NORMAL_USER_PW = "userPass123";

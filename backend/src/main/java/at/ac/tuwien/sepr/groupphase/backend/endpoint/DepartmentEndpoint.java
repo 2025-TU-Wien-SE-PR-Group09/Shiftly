@@ -102,7 +102,7 @@ public class DepartmentEndpoint {
     }
 
     @Transactional
-    @RolesAllowed({"ADMIN"})
+    @RolesAllowed({"ADMIN", "SUPERVISOR"})
     @Operation(summary = "Get department by name")
     @ApiResponse(responseCode = "200", description = "Get department by name")
     @GetMapping(path = "/{departmentName}", produces = MediaType.APPLICATION_JSON_VALUE)
@@ -186,7 +186,7 @@ public class DepartmentEndpoint {
 
 
     @Transactional
-    @RolesAllowed({"ADMIN"})
+    @RolesAllowed({"ADMIN", "SUPERVISOR"})
     @Operation(summary = "Get shift plan for a department")
     @ApiResponse(responseCode = "200", description = "Shiftplan for the department")
     @GetMapping(path = "/{departmentName}/shiftplanBlueprint", produces = MediaType.APPLICATION_JSON_VALUE)

@@ -8,6 +8,7 @@ import org.springframework.stereotype.Component;
 import javax.crypto.SecretKey;
 import java.util.Date;
 import java.util.List;
+import java.util.Optional;
 
 @Component
 public class JwtTokenizer {
@@ -18,19 +19,22 @@ public class JwtTokenizer {
         this.securityProperties = securityProperties;
     }
 
-    public String getAuthToken(String user, List<String> roles) {
+    public String getAuthToken(String user, List<String> roles, Optional<Long> departmentId, Optional<String> departmentName) {
         byte[] signingKey = securityProperties.getJwtSecret().getBytes();
         SecretKey key = Keys.hmacShaKeyFor(signingKey);
 
-        String token = Jwts.builder()
+        var builder = Jwts.builder()
             .header().add("typ", securityProperties.getJwtType()).and()
             .issuer(securityProperties.getJwtIssuer())
             .audience().add(securityProperties.getJwtAudience()).and()
             .subject(user)
             .expiration(new Date(System.currentTimeMillis() + securityProperties.getJwtExpirationTime()))
-            .claim("rol", roles)
-            .signWith(key, Jwts.SIG.HS512)
-            .compact();
+            .claim("rol", roles);
+
+        departmentId.ifPresent(depId -> builder.claim("depId", depId));
+        departmentName.ifPresent(depName -> builder.claim("depName", depName));
+
+        var token = builder.signWith(key, Jwts.SIG.HS512).compact();
         return securityProperties.getAuthTokenPrefix() + token;
     }
 }

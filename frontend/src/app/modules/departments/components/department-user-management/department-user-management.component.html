@@ -25,11 +25,12 @@
 <!-- Header -->
 <div class="mb-4 flex justify-between">
   <div class="inline-block">
-    <h3 class="text-foreground font-semibold">Employees of Department {{departmentName}}</h3>
+    <h3 class="text-foreground font-semibold">Employees of Department {{ departmentName }}</h3>
     <div class="text-muted-foreground space-x-1 text-xs font-medium">
       <span>Total:</span>
       <span class="text-foreground">{{ employees.length }}</span>
     </div>
+    <a [routerLink]="['/departments', this.departmentName!, 'shiftplan-editor']">Shiftplan</a>
   </div>
   <app-button tone="primary" shape="rounded" impact="bold" size="medium" (click)="showForm = !showForm" class="mb-4">
     + Invite Employee
@@ -42,18 +43,20 @@
     <table
       class="text-muted-foreground table w-full table-auto border-collapse border-0 text-left align-middle leading-5">
       <thead class="border-muted/20 text-muted-foreground border text-xs">
-      <tr>
-        <th class="px-2 py-3">Name</th>
+        <tr>
+          <th class="px-2 py-3">Name</th>
         <th class="px-2 py-3">E-Mail</th>
-      </tr>
+        </tr>
       </thead>
       <tbody>
-      <tr *ngFor="let emp of employees; let i = index" class="hover:bg-card/50">
-        <td class="px-2 py-3">{{ emp.firstName }} {{ emp.lastName }}</td>
+        <tr *ngFor="let emp of employees; let i = index" class="hover:bg-card/50">
+          <td class="px-2 py-3">{{ emp.firstName }} {{ emp.lastName }}</td>
         <td class="px-2 py-3">{{ emp.email }}</td>
-      <tr *ngIf="employees.length === 0">
-        <td class="py-4 text-center text-sm" colspan="3">No employees found</td>
-      </tr>
+        </tr>
+
+        <tr *ngIf="employees.length === 0">
+          <td class="py-4 text-center text-sm" colspan="3">No employees found</td>
+        </tr>
       </tbody>
     </table>
   </div>

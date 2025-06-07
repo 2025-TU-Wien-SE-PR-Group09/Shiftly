@@ -6,7 +6,6 @@ import at.ac.tuwien.sepr.groupphase.backend.service.dto.vacation.VacationRequest
 import java.util.List;
 
 
-
 public interface VacationRequestService {
     /**
      * Creates a new vacation request.
