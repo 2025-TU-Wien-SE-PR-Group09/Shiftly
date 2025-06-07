@@ -1,9 +1,11 @@
-import {Component, OnInit} from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { RouterLink } from '@angular/router';
 import {
   DepartmentCreateRestDto,
   DepartmentService,
-  ApplicationUserResponseDto, DepartmentEditRestDto, DepartmentDetailRestResponseDto,
+  ApplicationUserResponseDto,
+  DepartmentEditRestDto,
+  DepartmentDetailRestResponseDto,
 } from '../../../../rest_client';
 import { ButtonComponent } from '../../../../shared/components/button/button.component';
 import { FormsModule } from '@angular/forms';
@@ -31,6 +33,7 @@ export class DepartmentDetailAdminComponent implements OnInit {
   };
   protected departments: DepartmentDetailRestResponseDto[] = [];
   protected supervisorEmails: string[] = [];
+  protected confirmingDeleteDepartment: string | null = null;
 
   constructor(private departmentService: DepartmentService, private toastr: ToastrService) {}
 
@@ -98,12 +101,11 @@ export class DepartmentDetailAdminComponent implements OnInit {
               .filter((dept) => dept.name !== this.editedDepartment.oldName)
               .map((dept) => dept.supervisorEmail);
 
-            this.supervisorEmails = data.filter((sup) => !usedEmails.includes(<string>sup.email)).map(s => s.email!);
+            this.supervisorEmails = data.filter((sup) => !usedEmails.includes(<string>sup.email)).map((s) => s.email!);
           },
         });
-    },
+      },
     });
-
   }
 
   onSupervisorSelected(email: string) {
@@ -112,5 +114,28 @@ export class DepartmentDetailAdminComponent implements OnInit {
 
   onSupervisorSelectedEdit(email: string) {
     this.editedDepartment.supervisorEmail = email;
+  }
+
+  toggleConfirmDelete(departmentName: string): void {
+    this.confirmingDeleteDepartment = departmentName;
+  }
+
+  cancelDelete(): void {
+    this.confirmingDeleteDepartment = null;
+  }
+
+  confirmDelete(): void {
+    if (this.confirmingDeleteDepartment) {
+      this.departmentService.deleteDepartment(this.confirmingDeleteDepartment).subscribe({
+        next: () => {
+          this.toastr.success(`Department "${this.confirmingDeleteDepartment}" deleted successfully`, 'Success');
+          this.loadDepartments();
+          this.confirmingDeleteDepartment = null;
+        },
+        error: () => {
+          this.toastr.error('Failed to delete department.', 'Error');
+        },
+      });
+    }
   }
 }

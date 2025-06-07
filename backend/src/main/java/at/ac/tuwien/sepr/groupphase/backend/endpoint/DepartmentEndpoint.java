@@ -37,6 +37,7 @@ import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -296,4 +297,14 @@ public class DepartmentEndpoint {
 
         return ResponseEntity.status(HttpStatus.CREATED).body(new DepartmentShiftplanCalendarResponse(result));
     }
+
+    @DeleteMapping(path = "/{departmentName}")
+    @RolesAllowed({"ADMIN"})
+    @Operation(summary = "Delete a department")
+    @ApiResponse(responseCode = "200", description = "Department deleted successfully")
+    public ResponseEntity<Void> deleteDepartment(@PathVariable("departmentName") String departmentName) {
+        departmentService.deleteDepartmentByName(departmentName);
+        return ResponseEntity.ok().build();
+    }
+
 }

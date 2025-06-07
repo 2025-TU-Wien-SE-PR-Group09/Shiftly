@@ -55,4 +55,14 @@ public interface DepartmentService {
      * @return an optional containing the supervisor details if found, or empty if not found
      */
     Optional<UserEmailDto> getSupervisorByDepartmentName(String departmentName);
+
+    /**
+     * Deletes a department by its name.
+     *
+     * <p>Also unassigns any users linked to this department and removes their supervisor role if assigned.
+     *
+     * @param departmentName the name of the department to be deleted
+     * @throws NotFoundException if no department with the given name exists
+     */
+    void deleteDepartmentByName(String departmentName) throws NotFoundException;
 }
