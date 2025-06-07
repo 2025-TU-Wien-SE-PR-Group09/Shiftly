@@ -9,5 +9,5 @@ import java.util.List;
 
 @Repository
 public interface ScheduledShiftRepository extends JpaRepository<ScheduledShift, ScheduledShiftId> {
-    List<ScheduledShift> findByDepartmentId(Long departmentId);
+    List<ScheduledShift> findByDepartmentName(String departmentName);
 }

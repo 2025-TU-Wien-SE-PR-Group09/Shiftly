@@ -9,7 +9,7 @@ import java.util.Optional;
 public record PlanBlueprintCreationDto(
     String description,
     List<ShiftBlueprintCreationDto> shifts,
-    Long departmentId
+    String departmentName
 ) {
 
     public record ShiftBlueprintCreationDto(String description, int manpower,

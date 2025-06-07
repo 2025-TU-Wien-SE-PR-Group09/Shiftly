@@ -14,13 +14,13 @@ public class UserRoleDto {
     private Role role;
 
     // TODO: make not nullable but keep in mind admin has no departmentId
-    @PositiveOrZero
-    private Long departmentId;
+    @NotNull
+    private String departmentName;
 
-    public UserRoleDto(String email, Role role, Long departmentId) {
+    public UserRoleDto(String email, Role role, String departmentName) {
         this.userEmail = email;
         this.role = role;
-        this.departmentId = departmentId;
+        this.departmentName = departmentName;
     }
 
     public String getUserEmail() {
@@ -35,8 +35,8 @@ public class UserRoleDto {
         return role;
     }
 
-    public Long getDepartmentId() {
-        return departmentId;
+    public String getDepartmentName() {
+        return departmentName;
     }
 
     public void setRole(Role role) {

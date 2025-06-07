@@ -70,7 +70,7 @@ public class ShiftPlanningServiceImpl implements ShiftPlanningService {
 
     @Override
     public PlanBlueprintDto createPlanBlueprint(PlanBlueprintCreationDto createPlanBlueprintDto) {
-        var dept = departmentRepository.findById(createPlanBlueprintDto.departmentId())
+        var dept = departmentRepository.findById(createPlanBlueprintDto.departmentName())
             .orElseThrow(() -> new NotFoundException("Department not found!"));
 
         var planBuilder = new PlanBlueprint.Builder()
@@ -212,8 +212,7 @@ public class ShiftPlanningServiceImpl implements ShiftPlanningService {
         var month = concretePlanGenerateDto.startDate().orElseThrow(() -> new ConflictException("Start date is required"));
         LocalDate startDate = timeService.nextMondayInMonth(month);
 
-        //TODO: Validator
-        concreteShiftPlanRepository.findByDepartmentId(department.getId()).stream()
+        concreteShiftPlanRepository.findByDepartmentName(department.getName()).stream()
             .min((a, b) -> b.getEndDate().compareTo(a.getEndDate())).ifPresent(concreteShiftPlan -> {
                 if (concreteShiftPlan.getEndDate().isAfter(startDate)) {
                     throw new ConflictException("A concrete plan for this department already exists for the specified period.");
@@ -247,7 +246,7 @@ public class ShiftPlanningServiceImpl implements ShiftPlanningService {
                 ShiftWeekBlueprint templateWeek = shiftWeekBlueprints.get(i % shiftWeekBlueprints.size());
 
                 ScheduledShiftId shiftId = new ScheduledShiftId(
-                    department.getId(),
+                    department.getName(),
                     calendarWeek,
                     year,
                     shiftBlueprint.getId()
@@ -280,16 +279,16 @@ public class ShiftPlanningServiceImpl implements ShiftPlanningService {
     }
 
     @Override
-    public ConcreteShiftPlan getCurrentConcretePlan(Long departmentId) {
-        return concreteShiftPlanRepository.findByDepartmentId(departmentId)
+    public ConcreteShiftPlan getCurrentConcretePlan(String departmentName) {
+        return concreteShiftPlanRepository.findByDepartmentName(departmentName)
             .stream()
             .max(Comparator.comparing(ConcreteShiftPlan::getStartDate))
-            .orElseThrow(() -> new NotFoundException(("No current concrete plan found for department with ID: " + departmentId)));
+            .orElseThrow(() -> new NotFoundException(("No current concrete plan found for department with ID: " + departmentName)));
     }
 
 
-    public List<ScheduledShiftDetailDto> getCurrentConcretePlanDebug(Long departmentId) {
-        List<ScheduledShift> scheduledShifts = scheduledShiftRepository.findByDepartmentId(departmentId);
+    public List<ScheduledShiftDetailDto> getCurrentConcretePlanDebug(String departmentName) {
+        List<ScheduledShift> scheduledShifts = scheduledShiftRepository.findByDepartmentName(departmentName);
 
         return scheduledShifts.stream()
             .map(shift -> {

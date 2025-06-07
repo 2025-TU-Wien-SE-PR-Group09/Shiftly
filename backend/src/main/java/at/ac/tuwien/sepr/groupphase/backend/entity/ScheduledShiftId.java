@@ -10,7 +10,7 @@ import java.util.Objects;
 public class ScheduledShiftId implements Serializable {
 
     @Column(name = "department_id")
-    private Long departmentId;
+    private String departmentId;
 
     @Column(name = "calendar_week")
     private int calendarWeek;
@@ -24,18 +24,18 @@ public class ScheduledShiftId implements Serializable {
     public ScheduledShiftId() {
     }
 
-    public ScheduledShiftId(Long departmentId, int calendarWeek, int calendarYear, Long shiftBlueprintId) {
+    public ScheduledShiftId(String departmentId, int calendarWeek, int calendarYear, Long shiftBlueprintId) {
         this.departmentId = departmentId;
         this.calendarWeek = calendarWeek;
         this.calendarYear = calendarYear;
         this.shiftBlueprintId = shiftBlueprintId;
     }
 
-    public Long getDepartmentId() {
+    public String getDepartmentId() {
         return departmentId;
     }
 
-    public void setDepartmentId(Long departmentId) {
+    public void setDepartmentId(String departmentId) {
         this.departmentId = departmentId;
     }
 

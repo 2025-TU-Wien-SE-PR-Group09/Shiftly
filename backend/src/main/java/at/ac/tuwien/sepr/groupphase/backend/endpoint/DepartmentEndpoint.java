@@ -78,7 +78,6 @@ public class DepartmentEndpoint {
     public List<DepartmentDetailRestResponseDto> getAllDepartments() {
         return departmentService.getAllDepartments().stream()
             .map(dept -> new DepartmentDetailRestResponseDto(
-                dept.getId(),
                 dept.getName(),
                 dept.getSupervisorEmail()))
             .toList();
@@ -111,7 +110,6 @@ public class DepartmentEndpoint {
     public DepartmentDetailRestResponseDto getDepartmentByName(@PathVariable(name = "departmentName") String departmentName) {
         return departmentService.getDepartmentByName(departmentName).map(d ->
             new DepartmentDetailRestResponseDto(
-                d.id(),
                 d.name(),
                 departmentService.getSupervisorByDepartmentName(d.name())
                     .map(UserEmailDto::email)
@@ -164,7 +162,7 @@ public class DepartmentEndpoint {
         DepartmentDto department = departmentService.getDepartmentByName(departmentName)
             .orElseThrow(() -> new NotFoundException("Department not found!"));
 
-        var mapped = ShiftRestMapper.mapFromRequest(department.id(), blueprintDto);
+        var mapped = ShiftRestMapper.mapFromRequest(department.name(), blueprintDto);
         return ShiftPlanningMapper.Plans.toResponse(shiftPlanningService.createPlanBlueprint(mapped));
     }
 
@@ -228,7 +226,7 @@ public class DepartmentEndpoint {
 
         // TODO: Verify if user has access to this department
 
-        EmployeeDto employee = new EmployeeDto(employeeEmail, department.id());
+        EmployeeDto employee = new EmployeeDto(employeeEmail, department.name());
         employee = employeeService.convertUserToEmployee(employee);
 
         // in this case, a mapper function cannot be used because the service
@@ -261,11 +259,11 @@ public class DepartmentEndpoint {
     @Transactional
     @Operation(summary = "Get the concrete shift plan for the given department and return the scheduled shifts in suitable calendar format")
     @ApiResponse(responseCode = "201", description = "Concrete shift plan in calendar format.")
-    @GetMapping(path = "/{departmentId}/shiftplan",
+    @GetMapping(path = "/{departmentName}/shiftplan",
         produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<DepartmentShiftplanCalendarResponse> getConcreteShiftplan(@PathVariable("departmentId") Long id) {
+    public ResponseEntity<DepartmentShiftplanCalendarResponse> getConcreteShiftplan(@PathVariable("departmentName") String name) {
 
-        var plan = shiftPlanningService.getCurrentConcretePlan(id);
+        var plan = shiftPlanningService.getCurrentConcretePlan(name);
         List<DepartmentShiftplanCalendarResponse.ScheduledShift> result = new ArrayList<>();
 
         //TODO: move to service/mapper

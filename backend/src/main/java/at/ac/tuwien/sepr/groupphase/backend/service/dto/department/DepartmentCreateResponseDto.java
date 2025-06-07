@@ -22,8 +22,7 @@ public class DepartmentCreateResponseDto {
     public DepartmentCreateResponseDto() {
     }
 
-    public DepartmentCreateResponseDto(Long id, String name, String supervisorEmail) {
-        this.id = id;
+    public DepartmentCreateResponseDto(String name, String supervisorEmail) {
         this.name = name;
         this.supervisorEmail = supervisorEmail;
     }

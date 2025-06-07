@@ -10,8 +10,6 @@ import java.util.Objects;
 
 public class DepartmentDetailResponseDto {
 
-    private Long id;
-
     @NotBlank(message = "Department name must not be blank")
     @Size(min = 1, max = 100, message = "Department name must be between 1 and 100 characters long")
     private String name;
@@ -25,18 +23,9 @@ public class DepartmentDetailResponseDto {
     public DepartmentDetailResponseDto() {
     }
 
-    public DepartmentDetailResponseDto(Long id, String name, String supervisorEmail) {
-        this.id = id;
+    public DepartmentDetailResponseDto(String name, String supervisorEmail) {
         this.name = name;
         this.supervisorEmail = supervisorEmail;
-    }
-
-    public Long getId() {
-        return id;
-    }
-
-    public void setId(Long id) {
-        this.id = id;
     }
 
     public String getName() {

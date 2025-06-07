@@ -159,8 +159,8 @@ export class AdminHomeComponent implements OnInit {
   }
 
   loadScheduledShifts() {
-    if (this.selectedDepartment?.id) {
-      this._departmentService.getConcreteShiftplan(this.selectedDepartment.id).subscribe({
+    if (this.selectedDepartment?.name) {
+      this._departmentService.getConcreteShiftplan(this.selectedDepartment.name).subscribe({
         next: (data) => {
           if (data.shifts) {
             this.shiftPlan = data;

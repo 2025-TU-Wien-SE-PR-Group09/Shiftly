@@ -46,12 +46,11 @@ public class EmployeeServiceImpl implements EmployeeService {
                 "Employee with email " + employeeDto.email() + " is already member of a department or admin.");
         }
 
-        var departmentId = applicationUser.getDepartment().getId();
-        userService.assignRoleToUser(new UserRoleDto(applicationUser.getEmail(), Role.EMPLOYEE, departmentId));
+        userService.assignRoleToUser(new UserRoleDto(applicationUser.getEmail(), Role.EMPLOYEE, employeeDto.departmentName()));
 
-        Department department = departmentRepository.findById(employeeDto.departmentId())
+        Department department = departmentRepository.findById(employeeDto.departmentName())
             .orElseThrow(
-                () -> new NotFoundException("Department with id " + employeeDto.departmentId() + " not found"));
+                () -> new NotFoundException("Department with name " + employeeDto.departmentName() + " not found"));
 
         applicationUser.setDepartment(department);
         userRepository.save(applicationUser);
