@@ -16,6 +16,18 @@ spring:
     driver-class-name: org.h2.Driver
     username: admin
     password: password
+  mail:
+    host: localhost
+    port: 1025
+    username: ''
+    password: ''
+    properties:
+      mail:
+        smtp:
+          auth: false
+          starttls:
+            enable: false
+
   jpa:
     # Set this property to true if you want to see the executed queries
     show-sql: false

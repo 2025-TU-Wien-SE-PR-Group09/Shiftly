@@ -1,6 +1,6 @@
 package at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.validator;
 
-import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.SickLeaveCertificateUploadDto;
+import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.sickleave.SickLeaveCertificateUploadDto;
 import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.validator.annotation.ValidSickLeaveDateRange;
 import jakarta.validation.ConstraintValidator;
 import jakarta.validation.ConstraintValidatorContext;

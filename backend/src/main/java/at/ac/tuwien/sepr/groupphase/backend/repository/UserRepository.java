@@ -27,4 +27,9 @@ public interface UserRepository extends JpaRepository<ApplicationUser, String> {
 
     @Query("SELECT u FROM ApplicationUser u WHERE u.department.id = :departmentId")
     List<ApplicationUser> findByDepartmentId(@Param("departmentId") Long departmentId);
+
+    @Query("SELECT u FROM ApplicationUser u JOIN u.roles r "
+        + "WHERE r.name = 'SUPERVISOR' AND u.department = :department")
+    List<ApplicationUser> findSupervisorsByDepartment(@Param("department") at.ac.tuwien.sepr.groupphase.backend.entity.Department department);
+
 }

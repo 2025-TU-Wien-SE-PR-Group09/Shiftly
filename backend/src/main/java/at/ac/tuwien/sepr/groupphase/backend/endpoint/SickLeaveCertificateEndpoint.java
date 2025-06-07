@@ -1,6 +1,6 @@
 package at.ac.tuwien.sepr.groupphase.backend.endpoint;
 
-import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.SickLeaveCertificateUploadDto;
+import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.sickleave.SickLeaveCertificateUploadDto;
 import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.sickleave.SickLeaveCertificateRestDto;
 import at.ac.tuwien.sepr.groupphase.backend.endpoint.mapper.SickLeaveCertificateMapper;
 import at.ac.tuwien.sepr.groupphase.backend.entity.ApplicationUser;
