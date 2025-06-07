@@ -35,7 +35,8 @@ export class DepartmentUserManagementComponent implements OnChanges, OnInit {
     this.loadData();
   }
 
-  ngOnInit(): void {}
+  ngOnInit(): void {
+  }
 
   loadData(): void {
     if (this.departmentName === '') {
