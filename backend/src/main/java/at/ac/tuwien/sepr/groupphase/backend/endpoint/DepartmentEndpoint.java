@@ -87,7 +87,7 @@ public class DepartmentEndpoint {
     @GetMapping(value = "/api/departments/supervisors", produces = MediaType.APPLICATION_JSON_VALUE)
     public List<ApplicationUserResponseDto> getAllAvailableSupervisors() {
         List<ApplicationUserResponseDto> availableUsers = userService.getAllAvailableUsers();
-        availableUsers.addAll(userService.getAllSupervisors());
+        availableUsers.addAll(userService.getAllSupervisors(false));
         return availableUsers;
     }
 

@@ -100,7 +100,6 @@ export class DepartmentDetailAdminComponent implements OnInit {
 
             this.supervisorEmails = data.filter((sup) => !usedEmails.includes(<string>sup.email)).map(s => s.email!);
           },
-          error: (err) => console.error('Fehler beim Laden der Supervisoren', err),
         });
     },
     });

@@ -31,29 +31,28 @@ export class DepartmentUserManagementComponent implements OnChanges, OnInit {
   ) {}
 
   ngOnChanges(changes: SimpleChanges): void {
-    this.loadEmployees();
+    this.loadData();
   }
 
   ngOnInit(): void {
+  }
+
+  loadData(): void {
+    if (this.departmentName === '') {
+      return;
+    }
+
     this.departmentService.getAllAvailableEmployees().subscribe(
       emps => {
         this.possibleEmployeeMails = emps.map(e => e.email!);
       }
     )
-  }
-
-  loadEmployees(): void {
-    if (this.departmentName === '') {
-      return;
-    }
 
     this.departmentService.getEmployeesOfDepartment(this.departmentName).subscribe({
       next: (employees) => {
         this.employees = employees;
       },
     });
-
-
   }
 
   inviteEmployee() {
@@ -65,7 +64,7 @@ export class DepartmentUserManagementComponent implements OnChanges, OnInit {
     this.departmentService.addEmployeeToDepartment(this.departmentName, this.newEmployeeMail).subscribe({
       next: (employee) => {
         this.toastrService.success('Successfully added ' + employee.email + ' to ' + employee.departmentName + '!');
-        this.loadEmployees();
+        this.loadData();
         this.showForm = false;
       },
     });

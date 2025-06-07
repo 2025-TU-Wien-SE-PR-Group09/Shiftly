@@ -53,9 +53,10 @@ public interface UserService {
     /**
      * Retrieves all users who are supervisors.
      *
+     * @param hasDepartment if true, only supervisors with a department are returned
      * @return a {@link ApplicationUser} list containing all supervisors
      */
-    List<ApplicationUserResponseDto> getAllSupervisors();
+    List<ApplicationUserResponseDto> getAllSupervisors(boolean hasDepartment);
 
     /**
      * Retrieves all users who are available, also who do not have a role.

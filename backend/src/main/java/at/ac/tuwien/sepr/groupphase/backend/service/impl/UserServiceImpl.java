@@ -24,6 +24,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import static at.ac.tuwien.sepr.groupphase.backend.config.Constants.ADMIN_EMAIL;
 
@@ -169,8 +170,16 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public List<ApplicationUserResponseDto> getAllSupervisors() {
-        return userRepository.findAllByRoleName("SUPERVISOR").stream()
+    public List<ApplicationUserResponseDto> getAllSupervisors(boolean hasDepartment) {
+        Stream<ApplicationUser> users = userRepository.findAllByRoleName("SUPERVISOR").stream();
+
+        if (hasDepartment) {
+            users = users.filter(user -> user.getDepartment() != null);
+        } else {
+            users = users.filter(user -> user.getDepartment() == null);
+        }
+
+        return users
             .map(user -> new ApplicationUserResponseDto(user.getEmail()))
             .collect(Collectors.toList());
     }
