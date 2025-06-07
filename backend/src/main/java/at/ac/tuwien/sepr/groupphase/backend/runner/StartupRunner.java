@@ -38,7 +38,7 @@ public class StartupRunner implements CommandLineRunner {
     private final DepartmentService departmentService;
     private final PlanBlueprintRepository planBlueprintRepository;
 
-    private final UserRepository userRepsitory;
+    private final UserRepository userRepository;
     private final DepartmentRepository departmentRepository;
 
     private static final Logger LOGGER = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());

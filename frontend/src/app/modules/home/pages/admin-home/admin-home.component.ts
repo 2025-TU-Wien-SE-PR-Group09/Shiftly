@@ -16,7 +16,6 @@ import { SKIP_EXCEPTION_INTERCEPTOR } from '../../../../core/interceptor/skip-ex
 @Component({
   selector: 'app-admin-home',
   imports: [CommonModule, CalendarModule, ButtonComponent, FormsModule],
-  standalone: true,
   templateUrl: './admin-home.component.html',
   styleUrl: './admin-home.component.css',
 
