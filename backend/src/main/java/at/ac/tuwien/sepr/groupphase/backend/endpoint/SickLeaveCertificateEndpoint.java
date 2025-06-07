@@ -56,7 +56,8 @@ public class SickLeaveCertificateEndpoint {
      * @param file the file to upload
      * @return metadata of the uploaded certificate
      */
-    @PostMapping(path = "/upload", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    @PostMapping(path = "/upload", consumes = MediaType.MULTIPART_FORM_DATA_VALUE,
+        produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<SickLeaveCertificateRestDto> upload(@RequestParam(name = "file") MultipartFile file,
                                                               @RequestPart(name = "uploadDto") @Valid SickLeaveCertificateUploadDto dto) {
 
