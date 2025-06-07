@@ -1,4 +1,5 @@
 package at.ac.tuwien.sepr.groupphase.backend.unittests;
+
 import at.ac.tuwien.sepr.groupphase.backend.entity.ApplicationUser;
 import at.ac.tuwien.sepr.groupphase.backend.entity.VacationRequest;
 import at.ac.tuwien.sepr.groupphase.backend.exception.ConflictException;
@@ -9,10 +10,14 @@ import at.ac.tuwien.sepr.groupphase.backend.service.dto.user.UserEmailDto;
 import at.ac.tuwien.sepr.groupphase.backend.service.dto.vacation.VacationRequestDto;
 import at.ac.tuwien.sepr.groupphase.backend.service.impl.VacationRequestServiceImpl;
 import at.ac.tuwien.sepr.groupphase.backend.type.VacationStatus;
+
+
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+
 import java.util.List;
 import java.util.Optional;
+
 import static at.ac.tuwien.sepr.groupphase.backend.basetest.TestData.EMPLOYEE_EMAIL;
 import static at.ac.tuwien.sepr.groupphase.backend.basetest.TestData.END_DATE;
 import static at.ac.tuwien.sepr.groupphase.backend.basetest.TestData.OVERLAPPING_END;
@@ -148,14 +153,6 @@ class VacationServiceTest {
         assertThrows(NotFoundException.class, () ->
             service.deletePendingRequest(VACATION_ID, EMPLOYEE_EMAIL));
     }
-
-
-
-
-
-
-
-
 
 
 }

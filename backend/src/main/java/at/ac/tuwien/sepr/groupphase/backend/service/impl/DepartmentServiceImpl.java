@@ -62,8 +62,8 @@ public class DepartmentServiceImpl implements DepartmentService {
         applicationUserRepository.save(supervisor);
         userService.assignRoleToUser(new UserRoleDto(
             supervisor.getEmail(),
-            Role.SUPERVISOR
-        ));
+            Role.SUPERVISOR,
+            department.getId()));
 
         return new DepartmentCreateResponseDto(
             department.getId(),
@@ -110,7 +110,8 @@ public class DepartmentServiceImpl implements DepartmentService {
 
         userService.assignRoleToUser(new UserRoleDto(
             newSupervisor.getEmail(),
-            Role.SUPERVISOR
+            Role.SUPERVISOR,
+            department.getId()
         ));
 
         return new DepartmentEditResponseDto(

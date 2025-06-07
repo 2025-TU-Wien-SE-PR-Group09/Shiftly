@@ -4,6 +4,7 @@ import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.vacation.VacationReques
 import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.validator.annotation.ValidDateRange;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotNull;
+
 import java.time.LocalDate;
 
 @ValidDateRange
@@ -18,8 +19,6 @@ public class VacationRequestDto {
 
     @NotNull(message = "End date must not be null")
     private LocalDate endDate;
-
-
 
 
     public VacationRequestDto(String employeeEmail, LocalDate startDate, LocalDate endDate) {
@@ -44,8 +43,6 @@ public class VacationRequestDto {
     public String getEmployeeEmail() {
         return employeeEmail;
     }
-
-
 
 
     /**

@@ -12,10 +12,12 @@ import at.ac.tuwien.sepr.groupphase.backend.service.dto.user.UserEmailDto;
 import at.ac.tuwien.sepr.groupphase.backend.service.dto.vacation.VacationRequestDto;
 import at.ac.tuwien.sepr.groupphase.backend.service.dto.vacation.VacationRequestResponseDto;
 import at.ac.tuwien.sepr.groupphase.backend.type.VacationStatus;
+
 import java.time.format.DateTimeFormatter;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -45,9 +47,6 @@ public class VacationRequestServiceImpl implements VacationRequestService {
     public VacationRequestResponseDto createVacationRequest(VacationRequestDto vacationRequestDto) {
         LocalDate start = vacationRequestDto.getStartDate();
         LocalDate end = vacationRequestDto.getEndDate();
-
-
-
 
 
         ApplicationUser employee = userRepository.findByEmail(vacationRequestDto.getEmployeeEmail())
@@ -128,8 +127,6 @@ public class VacationRequestServiceImpl implements VacationRequestService {
 
         vacationRequestRepository.delete(request);
     }
-
-
 
 
 }

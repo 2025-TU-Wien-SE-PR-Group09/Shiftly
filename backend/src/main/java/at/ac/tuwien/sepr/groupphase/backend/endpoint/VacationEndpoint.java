@@ -11,8 +11,10 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import jakarta.annotation.security.RolesAllowed;
 import jakarta.transaction.Transactional;
 import jakarta.validation.Valid;
+
 import java.security.Principal;
 import java.util.List;
+
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -41,7 +43,6 @@ public class VacationEndpoint {
     }
 
 
-
     @PostMapping(produces = MediaType.APPLICATION_JSON_VALUE,
         consumes = MediaType.APPLICATION_JSON_VALUE)
     @Transactional
@@ -55,8 +56,6 @@ public class VacationEndpoint {
         VacationRequestResponseDto created = vacationRequestService.createVacationRequest(dto);
         return ResponseEntity.status(HttpStatus.CREATED).body(VacationRequestResponseRestDto.from(created));
     }
-
-
 
 
     @GetMapping(produces = MediaType.APPLICATION_JSON_VALUE)
@@ -79,7 +78,6 @@ public class VacationEndpoint {
         vacationRequestService.deletePendingRequest(id, principal.getName());
         return ResponseEntity.noContent().build();
     }
-
 
 
 }

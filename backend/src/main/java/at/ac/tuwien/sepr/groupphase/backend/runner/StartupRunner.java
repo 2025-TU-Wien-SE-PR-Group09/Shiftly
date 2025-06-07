@@ -62,7 +62,7 @@ public class StartupRunner implements CommandLineRunner {
 
         this.userService.createOrChangePassword(
             new UserDataDto(ADMIN_EMAIL, adminUserPassword, "Admin", "Shyft"));
-        this.userService.assignRoleToUser(new UserRoleDto(ADMIN_EMAIL, Role.ADMIN));
+        this.userService.assignRoleToUser(new UserRoleDto(ADMIN_EMAIL, Role.ADMIN, null));
 
         var production = this.departmentService.getDepartmentByName("Produktion")
             .flatMap(d -> departmentRepository.findById(d.id()));
@@ -114,19 +114,33 @@ public class StartupRunner implements CommandLineRunner {
             "Shyft"
         ));
 
+        this.departmentService.createDepartment(new DepartmentCreateDto("Controlling", "new_supervisor@shyft.local"));
+        var secondDepartment = this.departmentRepository.findByName("Controlling")
+            .orElseThrow(() -> new RuntimeException("Department Controlling not found"));
+        var newSupervisor = this.userRepository.findByEmail("new_supervisor@shyft.local").get();
+        newSupervisor.setDepartment(secondDepartment);
+        this.userRepository.save(newSupervisor);
+        this.userService.assignRoleToUser(new UserRoleDto("new_supervisor@shyft.local", Role.SUPERVISOR, secondDepartment.getId()));
+
         ApplicationUser supervisor = this.userRepository.findByEmail("supervisor@shyft.local").get();
-        supervisor.setDepartment(this.departmentRepository.findByName("Produktion").get());
+        var department = this.departmentRepository.findByName("Produktion").get();
+        supervisor.setDepartment(department);
         this.userRepository.save(supervisor);
         this.userService.assignRoleToUser(
-            new UserRoleDto("supervisor@shyft.local", Role.SUPERVISOR)
+            new UserRoleDto("supervisor@shyft.local", Role.SUPERVISOR, department.getId())
         );
 
         ApplicationUser employee = this.userRepository.findByEmail("employee@shyft.local").get();
         employee.setDepartment(this.departmentRepository.findByName("Produktion").get());
         this.userRepository.save(employee);
         this.userService.assignRoleToUser(
-            new UserRoleDto("employee@shyft.local", Role.EMPLOYEE)
+            new UserRoleDto("employee@shyft.local", Role.EMPLOYEE, department.getId())
         );
+
+        /*
+        this.userService.assignRoleToUser(
+            new UserRoleDto("new_supervisor@shyft.local", Role.SUPERVISOR, department.getId())
+        );*/
     }
 
     private void createPlan(Department department) {

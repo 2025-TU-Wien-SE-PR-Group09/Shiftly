@@ -9,11 +9,12 @@ import { ToastrService } from 'ngx-toastr';
 import { ButtonComponent } from '../../../../shared/components/button/button.component';
 import { NgForOf, NgIf } from '@angular/common';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
+import { Router, RouterLink } from '@angular/router';
 import { AutocompleteComponent } from '../../../../shared/components/autocomplete/autocomplete.component';
 
 @Component({
   selector: 'app-department-user-management',
-  imports: [ButtonComponent, NgForOf, NgIf, ReactiveFormsModule, FormsModule, AutocompleteComponent],
+  imports: [ButtonComponent, NgForOf, NgIf, ReactiveFormsModule, FormsModule, RouterLink, AutocompleteComponent],
   templateUrl: './department-user-management.component.html',
   styleUrl: './department-user-management.component.css',
 })
@@ -34,8 +35,7 @@ export class DepartmentUserManagementComponent implements OnChanges, OnInit {
     this.loadData();
   }
 
-  ngOnInit(): void {
-  }
+  ngOnInit(): void {}
 
   loadData(): void {
     if (this.departmentName === '') {

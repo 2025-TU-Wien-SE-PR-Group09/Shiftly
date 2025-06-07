@@ -42,13 +42,16 @@ public class EmployeeServiceImpl implements EmployeeService {
         if (applicationUser.getRoles().stream()
             .map(ApplicationRole::getName)
             .anyMatch(r -> r.equals("EMPLOYEE") || r.equals("ADMIN") || r.equals("SUPERVISOR"))) {
-            throw new ConflictException("Employee with email " + employeeDto.email() + " is already member of a department or admin.");
+            throw new ConflictException(
+                "Employee with email " + employeeDto.email() + " is already member of a department or admin.");
         }
 
-        userService.assignRoleToUser(new UserRoleDto(applicationUser.getEmail(), Role.EMPLOYEE));
+        var departmentId = applicationUser.getDepartment().getId();
+        userService.assignRoleToUser(new UserRoleDto(applicationUser.getEmail(), Role.EMPLOYEE, departmentId));
 
         Department department = departmentRepository.findById(employeeDto.departmentId())
-            .orElseThrow(() -> new NotFoundException("Department with id " + employeeDto.departmentId() + " not found"));
+            .orElseThrow(
+                () -> new NotFoundException("Department with id " + employeeDto.departmentId() + " not found"));
 
         applicationUser.setDepartment(department);
         userRepository.save(applicationUser);
@@ -59,7 +62,8 @@ public class EmployeeServiceImpl implements EmployeeService {
     @Override
     public List<EmployeeListItemDto> getEmployeesOfDepartment(DepartmentNameDto departmentName) {
         Department department = departmentRepository.findByName(departmentName.name())
-            .orElseThrow(() -> new NotFoundException("Department with name " + departmentName.name() + " not found"));
+            .orElseThrow(
+                () -> new NotFoundException("Department with name " + departmentName.name() + " not found"));
 
         Set<ApplicationUser> employees = department.getUsers();
 

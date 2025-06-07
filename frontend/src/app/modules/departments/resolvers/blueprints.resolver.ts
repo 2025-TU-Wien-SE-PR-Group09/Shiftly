@@ -11,7 +11,7 @@ export class BlueprintsResolver implements Resolve<Array<PlanBlueprintResponse>>
   constructor(private departmentService: DepartmentService, private router: Router) {}
 
   resolve(route: ActivatedRouteSnapshot, state: RouterStateSnapshot): Observable<Array<PlanBlueprintResponse>> {
-    const name = route.paramMap.get('name');
+    const name = route.paramMap.get('depName');
 
     if (!name) {
       this.router.navigate(['/not-found']);
