@@ -95,7 +95,17 @@ public class ShiftPlanningValidatorImpl implements ShiftPlanningValidator {
 
 
     @Override
-    public Optional<ValidationErrors> validateWeek(ShiftWeekBlueprintDto shiftWeekBlueprintDto) {
+    public Optional<ValidationErrors> validatePlan(PlanBlueprint planBlueprint) {
+        return Optional.empty();
+    }
+
+    @Override
+    public Optional<ValidationErrors> validateShift(ShiftBlueprint shiftBlueprint) {
+        return Optional.empty();
+    }
+
+    @Override
+    public Optional<ValidationErrors> validateWeek(ShiftWeekBlueprint shiftWeekBlueprint) {
         return Optional.empty();
     }
 

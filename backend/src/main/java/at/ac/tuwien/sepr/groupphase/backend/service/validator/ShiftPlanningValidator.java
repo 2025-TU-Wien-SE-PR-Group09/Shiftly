@@ -3,6 +3,8 @@ package at.ac.tuwien.sepr.groupphase.backend.service.validator;
 import at.ac.tuwien.sepr.groupphase.backend.entity.PlanBlueprint;
 import at.ac.tuwien.sepr.groupphase.backend.entity.ShiftBlueprint;
 import at.ac.tuwien.sepr.groupphase.backend.entity.ShiftDayBlueprint;
+import at.ac.tuwien.sepr.groupphase.backend.entity.ShiftWeekBlueprint;
+import at.ac.tuwien.sepr.groupphase.backend.service.dto.shift.PlanBlueprintCreationDto;
 import at.ac.tuwien.sepr.groupphase.backend.service.dto.shift.PlanBlueprintCreationDto;
 import at.ac.tuwien.sepr.groupphase.backend.service.dto.shift.ShiftWeekBlueprintDto;
 
@@ -15,18 +17,37 @@ import java.util.Optional;
  * laws and regulations.
  */
 public interface ShiftPlanningValidator {
+
+    /**
+     * Validates the whole plan
+     *
+     * @param planBlueprint the PlanBlueprint to validate
+     * @return an Optional containing ValidationErrors if validation fails, or an empty Optional if validation succeeds
+     */
+
+    Optional<ValidationErrors> validatePlan(PlanBlueprint planBlueprint);
+
+    /**
+     * Validates the whole shift;
+     *
+     * @param shiftBlueprint the ShiftBlueprint to validate
+     * @return an Optional containing ValidationErrors if validation fails, or an empty Optional if validation succeeds
+     */
+
+    Optional<ValidationErrors> validateShift(ShiftBlueprint shiftBlueprint);
+
     /**
      * Validates the week.
      *
-     * @param shiftWeekBlueprintDto the ShiftWeekDto to validate
+     * @param shiftWeekBlueprint the ShiftWeekBlueprint to validate
      * @return an Optional containing ValidationErrors if validation fails, or an empty Optional if validation succeeds
      */
-    Optional<ValidationErrors> validateWeek(ShiftWeekBlueprintDto shiftWeekBlueprintDto);
+    Optional<ValidationErrors> validateWeek(ShiftWeekBlueprint shiftWeekBlueprint);
 
     /**
      * Validates the day.
      *
-     * @param shiftWeekBlueprintDto the ShiftWeekDto to validate
+     * @param shiftWeekBlueprintDto the ShiftDayBlueprint to validate
      * @return an Optional containing ValidationErrors if validation fails, or an empty Optional if validation succeeds
      */
     Optional<ValidationErrors> validateDay(ShiftDayBlueprint shiftWeekBlueprintDto);

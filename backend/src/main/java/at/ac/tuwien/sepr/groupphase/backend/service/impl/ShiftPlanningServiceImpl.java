@@ -20,8 +20,6 @@ import at.ac.tuwien.sepr.groupphase.backend.repository.PlanBlueprintRepository;
 import at.ac.tuwien.sepr.groupphase.backend.repository.ScheduledShiftRepository;
 import at.ac.tuwien.sepr.groupphase.backend.repository.ShiftAssignmentAuditLogRepository;
 import at.ac.tuwien.sepr.groupphase.backend.service.ShiftPlanningService;
-import at.ac.tuwien.sepr.groupphase.backend.service.dto.shift.ScheduledShiftDetailDto;
-import at.ac.tuwien.sepr.groupphase.backend.service.dto.shift.ShiftDayDetailDto;
 import at.ac.tuwien.sepr.groupphase.backend.service.dto.Role;
 import at.ac.tuwien.sepr.groupphase.backend.service.dto.shift.ConcretePlanGenerateDto;
 import at.ac.tuwien.sepr.groupphase.backend.service.dto.shift.PlanBlueprintAddShiftDto;
@@ -29,7 +27,6 @@ import at.ac.tuwien.sepr.groupphase.backend.service.dto.shift.PlanBlueprintCreat
 import at.ac.tuwien.sepr.groupphase.backend.service.dto.shift.PlanBlueprintDto;
 import at.ac.tuwien.sepr.groupphase.backend.service.mapper.ShiftPlanningMapper;
 import at.ac.tuwien.sepr.groupphase.backend.service.validator.ShiftPlanningValidator;
-import io.jsonwebtoken.lang.Collections;
 import jakarta.transaction.Transactional;
 
 import org.slf4j.Logger;
@@ -39,10 +36,10 @@ import org.springframework.stereotype.Service;
 import java.lang.invoke.MethodHandles;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.time.temporal.ChronoField;
+import java.time.LocalTime;
 import java.util.*;
 import java.util.concurrent.atomic.AtomicInteger;
-import java.util.stream.Collectors;
+import java.util.function.Predicate;
 
 @Service
 public class ShiftPlanningServiceImpl implements ShiftPlanningService {
@@ -57,13 +54,12 @@ public class ShiftPlanningServiceImpl implements ShiftPlanningService {
     private final ShiftAssignmentAuditLogRepository shiftAssignmentAuditRepository;
 
     public ShiftPlanningServiceImpl(TimeService timeService,
-            ShiftPlanningValidator shiftPlanningValidator,
-            PlanBlueprintRepository planBlueprintRepository,
-            DepartmentRepository departmentRepository,
-            ConcreteShiftPlanRepository concreteShiftPlanRepository,
-            ScheduledShiftRepository scheduledShiftRepository,
-            ShiftAssignmentAuditLogRepository shiftAssignmentAuditRepository,
-            ) {
+                                    ShiftPlanningValidator shiftPlanningValidator,
+                                    PlanBlueprintRepository planBlueprintRepository,
+                                    DepartmentRepository departmentRepository,
+                                    ConcreteShiftPlanRepository concreteShiftPlanRepository,
+                                    ScheduledShiftRepository scheduledShiftRepository,
+                                    ShiftAssignmentAuditLogRepository shiftAssignmentAuditRepository) {
         this.planBlueprintRepository = planBlueprintRepository;
         this.timeService = timeService;
         this.departmentRepository = departmentRepository;
@@ -79,39 +75,50 @@ public class ShiftPlanningServiceImpl implements ShiftPlanningService {
             .orElseThrow(() -> new NotFoundException("Department not found!"));
 
         var planBuilder = new PlanBlueprint.Builder()
-                .withDepartment(dept)
-                .withDescription(createPlanBlueprintDto.description());
+            .withDepartment(dept)
+            .withDescription(createPlanBlueprintDto.description())
+            .intercept(p -> shiftPlanningValidator.validatePlan(p).ifPresent(errors -> {
+                throw new ConflictException(errors);
+            }));
 
         createPlanBlueprintDto.shifts().forEach(shiftDto -> {
-            final var shiftBuilder = planBuilder.addShift(shift -> {
-                shift.withDescription(shiftDto.description())
-                        .withManPower(shiftDto.manpower());
 
-                AtomicInteger i = new AtomicInteger();
-                shiftDto.weeks().forEach(weekDto -> {
-                    shift.addWeek(i.getAndIncrement(), weekBuilder -> {
-                        weekBuilder.withDays(weekDto.days().stream()
-                                .map(day -> {
-                                    var d = new ShiftDayBlueprint.Builder()
-                                            .withDay(day.dayOfWeek().get())
-                                            .withStartTime(day.startTime().get())
-                                            .withDuration(day.duration().get())
-                                            .build();
+            var shiftBuilder = new ShiftBlueprint.Builder()
+                .withDescription(shiftDto.description())
+                .withManPower(shiftDto.manpower())
+                .intercept(s -> shiftPlanningValidator.validateShift(s).ifPresent(errors -> {
+                    throw new ConflictException(errors);
+                }));
 
-                                    shiftPlanningValidator.validateDay(d).ifPresent(errors -> {
-                                        throw new ConflictException(errors);
-                                    });
+            AtomicInteger weekIndex = new AtomicInteger();
+            shiftDto.weeks().forEach(weekDto -> {
 
-                                    return d;
-                                })
-                                .toList());
-                    });
-                });
+                var days = weekDto.days().stream()
+                    .map(day -> new ShiftDayBlueprint.Builder()
+                        .withDay(day.dayOfWeek().orElse(null))
+                        .withStartTime(day.startTime().orElse(null))
+                        .withDuration(day.duration().orElse(null))
+                        .intercept(d -> shiftPlanningValidator.validateDay(d).ifPresent(errors -> {
+                            throw new ConflictException(errors);
+                        }))
+                        .build()).toList();
+
+                var week = new ShiftWeekBlueprint.Builder()
+                    .withIndex(weekIndex.getAndIncrement())
+                    .withDays(days)
+                    .intercept(w -> shiftPlanningValidator.validateWeek(w).ifPresent(errors -> {
+                        throw new ConflictException(errors);
+                    }))
+                    .build();
+
+                shiftBuilder.addWeek(week);
             });
+
+            var shift = shiftBuilder.build();
+
+            planBuilder.addShift(shift);
         });
         PlanBlueprint plan = planBuilder.build();
-
-        plan = planBuilder.build();
 
         shiftPlanningValidator.validateDescriptions(plan.getShifts())
             .ifPresent(errors -> {
@@ -137,34 +144,47 @@ public class ShiftPlanningServiceImpl implements ShiftPlanningService {
     @Override
     public PlanBlueprintDto addShiftToPlan(PlanBlueprintAddShiftDto addShiftDto) {
         var plan = this.planBlueprintRepository.findById(addShiftDto.planId())
-                .orElseThrow(() -> new NotFoundException("Plan not found!"));
+            .orElseThrow(() -> new NotFoundException("Plan not found!"));
 
-        // TODO: validation
-        var newShifts = addShiftDto.shifts().stream().map(shiftDto -> {
-            var shift = new ShiftBlueprint.Builder()
-                    .withDescription(shiftDto.description())
-                    .withManPower(shiftDto.manPower())
+        PlanBlueprint finalPlan1 = plan;
+        addShiftDto.shifts().forEach(shiftDto -> {
+            var shiftBuilder = new ShiftBlueprint.Builder()
+                .withDescription(shiftDto.description())
+                .withManPower(shiftDto.manPower())
+                .intercept(shift -> shiftPlanningValidator.validateShift(shift).ifPresent(errors -> {
+                    throw new ConflictException(errors);
+                }));
+
+            AtomicInteger weekIndex = new AtomicInteger();
+
+            shiftDto.weeks().forEach(weekDto -> {
+                var days = weekDto.days().stream()
+                    .map(day -> new ShiftDayBlueprint.Builder()
+                        .withDay(day.dayOfWeek().orElse(null))
+                        .withStartTime(day.startTime().orElse(null))
+                        .withDuration(day.duration().orElse(null))
+                        .intercept(d -> shiftPlanningValidator.validateDay(d).ifPresent(errors -> {
+                            throw new ConflictException(errors);
+                        }))
+                        .build())
+                    .toList();
+
+                var week = new ShiftWeekBlueprint.Builder()
+                    .withIndex(weekIndex.getAndIncrement())
+                    .withDays(days)
+                    .intercept(w -> shiftPlanningValidator.validateWeek(w).ifPresent(errors -> {
+                        throw new ConflictException(errors);
+                    }))
                     .build();
 
-            AtomicInteger i = new AtomicInteger();
-            var weeks = shiftDto.weeks().stream().map(weekDto -> new ShiftWeekBlueprint.Builder()
-                .withIndex(i.getAndIncrement())
-                .withDays(weekDto.days().stream()
-                    .map(day -> new ShiftDayBlueprint.Builder()
-                        .withDay(day.dayOfWeek().get())
-                        .withStartTime(day.startTime().get())
-                        .withDuration(day.duration().get())
-                        .build())
-                    .toList())
-                .build()).toList();
+                shiftBuilder.addWeek(week);
+            });
 
-            shift.addWeeks(weeks);
-
-            return shift;
-        }).toList();
+            var shift = shiftBuilder.build();
+            finalPlan1.addShiftBlueprint(shift);
+        });
 
         List<ShiftBlueprint> allShifts = new ArrayList<>(plan.getShifts());
-        allShifts.addAll(newShifts);
 
         shiftPlanningValidator.validateDescriptions(allShifts)
             .ifPresent(errors -> {
@@ -194,24 +214,22 @@ public class ShiftPlanningServiceImpl implements ShiftPlanningService {
             });
 
 
-
-
-        final var finalPlan = plan;
-        newShifts.forEach(shift -> {
-            shift.setPlan(finalPlan);
-            finalPlan.addShiftBlueprint(shift);
+        plan = this.planBlueprintRepository.save(plan);
+        // validate whole plan after changes
+        shiftPlanningValidator.validatePlan(plan).ifPresent(errors -> {
+            throw new ConflictException(errors);
         });
 
-        plan = this.planBlueprintRepository.save(plan);
-
-        return ShiftPlanningMapper.Plans.fromEntity(plan);
+        var updated = planBlueprintRepository.save(plan);
+        return ShiftPlanningMapper.Plans.fromEntity(updated);
     }
+
 
     @Override
     @Transactional
     public ConcreteShiftPlan generateConcreteQuarterlyPlan(ConcretePlanGenerateDto dto) {
         PlanBlueprint blueprint = planBlueprintRepository.findById(dto.planBlueprintId())
-                .orElseThrow(() -> new NotFoundException("Plan blueprint not found"));
+            .orElseThrow(() -> new NotFoundException("Plan blueprint not found"));
 
         Department department = blueprint.getDepartment();
         LocalDate month = dto.startDate().orElseThrow(() -> new ConflictException("Start date is required"));
@@ -231,18 +249,61 @@ public class ShiftPlanningServiceImpl implements ShiftPlanningService {
         plan.setStartDate(startDate);
         plan.setEndDate(endDate);
 
-        List<ScheduledShift> allShifts = new ArrayList<>();
-        Map<ShiftBlueprint, List<ApplicationUser>> rotationMap = prepareRotation(blueprint);
-        List<ShiftAssignmentAuditLog> logs = new LinkedList<>();
+        Predicate<ApplicationUser> isNotSupervisor =
+            u -> u.getRoles().stream().noneMatch(r -> r.getName().equals(Role.SUPERVISOR.name()));
 
-        for (int weekIndex = 0; weekIndex < 12; weekIndex++) {
-            LocalDate weekStart = startDate.plusWeeks(weekIndex);
+        List<ApplicationUser> allUsers = plan.getDepartment().getUsers().stream().toList()
+            .stream()
+            .filter(isNotSupervisor)
+            .toList();
 
-            for (ShiftBlueprint shiftBlueprint : blueprint.getShifts()) {
-                int blueprintWeekIndex = weekIndex % shiftBlueprint.getShiftWeeks().size();
-                ShiftWeekBlueprint weekTemplate = shiftBlueprint.getShiftWeeks().get(blueprintWeekIndex);
+        var weeks = blueprint.getShifts().stream().flatMap(s -> s.getShiftWeeks().stream())
+            .map(x -> new ShiftWeekRotationNode(x.getShiftBlueprint(), x))
+            .toList();
 
-                for (ShiftDayBlueprint day : weekTemplate.getDays()) {
+        var c = weeks.stream()
+            .sorted(Comparator.<ShiftWeekRotationNode, String>comparing(x -> x.blueprint.getDescription())
+                .thenComparingInt(x -> x.week.getWeekIndex()))
+            .toList();
+
+        var a = weeks.stream()
+            .sorted(Comparator.<ShiftWeekRotationNode>comparingInt(x -> x.week.getWeekIndex())
+                .thenComparing(x -> x.week.getDays().stream()
+                    .map(ShiftDayBlueprint::getStartTime)
+                    .min(Comparator.naturalOrder())
+                    .orElse(LocalTime.MAX)
+                ))
+            .toList();
+
+        Queue<ShiftWeekRotationNode> rotationQueue = new LinkedList<>();
+        int size = weeks.size();
+        for (int i = 0; i < size; i++) {
+            rotationQueue.add(a.get(i));
+            ShiftWeekRotationNode current = c.get(i);
+            current.next = c.get((i + 1) % size);
+            current.prev = c.get((i - 1 + size) % size);
+        }
+
+        var mutable = new ArrayList<>(allUsers);
+        a.stream().limit(blueprint.getShifts().size()).forEach(
+            x -> {
+                int i = 0;
+                while (i < x.blueprint.getManPower()) {
+                    var user = mutable.removeFirst();
+                    x.users.add(user);
+                    i++;
+                }
+            });
+
+        var logs = new ArrayList<ShiftAssignmentAuditLog>();
+        var allShifts = new ArrayList<ScheduledShift>();
+        for (int week = 0; week < 12; week++) {
+            LocalDate weekStart = startDate.plusWeeks(week);
+            int weekSize = 2;
+            for (int y = 0; y < weekSize; y++) {
+                var node = rotationQueue.poll();
+                assert node != null;
+                for (ShiftDayBlueprint day : node.week.getDays()) {
                     LocalDateTime shiftStart = weekStart.with(day.getDay()).atTime(day.getStartTime());
                     LocalDateTime shiftEnd = shiftStart.plus(day.getDuration());
 
@@ -254,34 +315,28 @@ public class ShiftPlanningServiceImpl implements ShiftPlanningService {
                             .withPlan(plan)
                             .build();
 
-                    // Rotierender Mitarbeiterkreis
-                    List<ApplicationUser> candidates = rotationMap.get(shiftBlueprint);
-                    int manpower = shiftBlueprint.getManPower();
-                    int offset = (weekIndex * manpower) % candidates.size();
+                    node.users.forEach(u -> {
+                        scheduledShift.addAssignment(new ScheduledShiftAssignment(scheduledShift, u));
 
-                    for (int i = 0; i < manpower; i++) {
-                        ApplicationUser user = candidates.get((offset + i) % candidates.size());
-                        ScheduledShiftAssignment assignment = new ScheduledShiftAssignment(scheduledShift, user);
-                        scheduledShift.addAssignment(assignment);
-
-                        var log = new ShiftAssignmentAuditLog.Builder()
-                                .withTimestamp(this.timeService.now())
-                                .withWorker(user)
-                                .withTrigger(ShiftAssignmentTrigger.INITIAL_ASSIGNMENT_ALGORITHM)
-                                .withShift(scheduledShift)
-                                .build();
-
-                        logs.add(log);
-                    }
+                        logs.add(new ShiftAssignmentAuditLog.Builder()
+                            .withTimestamp(timeService.now())
+                            .withWorker(u)
+                            .withTrigger(ShiftAssignmentTrigger.INITIAL_ASSIGNMENT_ALGORITHM)
+                            .withShift(scheduledShift)
+                            .build());
+                    });
 
                     allShifts.add(scheduledShift);
                 }
+                node.rotate();
+                rotationQueue.add(node);
             }
         }
 
+
         plan.addScheduledShifts(allShifts);
-        var result = concreteShiftPlanRepository.save(plan);
-        this.shiftAssignmentAuditRepository.saveAll(logs);
+        ConcreteShiftPlan result = concreteShiftPlanRepository.save(plan);
+        shiftAssignmentAuditRepository.saveAll(logs);
         return result;
     }
 
@@ -293,5 +348,69 @@ public class ShiftPlanningServiceImpl implements ShiftPlanningService {
             .max(Comparator.comparing(ConcreteShiftPlan::getStartDate))
             .orElseThrow(() -> new NotFoundException(("No current concrete plan found for department with ID: " + departmentName)));
     }
+
+    private static class ShiftWeekRotationNode {
+        ShiftBlueprint blueprint;
+        ShiftWeekBlueprint week;
+        int manpower;
+        Deque<ApplicationUser> users = new ArrayDeque<>();
+        ShiftWeekRotationNode next;
+        ShiftWeekRotationNode prev;
+
+        ShiftWeekRotationNode(ShiftBlueprint blueprint, ShiftWeekBlueprint week) {
+            this.blueprint = blueprint;
+            this.week = week;
+            this.manpower = blueprint.getManPower();
+        }
+
+        void rotate() {
+            if (users.isEmpty()) return;
+
+            // Übergabe an nächste Woche
+            for (int i = 0; i < Math.min(manpower, next.manpower); i++) {
+                if (users.isEmpty()) break;
+                ApplicationUser user = users.removeLast();
+                next.users.addFirst(user);
+            }
+
+            // Überschuss an vorige Woche
+            for (int i = 0; i < manpower - Math.min(manpower, next.next.manpower); i++) {
+                if (users.isEmpty()) break;
+                ApplicationUser user = users.removeLast();
+                fill(user);
+            }
+        }
+
+        public void fill(ApplicationUser user) {
+            while (prev != null) {
+                if (prev.users.size() < prev.manpower) {
+                    prev.users.addLast(user);
+                    return;
+                }
+                prev = prev.prev;
+            }
+        }
+
+        @Override
+        public String toString() {
+            String name = (blueprint != null ? blueprint.getDescription() : "unknown") + "-W" + week.getWeekIndex();
+            String prevName = (prev != null && prev.blueprint != null)
+                ? prev.blueprint.getDescription() + "-W" + prev.week.getWeekIndex()
+                : "null";
+            String nextName = (next != null && next.blueprint != null)
+                ? next.blueprint.getDescription() + "-W" + next.week.getWeekIndex()
+                : "null";
+
+            return String.format(
+                "[%s | manpower=%d | users=%s | prev=%s | next=%s]",
+                name,
+                manpower,
+                users.stream().map(ApplicationUser::getEmail).toList(),
+                prevName,
+                nextName
+            );
+        }
+    }
+
 
 }

@@ -14,6 +14,7 @@ import jakarta.persistence.Table;
 import java.time.DayOfWeek;
 import java.time.Duration;
 import java.time.LocalTime;
+import java.util.function.Consumer;
 
 
 /*
@@ -92,6 +93,11 @@ public class ShiftDayBlueprint {
 
         public Builder withDuration(Duration duration) {
             day.setDuration(duration);
+            return this;
+        }
+
+        public Builder intercept(Consumer<ShiftDayBlueprint> interceptor) {
+            interceptor.accept(day);
             return this;
         }
 

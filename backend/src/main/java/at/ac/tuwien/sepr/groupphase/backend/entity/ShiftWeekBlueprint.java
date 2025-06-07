@@ -101,6 +101,11 @@ public class ShiftWeekBlueprint {
             return this;
         }
 
+        public Builder intercept(Consumer<ShiftWeekBlueprint> interceptor) {
+            interceptor.accept(week);
+            return this;
+        }
+
         public ShiftWeekBlueprint build() {
             return week;
         }

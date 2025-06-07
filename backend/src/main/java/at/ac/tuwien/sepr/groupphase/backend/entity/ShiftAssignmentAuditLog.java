@@ -38,11 +38,11 @@ public class ShiftAssignmentAuditLog {
     }
 
     public ShiftAssignmentAuditLog(LocalDateTime timestamp,
-            ShiftAssignmentTrigger trigger,
-            String performedByUserEmail,
-            ApplicationUser assignedUser,
-            ScheduledShift scheduledShift,
-            String reason) {
+                                   ShiftAssignmentTrigger trigger,
+                                   String performedByUserEmail,
+                                   ApplicationUser assignedUser,
+                                   ScheduledShift scheduledShift,
+                                   String reason) {
         this.timestamp = timestamp;
         this.trigger = trigger;
         this.performedByUserEmail = performedByUserEmail;

@@ -104,6 +104,11 @@ public class ShiftBlueprint {
             return this;
         }
 
+        public Builder intercept(Consumer<ShiftBlueprint> interceptor) {
+            interceptor.accept(shift);
+            return this;
+        }
+
         public ShiftBlueprint.Builder addWeek(int index, Consumer<ShiftWeekBlueprint.Builder> weekConfig) {
             var weekBuilder = new ShiftWeekBlueprint.Builder()
                 .withIndex(index);
@@ -114,7 +119,7 @@ public class ShiftBlueprint {
             return this;
         }
 
-        public ShiftBlueprint.Builder addWeek(int index, ShiftWeekBlueprint week) {
+        public ShiftBlueprint.Builder addWeek(ShiftWeekBlueprint week) {
             this.shift.addWeeks(List.of(week));
             return this;
         }

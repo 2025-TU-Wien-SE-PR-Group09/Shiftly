@@ -48,8 +48,8 @@ public class ScheduledShiftAssignmentId implements Serializable {
             return false;
         }
         return Objects.equals(scheduledShiftId, that.scheduledShiftId)
-                &&
-                Objects.equals(userEmail, that.userEmail);
+            &&
+            Objects.equals(userEmail, that.userEmail);
     }
 
     @Override

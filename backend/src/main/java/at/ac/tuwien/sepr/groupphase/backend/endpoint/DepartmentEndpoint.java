@@ -63,16 +63,16 @@ public class DepartmentEndpoint {
     private final UserService userService;
 
     public DepartmentEndpoint(DepartmentService departmentService,
-            ShiftPlanningService shiftPlanningService,
-            EmployeeService employeeService,
-            UserService userService) {
+                              ShiftPlanningService shiftPlanningService,
+                              EmployeeService employeeService,
+                              UserService userService) {
         this.departmentService = departmentService;
         this.shiftPlanningService = shiftPlanningService;
         this.employeeService = employeeService;
         this.userService = userService;
     }
 
-    @RolesAllowed({ "ADMIN" })
+    @RolesAllowed({"ADMIN"})
     @Operation(summary = "Get all departments")
     @ApiResponse(responseCode = "200", description = "List of all departments")
     @GetMapping(produces = MediaType.APPLICATION_JSON_VALUE)
@@ -84,7 +84,7 @@ public class DepartmentEndpoint {
             .toList();
     }
 
-    @RolesAllowed({ "ADMIN" })
+    @RolesAllowed({"ADMIN"})
     @Operation(summary = "Get all supervisors")
     @ApiResponse(responseCode = "200", description = "List of all supervisors")
     @GetMapping(value = "/api/departments/supervisors", produces = MediaType.APPLICATION_JSON_VALUE)
@@ -113,66 +113,66 @@ public class DepartmentEndpoint {
             new DepartmentDetailRestResponseDto(
                 d.name(),
                 departmentService.getSupervisorByDepartmentName(d.name())
-                        .map(UserEmailDto::email)
-                        .orElse("NONE")))
-                .orElseThrow(() -> new NotFoundException("Department not found!"));
+                    .map(UserEmailDto::email)
+                    .orElse("NONE")))
+            .orElseThrow(() -> new NotFoundException("Department not found!"));
     }
 
     @Transactional
-    @RolesAllowed({ "ADMIN" })
+    @RolesAllowed({"ADMIN"})
     @Operation(summary = "Create a new department")
     @ApiResponse(responseCode = "201", description = "New department created")
     @PostMapping(produces = MediaType.APPLICATION_JSON_VALUE, consumes = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<Void> createDepartment(@RequestBody @Valid DepartmentCreateRestDto restDto) {
         DepartmentCreateDto serviceDto = new DepartmentCreateDto(
-                restDto.getName(),
-                restDto.getSupervisorEmail());
+            restDto.getName(),
+            restDto.getSupervisorEmail());
         departmentService.createDepartment(serviceDto);
         return ResponseEntity.status(HttpStatus.CREATED).build();
     }
 
     @Transactional
-    @RolesAllowed({ "ADMIN" })
+    @RolesAllowed({"ADMIN"})
     @Operation(summary = "Edit existing department")
     @ApiResponse(responseCode = "200", description = "Department edited")
     @PutMapping(produces = MediaType.APPLICATION_JSON_VALUE, consumes = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<Void> editDepartment(@RequestBody @Valid DepartmentEditRestDto restDto)
-            throws NotFoundException {
+        throws NotFoundException {
         DepartmentEditDto serviceDto = new DepartmentEditDto(
-                restDto.getOldName(),
-                restDto.getNewName(),
-                restDto.getSupervisorEmail());
+            restDto.getOldName(),
+            restDto.getNewName(),
+            restDto.getSupervisorEmail());
         departmentService.editDepartment(serviceDto);
         return ResponseEntity.status(HttpStatus.OK).build();
     }
 
     @Transactional
-    @RolesAllowed({ "ADMIN", "SUPERVISOR" })
+    @RolesAllowed({"ADMIN", "SUPERVISOR"})
     @Operation(summary = "Create shift plan(Blueprint) for a department")
     @ApiResponse(responseCode = "201", description = "Shiftplan for the department")
     @PostMapping(path = "/{departmentName}/shiftplanBlueprint", produces = MediaType.APPLICATION_JSON_VALUE, consumes = MediaType.APPLICATION_JSON_VALUE)
     public PlanBlueprintResponse createShiftplanBlueprint(
-            @PathVariable(name = "departmentName") String departmentName,
-            @RequestBody @Valid CreatePlanBlueprintDto blueprintDto) {
+        @PathVariable(name = "departmentName") String departmentName,
+        @RequestBody @Valid CreatePlanBlueprintDto blueprintDto) {
 
         DepartmentDto department = departmentService.getDepartmentByName(departmentName)
-                .orElseThrow(() -> new NotFoundException("Department not found!"));
+            .orElseThrow(() -> new NotFoundException("Department not found!"));
 
         var mapped = ShiftRestMapper.mapFromRequest(department.name(), blueprintDto);
         return ShiftPlanningMapper.Plans.toResponse(shiftPlanningService.createPlanBlueprint(mapped));
     }
 
     @Transactional
-    @RolesAllowed({ "ADMIN", "SUPERVISOR" })
+    @RolesAllowed({"ADMIN", "SUPERVISOR"})
     @Operation(summary = "Add shift to existing plan(Blueprint) for a department")
     @ApiResponse(responseCode = "201", description = "Add shift to existing plan(Blueprint) for a department")
     @PostMapping(path = "/{departmentName}/shiftplanBlueprint/add", produces = MediaType.APPLICATION_JSON_VALUE, consumes = MediaType.APPLICATION_JSON_VALUE)
     public PlanBlueprintResponse addShiftToPlanBlueprint(
-            @PathVariable(name = "departmentName") String departmentName,
-            @RequestBody @Valid AddShiftToPlanBlueprintDto blueprintDto) {
+        @PathVariable(name = "departmentName") String departmentName,
+        @RequestBody @Valid AddShiftToPlanBlueprintDto blueprintDto) {
 
         DepartmentDto department = departmentService.getDepartmentByName(departmentName)
-                .orElseThrow(() -> new NotFoundException("Department not found!"));
+            .orElseThrow(() -> new NotFoundException("Department not found!"));
 
         var mapped = ShiftRestMapper.mapFromRequest(blueprintDto);
         return ShiftPlanningMapper.Plans.toResponse(shiftPlanningService.addShiftToPlan(mapped));
@@ -184,21 +184,21 @@ public class DepartmentEndpoint {
     @ApiResponse(responseCode = "200", description = "Shiftplan for the department")
     @GetMapping(path = "/{departmentName}/shiftplanBlueprint", produces = MediaType.APPLICATION_JSON_VALUE)
     public List<PlanBlueprintResponse> getShiftplanBlueprints(
-            @PathVariable(name = "departmentName") String departmentName) {
+        @PathVariable(name = "departmentName") String departmentName) {
 
         DepartmentDto department = departmentService.getDepartmentByName(departmentName)
-                .orElseThrow(() -> new NotFoundException("Department not found!"));
+            .orElseThrow(() -> new NotFoundException("Department not found!"));
 
         return department.plans().stream().map(ShiftPlanningMapper.Plans::toResponse).toList();
     }
 
-    @RolesAllowed({ "ADMIN", "SUPERVISOR" })
+    @RolesAllowed({"ADMIN", "SUPERVISOR"})
     @Transactional
     @Operation(summary = "Generate concrete shift plan for the given department and return the scheduled shifts")
     @ApiResponse(responseCode = "201", description = "Concrete shift plan generated and returned")
     @PostMapping(path = "/{id}/generate-concrete-plan", consumes = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<Void> generateConcretePlan(
-            @RequestBody @Valid GenerateConcretePlanDto generateConcretePlanDto, @PathVariable("id") Long id) {
+        @RequestBody @Valid GenerateConcretePlanDto generateConcretePlanDto, @PathVariable("id") Long id) {
         ConcretePlanGenerateDto mapped = ShiftRestMapper.mapFromRequest(id, generateConcretePlanDto);
 
         ConcreteShiftPlan plan = shiftPlanningService.generateConcreteQuarterlyPlan(mapped);
@@ -207,16 +207,16 @@ public class DepartmentEndpoint {
     }
 
     @Transactional
-    @RolesAllowed({ "SUPERVISOR" })
+    @RolesAllowed({"SUPERVISOR"})
     @Operation(summary = "Add an employee to a department")
     @ApiResponse(responseCode = "200", description = "Successfully added employee to department")
     @PostMapping(path = "/{departmentName}/addEmployee/{employeeEmail}", produces = MediaType.APPLICATION_JSON_VALUE)
     public EmployeeRestResponseDto addEmployeeToDepartment(
-            @PathVariable(name = "departmentName") String departmentName,
-            @PathVariable(name = "employeeEmail") String employeeEmail) {
+        @PathVariable(name = "departmentName") String departmentName,
+        @PathVariable(name = "employeeEmail") String employeeEmail) {
 
         DepartmentDto department = departmentService.getDepartmentByName(departmentName)
-                .orElseThrow(() -> new NotFoundException("Department not found!"));
+            .orElseThrow(() -> new NotFoundException("Department not found!"));
 
         // TODO: Verify if user has access to this department
 
@@ -229,26 +229,26 @@ public class DepartmentEndpoint {
         return new EmployeeRestResponseDto(employee.email(), department.name());
     }
 
-    @RolesAllowed({ "SUPERVISOR" })
+    @RolesAllowed({"SUPERVISOR"})
     @Operation(summary = "List all employees of a department")
     @ApiResponse(responseCode = "200", description = "List all employees of a department")
     @GetMapping(path = "/{departmentName}/employees", produces = MediaType.APPLICATION_JSON_VALUE)
     @Transactional
     public List<EmployeeListItemResponseDto> getEmployeesOfDepartment(
-            @PathVariable(name = "departmentName") String departmentName) {
+        @PathVariable(name = "departmentName") String departmentName) {
 
         DepartmentDto department = departmentService.getDepartmentByName(departmentName)
-                .orElseThrow(() -> new NotFoundException("Department not found!"));
+            .orElseThrow(() -> new NotFoundException("Department not found!"));
 
         // TODO: Verify if user has access to this department
 
         List<EmployeeListItemDto> employees = employeeService.getEmployeesOfDepartment(
-                new DepartmentNameDto(department.name()));
+            new DepartmentNameDto(department.name()));
 
         return employees.stream().map(EmployeeListItemResponseDto::from).toList();
     }
 
-    @RolesAllowed({ "ADMIN", "SUPERVISOR" })
+    @RolesAllowed({"ADMIN", "SUPERVISOR"})
     @Transactional
     @Operation(summary = "Get the concrete shift plan for the given department and return the scheduled shifts in suitable calendar format")
     @ApiResponse(responseCode = "201", description = "Concrete shift plan in calendar format.")
@@ -262,9 +262,9 @@ public class DepartmentEndpoint {
         List<ScheduledShift> shifts = plan.getScheduledShifts();
 
         DepartmentShiftplanCalendarResponse response = new DepartmentShiftplanCalendarResponse(
-                shifts.stream()
-                        .map(ShiftPlanningMapper.Calendar::toResponse)
-                        .collect(Collectors.toList()));
+            shifts.stream()
+                .map(ShiftPlanningMapper.Calendar::toResponse)
+                .collect(Collectors.toList()));
 
         return ResponseEntity.ok(response);
     }

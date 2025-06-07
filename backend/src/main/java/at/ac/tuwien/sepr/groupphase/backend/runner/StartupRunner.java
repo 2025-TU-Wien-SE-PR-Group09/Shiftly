@@ -38,7 +38,7 @@ public class StartupRunner implements CommandLineRunner {
     private final DepartmentService departmentService;
     private final PlanBlueprintRepository planBlueprintRepository;
 
-    private final UserRepository userRepository;
+    private final UserRepository userRepsitory;
     private final DepartmentRepository departmentRepository;
 
     private static final Logger LOGGER = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
@@ -47,8 +47,8 @@ public class StartupRunner implements CommandLineRunner {
     private String adminUserPassword;
 
     public StartupRunner(UserService userService, ShiftPlanningService shiftPlanningService,
-            DepartmentService departmentService, PlanBlueprintRepository planBlueprintRepository,
-            UserRepository userRepository, DepartmentRepository departmentRepository) {
+                         DepartmentService departmentService, PlanBlueprintRepository planBlueprintRepository,
+                         UserRepository userRepository, DepartmentRepository departmentRepository) {
         this.userService = userService;
         this.shiftPlanningService = shiftPlanningService;
         this.departmentService = departmentService;
@@ -149,7 +149,7 @@ public class StartupRunner implements CommandLineRunner {
 
         // Neue Employees zuweisen
         for (String email : List.of("employee1@shyft.local", "employee2@shyft.local", "employee3@shyft.local",
-                "employee4@shyft.local", "employee5@shyft.local", "employee6@shyft.local")) {
+            "employee4@shyft.local", "employee5@shyft.local", "employee6@shyft.local")) {
             ApplicationUser user = this.userRepository.findByEmail(email).orElseThrow();
             user.setDepartment(production);
             this.userRepository.save(user);
@@ -160,109 +160,148 @@ public class StartupRunner implements CommandLineRunner {
     }
 
     private void createPlan(Department department) {
-        var monDay = new ShiftDayDto(DayOfWeek.MONDAY, LocalTime.of(7, 0), Duration.ofHours(8));
-        var tuesDay = new ShiftDayDto(DayOfWeek.TUESDAY, LocalTime.of(7, 0), Duration.ofHours(8));
-        var wedDay = new ShiftDayDto(DayOfWeek.WEDNESDAY, LocalTime.of(7, 0), Duration.ofHours(8));
-        var thurDay = new ShiftDayDto(DayOfWeek.THURSDAY, LocalTime.of(7, 0), Duration.ofHours(8));
-        var fridayDay = new ShiftDayDto(DayOfWeek.FRIDAY, LocalTime.of(7, 0), Duration.ofHours(8));
-
         List<ShiftDayBlueprint> days = List.of(
-                new ShiftDayBlueprint.Builder().withDay(DayOfWeek.MONDAY)
-                        .withStartTime(LocalTime.of(7, 0))
-                        .withDuration(Duration.ofHours(8))
-                        .build(),
-                new ShiftDayBlueprint.Builder().withDay(DayOfWeek.TUESDAY)
-                        .withStartTime(LocalTime.of(7, 0))
-                        .withDuration(Duration.ofHours(8))
-                        .build(),
-                new ShiftDayBlueprint.Builder().withDay(DayOfWeek.WEDNESDAY)
-                        .withStartTime(LocalTime.of(7, 0))
-                        .withDuration(Duration.ofHours(8))
-                        .build(),
-                new ShiftDayBlueprint.Builder().withDay(DayOfWeek.THURSDAY)
-                        .withStartTime(LocalTime.of(7, 0))
-                        .withDuration(Duration.ofHours(8))
-                        .build(),
-                new ShiftDayBlueprint.Builder()
-                        .withDay(DayOfWeek.FRIDAY)
-                        .withStartTime(LocalTime.of(7, 0))
-                        .withDuration(Duration.ofHours(8))
-                        .build());
+            new ShiftDayBlueprint.Builder().withDay(DayOfWeek.MONDAY)
+                .withStartTime(LocalTime.of(7, 0))
+                .withDuration(Duration.ofHours(8))
+                .build(),
+            new ShiftDayBlueprint.Builder().withDay(DayOfWeek.TUESDAY)
+                .withStartTime(LocalTime.of(7, 0))
+                .withDuration(Duration.ofHours(8))
+                .build(),
+            new ShiftDayBlueprint.Builder().withDay(DayOfWeek.WEDNESDAY)
+                .withStartTime(LocalTime.of(7, 0))
+                .withDuration(Duration.ofHours(8))
+                .build(),
+            new ShiftDayBlueprint.Builder().withDay(DayOfWeek.THURSDAY)
+                .withStartTime(LocalTime.of(7, 0))
+                .withDuration(Duration.ofHours(8))
+                .build(),
+            new ShiftDayBlueprint.Builder()
+                .withDay(DayOfWeek.FRIDAY)
+                .withStartTime(LocalTime.of(7, 0))
+                .withDuration(Duration.ofHours(8))
+                .build());
 
         var plan = new PlanBlueprint.Builder()
-                .withDepartment(department)
-                .withDescription("Standard-plan for Production (1-1 Day/Night Rotation)")
-                .addShift(shiftBuilder -> {
-                    shiftBuilder.withDescription("Dayshift")
-                            .withManPower(4)
-                            .addWeek(0, weekBuilder -> {
-                                weekBuilder.withDays(days);
-                            });
-                })
-                .build();
+            .withDepartment(department)
+            .withDescription("Standard-plan for Production (1-1 Day/Night Rotation)")
+            .addShift(shiftBuilder -> {
+                shiftBuilder.withDescription("Dayshift")
+                    .withManPower(4)
+                    .addWeek(0, weekBuilder -> {
+                        weekBuilder.withDays(days);
+                    });
+            })
+            .build();
         plan = this.planBlueprintRepository.save(plan);
 
     }
 
     private void createSecondPlan(Department department) {
         List<ShiftDayBlueprint> earlyShiftDays = List.of(
-                new ShiftDayBlueprint.Builder().withDay(DayOfWeek.MONDAY)
-                        .withStartTime(LocalTime.of(5, 30))
-                        .withDuration(Duration.ofHours(8))
-                        .build(),
-                new ShiftDayBlueprint.Builder().withDay(DayOfWeek.TUESDAY)
-                        .withStartTime(LocalTime.of(5, 30))
-                        .withDuration(Duration.ofHours(8))
-                        .build(),
-                new ShiftDayBlueprint.Builder().withDay(DayOfWeek.WEDNESDAY)
-                        .withStartTime(LocalTime.of(5, 30))
-                        .withDuration(Duration.ofHours(8))
-                        .build(),
-                new ShiftDayBlueprint.Builder().withDay(DayOfWeek.THURSDAY)
-                        .withStartTime(LocalTime.of(5, 30))
-                        .withDuration(Duration.ofHours(8))
-                        .build(),
-                new ShiftDayBlueprint.Builder().withDay(DayOfWeek.FRIDAY)
-                        .withStartTime(LocalTime.of(5, 30))
-                        .withDuration(Duration.ofHours(8))
-                        .build());
+            new ShiftDayBlueprint.Builder().withDay(DayOfWeek.MONDAY)
+                .withStartTime(LocalTime.of(5, 30))
+                .withDuration(Duration.ofHours(8))
+                .build(),
+            new ShiftDayBlueprint.Builder().withDay(DayOfWeek.TUESDAY)
+                .withStartTime(LocalTime.of(5, 30))
+                .withDuration(Duration.ofHours(8))
+                .build(),
+            new ShiftDayBlueprint.Builder().withDay(DayOfWeek.WEDNESDAY)
+                .withStartTime(LocalTime.of(5, 30))
+                .withDuration(Duration.ofHours(8))
+                .build(),
+            new ShiftDayBlueprint.Builder().withDay(DayOfWeek.THURSDAY)
+                .withStartTime(LocalTime.of(5, 30))
+                .withDuration(Duration.ofHours(8))
+                .build(),
+            new ShiftDayBlueprint.Builder().withDay(DayOfWeek.FRIDAY)
+                .withStartTime(LocalTime.of(5, 30))
+                .withDuration(Duration.ofHours(8))
+                .build());
+
+        List<ShiftDayBlueprint> earlyShiftDays2 = List.of(
+            new ShiftDayBlueprint.Builder().withDay(DayOfWeek.MONDAY)
+                .withStartTime(LocalTime.of(5, 30))
+                .withDuration(Duration.ofHours(8))
+                .build(),
+            new ShiftDayBlueprint.Builder().withDay(DayOfWeek.TUESDAY)
+                .withStartTime(LocalTime.of(5, 30))
+                .withDuration(Duration.ofHours(8))
+                .build(),
+            new ShiftDayBlueprint.Builder().withDay(DayOfWeek.WEDNESDAY)
+                .withStartTime(LocalTime.of(5, 30))
+                .withDuration(Duration.ofHours(8))
+                .build(),
+            new ShiftDayBlueprint.Builder().withDay(DayOfWeek.THURSDAY)
+                .withStartTime(LocalTime.of(5, 30))
+                .withDuration(Duration.ofHours(8))
+                .build(),
+            new ShiftDayBlueprint.Builder().withDay(DayOfWeek.FRIDAY)
+                .withStartTime(LocalTime.of(5, 30))
+                .withDuration(Duration.ofHours(8))
+                .build());
 
         List<ShiftDayBlueprint> lateShiftDays = List.of(
-                new ShiftDayBlueprint.Builder().withDay(DayOfWeek.MONDAY)
-                        .withStartTime(LocalTime.of(14, 0))
-                        .withDuration(Duration.ofHours(8))
-                        .build(),
-                new ShiftDayBlueprint.Builder().withDay(DayOfWeek.TUESDAY)
-                        .withStartTime(LocalTime.of(14, 0))
-                        .withDuration(Duration.ofHours(8))
-                        .build(),
-                new ShiftDayBlueprint.Builder().withDay(DayOfWeek.WEDNESDAY)
-                        .withStartTime(LocalTime.of(14, 0))
-                        .withDuration(Duration.ofHours(8))
-                        .build(),
-                new ShiftDayBlueprint.Builder().withDay(DayOfWeek.THURSDAY)
-                        .withStartTime(LocalTime.of(14, 0))
-                        .withDuration(Duration.ofHours(8))
-                        .build(),
-                new ShiftDayBlueprint.Builder().withDay(DayOfWeek.FRIDAY)
-                        .withStartTime(LocalTime.of(14, 0))
-                        .withDuration(Duration.ofHours(8))
-                        .build());
+            new ShiftDayBlueprint.Builder().withDay(DayOfWeek.MONDAY)
+                .withStartTime(LocalTime.of(14, 0))
+                .withDuration(Duration.ofHours(8))
+                .build(),
+            new ShiftDayBlueprint.Builder().withDay(DayOfWeek.TUESDAY)
+                .withStartTime(LocalTime.of(14, 0))
+                .withDuration(Duration.ofHours(8))
+                .build(),
+            new ShiftDayBlueprint.Builder().withDay(DayOfWeek.WEDNESDAY)
+                .withStartTime(LocalTime.of(14, 0))
+                .withDuration(Duration.ofHours(8))
+                .build(),
+            new ShiftDayBlueprint.Builder().withDay(DayOfWeek.THURSDAY)
+                .withStartTime(LocalTime.of(14, 0))
+                .withDuration(Duration.ofHours(8))
+                .build(),
+            new ShiftDayBlueprint.Builder().withDay(DayOfWeek.FRIDAY)
+                .withStartTime(LocalTime.of(14, 0))
+                .withDuration(Duration.ofHours(8))
+                .build());
+        List<ShiftDayBlueprint> lateShiftDays2 = List.of(
+            new ShiftDayBlueprint.Builder().withDay(DayOfWeek.MONDAY)
+                .withStartTime(LocalTime.of(14, 0))
+                .withDuration(Duration.ofHours(8))
+                .build(),
+            new ShiftDayBlueprint.Builder().withDay(DayOfWeek.TUESDAY)
+                .withStartTime(LocalTime.of(14, 0))
+                .withDuration(Duration.ofHours(8))
+                .build(),
+            new ShiftDayBlueprint.Builder().withDay(DayOfWeek.WEDNESDAY)
+                .withStartTime(LocalTime.of(14, 0))
+                .withDuration(Duration.ofHours(8))
+                .build(),
+            new ShiftDayBlueprint.Builder().withDay(DayOfWeek.THURSDAY)
+                .withStartTime(LocalTime.of(14, 0))
+                .withDuration(Duration.ofHours(8))
+                .build(),
+            new ShiftDayBlueprint.Builder().withDay(DayOfWeek.FRIDAY)
+                .withStartTime(LocalTime.of(14, 0))
+                .withDuration(Duration.ofHours(8))
+                .build());
 
         var plan = new PlanBlueprint.Builder()
-                .withDepartment(department)
-                .withDescription("Second plan: Early/Late Shift Schedule")
-                .addShift(shiftBuilder -> {
-                    shiftBuilder.withDescription("Early Shift")
-                            .withManPower(3)
-                            .addWeek(0, weekBuilder -> weekBuilder.withDays(earlyShiftDays));
-                })
-                .addShift(shiftBuilder -> {
-                    shiftBuilder.withDescription("Late Shift")
-                            .withManPower(3)
-                            .addWeek(0, weekBuilder -> weekBuilder.withDays(lateShiftDays));
-                })
-                .build();
+            .withDepartment(department)
+            .withDescription("Second plan: Early/Late Shift Schedule")
+            .addShift(shiftBuilder -> {
+                shiftBuilder.withDescription("Early Shift")
+                    .withManPower(3)
+                    .addWeek(0, weekBuilder -> weekBuilder.withDays(earlyShiftDays))
+                    .addWeek(1, weekBuilder -> weekBuilder.withDays(earlyShiftDays2));
+            })
+            .addShift(shiftBuilder -> {
+                shiftBuilder.withDescription("Late Shift")
+                    .withManPower(2)
+                    .addWeek(0, weekBuilder -> weekBuilder.withDays(lateShiftDays))
+                    .addWeek(1, weekBuilder -> weekBuilder.withDays(lateShiftDays2));
+            })
+            .build();
 
         plan = this.planBlueprintRepository.save(plan);
     }

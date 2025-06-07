@@ -1,5 +1,6 @@
 package at.ac.tuwien.sepr.groupphase.backend.entity;
 
+import at.ac.tuwien.sepr.groupphase.backend.config.Constants;
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -92,6 +93,11 @@ public class PlanBlueprint {
 
         public Builder withDescription(String description) {
             plan.setDescription(description);
+            return this;
+        }
+
+        public Builder intercept(Consumer<PlanBlueprint> interceptor) {
+            interceptor.accept(plan);
             return this;
         }
 
