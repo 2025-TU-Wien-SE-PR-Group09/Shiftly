@@ -127,10 +127,6 @@ public class StartupRunner implements CommandLineRunner {
         this.userService.assignRoleToUser(
             new UserRoleDto("employee@shyft.local", Role.EMPLOYEE)
         );
-
-        this.userService.assignRoleToUser(
-            new UserRoleDto("new_supervisor@shyft.local", Role.SUPERVISOR)
-        );
     }
 
     private void createPlan(Department department) {

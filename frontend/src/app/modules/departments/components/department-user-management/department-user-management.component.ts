@@ -9,10 +9,11 @@ import { ToastrService } from 'ngx-toastr';
 import { ButtonComponent } from '../../../../shared/components/button/button.component';
 import { NgForOf, NgIf } from '@angular/common';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
+import { AutocompleteComponent } from '../../../../shared/components/autocomplete/autocomplete.component';
 
 @Component({
   selector: 'app-department-user-management',
-  imports: [ButtonComponent, NgForOf, NgIf, ReactiveFormsModule, FormsModule],
+  imports: [ButtonComponent, NgForOf, NgIf, ReactiveFormsModule, FormsModule, AutocompleteComponent],
   templateUrl: './department-user-management.component.html',
   styleUrl: './department-user-management.component.css',
 })
@@ -21,6 +22,7 @@ export class DepartmentUserManagementComponent implements OnChanges, OnInit {
   employees: EmployeeListItemResponseDto[] = [];
   showForm: boolean = false;
   newEmployeeMail: string = '';
+  possibleEmployeeMails: string[] = [];
 
   constructor(
     private departmentService: DepartmentService,
@@ -29,36 +31,42 @@ export class DepartmentUserManagementComponent implements OnChanges, OnInit {
   ) {}
 
   ngOnChanges(changes: SimpleChanges): void {
-    this.loadEmployees();
+    this.loadData();
   }
 
   ngOnInit(): void {
   }
 
-  loadEmployees(): void {
+  loadData(): void {
     if (this.departmentName === '') {
       return;
     }
 
+    this.departmentService.getAllAvailableEmployees().subscribe(
+      emps => {
+        this.possibleEmployeeMails = emps.map(e => e.email!);
+      }
+    )
+
     this.departmentService.getEmployeesOfDepartment(this.departmentName).subscribe({
       next: (employees) => {
         this.employees = employees;
-      }
+      },
     });
   }
 
   inviteEmployee() {
-    if(!this.newEmployeeMail || !this.newEmployeeMail.trim()) {
-      this.toastrService.error("Please enter a valid Employee Mail", "Error occurred");
+    if (!this.newEmployeeMail || !this.newEmployeeMail.trim()) {
+      this.toastrService.error('Please enter a valid Employee Mail', 'Error occurred');
       return;
     }
 
     this.departmentService.addEmployeeToDepartment(this.departmentName, this.newEmployeeMail).subscribe({
       next: (employee) => {
-        this.toastrService.success('Successfully added ' + employee.email + ' to ' + employee.departmentName +'!');
-        this.loadEmployees();
+        this.toastrService.success('Successfully added ' + employee.email + ' to ' + employee.departmentName + '!');
+        this.loadData();
         this.showForm = false;
-      }
-    })
+      },
+    });
   }
 }
