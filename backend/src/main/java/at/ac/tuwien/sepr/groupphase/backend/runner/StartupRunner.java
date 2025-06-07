@@ -38,7 +38,7 @@ public class StartupRunner implements CommandLineRunner {
     private final DepartmentService departmentService;
     private final PlanBlueprintRepository planBlueprintRepository;
 
-    private final UserRepository userRepsitory;
+    private final UserRepository userRepository;
     private final DepartmentRepository departmentRepository;
 
     private static final Logger LOGGER = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
@@ -125,18 +125,19 @@ public class StartupRunner implements CommandLineRunner {
         this.userService.assignRoleToUser(new UserRoleDto("new_supervisor@shyft.local", Role.SUPERVISOR, secondDepartment.getName()));
 
         // Neue Employees für Produktion
-        this.userService.createUser(new UserDataDto("employee1@shyft.local", "password","",""));
-        this.userService.createUser(new UserDataDto("employee2@shyft.local", "password","",""));
-        this.userService.createUser(new UserDataDto("employee3@shyft.local", "password","",""));
-        this.userService.createUser(new UserDataDto("employee4@shyft.local", "password","",""));
-        this.userService.createUser(new UserDataDto("employee5@shyft.local", "password","",""));
+        this.userService.createUser(new UserDataDto("employee1@shyft.local", "password", "Firstname", "Lastname"));
+        this.userService.createUser(new UserDataDto("employee2@shyft.local", "password", "Firstname", "Lastname"));
+        this.userService.createUser(new UserDataDto("employee3@shyft.local", "password", "Firstname", "Lastname"));
+        this.userService.createUser(new UserDataDto("employee4@shyft.local", "password", "Firstname", "Lastname"));
+        this.userService.createUser(new UserDataDto("employee5@shyft.local", "password", "Firstname", "Lastname"));
+        this.userService.createUser(new UserDataDto("employee6@shyft.local", "password", "Firstname", "Lastname"));
 
         // Supervisor
         ApplicationUser supervisor = this.userRepository.findByEmail("supervisor@shyft.local").orElseThrow();
         supervisor.setDepartment(production);
         this.userRepository.save(supervisor);
         this.userService.assignRoleToUser(
-            new UserRoleDto("supervisor@shyft.local", Role.SUPERVISOR, department.getName())
+            new UserRoleDto("supervisor@shyft.local", Role.SUPERVISOR, production.getName())
         );
 
         // Employee (bestehend)
@@ -144,7 +145,7 @@ public class StartupRunner implements CommandLineRunner {
         employee.setDepartment(production);
         this.userRepository.save(employee);
         this.userService.assignRoleToUser(
-            new UserRoleDto("employee@shyft.local", Role.EMPLOYEE, department.getName())
+            new UserRoleDto("employee@shyft.local", Role.EMPLOYEE, production.getName())
         );
 
         // Neue Employees zuweisen
@@ -153,7 +154,7 @@ public class StartupRunner implements CommandLineRunner {
             ApplicationUser user = this.userRepository.findByEmail(email).orElseThrow();
             user.setDepartment(production);
             this.userRepository.save(user);
-            this.userService.assignRoleToUser(new UserRoleDto(email, Role.EMPLOYEE));
+            this.userService.assignRoleToUser(new UserRoleDto(email, Role.EMPLOYEE, production.getName()));
         }
 
         LOGGER.info("Default users created and assigned to production department");

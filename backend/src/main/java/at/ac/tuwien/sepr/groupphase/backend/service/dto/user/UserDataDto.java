@@ -59,7 +59,7 @@ public class UserDataDto {
             return false;
         }
         return Objects.equals(email, userLoginDto.email)
-            && Objects.equals(password, userLoginDto.password);
+                && Objects.equals(password, userLoginDto.password);
     }
 
     @Override
@@ -70,9 +70,9 @@ public class UserDataDto {
     @Override
     public String toString() {
         return "UserLoginDto{"
-            + "email='" + email + '\''
-            + ", password='" + password + '\''
-            + '}';
+                + "email='" + email + '\''
+                + ", password='" + password + '\''
+                + '}';
     }
 
 
