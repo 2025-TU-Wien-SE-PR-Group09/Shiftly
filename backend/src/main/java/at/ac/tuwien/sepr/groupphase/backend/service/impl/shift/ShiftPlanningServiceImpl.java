@@ -64,10 +64,8 @@ public class ShiftPlanningServiceImpl implements ShiftPlanningService {
                                     PlanBlueprintRepository planBlueprintRepository,
                                     DepartmentRepository departmentRepository,
                                     ShiftPlanRotationService shiftPlanRotationService,
-                                    ShiftPlanConstraintService shiftPlanConstraintService,
                                     ConcreteShiftPlanRepository concreteShiftPlanRepository,
-                                    ScheduledShiftRepository scheduledShiftRepository,
-                                    ShiftAssignmentAuditLogRepository shiftAssignmentAuditRepository) {
+                                    ShiftPlanConstraintService shiftPlanConstraintService) {
         this.planBlueprintRepository = planBlueprintRepository;
         this.timeService = timeService;
         this.departmentRepository = departmentRepository;
@@ -242,6 +240,7 @@ public class ShiftPlanningServiceImpl implements ShiftPlanningService {
         Department department = blueprint.getDepartment();
         LocalDate startDate = timeService.nextMondayInMonth(dto.startDate()
             .orElseThrow(() -> new ConflictException("Start date is required")));
+        LocalDate endDate = startDate.plusWeeks(11);
 
         concreteShiftPlanRepository.findByDepartmentName(department.getName()).stream()
             .min((a, b) -> b.getEndDate().compareTo(a.getEndDate())).ifPresent(concreteShiftPlan -> {
@@ -250,9 +249,7 @@ public class ShiftPlanningServiceImpl implements ShiftPlanningService {
                 }
             });
 
-        // Initialisieren
         ConcreteShiftPlan plan = new ConcreteShiftPlan();
-        LocalDate endDate = startDate.plusWeeks(11);
         plan.setDepartment(department);
         plan.setStartDate(startDate);
         plan.setEndDate(endDate);
