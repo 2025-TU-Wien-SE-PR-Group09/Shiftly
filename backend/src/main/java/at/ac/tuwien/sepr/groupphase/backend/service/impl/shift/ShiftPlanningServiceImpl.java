@@ -29,7 +29,10 @@ import at.ac.tuwien.sepr.groupphase.backend.service.dto.shift.ConcretePlanGenera
 import at.ac.tuwien.sepr.groupphase.backend.service.dto.shift.PlanBlueprintAddShiftDto;
 import at.ac.tuwien.sepr.groupphase.backend.service.dto.shift.PlanBlueprintCreationDto;
 import at.ac.tuwien.sepr.groupphase.backend.service.dto.shift.PlanBlueprintDto;
+import at.ac.tuwien.sepr.groupphase.backend.service.impl.TimeService;
 import at.ac.tuwien.sepr.groupphase.backend.service.mapper.ShiftPlanningMapper;
+import at.ac.tuwien.sepr.groupphase.backend.service.shift.ShiftPlanConstraintService;
+import at.ac.tuwien.sepr.groupphase.backend.service.shift.ShiftPlanRotationService;
 import at.ac.tuwien.sepr.groupphase.backend.service.validator.ShiftPlanningValidator;
 import jakarta.transaction.Transactional;
 
@@ -61,8 +64,10 @@ public class ShiftPlanningServiceImpl implements ShiftPlanningService {
                                     PlanBlueprintRepository planBlueprintRepository,
                                     DepartmentRepository departmentRepository,
                                     ShiftPlanRotationService shiftPlanRotationService,
+                                    ShiftPlanConstraintService shiftPlanConstraintService,
                                     ConcreteShiftPlanRepository concreteShiftPlanRepository,
-                                    ShiftPlanConstraintService shiftPlanConstraintService) {
+                                    ScheduledShiftRepository scheduledShiftRepository,
+                                    ShiftAssignmentAuditLogRepository shiftAssignmentAuditRepository) {
         this.planBlueprintRepository = planBlueprintRepository;
         this.timeService = timeService;
         this.departmentRepository = departmentRepository;
