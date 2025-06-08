@@ -19,7 +19,7 @@ import java.util.Optional;
 public interface ShiftPlanningValidator {
 
     /**
-     * Validates the whole plan
+     * Validates the whole plan.
      *
      * @param planBlueprint the PlanBlueprint to validate
      * @return an Optional containing ValidationErrors if validation fails, or an empty Optional if validation succeeds
@@ -28,7 +28,7 @@ public interface ShiftPlanningValidator {
     Optional<ValidationErrors> validatePlan(PlanBlueprint planBlueprint);
 
     /**
-     * Validates the whole shift;
+     * Validates the whole shift.
      *
      * @param shiftBlueprint the ShiftBlueprint to validate
      * @return an Optional containing ValidationErrors if validation fails, or an empty Optional if validation succeeds

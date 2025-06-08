@@ -37,13 +37,17 @@ public class RotatingShiftSlot {
     }
 
     public int rotate() {
-        if (assignedUsers.isEmpty()) return 0;
+        if (assignedUsers.isEmpty()) {
+            return 0;
+        }
         int extraRotationsPerformed = 0;
 
         for (int i = 0; i < Math.min(manpower, next.manpower); i++) {
-            if (assignedUsers.isEmpty()) break;
+            if (assignedUsers.isEmpty()) {
+                break;
+            }
             ApplicationUser user = assignedUsers.removeLast();
-            if(next.manpower <= next.assignedUsers.size()) {
+            if (next.manpower <= next.assignedUsers.size()) {
                 // this means we need to rotate the next to make space
                 if (!fillFromPrevious(user)) {
                     extraRotationsPerformed += next.pureRotateOne();
@@ -63,11 +67,13 @@ public class RotatingShiftSlot {
         return extraRotationsPerformed;
     }
 
-    private int pureRotateOne(){
-        if (assignedUsers.isEmpty()) return 0;
+    private int pureRotateOne() {
+        if (assignedUsers.isEmpty()) {
+            return 0;
+        }
         int extraRotationsPerformed = 1;
         ApplicationUser user = assignedUsers.removeLast();
-        if(next.manpower <= next.assignedUsers.size()) {
+        if (next.manpower <= next.assignedUsers.size()) {
             extraRotationsPerformed += next.pureRotateOne();
         }
         next.assignedUsers.addFirst(user);
@@ -124,8 +130,12 @@ public class RotatingShiftSlot {
 
     @Override
     public boolean equals(Object o) {
-        if (this == o) return true;
-        if (!(o instanceof RotatingShiftSlot that)) return false;
+        if (this == o) {
+            return true;
+        }
+        if (!(o instanceof RotatingShiftSlot that)) {
+            return false;
+        }
         return Objects.equals(blueprint, that.blueprint)
             && Objects.equals(week, that.week);
     }

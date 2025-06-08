@@ -44,8 +44,7 @@ public class UserEndpoint {
      * access is denied with a 403 Forbidden response.
      *
      * @param restDto DTO containing the new password (validated)
-     * @return 200 OK on successful password change, 400 Bad Request if the input is invalid,
-      403 Forbidden if the user is not authenticated or has the ADMIN role
+     * @return 200 OK on successful password change, 400 Bad Request if the input is invalid, 403 Forbidden if the user is not authenticated or has the ADMIN role
      */
     @PreAuthorize("isAuthenticated() and !hasRole('ADMIN')")
     @PutMapping(path = "/me/password", produces = MediaType.APPLICATION_JSON_VALUE)

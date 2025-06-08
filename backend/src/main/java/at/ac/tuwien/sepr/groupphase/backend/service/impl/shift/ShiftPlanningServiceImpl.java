@@ -235,8 +235,8 @@ public class ShiftPlanningServiceImpl implements ShiftPlanningService {
             .orElseThrow(() -> new NotFoundException("Plan blueprint not found"));
 
         Department department = blueprint.getDepartment();
-        LocalDate month = dto.startDate().orElseThrow(() -> new ConflictException("Start date is required"));
-        LocalDate startDate = timeService.nextMondayInMonth(month);
+        LocalDate startDate = timeService.nextMondayInMonth(dto.startDate()
+            .orElseThrow(() -> new ConflictException("Start date is required")));
 
         concreteShiftPlanRepository.findByDepartmentName(department.getName()).stream()
             .min((a, b) -> b.getEndDate().compareTo(a.getEndDate())).ifPresent(concreteShiftPlan -> {
@@ -245,9 +245,9 @@ public class ShiftPlanningServiceImpl implements ShiftPlanningService {
                 }
             });
 
-        LocalDate endDate = startDate.plusWeeks(11); // 12 Wochen
-
+        // Initialisieren
         ConcreteShiftPlan plan = new ConcreteShiftPlan();
+        LocalDate endDate = startDate.plusWeeks(11);
         plan.setDepartment(department);
         plan.setStartDate(startDate);
         plan.setEndDate(endDate);

@@ -35,14 +35,14 @@ public class ShiftRotator {
                     .map(ShiftDayBlueprint::getStartTime)
                     .min(Comparator.naturalOrder())
                     .orElse(LocalTime.MAX)
-            ))
+                ))
             .toList();
 
         this.slotsInNaturalOrder = allSlotsBase.stream()
             .sorted(Comparator.<RotatingShiftSlot, LocalTime>comparing(x -> x.getWeek().getDays().stream()
-                .map(ShiftDayBlueprint::getStartTime)
-                .min(Comparator.naturalOrder())
-                .orElse(LocalTime.MAX))
+                    .map(ShiftDayBlueprint::getStartTime)
+                    .min(Comparator.naturalOrder())
+                    .orElse(LocalTime.MAX))
                 .thenComparingInt(x -> x.getWeek().getWeekIndex()))
             .collect(Collectors.toList());
 
@@ -79,7 +79,7 @@ public class ShiftRotator {
         for (int i = 0; i < shifts; i++) {
             RotatingShiftSlot slot = iter.next();
             assert slot != null;
-            result.add(new CurrentShiftSlot(slot.getBlueprint(),slot.getWeek(), new ArrayList<>(slot.assignedUsers)));
+            result.add(new CurrentShiftSlot(slot.getBlueprint(), slot.getWeek(), new ArrayList<>(slot.assignedUsers)));
         }
 
         for (int i = 0; i < shifts; i++) {
@@ -88,11 +88,13 @@ public class ShiftRotator {
             // in cases like [user1]->[user2,user3] when the current slot we want to rotate is [user1] we need to rotate the user1 to the next slot
             // so slot.rotate() will also rotate the next slot so user1 has a chance to be assigned to the next slot
             // .rotate() will return the number of slots to skip in the rotation queue
-            i+=slot.rotate();
+            i += slot.rotate();
             rotationQueue.add(slot);
         }
         return result;
     }
 
-    public record CurrentShiftSlot(ShiftBlueprint blueprint, ShiftWeekBlueprint week, List<ApplicationUser> assignedUsers) {}
+    public record CurrentShiftSlot(ShiftBlueprint blueprint, ShiftWeekBlueprint week,
+                                   List<ApplicationUser> assignedUsers) {
+    }
 }
