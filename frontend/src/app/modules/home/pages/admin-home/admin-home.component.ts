@@ -1,21 +1,25 @@
-import { Component , OnInit} from '@angular/core';
-import {
-  AdminEndpointService,
-  DepartmentDetailRestResponseDto,
-  DepartmentService, DepartmentShiftplanCalendarResponse,
-} from '../../../../rest_client';
-import { ToastrService } from 'ngx-toastr';
+import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { CalendarEvent, CalendarModule, CalendarView } from 'angular-calendar';
 import { ButtonComponent } from '../../../../shared/components/button/button.component';
 import { FormsModule } from '@angular/forms';
+import {
+  AdminEndpointService,
+  DepartmentDetailRestResponseDto,
+  DepartmentService,
+  DepartmentShiftplanCalendarResponse,
+} from '../../../../rest_client';
+import { ToastrService } from 'ngx-toastr';
 
 @Component({
   selector: 'app-admin-home',
+  standalone: true,
   imports: [CommonModule, CalendarModule, ButtonComponent, FormsModule],
   templateUrl: './admin-home.component.html',
   styleUrl: './admin-home.component.css',
+
 })
+
 export class AdminHomeComponent implements OnInit {
   constructor(
     private _adminService: AdminEndpointService,
@@ -31,6 +35,7 @@ export class AdminHomeComponent implements OnInit {
   view: CalendarView = CalendarView.Month;
   CalendarView = CalendarView; // Für Template-Zugriff
   viewDate: Date = new Date();
+
   events: CalendarEvent[] = [
     {
       start: new Date(2025, 4, 21, 22, 0, 0),
@@ -57,6 +62,17 @@ export class AdminHomeComponent implements OnInit {
       color: { primary: '#cc99ff', secondary: '#ccccff' },
     },
   ];
+
+  selectedEvent: CalendarEvent | null = null;
+
+  handleEventClick(event: { event: CalendarEvent }): void {
+    if (this.selectedEvent === event.event) {
+      this.selectedEvent = null;
+    } else {
+      this.selectedEvent = event.event;
+    }
+  }
+
 
   setView(view: CalendarView) {
     this.view = view;
@@ -88,8 +104,6 @@ export class AdminHomeComponent implements OnInit {
 
   private getColorForShiftType(shiftType: string): { primary: string; secondary: string } {
     if (!this.shiftColors.has(shiftType)) {
-      //todo delete this comment
-      // Nimm die nächste verfügbare Farbe oder starte von vorne wenn alle verwendet wurden
       const colorIndex = this.shiftColors.size % this.colorPalette.length;
       this.shiftColors.set(shiftType, this.colorPalette[colorIndex]);
     }
@@ -119,6 +133,8 @@ export class AdminHomeComponent implements OnInit {
         end: endDate,
         color: this.getColorForShiftType(shiftTitle),
         meta: {
+          //todo: workers should become entity "worker" e.g. including the role
+          //todo: 'springer' should be displayed visible in the calendar
           workers: shift.workers
         }
       });
