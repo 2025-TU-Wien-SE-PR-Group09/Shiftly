@@ -32,7 +32,7 @@ public interface ShiftPlanningValidator {
     Optional<ValidationErrors> validateDay(ShiftDayBlueprint shiftWeekBlueprintDto);
 
     /**
-     * Validates the structure of shift days across a department:
+     * Validates the structure of shift days across a department.
      *  - no overlapping shift times are allowed per day
      *
      * @param shiftBlueprints all shift blueprints belonging to one department

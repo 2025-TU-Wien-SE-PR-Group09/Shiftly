@@ -46,8 +46,8 @@ public class ShiftPlanningValidatorImpl implements ShiftPlanningValidator {
             Duration reference = null;
             for (int i = 0; i < dayShifts.size(); i++) {
                 ShiftDayBlueprint a = dayShifts.get(i);
-                LocalTime aStart = a.getStartTime();
-                LocalTime aEnd = aStart.plus(a.getDuration());
+                LocalTime startA = a.getStartTime();
+                LocalTime endA = startA.plus(a.getDuration());
 
 
                 if (reference == null) {
@@ -56,11 +56,11 @@ public class ShiftPlanningValidatorImpl implements ShiftPlanningValidator {
 
                 if (i + 1 < dayShifts.size()) {
                     ShiftDayBlueprint b = dayShifts.get(i + 1);
-                    LocalTime bStart = b.getStartTime();
-                    LocalTime bEnd = bStart.plus(b.getDuration());
-                    if (aStart.isBefore(bEnd) && aEnd.isAfter(bStart)) {
+                    LocalTime startB = b.getStartTime();
+                    LocalTime endB = startB.plus(b.getDuration());
+                    if (startA.isBefore(endB) && endA.isAfter(startB)) {
                         errors.add("Overlapping shifts on " + day + ": "
-                            + aStart + "–" + aEnd + " overlaps with " + bStart + "–" + bEnd);
+                            + startA + "–" + endA + " overlaps with " + startB + "–" + endB);
                     }
                 }
             }
@@ -118,8 +118,8 @@ public class ShiftPlanningValidatorImpl implements ShiftPlanningValidator {
             Duration reference = durations.get(0);
             for (Duration d : durations) {
                 if (!reference.minus(d).abs().isZero()) {
-                    errors.add("Mismatch in week " + index + ": Found shift with " +
-                        d.toHours() + "h, expected " + reference.toHours() + "h");
+                    errors.add("Mismatch in week " + index + ": Found shift with "
+                        + d.toHours() + "h, expected " + reference.toHours() + "h");
                 }
             }
         }
