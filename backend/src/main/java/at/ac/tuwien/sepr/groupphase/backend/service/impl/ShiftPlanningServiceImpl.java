@@ -108,12 +108,16 @@ public class ShiftPlanningServiceImpl implements ShiftPlanningService {
 
         plan = planBuilder.build();
 
-
-
-        shiftPlanningValidator.validateDayStructuresPerDepartment(plan.getShifts())
+        shiftPlanningValidator.validateDescriptions(plan.getShifts())
             .ifPresent(errors -> {
                 throw new ConflictException(errors);
             });
+
+        shiftPlanningValidator.validateManpowerMinimum(plan.getShifts())
+            .ifPresent(errors -> {
+                throw new ConflictException(errors);
+            });
+
 
         shiftPlanningValidator.validateWeeklyDurationsPerPlan(plan.getShifts(), plan)
             .ifPresent(errors -> {
@@ -157,13 +161,24 @@ public class ShiftPlanningServiceImpl implements ShiftPlanningService {
         List<ShiftBlueprint> allShifts = new ArrayList<>(plan.getShifts());
         allShifts.addAll(newShifts);
 
+        shiftPlanningValidator.validateDescriptions(allShifts)
+            .ifPresent(errors -> {
+                throw new ConflictException(errors);
+            });
+
+        shiftPlanningValidator.validateManpowerMinimum(allShifts)
+            .ifPresent(errors -> {
+                throw new ConflictException(errors);
+            });
+
+
         shiftPlanningValidator.validateConsistentWeekCountPerPlan(allShifts, plan)
 
             .ifPresent(errors -> {
                 throw new ConflictException(errors);
             });
 
-        shiftPlanningValidator.validateDayStructuresPerDepartment(allShifts)
+        shiftPlanningValidator.validateOverlappingShiftsPerPlan(allShifts, plan)
             .ifPresent(errors -> {
                 throw new ConflictException(errors);
             });

@@ -31,25 +31,67 @@ public interface ShiftPlanningValidator {
      */
     Optional<ValidationErrors> validateDay(ShiftDayBlueprint shiftWeekBlueprintDto);
 
-    /**
-     * Validates the structure of shift days across a department.
-     *  - no overlapping shift times are allowed per day
-     *
-     * @param shiftBlueprints all shift blueprints belonging to one department
-     * @return an Optional containing ValidationErrors if any structural issues are found
-     */
-    Optional<ValidationErrors> validateDayStructuresPerDepartment(List<ShiftBlueprint> shiftBlueprints);
 
     /**
-     * Validates the weekly durations of shifts per plan.
+     * Validates that no overlapping shifts exist within a plan.
      *
-     * @param shifts the list of ShiftBlueprints to validate
-     * @param plan the PlanBlueprint containing the shifts
-     * @return an Optional containing ValidationErrors if any issues are found, or an empty Optional if validation succeeds
+     *<p>
+     * Shifts are grouped by plan, week, and day. Within each group, overlapping time intervals are detected.
+     *
+     * @param shifts the list of shift blueprints to check
+     * @param plan   the plan blueprint these shifts belong to
+     * @return an Optional containing validation errors if overlaps are detected, or empty if all shifts are non-overlapping
+     */
+    Optional<ValidationErrors> validateOverlappingShiftsPerPlan(List<ShiftBlueprint> shifts, PlanBlueprint plan);
+
+
+    /**
+     * Validates that all shifts in the plan have equal weekly working durations.
+     *
+     *<p>
+     * For each week index, this method ensures that the sum of durations across days is consistent across all shifts.
+     *
+     * @param shifts the list of shift blueprints to check
+     * @param plan   the plan blueprint these shifts belong to
+     * @return an Optional containing validation errors if inconsistencies are found, or empty if all durations match
      */
     Optional<ValidationErrors> validateWeeklyDurationsPerPlan(List<ShiftBlueprint> shifts, PlanBlueprint plan);
 
+    /**
+     * Validates that all shifts within a plan cover the same number of weeks.
+     *
+     * <p>
+     * Ensures that each shift includes the same set of week indices so that all weeks are consistently covered.
+     *
+     * @param shifts     the list of shift blueprints to validate
+     * @param targetPlan the plan blueprint that the shifts belong to
+     * @return an Optional containing validation errors if week coverage is inconsistent, or empty if all are aligned
+     */
     Optional<ValidationErrors> validateConsistentWeekCountPerPlan(List<ShiftBlueprint> shifts, PlanBlueprint targetPlan);
+
+    /**
+     * Validates that all provided ShiftBlueprints have non-empty descriptions.
+     *
+     *<p>
+     *
+     * @param shifts the list of ShiftBlueprints to validate
+     * @return an Optional containing ValidationErrors if any descriptions are missing or blank,
+     *         or an empty Optional if all descriptions are valid
+     */
+    Optional<ValidationErrors> validateDescriptions(List<ShiftBlueprint> shifts);
+
+    /**
+     * Validates that the manpower requirements for each shift are met.
+     *
+     * <p>
+     * Checks that each shift has a positive manpower value and that it meets the minimum requirements.
+     *
+     * @param shifts the list of ShiftBlueprints to validate
+     * @return an Optional containing ValidationErrors if any shifts have invalid manpower values,
+     *         or an empty Optional if all shifts are valid
+     */
+    Optional<ValidationErrors> validateManpowerMinimum(List<ShiftBlueprint> shifts);
+
 
 
 

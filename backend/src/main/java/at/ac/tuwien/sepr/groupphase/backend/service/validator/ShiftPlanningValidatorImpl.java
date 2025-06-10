@@ -21,53 +21,70 @@ import java.util.Optional;
 public class ShiftPlanningValidatorImpl implements ShiftPlanningValidator {
 
     @Override
-    public Optional<ValidationErrors> validateDayStructuresPerDepartment(List<ShiftBlueprint> shifts) {
-
+    public Optional<ValidationErrors> validateOverlappingShiftsPerPlan(List<ShiftBlueprint> shifts, PlanBlueprint plan) {
         ValidationErrors errors = new ValidationErrors();
 
-        Map<DayOfWeek, List<ShiftDayBlueprint>> groupedByDay = new HashMap<>();
+        record GroupKey(DayOfWeek day, Long planId, int weekIndex) {}
+
+        Map<GroupKey, List<ShiftDayBlueprint>> grouped = new HashMap<>();
 
         for (ShiftBlueprint shift : shifts) {
+            Long planId = (shift.getPlan() != null && shift.getPlan().getId() != null)
+                ? shift.getPlan().getId()
+                : plan.getId();
+
             for (ShiftWeekBlueprint week : shift.getShiftWeeks()) {
+                int weekIndex = week.getWeekIndex();
                 for (ShiftDayBlueprint day : week.getDays()) {
-                    System.out.println("   Tag: " + day.getDay() + ", Start: " + day.getStartTime() + ", Dauer: " + day.getDuration());
-                    groupedByDay.computeIfAbsent(day.getDay(), k -> new ArrayList<>()).add(day);
+                    GroupKey key = new GroupKey(day.getDay(), planId, weekIndex);
+                    grouped.computeIfAbsent(key, k -> new ArrayList<>()).add(day);
                 }
             }
         }
 
-
-        for (var entry : groupedByDay.entrySet()) {
-            DayOfWeek day = entry.getKey();
+        for (var entry : grouped.entrySet()) {
+            GroupKey key = entry.getKey();
             List<ShiftDayBlueprint> dayShifts = entry.getValue();
-
             dayShifts.sort(Comparator.comparing(ShiftDayBlueprint::getStartTime));
 
-            Duration reference = null;
-            for (int i = 0; i < dayShifts.size(); i++) {
+            for (int i = 0; i < dayShifts.size() - 1; i++) {
                 ShiftDayBlueprint a = dayShifts.get(i);
+                ShiftDayBlueprint b = dayShifts.get(i + 1);
+
                 LocalTime startA = a.getStartTime();
                 LocalTime endA = startA.plus(a.getDuration());
+                LocalTime startB = b.getStartTime();
+                LocalTime endB = startB.plus(b.getDuration());
 
-
-                if (reference == null) {
-                    reference = a.getDuration();
+                long startAsec = startA.toSecondOfDay();
+                long endAsec = endA.toSecondOfDay();
+                if (endAsec <= startAsec) {
+                    endAsec += 24 * 3600;
                 }
 
-                if (i + 1 < dayShifts.size()) {
-                    ShiftDayBlueprint b = dayShifts.get(i + 1);
-                    LocalTime startB = b.getStartTime();
-                    LocalTime endB = startB.plus(b.getDuration());
-                    if (startA.isBefore(endB) && endA.isAfter(startB)) {
-                        errors.add("Overlapping shifts on " + day + ": "
-                            + startA + "–" + endA + " overlaps with " + startB + "–" + endB);
-                    }
+                long startBsec = startB.toSecondOfDay();
+                long endBsec = endB.toSecondOfDay();
+                if (endBsec <= startBsec) {
+                    endBsec += 24 * 3600;
+                }
+
+                if (startAsec < endBsec && endAsec > startBsec) {
+                    String message = String.format(
+                        "Shift overlap on %s: A shift from %s to %s overlaps with another from %s to %s in this plan.",
+                        key.day(), startA, endA, startB, endB
+                    );
+                    errors.add(message);
                 }
             }
         }
 
         return errors.isValid() ? Optional.empty() : Optional.of(errors);
     }
+
+
+
+
+
 
 
     private String format(Duration duration) {
@@ -87,7 +104,7 @@ public class ShiftPlanningValidatorImpl implements ShiftPlanningValidator {
         return Optional.empty();
     }
 
-    @Override
+    /*  @Override
     public Optional<ValidationErrors> validateWeeklyDurationsPerPlan(List<ShiftBlueprint> shifts, PlanBlueprint plan) {
         ValidationErrors errors = new ValidationErrors();
 
@@ -118,14 +135,43 @@ public class ShiftPlanningValidatorImpl implements ShiftPlanningValidator {
             Duration reference = durations.get(0);
             for (Duration d : durations) {
                 if (!reference.minus(d).abs().isZero()) {
-                    errors.add("Mismatch in week " + index + ": Found shift with "
-                        + d.toHours() + "h, expected " + reference.toHours() + "h");
+                    errors.add(String.format(
+                        "Inconsistent weekly shift duration: Expected %dh but found %dh in one of the shifts.",
+                        reference.toHours(), d.toHours()
+                    ));
                 }
             }
         }
 
         return errors.isValid() ? Optional.empty() : Optional.of(errors);
     }
+    */
+
+    @Override
+    public Optional<ValidationErrors> validateWeeklyDurationsPerPlan(List<ShiftBlueprint> shifts, PlanBlueprint plan) {
+        ValidationErrors errors = new ValidationErrors();
+
+        for (ShiftBlueprint shift : shifts) {
+            for (ShiftWeekBlueprint week : shift.getShiftWeeks()) {
+                Duration total = week.getDays().stream()
+                    .map(ShiftDayBlueprint::getDuration)
+                    .reduce(Duration.ZERO, Duration::plus);
+
+                if (!total.equals(Duration.ofHours(40))) {
+                    String message = String.format(
+                        "Shift '%s' has a week with total duration of %dh %dm instead of required 40h.",
+                        shift.getDescription(),
+                        total.toHours(),
+                        total.toMinutesPart()
+                    );
+                    errors.add(message);
+                }
+            }
+        }
+
+        return errors.isValid() ? Optional.empty() : Optional.of(errors);
+    }
+
 
     @Override
     public Optional<ValidationErrors> validateConsistentWeekCountPerPlan(List<ShiftBlueprint> shifts, PlanBlueprint targetPlan) {
@@ -151,6 +197,37 @@ public class ShiftPlanningValidatorImpl implements ShiftPlanningValidator {
 
         return errors.isValid() ? Optional.empty() : Optional.of(errors);
     }
+
+    @Override
+    public Optional<ValidationErrors> validateDescriptions(List<ShiftBlueprint> shifts) {
+        ValidationErrors errors = new ValidationErrors();
+
+        for (ShiftBlueprint shift : shifts) {
+            String description = shift.getDescription();
+            if (description == null || description.trim().isEmpty()) {
+                errors.add("Description must not be empty.");
+            } else if (description.length() > 100) {
+                errors.add("Description is too long (max 100 characters).");
+            }
+        }
+
+        return errors.isValid() ? Optional.empty() : Optional.of(errors);
+    }
+
+    @Override
+    public Optional<ValidationErrors> validateManpowerMinimum(List<ShiftBlueprint> shifts) {
+        ValidationErrors errors = new ValidationErrors();
+
+        for (ShiftBlueprint shift : shifts) {
+            if (shift.getManPower() < 1) {
+                errors.add("Shift \"" + shift.getDescription() + "\" must have at least one required person.");
+            }
+        }
+
+        return errors.isValid() ? Optional.empty() : Optional.of(errors);
+    }
+
+
 
 
 
