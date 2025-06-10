@@ -111,7 +111,7 @@ public class DepartmentEndpoint {
     public DepartmentDetailRestResponseDto getDepartmentByName(@PathVariable(name = "departmentName") String departmentName) {
         return departmentService.getDepartmentByName(departmentName).map(d ->
             new DepartmentDetailRestResponseDto(
-                d.id(),x
+                d.id(),
                 d.name(),
                 departmentService.getSupervisorByDepartmentName(d.name())
                     .map(UserEmailDto::email)
