@@ -102,15 +102,16 @@ public class DepartmentEndpoint {
         return userService.getAllAvailableUsers();
     }
 
+    //TODO; Fix all roles being allowed (needed because depID ist needed to load shiftPlan in calendar)
     @Transactional
-    @RolesAllowed({"ADMIN"})
+    @RolesAllowed({"ADMIN", "SUPERVISOR", "EMPLOYEE"})
     @Operation(summary = "Get department by name")
     @ApiResponse(responseCode = "200", description = "Get department by name")
     @GetMapping(path = "/{departmentName}", produces = MediaType.APPLICATION_JSON_VALUE)
     public DepartmentDetailRestResponseDto getDepartmentByName(@PathVariable(name = "departmentName") String departmentName) {
         return departmentService.getDepartmentByName(departmentName).map(d ->
             new DepartmentDetailRestResponseDto(
-                d.id(),
+                d.id(),x
                 d.name(),
                 departmentService.getSupervisorByDepartmentName(d.name())
                     .map(UserEmailDto::email)
