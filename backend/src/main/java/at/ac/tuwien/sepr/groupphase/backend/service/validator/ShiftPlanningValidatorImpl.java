@@ -50,15 +50,15 @@ public class ShiftPlanningValidatorImpl implements ShiftPlanningValidator {
                 LocalTime aEnd = aStart.plus(a.getDuration());
 
 
-               if (reference == null) {
+                if (reference == null) {
                     reference = a.getDuration();
                 }
 
-               if (i + 1 < dayShifts.size()) {
+                if (i + 1 < dayShifts.size()) {
                     ShiftDayBlueprint b = dayShifts.get(i + 1);
                     LocalTime bStart = b.getStartTime();
-                    if (aEnd.isAfter(bStart)) {
-                        LocalTime bEnd = bStart.plus(b.getDuration());
+                    LocalTime bEnd = bStart.plus(b.getDuration());
+                    if (aStart.isBefore(bEnd) && aEnd.isAfter(bStart)) {
                         errors.add("Overlapping shifts on " + day + ": "
                             + aStart + "–" + aEnd + " overlaps with " + bStart + "–" + bEnd);
                     }
@@ -75,7 +75,6 @@ public class ShiftPlanningValidatorImpl implements ShiftPlanningValidator {
         long minutes = duration.minusHours(hours).toMinutes();
         return (hours > 0 ? hours + "h" : "") + (minutes > 0 ? " " + minutes + "m" : "").trim();
     }
-
 
 
     @Override
@@ -127,7 +126,6 @@ public class ShiftPlanningValidatorImpl implements ShiftPlanningValidator {
 
         return errors.isValid() ? Optional.empty() : Optional.of(errors);
     }
-
 
 
 }
