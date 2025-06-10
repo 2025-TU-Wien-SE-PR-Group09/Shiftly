@@ -156,7 +156,7 @@ class ShiftPlanningServiceTest {
 
     @Test
     void createPlan_Blueprint_withMissingDepartment_shouldThrowNotFound() {
-        var departmentId = 42L;
+        var departmentId = "asdf";
         when(departmentRepository.findById(departmentId)).thenReturn(Optional.empty());
         var createPlanBlueprintDto = new PlanBlueprintCreationDto("Testplan", List.of(), departmentId);
         assertThrows(NotFoundException.class, () -> shiftPlanningService.createPlanBlueprint(createPlanBlueprintDto));
