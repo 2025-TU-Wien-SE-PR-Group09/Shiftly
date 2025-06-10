@@ -1,4 +1,4 @@
-package at.ac.tuwien.sepr.groupphase.backend.service;
+package at.ac.tuwien.sepr.groupphase.backend.service.shift;
 
 import at.ac.tuwien.sepr.groupphase.backend.entity.ConcreteShiftPlan;
 import at.ac.tuwien.sepr.groupphase.backend.service.dto.shift.ConcretePlanGenerateDto;

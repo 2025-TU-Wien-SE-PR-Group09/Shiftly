@@ -8,13 +8,14 @@ import at.ac.tuwien.sepr.groupphase.backend.repository.DepartmentRepository;
 import at.ac.tuwien.sepr.groupphase.backend.repository.PlanBlueprintRepository;
 import at.ac.tuwien.sepr.groupphase.backend.repository.UserRepository;
 import at.ac.tuwien.sepr.groupphase.backend.service.DepartmentService;
-import at.ac.tuwien.sepr.groupphase.backend.service.ShiftPlanningService;
+import at.ac.tuwien.sepr.groupphase.backend.service.shift.ShiftPlanningService;
 import at.ac.tuwien.sepr.groupphase.backend.service.UserService;
 import at.ac.tuwien.sepr.groupphase.backend.service.dto.department.DepartmentCreateDto;
 import at.ac.tuwien.sepr.groupphase.backend.service.dto.Role;
 import at.ac.tuwien.sepr.groupphase.backend.service.dto.user.UserDataDto;
 import at.ac.tuwien.sepr.groupphase.backend.service.dto.user.UserRoleDto;
 import at.ac.tuwien.sepr.groupphase.backend.service.dto.shift.ShiftDayDto;
+import at.ac.tuwien.sepr.groupphase.backend.service.mapper.DepartmentMapper;
 import jakarta.transaction.Transactional;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -46,7 +47,8 @@ public class StartupRunner implements CommandLineRunner {
     private String adminUserPassword;
 
     public StartupRunner(UserService userService, ShiftPlanningService shiftPlanningService,
-                         DepartmentService departmentService, PlanBlueprintRepository planBlueprintRepository, UserRepository userRepository, DepartmentRepository departmentRepository) {
+                         DepartmentService departmentService, PlanBlueprintRepository planBlueprintRepository,
+                         UserRepository userRepository, DepartmentRepository departmentRepository) {
         this.userService = userService;
         this.shiftPlanningService = shiftPlanningService;
         this.departmentService = departmentService;
@@ -80,7 +82,7 @@ public class StartupRunner implements CommandLineRunner {
             var actDep = this.departmentRepository.findById(dep.getName()).orElseThrow(() -> new RuntimeException("Department not found"));
             createPlan(actDep);
             createSecondPlan(actDep);
-            createUsers();
+            createUsers(actDep);
         } else {
             LOGGER.info("Department found: {}", production.get().getName());
             if (production.get().getPlans().isEmpty()) {
@@ -93,7 +95,7 @@ public class StartupRunner implements CommandLineRunner {
         }
     }
 
-    private void createUsers() {
+    private void createUsers(Department production) {
         LOGGER.info("Creating default users");
         this.userService.createUser(new UserDataDto(
             "employee@shyft.local",
@@ -122,34 +124,43 @@ public class StartupRunner implements CommandLineRunner {
         this.userRepository.save(newSupervisor);
         this.userService.assignRoleToUser(new UserRoleDto("new_supervisor@shyft.local", Role.SUPERVISOR, secondDepartment.getName()));
 
-        ApplicationUser supervisor = this.userRepository.findByEmail("supervisor@shyft.local").get();
-        var department = this.departmentRepository.findByName("Produktion").get();
-        supervisor.setDepartment(department);
+        // Neue Employees für Produktion
+        this.userService.createUser(new UserDataDto("employee1@shyft.local", "password", "Firstname", "Lastname"));
+        this.userService.createUser(new UserDataDto("employee2@shyft.local", "password", "Firstname", "Lastname"));
+        this.userService.createUser(new UserDataDto("employee3@shyft.local", "password", "Firstname", "Lastname"));
+        this.userService.createUser(new UserDataDto("employee4@shyft.local", "password", "Firstname", "Lastname"));
+        this.userService.createUser(new UserDataDto("employee5@shyft.local", "password", "Firstname", "Lastname"));
+        this.userService.createUser(new UserDataDto("employee6@shyft.local", "password", "Firstname", "Lastname"));
+
+        // Supervisor
+        ApplicationUser supervisor = this.userRepository.findByEmail("supervisor@shyft.local").orElseThrow();
+        supervisor.setDepartment(production);
         this.userRepository.save(supervisor);
         this.userService.assignRoleToUser(
-            new UserRoleDto("supervisor@shyft.local", Role.SUPERVISOR, department.getName())
+            new UserRoleDto("supervisor@shyft.local", Role.SUPERVISOR, production.getName())
         );
 
-        ApplicationUser employee = this.userRepository.findByEmail("employee@shyft.local").get();
-        employee.setDepartment(this.departmentRepository.findByName("Produktion").get());
+        // Employee (bestehend)
+        ApplicationUser employee = this.userRepository.findByEmail("employee@shyft.local").orElseThrow();
+        employee.setDepartment(production);
         this.userRepository.save(employee);
         this.userService.assignRoleToUser(
-            new UserRoleDto("employee@shyft.local", Role.EMPLOYEE, department.getName())
+            new UserRoleDto("employee@shyft.local", Role.EMPLOYEE, production.getName())
         );
 
-        /*
-        this.userService.assignRoleToUser(
-            new UserRoleDto("new_supervisor@shyft.local", Role.SUPERVISOR, department.getId())
-        );*/
+        // Neue Employees zuweisen
+        for (String email : List.of("employee1@shyft.local", "employee2@shyft.local", "employee3@shyft.local",
+            "employee4@shyft.local", "employee5@shyft.local", "employee6@shyft.local")) {
+            ApplicationUser user = this.userRepository.findByEmail(email).orElseThrow();
+            user.setDepartment(production);
+            this.userRepository.save(user);
+            this.userService.assignRoleToUser(new UserRoleDto(email, Role.EMPLOYEE, production.getName()));
+        }
+
+        LOGGER.info("Default users created and assigned to production department");
     }
 
     private void createPlan(Department department) {
-        var monDay = new ShiftDayDto(DayOfWeek.MONDAY, LocalTime.of(7, 0), Duration.ofHours(8));
-        var tuesDay = new ShiftDayDto(DayOfWeek.TUESDAY, LocalTime.of(7, 0), Duration.ofHours(8));
-        var wedDay = new ShiftDayDto(DayOfWeek.WEDNESDAY, LocalTime.of(7, 0), Duration.ofHours(8));
-        var thurDay = new ShiftDayDto(DayOfWeek.THURSDAY, LocalTime.of(7, 0), Duration.ofHours(8));
-        var fridayDay = new ShiftDayDto(DayOfWeek.FRIDAY, LocalTime.of(7, 0), Duration.ofHours(8));
-
         List<ShiftDayBlueprint> days = List.of(
             new ShiftDayBlueprint.Builder().withDay(DayOfWeek.MONDAY)
                 .withStartTime(LocalTime.of(7, 0))
@@ -171,8 +182,7 @@ public class StartupRunner implements CommandLineRunner {
                 .withDay(DayOfWeek.FRIDAY)
                 .withStartTime(LocalTime.of(7, 0))
                 .withDuration(Duration.ofHours(8))
-                .build()
-        );
+                .build());
 
         var plan = new PlanBlueprint.Builder()
             .withDepartment(department)
@@ -186,7 +196,6 @@ public class StartupRunner implements CommandLineRunner {
             })
             .build();
         plan = this.planBlueprintRepository.save(plan);
-
 
     }
 
@@ -211,8 +220,29 @@ public class StartupRunner implements CommandLineRunner {
             new ShiftDayBlueprint.Builder().withDay(DayOfWeek.FRIDAY)
                 .withStartTime(LocalTime.of(5, 30))
                 .withDuration(Duration.ofHours(8))
-                .build()
-        );
+                .build());
+
+        List<ShiftDayBlueprint> earlyShiftDays2 = List.of(
+            new ShiftDayBlueprint.Builder().withDay(DayOfWeek.MONDAY)
+                .withStartTime(LocalTime.of(5, 30))
+                .withDuration(Duration.ofHours(8))
+                .build(),
+            new ShiftDayBlueprint.Builder().withDay(DayOfWeek.TUESDAY)
+                .withStartTime(LocalTime.of(5, 30))
+                .withDuration(Duration.ofHours(8))
+                .build(),
+            new ShiftDayBlueprint.Builder().withDay(DayOfWeek.WEDNESDAY)
+                .withStartTime(LocalTime.of(5, 30))
+                .withDuration(Duration.ofHours(8))
+                .build(),
+            new ShiftDayBlueprint.Builder().withDay(DayOfWeek.THURSDAY)
+                .withStartTime(LocalTime.of(5, 30))
+                .withDuration(Duration.ofHours(8))
+                .build(),
+            new ShiftDayBlueprint.Builder().withDay(DayOfWeek.FRIDAY)
+                .withStartTime(LocalTime.of(5, 30))
+                .withDuration(Duration.ofHours(8))
+                .build());
 
         List<ShiftDayBlueprint> lateShiftDays = List.of(
             new ShiftDayBlueprint.Builder().withDay(DayOfWeek.MONDAY)
@@ -234,9 +264,28 @@ public class StartupRunner implements CommandLineRunner {
             new ShiftDayBlueprint.Builder().withDay(DayOfWeek.FRIDAY)
                 .withStartTime(LocalTime.of(14, 0))
                 .withDuration(Duration.ofHours(8))
-                .build()
-        );
-
+                .build());
+        List<ShiftDayBlueprint> lateShiftDays2 = List.of(
+            new ShiftDayBlueprint.Builder().withDay(DayOfWeek.MONDAY)
+                .withStartTime(LocalTime.of(14, 0))
+                .withDuration(Duration.ofHours(8))
+                .build(),
+            new ShiftDayBlueprint.Builder().withDay(DayOfWeek.TUESDAY)
+                .withStartTime(LocalTime.of(14, 0))
+                .withDuration(Duration.ofHours(8))
+                .build(),
+            new ShiftDayBlueprint.Builder().withDay(DayOfWeek.WEDNESDAY)
+                .withStartTime(LocalTime.of(14, 0))
+                .withDuration(Duration.ofHours(8))
+                .build(),
+            new ShiftDayBlueprint.Builder().withDay(DayOfWeek.THURSDAY)
+                .withStartTime(LocalTime.of(14, 0))
+                .withDuration(Duration.ofHours(8))
+                .build(),
+            new ShiftDayBlueprint.Builder().withDay(DayOfWeek.FRIDAY)
+                .withStartTime(LocalTime.of(14, 0))
+                .withDuration(Duration.ofHours(8))
+                .build());
 
         var plan = new PlanBlueprint.Builder()
             .withDepartment(department)
@@ -244,17 +293,18 @@ public class StartupRunner implements CommandLineRunner {
             .addShift(shiftBuilder -> {
                 shiftBuilder.withDescription("Early Shift")
                     .withManPower(3)
-                    .addWeek(0, weekBuilder -> weekBuilder.withDays(earlyShiftDays));
+                    .addWeek(0, weekBuilder -> weekBuilder.withDays(earlyShiftDays))
+                    .addWeek(1, weekBuilder -> weekBuilder.withDays(earlyShiftDays2));
             })
             .addShift(shiftBuilder -> {
                 shiftBuilder.withDescription("Late Shift")
-                    .withManPower(3)
-                    .addWeek(0, weekBuilder -> weekBuilder.withDays(lateShiftDays));
+                    .withManPower(2)
+                    .addWeek(0, weekBuilder -> weekBuilder.withDays(lateShiftDays))
+                    .addWeek(1, weekBuilder -> weekBuilder.withDays(lateShiftDays2));
             })
             .build();
 
         plan = this.planBlueprintRepository.save(plan);
     }
-
 
 }

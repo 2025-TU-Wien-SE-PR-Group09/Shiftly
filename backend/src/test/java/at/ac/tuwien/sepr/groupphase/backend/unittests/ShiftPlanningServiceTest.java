@@ -13,11 +13,10 @@ import at.ac.tuwien.sepr.groupphase.backend.repository.ScheduledShiftRepository;
 import at.ac.tuwien.sepr.groupphase.backend.repository.ShiftBlueprintRepository;
 import at.ac.tuwien.sepr.groupphase.backend.repository.ShiftDayBlueprintRepository;
 import at.ac.tuwien.sepr.groupphase.backend.repository.ShiftWeekBlueprintRepository;
-import at.ac.tuwien.sepr.groupphase.backend.repository.UserRepository;
 import at.ac.tuwien.sepr.groupphase.backend.service.dto.shift.PlanBlueprintCreationDto;
 import at.ac.tuwien.sepr.groupphase.backend.service.dto.shift.PlanBlueprintDto;
 import at.ac.tuwien.sepr.groupphase.backend.service.dto.shift.ShiftBlueprintDto;
-import at.ac.tuwien.sepr.groupphase.backend.service.impl.ShiftPlanningServiceImpl;
+import at.ac.tuwien.sepr.groupphase.backend.service.impl.shift.ShiftPlanningServiceImpl;
 import at.ac.tuwien.sepr.groupphase.backend.service.impl.TimeService;
 import at.ac.tuwien.sepr.groupphase.backend.service.validator.ShiftPlanningValidatorImpl;
 import org.junit.jupiter.api.BeforeEach;
@@ -46,7 +45,6 @@ class ShiftPlanningServiceTest {
     private PlanBlueprintRepository planBlueprintRepository;
     private ScheduledShiftRepository scheduledShiftRepository;
     private ConcreteShiftPlanRepository concreteShiftPlanRepository;
-    private UserRepository userRepository;
 
     @BeforeEach
     void setUp() {
@@ -57,7 +55,6 @@ class ShiftPlanningServiceTest {
         timeService = mock(TimeService.class);
         planBlueprintRepository = mock(PlanBlueprintRepository.class);
         scheduledShiftRepository = mock(ScheduledShiftRepository.class);
-        userRepository = mock(UserRepository.class);
         concreteShiftPlanRepository = mock(ConcreteShiftPlanRepository.class);
 
 
@@ -66,9 +63,9 @@ class ShiftPlanningServiceTest {
             new ShiftPlanningValidatorImpl(),
             planBlueprintRepository,
             departmentRepository,
+            null,
             concreteShiftPlanRepository,
-            scheduledShiftRepository,
-            userRepository
+            null
         );
     }
 
@@ -95,7 +92,7 @@ class ShiftPlanningServiceTest {
         var shift = new ShiftBlueprint.Builder()
             .withDescription("Frühschicht")
             .withManPower(3)
-            .addWeek(0, week)
+            .addWeek(week)
             .build();
         shift.setId(100L);
 

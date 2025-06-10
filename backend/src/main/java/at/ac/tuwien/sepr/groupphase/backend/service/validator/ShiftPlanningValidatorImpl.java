@@ -5,6 +5,7 @@ import at.ac.tuwien.sepr.groupphase.backend.entity.ShiftBlueprint;
 import at.ac.tuwien.sepr.groupphase.backend.entity.ShiftDayBlueprint;
 import at.ac.tuwien.sepr.groupphase.backend.entity.ShiftWeekBlueprint;
 import at.ac.tuwien.sepr.groupphase.backend.service.dto.shift.ShiftWeekBlueprintDto;
+
 import java.time.DayOfWeek;
 import java.time.Duration;
 import java.time.LocalTime;
@@ -13,6 +14,7 @@ import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+
 import org.springframework.stereotype.Service;
 
 import java.util.Optional;
@@ -24,7 +26,8 @@ public class ShiftPlanningValidatorImpl implements ShiftPlanningValidator {
     public Optional<ValidationErrors> validateOverlappingShiftsPerPlan(List<ShiftBlueprint> shifts, PlanBlueprint plan) {
         ValidationErrors errors = new ValidationErrors();
 
-        record GroupKey(DayOfWeek day, Long planId, int weekIndex) {}
+        record GroupKey(DayOfWeek day, Long planId, int weekIndex) {
+        }
 
         Map<GroupKey, List<ShiftDayBlueprint>> grouped = new HashMap<>();
 
@@ -82,11 +85,6 @@ public class ShiftPlanningValidatorImpl implements ShiftPlanningValidator {
     }
 
 
-
-
-
-
-
     private String format(Duration duration) {
         long hours = duration.toHours();
         long minutes = duration.minusHours(hours).toMinutes();
@@ -95,7 +93,17 @@ public class ShiftPlanningValidatorImpl implements ShiftPlanningValidator {
 
 
     @Override
-    public Optional<ValidationErrors> validateWeek(ShiftWeekBlueprintDto shiftWeekBlueprintDto) {
+    public Optional<ValidationErrors> validatePlan(PlanBlueprint planBlueprint) {
+        return Optional.empty();
+    }
+
+    @Override
+    public Optional<ValidationErrors> validateShift(ShiftBlueprint shiftBlueprint) {
+        return Optional.empty();
+    }
+
+    @Override
+    public Optional<ValidationErrors> validateWeek(ShiftWeekBlueprint shiftWeekBlueprint) {
         return Optional.empty();
     }
 
@@ -226,12 +234,6 @@ public class ShiftPlanningValidatorImpl implements ShiftPlanningValidator {
 
         return errors.isValid() ? Optional.empty() : Optional.of(errors);
     }
-
-
-
-
-
-
 
 
 }

@@ -17,10 +17,10 @@ public record DepartmentShiftplanCalendarResponse(List<ScheduledShift> shifts) {
 
     @Schema(description = "Details of a day in the shift plan calendar")
     public record Day(
-            @Schema(description = "Start of the day", example = "2023-10-01T08:00:00")
-            LocalDateTime start,
-            @Schema(description = "End of the day", example = "2023-10-01T16:00:00")
-            LocalDateTime end
+        @Schema(description = "Start of the day", example = "2023-10-01T08:00:00")
+        LocalDateTime start,
+        @Schema(description = "End of the day", example = "2023-10-01T16:00:00")
+        LocalDateTime end
     ) {
     }
 }

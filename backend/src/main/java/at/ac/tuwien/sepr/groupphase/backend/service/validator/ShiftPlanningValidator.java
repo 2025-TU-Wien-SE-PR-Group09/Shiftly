@@ -3,6 +3,8 @@ package at.ac.tuwien.sepr.groupphase.backend.service.validator;
 import at.ac.tuwien.sepr.groupphase.backend.entity.PlanBlueprint;
 import at.ac.tuwien.sepr.groupphase.backend.entity.ShiftBlueprint;
 import at.ac.tuwien.sepr.groupphase.backend.entity.ShiftDayBlueprint;
+import at.ac.tuwien.sepr.groupphase.backend.entity.ShiftWeekBlueprint;
+import at.ac.tuwien.sepr.groupphase.backend.service.dto.shift.PlanBlueprintCreationDto;
 import at.ac.tuwien.sepr.groupphase.backend.service.dto.shift.PlanBlueprintCreationDto;
 import at.ac.tuwien.sepr.groupphase.backend.service.dto.shift.ShiftWeekBlueprintDto;
 
@@ -15,18 +17,37 @@ import java.util.Optional;
  * laws and regulations.
  */
 public interface ShiftPlanningValidator {
+
+    /**
+     * Validates the whole plan.
+     *
+     * @param planBlueprint the PlanBlueprint to validate
+     * @return an Optional containing ValidationErrors if validation fails, or an empty Optional if validation succeeds
+     */
+
+    Optional<ValidationErrors> validatePlan(PlanBlueprint planBlueprint);
+
+    /**
+     * Validates the whole shift.
+     *
+     * @param shiftBlueprint the ShiftBlueprint to validate
+     * @return an Optional containing ValidationErrors if validation fails, or an empty Optional if validation succeeds
+     */
+
+    Optional<ValidationErrors> validateShift(ShiftBlueprint shiftBlueprint);
+
     /**
      * Validates the week.
      *
-     * @param shiftWeekBlueprintDto the ShiftWeekDto to validate
+     * @param shiftWeekBlueprint the ShiftWeekBlueprint to validate
      * @return an Optional containing ValidationErrors if validation fails, or an empty Optional if validation succeeds
      */
-    Optional<ValidationErrors> validateWeek(ShiftWeekBlueprintDto shiftWeekBlueprintDto);
+    Optional<ValidationErrors> validateWeek(ShiftWeekBlueprint shiftWeekBlueprint);
 
     /**
      * Validates the day.
      *
-     * @param shiftWeekBlueprintDto the ShiftWeekDto to validate
+     * @param shiftWeekBlueprintDto the ShiftDayBlueprint to validate
      * @return an Optional containing ValidationErrors if validation fails, or an empty Optional if validation succeeds
      */
     Optional<ValidationErrors> validateDay(ShiftDayBlueprint shiftWeekBlueprintDto);
@@ -35,7 +56,7 @@ public interface ShiftPlanningValidator {
     /**
      * Validates that no overlapping shifts exist within a plan.
      *
-     *<p>
+     * <p>
      * Shifts are grouped by plan, week, and day. Within each group, overlapping time intervals are detected.
      *
      * @param shifts the list of shift blueprints to check
@@ -48,7 +69,7 @@ public interface ShiftPlanningValidator {
     /**
      * Validates that all shifts in the plan have equal weekly working durations.
      *
-     *<p>
+     * <p>
      * For each week index, this method ensures that the sum of durations across days is consistent across all shifts.
      *
      * @param shifts the list of shift blueprints to check
@@ -72,11 +93,10 @@ public interface ShiftPlanningValidator {
     /**
      * Validates that all provided ShiftBlueprints have non-empty descriptions.
      *
-     *<p>
+     * <p>
      *
      * @param shifts the list of ShiftBlueprints to validate
-     * @return an Optional containing ValidationErrors if any descriptions are missing or blank,
-     *         or an empty Optional if all descriptions are valid
+     * @return an Optional containing ValidationErrors if any descriptions are missing or blank,  or an empty Optional if all descriptions are valid
      */
     Optional<ValidationErrors> validateDescriptions(List<ShiftBlueprint> shifts);
 
@@ -87,12 +107,9 @@ public interface ShiftPlanningValidator {
      * Checks that each shift has a positive manpower value and that it meets the minimum requirements.
      *
      * @param shifts the list of ShiftBlueprints to validate
-     * @return an Optional containing ValidationErrors if any shifts have invalid manpower values,
-     *         or an empty Optional if all shifts are valid
+     * @return an Optional containing ValidationErrors if any shifts have invalid manpower values,  or an empty Optional if all shifts are valid
      */
     Optional<ValidationErrors> validateManpowerMinimum(List<ShiftBlueprint> shifts);
-
-
 
 
 }

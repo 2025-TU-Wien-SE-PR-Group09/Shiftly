@@ -11,11 +11,12 @@ import { ButtonComponent } from '../../../../shared/components/button/button.com
 import { FormsModule } from '@angular/forms';
 import { CommonModule } from '@angular/common';
 import { ToastrService } from 'ngx-toastr';
+import { ShiftRotationSimulatorComponent } from 'src/app/modules/shift/shift-rotation-simulator.component';
 import { AutocompleteComponent } from '../../../../shared/components/autocomplete/autocomplete.component';
 
 @Component({
   selector: 'app-department-detail-admin',
-  imports: [ButtonComponent, FormsModule, CommonModule, RouterLink, AutocompleteComponent],
+  imports: [ButtonComponent, FormsModule, CommonModule, RouterLink, ShiftRotationSimulatorComponent, AutocompleteComponent],
   templateUrl: './department-detail-admin.component.html',
   styleUrl: './department-detail-admin.component.css',
 })
@@ -35,7 +36,7 @@ export class DepartmentDetailAdminComponent implements OnInit {
   protected supervisorEmails: string[] = [];
   protected confirmingDeleteDepartment: string | null = null;
 
-  constructor(private departmentService: DepartmentService, private toastr: ToastrService) {}
+  constructor(private departmentService: DepartmentService, private toastr: ToastrService) { }
 
   toggleFormCreate(): void {
     this.showFormCreate = !this.showFormCreate;

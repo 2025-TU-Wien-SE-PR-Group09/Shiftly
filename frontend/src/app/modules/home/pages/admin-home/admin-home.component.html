@@ -77,9 +77,14 @@
   </div>
 
   <ng-template #eventTemplate let-event="event">
-    <span>{{ event.title }}</span>
+    <div class="text-sm">
+      <strong>{{ event.title }}</strong>
+      <span class="text-xs text-gray-300">Assigned:</span>
+      <ul class="list-disc list-inside text-xs text-gray-100">
+        <li *ngFor="let worker of event.meta.workers">{{ worker }}</li>
+      </ul>
+    </div>
   </ng-template>
-
   <ng-container *ngIf="view === CalendarView.Month">
     <mwl-calendar-month-view
       [viewDate]="viewDate"

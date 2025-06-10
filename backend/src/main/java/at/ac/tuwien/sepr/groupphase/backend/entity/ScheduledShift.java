@@ -1,15 +1,16 @@
 package at.ac.tuwien.sepr.groupphase.backend.entity;
 
-
 import jakarta.persistence.CascadeType;
-import jakarta.persistence.EmbeddedId;
+import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
 import jakarta.persistence.ManyToOne;
-import jakarta.persistence.MapsId;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
 
-import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -17,55 +18,35 @@ import java.util.Set;
 @Table(name = "scheduled_shift")
 public class ScheduledShift {
 
-    @EmbeddedId
-    private ScheduledShiftId id;
-
-    @ManyToOne(optional = false)
-    @MapsId("departmentId")
-    private Department department;
-
-    @ManyToOne(optional = false)
-    @MapsId("shiftBlueprintId")
-    private ShiftBlueprint shiftBlueprint;
-
-    private LocalDate weekStartDate;
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
 
     @ManyToOne(optional = false)
     private ConcreteShiftPlan plan;
 
+    @Column(name = "shift_start", nullable = false)
+    private LocalDateTime start;
+
+    @Column(name = "shift_end", nullable = false)
+    private LocalDateTime end;
+
+    @Column(nullable = false)
+    private String description;
+
     @OneToMany(mappedBy = "scheduledShift", cascade = CascadeType.ALL, orphanRemoval = true)
     private Set<ScheduledShiftAssignment> assignments = new HashSet<>();
 
-    public ScheduledShiftId getId() {
+    public Long getId() {
         return id;
     }
 
-    public void setId(ScheduledShiftId id) {
+    public void setId(Long id) {
         this.id = id;
     }
 
     public Department getDepartment() {
-        return department;
-    }
-
-    public void setDepartment(Department department) {
-        this.department = department;
-    }
-
-    public ShiftBlueprint getShift() {
-        return shiftBlueprint;
-    }
-
-    public void setShift(ShiftBlueprint shiftBlueprint) {
-        this.shiftBlueprint = shiftBlueprint;
-    }
-
-    public LocalDate getWeekStartDate() {
-        return weekStartDate;
-    }
-
-    public void setWeekStartDate(LocalDate weekStartDate) {
-        this.weekStartDate = weekStartDate;
+        return this.getPlan().getDepartment();
     }
 
     public ConcreteShiftPlan getPlan() {
@@ -74,6 +55,30 @@ public class ScheduledShift {
 
     public void setPlan(ConcreteShiftPlan plan) {
         this.plan = plan;
+    }
+
+    public LocalDateTime getStart() {
+        return start;
+    }
+
+    public LocalDateTime getEnd() {
+        return end;
+    }
+
+    public void setStart(LocalDateTime start) {
+        this.start = start;
+    }
+
+    public void setDescription(String description) {
+        this.description = description;
+    }
+
+    public void setEnd(LocalDateTime end) {
+        this.end = end;
+    }
+
+    public String getDescription() {
+        return description;
     }
 
     public Set<ScheduledShiftAssignment> getAssignments() {
@@ -92,23 +97,23 @@ public class ScheduledShift {
     public static class Builder {
         private final ScheduledShift shift = new ScheduledShift();
 
-        public Builder withId(ScheduledShiftId id) {
+        public Builder withId(Long id) {
             shift.setId(id);
             return this;
         }
 
-        public Builder withDepartment(Department department) {
-            shift.setDepartment(department);
+        public Builder withEnd(LocalDateTime end) {
+            shift.setEnd(end);
             return this;
         }
 
-        public Builder withShiftBlueprint(ShiftBlueprint blueprint) {
-            shift.setShift(blueprint);
+        public Builder withStart(LocalDateTime start) {
+            shift.setStart(start);
             return this;
         }
 
-        public Builder withWeekStartDate(LocalDate date) {
-            shift.setWeekStartDate(date);
+        public Builder withDescription(String description) {
+            shift.setDescription(description);
             return this;
         }
 

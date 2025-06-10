@@ -15,7 +15,6 @@ import { SKIP_EXCEPTION_INTERCEPTOR } from '../../../../core/interceptor/skip-ex
 
 @Component({
   selector: 'app-admin-home',
-  standalone: true,
   imports: [CommonModule, CalendarModule, ButtonComponent, FormsModule],
   templateUrl: './admin-home.component.html',
   styleUrl: './admin-home.component.css',
@@ -27,7 +26,7 @@ export class AdminHomeComponent implements OnInit {
     private _adminService: AdminEndpointService,
     private _departmentService: DepartmentService,
     private readonly _toastr: ToastrService,
-  ) {}
+  ) { }
 
   protected departments: DepartmentDetailRestResponseDto[] = [];
   protected selectedDepartment: DepartmentDetailRestResponseDto | undefined;

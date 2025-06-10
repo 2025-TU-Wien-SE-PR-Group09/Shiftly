@@ -1,6 +1,5 @@
 package at.ac.tuwien.sepr.groupphase.backend.entity;
 
-
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -36,41 +35,43 @@ public class ConcreteShiftPlan {
         return id;
     }
 
-    public void setId(Long id) {
-        this.id = id;
-    }
-
     public LocalDate getStartDate() {
         return startDate;
-    }
-
-    public void setStartDate(LocalDate startDate) {
-        this.startDate = startDate;
-    }
-
-    public LocalDate getEndDate() {
-        return endDate;
-    }
-
-    public void setEndDate(LocalDate endDate) {
-        this.endDate = endDate;
     }
 
     public Department getDepartment() {
         return department;
     }
 
-    public void setDepartment(Department department) {
-        this.department = department;
+    public LocalDate getEndDate() {
+        return endDate;
     }
 
     public List<ScheduledShift> getScheduledShifts() {
         return scheduledShifts;
     }
 
-    public void addScheduledShifts(List<ScheduledShift> scheduledShifts) {
-        this.scheduledShifts = scheduledShifts;
-        scheduledShifts.forEach(scheduledShift -> scheduledShift.setPlan(this));
+    public void setStartDate(LocalDate startDate) {
+        this.startDate = startDate;
+    }
+
+    public void setEndDate(LocalDate endDate) {
+        this.endDate = endDate;
+    }
+
+    public void setId(Long id) {
+        this.id = id;
+    }
+
+    public void setDepartment(Department department) {
+        this.department = department;
+    }
+
+    public void addScheduledShifts(List<ScheduledShift> newShifts) {
+        for (ScheduledShift shift : newShifts) {
+            shift.setPlan(this);
+            this.scheduledShifts.add(shift);
+        }
     }
 
     public static class Builder {

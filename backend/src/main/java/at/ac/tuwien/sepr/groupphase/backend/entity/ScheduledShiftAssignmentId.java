@@ -2,7 +2,6 @@ package at.ac.tuwien.sepr.groupphase.backend.entity;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Embeddable;
-import jakarta.persistence.Embedded;
 
 import java.io.Serializable;
 import java.util.Objects;
@@ -10,8 +9,8 @@ import java.util.Objects;
 @Embeddable
 public class ScheduledShiftAssignmentId implements Serializable {
 
-    @Embedded
-    private ScheduledShiftId scheduledShiftId;
+    @Column(name = "scheduled_shift_id")
+    private Long scheduledShiftId;
 
     @Column(name = "user_email")
     private String userEmail;
@@ -19,16 +18,16 @@ public class ScheduledShiftAssignmentId implements Serializable {
     public ScheduledShiftAssignmentId() {
     }
 
-    public ScheduledShiftAssignmentId(ScheduledShiftId scheduledShiftId, String userEmail) {
+    public ScheduledShiftAssignmentId(Long scheduledShiftId, String userEmail) {
         this.scheduledShiftId = scheduledShiftId;
         this.userEmail = userEmail;
     }
 
-    public ScheduledShiftId getScheduledShiftId() {
+    public Long getScheduledShiftId() {
         return scheduledShiftId;
     }
 
-    public void setScheduledShiftId(ScheduledShiftId scheduledShiftId) {
+    public void setScheduledShiftId(Long scheduledShiftId) {
         this.scheduledShiftId = scheduledShiftId;
     }
 
