@@ -1,11 +1,13 @@
 package at.ac.tuwien.sepr.groupphase.backend.endpoint;
 
-import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.VacationRequestResponseRestDto;
-import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.VacationRequestRestDto;
+
+import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.vacation.VacationRequestResponseRestDto;
+import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.vacation.VacationRequestRestDto;
 import at.ac.tuwien.sepr.groupphase.backend.service.VacationRequestService;
-import at.ac.tuwien.sepr.groupphase.backend.service.dto.UserEmailDto;
-import at.ac.tuwien.sepr.groupphase.backend.service.dto.VacationRequestDto;
-import at.ac.tuwien.sepr.groupphase.backend.service.dto.VacationRequestResponseDto;
+
+import at.ac.tuwien.sepr.groupphase.backend.service.dto.user.UserEmailDto;
+import at.ac.tuwien.sepr.groupphase.backend.service.dto.vacation.VacationRequestDto;
+import at.ac.tuwien.sepr.groupphase.backend.service.dto.vacation.VacationRequestResponseDto;
 import at.ac.tuwien.sepr.groupphase.backend.type.VacationStatus;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
