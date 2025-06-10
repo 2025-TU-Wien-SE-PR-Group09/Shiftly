@@ -151,6 +151,7 @@ class ShiftPlanningServiceTest {
      */
 
 
+
     @Test
     void createPlan_Blueprint_withMissingDepartment_shouldThrowNotFound() {
         var departmentId = "asdf";
@@ -159,5 +160,7 @@ class ShiftPlanningServiceTest {
         assertThrows(NotFoundException.class, () -> shiftPlanningService.createPlanBlueprint(createPlanBlueprintDto));
 
     }
+
+     */
 
 }

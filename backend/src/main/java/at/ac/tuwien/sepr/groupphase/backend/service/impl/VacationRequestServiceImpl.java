@@ -12,12 +12,11 @@ import at.ac.tuwien.sepr.groupphase.backend.service.dto.user.UserEmailDto;
 import at.ac.tuwien.sepr.groupphase.backend.service.dto.vacation.VacationRequestDto;
 import at.ac.tuwien.sepr.groupphase.backend.service.dto.vacation.VacationRequestResponseDto;
 import at.ac.tuwien.sepr.groupphase.backend.type.VacationStatus;
-
 import java.time.format.DateTimeFormatter;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
-
+import java.util.Set;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -47,6 +46,9 @@ public class VacationRequestServiceImpl implements VacationRequestService {
     public VacationRequestResponseDto createVacationRequest(VacationRequestDto vacationRequestDto) {
         LocalDate start = vacationRequestDto.getStartDate();
         LocalDate end = vacationRequestDto.getEndDate();
+
+
+
 
 
         ApplicationUser employee = userRepository.findByEmail(vacationRequestDto.getEmployeeEmail())
@@ -172,8 +174,28 @@ public class VacationRequestServiceImpl implements VacationRequestService {
             .toList();
     }
 
+    @Override
+    public List<VacationRequestResponseDto> getVacationRequestsByStatusAndSupervisor(VacationStatus status, String supervisorEmail) {
+        ApplicationUser supervisor = userRepository.findByEmail(supervisorEmail)
+            .orElseThrow(() -> new NotFoundException("Supervisor not found"));
 
+        if (supervisor.getDepartment() == null) {
+            throw new ConflictException("Supervisor is not assigned to any department");
+        }
 
+        String departmentName = supervisor.getDepartment().getName();
 
+        List<VacationRequest> requests = vacationRequestRepository.findByStatusAndEmployee_Department_Name(status, departmentName);
+
+        return requests.stream()
+            .map(r -> new VacationRequestResponseDto(
+                r.getId(),
+                r.getEmployee().getEmail(),
+                r.getStartDate(),
+                r.getEndDate(),
+                r.getStatus()
+            ))
+            .toList();
+    }
 
 }

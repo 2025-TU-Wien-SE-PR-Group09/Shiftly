@@ -39,6 +39,9 @@ public interface VacationRequestService {
 
     List<VacationRequestResponseDto> getVacationRequestsByStatus(VacationStatus status);
 
+    List<VacationRequestResponseDto> getVacationRequestsByStatusAndSupervisor(VacationStatus status, String supervisorEmail);
+
+
 
 
 }

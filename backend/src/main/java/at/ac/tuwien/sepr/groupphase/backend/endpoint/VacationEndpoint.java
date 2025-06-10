@@ -86,9 +86,10 @@ public class VacationEndpoint {
 
     @GetMapping(path = "/pending", produces = MediaType.APPLICATION_JSON_VALUE)
     @RolesAllowed("SUPERVISOR")
-    public List<VacationRequestResponseRestDto> getAllPendingRequests() {
+    public List<VacationRequestResponseRestDto> getAllPendingRequests(Principal principal) {
+        System.out.println("Supervisor: " + principal.getName());
         return vacationRequestService
-            .getAllPendingRequests()
+            .getVacationRequestsByStatusAndSupervisor(VacationStatus.PENDING, principal.getName())
             .stream()
             .map(VacationRequestResponseRestDto::from)
             .toList();
@@ -106,8 +107,9 @@ public class VacationEndpoint {
 
     @GetMapping(value = "/approved", produces = MediaType.APPLICATION_JSON_VALUE)
     @RolesAllowed("SUPERVISOR")
-    public List<VacationRequestResponseRestDto> getApprovedRequests() {
-        return vacationRequestService.getVacationRequestsByStatus(VacationStatus.APPROVED)
+    public List<VacationRequestResponseRestDto> getApprovedRequests(Principal principal) {
+        return vacationRequestService
+            .getVacationRequestsByStatusAndSupervisor(VacationStatus.APPROVED, principal.getName())
             .stream()
             .map(VacationRequestResponseRestDto::from)
             .toList();
