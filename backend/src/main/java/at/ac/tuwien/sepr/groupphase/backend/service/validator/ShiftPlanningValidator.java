@@ -49,5 +49,8 @@ public interface ShiftPlanningValidator {
      */
     Optional<ValidationErrors> validateWeeklyDurationsPerPlan(List<ShiftBlueprint> shifts, PlanBlueprint plan);
 
+    Optional<ValidationErrors> validateConsistentWeekCountPerPlan(List<ShiftBlueprint> shifts, PlanBlueprint targetPlan);
+
+
 
 }

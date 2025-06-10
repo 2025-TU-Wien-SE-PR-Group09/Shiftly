@@ -157,6 +157,12 @@ public class ShiftPlanningServiceImpl implements ShiftPlanningService {
         List<ShiftBlueprint> allShifts = new ArrayList<>(plan.getShifts());
         allShifts.addAll(newShifts);
 
+        shiftPlanningValidator.validateConsistentWeekCountPerPlan(allShifts, plan)
+
+            .ifPresent(errors -> {
+                throw new ConflictException(errors);
+            });
+
         shiftPlanningValidator.validateDayStructuresPerDepartment(allShifts)
             .ifPresent(errors -> {
                 throw new ConflictException(errors);
@@ -166,6 +172,8 @@ public class ShiftPlanningServiceImpl implements ShiftPlanningService {
             .ifPresent(errors -> {
                 throw new ConflictException(errors);
             });
+
+
 
 
         final var finalPlan = plan;

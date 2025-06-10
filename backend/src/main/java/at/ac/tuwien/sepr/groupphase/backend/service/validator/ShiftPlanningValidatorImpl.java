@@ -127,5 +127,34 @@ public class ShiftPlanningValidatorImpl implements ShiftPlanningValidator {
         return errors.isValid() ? Optional.empty() : Optional.of(errors);
     }
 
+    @Override
+    public Optional<ValidationErrors> validateConsistentWeekCountPerPlan(List<ShiftBlueprint> shifts, PlanBlueprint targetPlan) {
+        ValidationErrors errors = new ValidationErrors();
+
+        List<ShiftBlueprint> planShifts = shifts.stream()
+            .filter(s -> s.getPlan() == null || s.getPlan().getId().equals(targetPlan.getId()))
+            .toList();
+
+
+        int expectedWeekCount = planShifts.stream()
+            .mapToInt(s -> s.getShiftWeeks().size())
+            .max()
+            .orElse(0);
+
+        for (ShiftBlueprint shift : planShifts) {
+            int actualWeekCount = shift.getShiftWeeks().size();
+            if (actualWeekCount != expectedWeekCount) {
+                errors.add("Week count of newly added shift '"
+                    + "' does not match existing shifts in the same plan.");
+            }
+        }
+
+        return errors.isValid() ? Optional.empty() : Optional.of(errors);
+    }
+
+
+
+
+
 
 }
