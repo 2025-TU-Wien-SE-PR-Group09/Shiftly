@@ -19,5 +19,4 @@ public interface ScheduledShiftRepository extends JpaRepository<ScheduledShift, 
         """)
     List<ScheduledShift> findByStartBetween(@Param("start") LocalDateTime start, @Param("end") LocalDateTime end);
 
-    List<ScheduledShift> findByDepartmentName(String departmentName);
 }

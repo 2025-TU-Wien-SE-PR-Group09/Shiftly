@@ -108,11 +108,11 @@ public class DepartmentEndpoint {
     @GetMapping(path = "/{departmentName}", produces = MediaType.APPLICATION_JSON_VALUE)
     public DepartmentDetailRestResponseDto getDepartmentByName(@PathVariable(name = "departmentName") String departmentName) {
         return departmentService.getDepartmentByName(departmentName).map(d ->
-            new DepartmentDetailRestResponseDto(
-                d.name(),
-                departmentService.getSupervisorByDepartmentName(d.name())
-                    .map(UserEmailDto::email)
-                    .orElse("NONE")))
+                new DepartmentDetailRestResponseDto(
+                    d.name(),
+                    departmentService.getSupervisorByDepartmentName(d.name())
+                        .map(UserEmailDto::email)
+                        .orElse("NONE")))
             .orElseThrow(() -> new NotFoundException("Department not found!"));
     }
 
@@ -137,9 +137,9 @@ public class DepartmentEndpoint {
     public ResponseEntity<Void> editDepartment(@RequestBody @Valid DepartmentEditRestDto restDto)
         throws NotFoundException {
         DepartmentEditDto serviceDto = new DepartmentEditDto(
-                restDto.getOldName(),
-                restDto.getNewName(),
-                restDto.getSupervisorEmail());
+            restDto.getOldName(),
+            restDto.getNewName(),
+            restDto.getSupervisorEmail());
         departmentService.editDepartment(serviceDto);
         return ResponseEntity.status(HttpStatus.OK).build();
     }
@@ -177,7 +177,7 @@ public class DepartmentEndpoint {
     }
 
     @Transactional
-    @RolesAllowed({"ADMIN", "SUPERVISOR"})
+    @RolesAllowed({"ADMIN", "SUPERVISOR", "EMPLOYEE"})
     @Operation(summary = "Get shift plan for a department")
     @ApiResponse(responseCode = "200", description = "Shiftplan for the department")
     @GetMapping(path = "/{departmentName}/shiftplanBlueprint", produces = MediaType.APPLICATION_JSON_VALUE)
@@ -246,7 +246,7 @@ public class DepartmentEndpoint {
         return employees.stream().map(EmployeeListItemResponseDto::from).toList();
     }
 
-    @RolesAllowed({"ADMIN", "SUPERVISOR"})
+    @RolesAllowed({"ADMIN", "SUPERVISOR", "EMPLOYEE"})
     @Transactional
     @Operation(summary = "Get the concrete shift plan for the given department and return the scheduled shifts in suitable calendar format")
     @ApiResponse(responseCode = "201", description = "Concrete shift plan in calendar format.")

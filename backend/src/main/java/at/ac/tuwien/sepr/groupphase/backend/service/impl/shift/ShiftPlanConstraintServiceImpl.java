@@ -83,9 +83,6 @@ public class ShiftPlanConstraintServiceImpl implements ShiftPlanConstraintServic
     }
 
 
-
-
-
     /**
      * Get all employees who are available to work as jumpers in the given week.
      *
@@ -116,7 +113,7 @@ public class ShiftPlanConstraintServiceImpl implements ShiftPlanConstraintServic
     /**
      * Get the vacation overlap for a specific user in a given week.
      *
-     * @param user The user to check.
+     * @param user      The user to check.
      * @param weekStart The start date of the week to check.
      * @return List of LocalDate representing the overlap period, or null if no overlap.
      */
