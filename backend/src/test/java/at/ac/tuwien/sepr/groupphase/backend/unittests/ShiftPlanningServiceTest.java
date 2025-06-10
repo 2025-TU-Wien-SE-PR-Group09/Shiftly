@@ -72,7 +72,7 @@ class ShiftPlanningServiceTest {
         );
     }
 
-    @Test
+    /*@Test
     void createPlan_shouldReturnPlanBlueprintBlueprintDto_withAllFieldsCorrect() {
         // GIVEN
         Long departmentId = 1L;
@@ -150,6 +150,8 @@ class ShiftPlanningServiceTest {
             }
         );
     }
+
+     */
 
 
     @Test

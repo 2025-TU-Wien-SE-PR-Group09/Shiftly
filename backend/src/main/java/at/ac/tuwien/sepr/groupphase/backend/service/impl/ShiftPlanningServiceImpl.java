@@ -106,6 +106,25 @@ public class ShiftPlanningServiceImpl implements ShiftPlanningService {
         });
         PlanBlueprint plan = planBuilder.build();
 
+        plan = planBuilder.build();
+
+        shiftPlanningValidator.validateDescriptions(plan.getShifts())
+            .ifPresent(errors -> {
+                throw new ConflictException(errors);
+            });
+
+        shiftPlanningValidator.validateManpowerMinimum(plan.getShifts())
+            .ifPresent(errors -> {
+                throw new ConflictException(errors);
+            });
+
+
+        shiftPlanningValidator.validateWeeklyDurationsPerPlan(plan.getShifts(), plan)
+            .ifPresent(errors -> {
+                throw new ConflictException(errors);
+            });
+
+
         plan = this.planBlueprintRepository.save(plan);
         return ShiftPlanningMapper.Plans.fromEntity(plan);
     }
@@ -139,7 +158,45 @@ public class ShiftPlanningServiceImpl implements ShiftPlanningService {
             return shift;
         }).toList();
 
-        newShifts.forEach(plan::addShiftBlueprint);
+        List<ShiftBlueprint> allShifts = new ArrayList<>(plan.getShifts());
+        allShifts.addAll(newShifts);
+
+        shiftPlanningValidator.validateDescriptions(allShifts)
+            .ifPresent(errors -> {
+                throw new ConflictException(errors);
+            });
+
+        shiftPlanningValidator.validateManpowerMinimum(allShifts)
+            .ifPresent(errors -> {
+                throw new ConflictException(errors);
+            });
+
+
+        shiftPlanningValidator.validateConsistentWeekCountPerPlan(allShifts, plan)
+
+            .ifPresent(errors -> {
+                throw new ConflictException(errors);
+            });
+
+        shiftPlanningValidator.validateOverlappingShiftsPerPlan(allShifts, plan)
+            .ifPresent(errors -> {
+                throw new ConflictException(errors);
+            });
+
+        shiftPlanningValidator.validateWeeklyDurationsPerPlan(allShifts, plan)
+            .ifPresent(errors -> {
+                throw new ConflictException(errors);
+            });
+
+
+
+
+        final var finalPlan = plan;
+        newShifts.forEach(shift -> {
+            shift.setPlan(finalPlan);
+            finalPlan.addShiftBlueprint(shift);
+        });
+
         plan = this.planBlueprintRepository.save(plan);
 
         return ShiftPlanningMapper.Plans.fromEntity(plan);
@@ -155,6 +212,7 @@ public class ShiftPlanningServiceImpl implements ShiftPlanningService {
         var month = concretePlanGenerateDto.startDate().orElseThrow(() -> new ConflictException("Start date is required"));
         LocalDate startDate = timeService.nextMondayInMonth(month);
 
+        //TODO: Validator
         concreteShiftPlanRepository.findByDepartmentId(department.getId()).stream()
             .min((a, b) -> b.getEndDate().compareTo(a.getEndDate())).ifPresent(concreteShiftPlan -> {
                 if (concreteShiftPlan.getEndDate().isAfter(startDate)) {
