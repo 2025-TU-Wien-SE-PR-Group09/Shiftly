@@ -12,12 +12,18 @@ import { environment } from '../../../environments/environment';
 import { AuthService } from '../services/auth.service';
 import { ToastrService } from 'ngx-toastr';
 import { Router } from '@angular/router';
+import { SKIP_EXCEPTION_INTERCEPTOR } from './skip-exception-interceptor';
 
 @Injectable()
 export class ExceptionInterceptor implements HttpInterceptor {
   constructor(private toastr: ToastrService, private router: Router, private authService: AuthService) { }
 
   intercept(req: HttpRequest<any>, next: HttpHandler): Observable<HttpEvent<any>> {
+    const shouldSkip = req.context.get(SKIP_EXCEPTION_INTERCEPTOR);
+    if (shouldSkip) {
+      return next.handle(req); // Skip logic
+    }
+
     return next.handle(req).pipe(
       catchError((error: HttpErrorResponse) => {
         console.log(error)

@@ -63,10 +63,9 @@ public class DepartmentServiceImpl implements DepartmentService {
         userService.assignRoleToUser(new UserRoleDto(
             supervisor.getEmail(),
             Role.SUPERVISOR,
-            department.getId()));
+            department.getName()));
 
         return new DepartmentCreateResponseDto(
-            department.getId(),
             department.getName(),
             getSupervisorByDepartmentName(department.getName()).map(UserEmailDto::email).orElse("NONE"));
     }
@@ -111,7 +110,7 @@ public class DepartmentServiceImpl implements DepartmentService {
         userService.assignRoleToUser(new UserRoleDto(
             newSupervisor.getEmail(),
             Role.SUPERVISOR,
-            department.getId()
+            department.getName()
         ));
 
         return new DepartmentEditResponseDto(
@@ -125,7 +124,6 @@ public class DepartmentServiceImpl implements DepartmentService {
     public List<DepartmentDetailResponseDto> getAllDepartments() {
         return departmentRepository.findAll().stream()
             .map(dept -> new DepartmentDetailResponseDto(
-                dept.getId(),
                 dept.getName(),
                 getSupervisorByDepartmentName(dept.getName()).map(UserEmailDto::email).orElse("NONE")))
             .toList();

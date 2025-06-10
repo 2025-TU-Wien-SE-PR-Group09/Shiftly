@@ -9,8 +9,6 @@ import java.util.Objects;
 
 public class DepartmentDetailRestResponseDto {
 
-    private Long id;
-
     @NotBlank(message = "Department name must not be blank")
     @Size(min = 1, max = 100, message = "Department name must be between 1 and 100 characters long")
     private String name;
@@ -24,18 +22,9 @@ public class DepartmentDetailRestResponseDto {
     public DepartmentDetailRestResponseDto() {
     }
 
-    public DepartmentDetailRestResponseDto(Long id, String name, String supervisorEmail) {
-        this.id = id;
+    public DepartmentDetailRestResponseDto(String name, String supervisorEmail) {
         this.name = name;
         this.supervisorEmail = supervisorEmail;
-    }
-
-    public Long getId() {
-        return id;
-    }
-
-    public void setId(Long id) {
-        this.id = id;
     }
 
     public String getName() {

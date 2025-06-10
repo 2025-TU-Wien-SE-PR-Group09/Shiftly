@@ -65,7 +65,7 @@ public class StartupRunner implements CommandLineRunner {
         this.userService.assignRoleToUser(new UserRoleDto(ADMIN_EMAIL, Role.ADMIN, null));
 
         var production = this.departmentService.getDepartmentByName("Produktion")
-            .flatMap(d -> departmentRepository.findById(d.id()));
+            .flatMap(d -> departmentRepository.findById(d.name()));
 
         if (production.isEmpty()) {
             this.userService.createUser(new UserDataDto(
@@ -77,7 +77,7 @@ public class StartupRunner implements CommandLineRunner {
 
             LOGGER.info("Department not found, creating department!");
             var dep = this.departmentService.createDepartment(new DepartmentCreateDto("Produktion", "supervisor@shyft.local"));
-            var actDep = this.departmentRepository.findById(dep.getId()).orElseThrow(() -> new RuntimeException("Department not found"));
+            var actDep = this.departmentRepository.findById(dep.getName()).orElseThrow(() -> new RuntimeException("Department not found"));
             createPlan(actDep);
             createSecondPlan(actDep);
             createUsers();
@@ -120,21 +120,21 @@ public class StartupRunner implements CommandLineRunner {
         var newSupervisor = this.userRepository.findByEmail("new_supervisor@shyft.local").get();
         newSupervisor.setDepartment(secondDepartment);
         this.userRepository.save(newSupervisor);
-        this.userService.assignRoleToUser(new UserRoleDto("new_supervisor@shyft.local", Role.SUPERVISOR, secondDepartment.getId()));
+        this.userService.assignRoleToUser(new UserRoleDto("new_supervisor@shyft.local", Role.SUPERVISOR, secondDepartment.getName()));
 
         ApplicationUser supervisor = this.userRepository.findByEmail("supervisor@shyft.local").get();
         var department = this.departmentRepository.findByName("Produktion").get();
         supervisor.setDepartment(department);
         this.userRepository.save(supervisor);
         this.userService.assignRoleToUser(
-            new UserRoleDto("supervisor@shyft.local", Role.SUPERVISOR, department.getId())
+            new UserRoleDto("supervisor@shyft.local", Role.SUPERVISOR, department.getName())
         );
 
         ApplicationUser employee = this.userRepository.findByEmail("employee@shyft.local").get();
         employee.setDepartment(this.departmentRepository.findByName("Produktion").get());
         this.userRepository.save(employee);
         this.userService.assignRoleToUser(
-            new UserRoleDto("employee@shyft.local", Role.EMPLOYEE, department.getId())
+            new UserRoleDto("employee@shyft.local", Role.EMPLOYEE, department.getName())
         );
 
         /*

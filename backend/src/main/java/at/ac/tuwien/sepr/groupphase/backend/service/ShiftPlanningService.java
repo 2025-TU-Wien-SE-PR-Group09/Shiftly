@@ -27,9 +27,9 @@ public interface ShiftPlanningService {
     /**
      * Retrieves a detailed view of the scheduled shifts for a department based on the concrete quarterly plan.
      *
-     * @param departmentId the ID of the department for which the scheduled shifts will be retrieved
+     * @param departmentName the Name of the department for which the scheduled shifts will be retrieved
      * @return a list of ScheduledShiftDetailedViewDto containing the details of the scheduled shifts
      */
-    ConcreteShiftPlan getCurrentConcretePlan(Long departmentId);
+    ConcreteShiftPlan getCurrentConcretePlan(String departmentName);
 
 }

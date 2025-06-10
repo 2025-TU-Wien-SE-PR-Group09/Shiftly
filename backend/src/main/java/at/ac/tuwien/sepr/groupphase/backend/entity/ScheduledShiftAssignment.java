@@ -19,7 +19,7 @@ public class ScheduledShiftAssignment {
     @ManyToOne(optional = false)
     @MapsId("scheduledShiftId")
     @JoinColumns({
-        @JoinColumn(name = "department_id", referencedColumnName = "department_id"),
+        @JoinColumn(name = "department_name", referencedColumnName = "department_name"),
         @JoinColumn(name = "calendar_week", referencedColumnName = "calendar_week"),
         @JoinColumn(name = "calendar_year", referencedColumnName = "calendar_year"),
         @JoinColumn(name = "shift_blueprint_id", referencedColumnName = "shift_blueprint_id")

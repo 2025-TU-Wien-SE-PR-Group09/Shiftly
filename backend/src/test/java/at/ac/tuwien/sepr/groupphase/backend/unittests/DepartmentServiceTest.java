@@ -117,7 +117,6 @@ class DepartmentServiceTest {
         supervisor.setDepartment(null);
 
         Department department = new Department();
-        department.setId(ID);
         department.setName(DEPARTMENT_NAME);
 
         DepartmentCreateDto dto = new DepartmentCreateDto(DEPARTMENT_NAME, SUPERVISOR_EMAIL);
@@ -126,7 +125,6 @@ class DepartmentServiceTest {
         when(userRepository.findById(SUPERVISOR_EMAIL)).thenReturn(Optional.of(supervisor));
         when(departmentRepository.save(any(Department.class))).thenAnswer(inv -> {
             Department d = inv.getArgument(0);
-            d.setId(ID);
             return d;
         });
 
@@ -134,7 +132,6 @@ class DepartmentServiceTest {
 
         assertAll(
             () -> assertNotNull(result),
-            () -> assertEquals(ID, result.getId()),
             () -> assertEquals(DEPARTMENT_NAME, result.getName()),
             () -> assertEquals("NONE", result.getSupervisorEmail())
         );

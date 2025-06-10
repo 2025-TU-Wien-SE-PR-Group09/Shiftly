@@ -44,7 +44,7 @@ public class ShiftRestMapper {
         );
     }
 
-    public static PlanBlueprintCreationDto mapFromRequest(Long departmentId, CreatePlanBlueprintDto createPlanBlueprintDto) {
+    public static PlanBlueprintCreationDto mapFromRequest(String departmentName, CreatePlanBlueprintDto createPlanBlueprintDto) {
         return new PlanBlueprintCreationDto(
             createPlanBlueprintDto.description(),
             createPlanBlueprintDto.shifts().stream()
@@ -61,7 +61,7 @@ public class ShiftRestMapper {
                                 )).toList()
                         )).toList()
                 )).toList(),
-            departmentId
+            departmentName
         );
     }
 

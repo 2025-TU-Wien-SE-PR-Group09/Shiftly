@@ -17,12 +17,9 @@ import java.util.Set;
 @Entity
 public class Department {
 
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
-
     @NotBlank
     @Column(nullable = false, unique = true, length = 100)
+    @Id
     private String name;
 
     @OneToMany(fetch = FetchType.EAGER, mappedBy = "department")
@@ -31,16 +28,8 @@ public class Department {
     @OneToMany(fetch = FetchType.EAGER, mappedBy = "department", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<ConcreteShiftPlan> shiftPlans;
 
-    public Long getId() {
-        return id;
-    }
-
     public String getName() {
         return name;
-    }
-
-    public void setId(Long id) {
-        this.id = id;
     }
 
     public void setName(String name) {

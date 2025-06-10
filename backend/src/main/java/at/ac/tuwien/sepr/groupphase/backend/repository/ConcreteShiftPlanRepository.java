@@ -8,5 +8,5 @@ import java.util.List;
 
 @Repository
 public interface ConcreteShiftPlanRepository extends JpaRepository<ConcreteShiftPlan, Long> {
-    List<ConcreteShiftPlan> findByDepartmentId(Long departmentId);
+    List<ConcreteShiftPlan> findByDepartmentName(String departmentName);
 }

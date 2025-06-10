@@ -53,14 +53,13 @@ public class AuthServiceImpl implements AuthService {
 
             var department = userRepository.findByEmail(userLoginDto.getEmail()).map(ApplicationUser::getDepartment);
 
-            var depId = department.map(Department::getId);
             var depName = department.map(Department::getName);
             List<String> roles = userDetails.getAuthorities()
                 .stream()
                 .map(GrantedAuthority::getAuthority)
                 .toList();
             return new LoginResponseDto(
-                jwtTokenizer.getAuthToken(userDetails.getUsername(), roles, depId, depName));
+                jwtTokenizer.getAuthToken(userDetails.getUsername(), roles, depName));
         }
         throw new BadCredentialsException("Username or password is incorrect or account is locked");
     }

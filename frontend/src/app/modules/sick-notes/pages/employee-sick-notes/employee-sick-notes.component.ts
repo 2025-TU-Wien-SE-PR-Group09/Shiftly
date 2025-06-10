@@ -73,12 +73,7 @@ export class EmployeeSickNotesComponent implements OnInit {
         {
           startDate: this.startDate,
           endDate: this.endDate,
-        },
-        'body',
-        false,
-        {
-          httpHeaderAccept: '*/*',
-        },
+        }
       )
       .subscribe({
         next: () => {

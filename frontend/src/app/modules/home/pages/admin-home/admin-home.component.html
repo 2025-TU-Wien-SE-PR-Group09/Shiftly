@@ -1,74 +1,139 @@
-<div class="code-display">
-  <h1 class="text-foreground" style="font-size: 2rem;">Your Auth Code: {{ code }}</h1>
+<div class="flex flex-row justify-between items-center">
+  <div class="code-display">
+    <h1 class="text-foreground" style="font-size: 2rem;">Auth Code: {{ code }}</h1>
+  </div>
+
+  <div class="min-w-xs">
+    <label for="departmentSelect" class="block text-sm font-medium text-foreground">Select Department:</label>
+    <select id="departmentSelect" [(ngModel)]="selectedDepartment"   (ngModelChange)="onDepartmentChanged()"
+            class="mt-1 block w-auto max-w-xs pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm rounded-md text-background bg-foreground">
+      <option *ngFor="let department of departments" [ngValue]="department">
+        {{ department.name }}
+      </option>
+    </select>
+  </div>
 </div>
 
-<div class="mb-4">
-  <label for="departmentSelect" class="block text-sm font-medium text-foreground">Select Department:</label>
-  <select id="departmentSelect" [(ngModel)]="selectedDepartment"   (ngModelChange)="onDepartmentChanged()"
-          class="mt-1 block w-auto max-w-xs pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm rounded-md text-background bg-foreground">
-    <option [ngValue]="undefined" disabled selected>-- Select a Department --</option>
-    <option *ngFor="let department of departments" [ngValue]="department">
-      {{ department.name }}
-    </option>
-  </select>
-</div>
+<hr class="mt-5 mb-8 border-t border-foreground/50" />
 
 
-<div class="mb-4 flex justify-between">
-  <div class="btn-group">
-    <app-button
-      tone="primary"
-      impact="bold"
-      mwlCalendarPreviousView
-      [view]="view"
-      [(viewDate)]="viewDate"
-      (viewDateChange)="closeOpenMonthViewDay()"
-    >Previous
-    </app-button>
+<ng-container *ngIf="departments.length > 0 && shiftPlan && shiftPlan.shifts && shiftPlan.shifts.length > 0">
+  <div class="mb-4 flex justify-between">
+    <div class="btn-group">
+      <app-button
+        tone="primary"
+        impact="bold"
+        mwlCalendarPreviousView
+        [view]="view"
+        [(viewDate)]="viewDate"
+        (viewDateChange)="closeOpenMonthViewDay()"
+      >Previous
+      </app-button>
 
-    <app-button
-      tone="primary"
-      mwlCalendarToday
-      [(viewDate)]="viewDate"
-    >Today
-    </app-button>
+      <app-button
+        tone="primary"
+        mwlCalendarToday
+        [(viewDate)]="viewDate"
+      >Today
+      </app-button>
 
-    <app-button
-      tone="primary"
-      impact="bold"
-      mwlCalendarNextView
-      [view]="view"
-      [(viewDate)]="viewDate"
-      (viewDateChange)="closeOpenMonthViewDay()"
-    >Next
-    </app-button>
+      <app-button
+        tone="primary"
+        impact="bold"
+        mwlCalendarNextView
+        [view]="view"
+        [(viewDate)]="viewDate"
+        (viewDateChange)="closeOpenMonthViewDay()"
+      >Next
+      </app-button>
+    </div>
+
+    <div class="col-md-4">
+      <h3 class="text-foreground">{{ viewDate | calendarDate:(view + 'ViewTitle'):'en' }}</h3>
+    </div>
+
+    <div class="btn-group ml-4">
+      <app-button
+        tone="primary"
+        shape="rounded"
+        impact="bold"
+        size="medium"
+        (click)="setView(CalendarView.Month)"
+      >
+        Month
+      </app-button>
+
+      <app-button
+        tone="primary"
+        shape="rounded"
+        impact="bold"
+        size="medium"
+        (click)="setView(CalendarView.Week)"
+      >
+        Week
+      </app-button>
+    </div>
+
   </div>
 
-  <div class="col-md-4">
-    <h3 class="text-foreground">{{ viewDate | calendarDate:(view + 'ViewTitle'):'en' }}</h3>
-  </div>
+  <ng-template #eventTemplate let-event="event">
+    <span>{{ event.title }}</span>
+  </ng-template>
 
-  <div class="btn-group ml-4">
-    <app-button
-      tone="primary"
-      shape="rounded"
-      impact="bold"
-      size="medium"
-      (click)="setView(CalendarView.Month)"
-    >
-      Month
-    </app-button>
+  <ng-container *ngIf="view === CalendarView.Month">
+    <mwl-calendar-month-view
+      [viewDate]="viewDate"
+      [events]="events"
+      (eventClicked)="handleEventClick($event)">
+    </mwl-calendar-month-view>
+  </ng-container>
 
-    <app-button
-      tone="primary"
-      shape="rounded"
-      impact="bold"
-      size="medium"
-      (click)="setView(CalendarView.Week)"
-    >
-      Week
-    </app-button>
-  </div>
+  <ng-container *ngIf="view === CalendarView.Week">
+    <mwl-calendar-week-view
+      [viewDate]="viewDate"
+      [events]="events"
+      (eventClicked)="handleEventClick($event)">
+    </mwl-calendar-week-view>
+  </ng-container>
+
+  <ng-container *ngIf="view === CalendarView.Day">
+    <mwl-calendar-day-view
+      [viewDate]="viewDate"
+      [events]="events"
+      (eventClicked)="handleEventClick($event)">
+    </mwl-calendar-day-view>
+  </ng-container>
+
+</ng-container>
+
+<ng-container *ngIf="departments.length <= 0">
+  <p class="text-foreground flex items-center">
+    <svg xmlns="http://www.w3.org/2000/svg"
+         fill="none"
+         viewBox="0 0 24 24"
+         stroke-width="2"
+         stroke="currentColor"
+         class="w-8 h-8 text-red-500 mr-2">
+      <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
+    </svg>
+    No department available. Please create one.
+  </p>
+</ng-container>
+
+<ng-container *ngIf="this.departments.length > 0 && (shiftPlan === undefined || shiftPlan?.shifts === undefined || shiftPlan!.shifts!.length <= 0)">
+  <p class="text-foreground flex items-center">
+    <svg xmlns="http://www.w3.org/2000/svg"
+         fill="none"
+         viewBox="0 0 24 24"
+         stroke-width="2"
+         stroke="currentColor"
+         class="w-8 h-8 text-red-500 mr-2">
+      <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
+    </svg>
+    No shift plan available for {{this.selectedDepartment?.name}}. Please generate a shift plan.
+  </p>
+</ng-container>
+
   <!-- Modal Overlay -->
   <div class="modal-overlay" *ngIf="selectedEvent" (click)="selectedEvent = null">
     <div class="modal-content bg-white dark:bg-slate-800 text-foreground" (click)="$event.stopPropagation()">
@@ -102,33 +167,3 @@
       </div>
     </div>
   </div>
-
-</div>
-
-<ng-template #eventTemplate let-event="event">
-  <span>{{ event.title }}</span>
-</ng-template>
-
-<ng-container *ngIf="view === CalendarView.Month">
-  <mwl-calendar-month-view
-    [viewDate]="viewDate"
-    [events]="events"
-    (eventClicked)="handleEventClick($event)">
-  </mwl-calendar-month-view>
-</ng-container>
-
-<ng-container *ngIf="view === CalendarView.Week">
-  <mwl-calendar-week-view
-    [viewDate]="viewDate"
-    [events]="events"
-    (eventClicked)="handleEventClick($event)">
-  </mwl-calendar-week-view>
-</ng-container>
-
-<ng-container *ngIf="view === CalendarView.Day">
-  <mwl-calendar-day-view
-    [viewDate]="viewDate"
-    [events]="events"
-    (eventClicked)="handleEventClick($event)">
-  </mwl-calendar-day-view>
-</ng-container>

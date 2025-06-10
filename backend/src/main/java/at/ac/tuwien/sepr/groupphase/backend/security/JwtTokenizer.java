@@ -19,7 +19,7 @@ public class JwtTokenizer {
         this.securityProperties = securityProperties;
     }
 
-    public String getAuthToken(String user, List<String> roles, Optional<Long> departmentId, Optional<String> departmentName) {
+    public String getAuthToken(String user, List<String> roles, Optional<String> departmentName) {
         byte[] signingKey = securityProperties.getJwtSecret().getBytes();
         SecretKey key = Keys.hmacShaKeyFor(signingKey);
 
@@ -31,7 +31,6 @@ public class JwtTokenizer {
             .expiration(new Date(System.currentTimeMillis() + securityProperties.getJwtExpirationTime()))
             .claim("rol", roles);
 
-        departmentId.ifPresent(depId -> builder.claim("depId", depId));
         departmentName.ifPresent(depName -> builder.claim("depName", depName));
 
         var token = builder.signWith(key, Jwts.SIG.HS512).compact();
