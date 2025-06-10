@@ -240,7 +240,6 @@ public class ShiftPlanningServiceImpl implements ShiftPlanningService {
         Department department = blueprint.getDepartment();
         LocalDate startDate = timeService.nextMondayInMonth(dto.startDate()
             .orElseThrow(() -> new ConflictException("Start date is required")));
-        LocalDate endDate = startDate.plusWeeks(11);
 
         concreteShiftPlanRepository.findByDepartmentName(department.getName()).stream()
             .min((a, b) -> b.getEndDate().compareTo(a.getEndDate())).ifPresent(concreteShiftPlan -> {
@@ -250,6 +249,7 @@ public class ShiftPlanningServiceImpl implements ShiftPlanningService {
             });
 
         ConcreteShiftPlan plan = new ConcreteShiftPlan();
+        LocalDate endDate = startDate.plusWeeks(11);
         plan.setDepartment(department);
         plan.setStartDate(startDate);
         plan.setEndDate(endDate);

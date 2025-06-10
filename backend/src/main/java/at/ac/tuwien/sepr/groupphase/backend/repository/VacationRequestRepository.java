@@ -5,10 +5,13 @@ import at.ac.tuwien.sepr.groupphase.backend.entity.VacationRequest;
 
 import java.util.List;
 
+import at.ac.tuwien.sepr.groupphase.backend.type.VacationStatus;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
 @Repository
 public interface VacationRequestRepository extends JpaRepository<VacationRequest, Long> {
     List<VacationRequest> findByEmployee(ApplicationUser user);
+
+    List<VacationRequest> findByEmployeeAndStatus(ApplicationUser employee, VacationStatus status);
 }
