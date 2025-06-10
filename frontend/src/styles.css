@@ -23,8 +23,7 @@
   background-color: rgba(234, 179, 8, 0.9);
 }
 
-/**
-todo
+
 .cal-month-view .cal-cell-row:hover {
   background-color: var(--color-background) !important;
 }
@@ -33,7 +32,11 @@ todo
   background-color: var(--color-background) !important;
 }
 
-.cal-weekend .cal-day-number{
+.cal-day-number, .cal-header, .cal-time{
+  color: var(--color-foreground);
+}
+
+.cal-weekend {
   color: var(--color-primary) !important;
 }
 
@@ -41,7 +44,21 @@ todo
   background-color: initial;
 }
 
- */
+.cal-month-view .cal-day-cell.cal-weekend .cal-day-number {
+  color: var(--color-primary);
+}
+
+.cal-hour-segment {
+  background-color: var(--color-card);
+}
+.cal-hour-odd .cal-hour-segment {
+  background-color: var(--color-muted);
+}
+
+.cal-day-cell.cal-today, .cal-week-view .cal-header.cal-today{
+  background: var(--color-muted-foreground) !important;
+}
+
 
 /** Plugins **/
 @import './assets/styles/apexchart.css';
