@@ -154,4 +154,22 @@ public class DepartmentServiceImpl implements DepartmentService {
 
         return Optional.empty();
     }
+
+    @Override
+    public void deleteDepartmentByName(String departmentName) {
+        Department department = departmentRepository.findByName(departmentName)
+            .orElseThrow(() -> new NotFoundException("Department with name '" + departmentName + "' not found"));
+
+        // Unassign all users from this department and remove SUPERVISOR role if present
+        for (ApplicationUser user : department.getUsers()) {
+            user.setDepartment(null);
+            user.getRoles().removeIf(role -> role.getName().equals("SUPERVISOR"));
+            applicationUserRepository.save(user);
+        }
+
+        // Delete the department from the database
+        departmentRepository.delete(department);
+    }
+
+
 }
