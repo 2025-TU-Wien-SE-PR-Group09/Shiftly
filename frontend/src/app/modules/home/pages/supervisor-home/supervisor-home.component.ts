@@ -130,9 +130,9 @@ export class SupervisorHomeComponent implements OnInit{
 
   loadScheduledShifts() {
     console.log("loadschedule");
-    if (this.selectedDepartment?.id) {
+    if (this.selectedDepartment?.name) {
       console.log("fetching plan");
-      this._departmentService.getConcreteShiftplan(this.selectedDepartment.id).subscribe({
+      this._departmentService.getConcreteShiftplan(this.selectedDepartment.name!).subscribe({
         next: (data) => {
           if (data.shifts) {
             this.shiftPlan = data;

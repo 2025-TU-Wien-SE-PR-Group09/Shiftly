@@ -3,7 +3,7 @@ import { MenuItem } from '../models/menu.model';
 export class Menu {
   public static pages: MenuItem[] = [
     {
-      group: 'Admin',
+      group: 'Menu',
       separator: false,
       items: [
         {
@@ -25,7 +25,7 @@ export class Menu {
       role: "ADMIN"
     },
     {
-      group: 'Supervisor',
+      group: 'Menu',
       separator: false,
       items: [
         {
@@ -52,7 +52,7 @@ export class Menu {
       role: "SUPERVISOR"
     },
     {
-      group: 'Employee',
+      group: 'Menu',
       separator: false,
       items: [
         {
@@ -73,31 +73,5 @@ export class Menu {
       ],
       role: "EMPLOYEE"
     },
-
-    {
-      group: 'Template',
-      separator: false,
-      items: [
-        {
-          icon: 'assets/icons/heroicons/outline/lock-closed.svg',
-          label: 'Auth',
-          route: '/auth',
-          children: [
-            { label: 'Sign up', route: '/auth/sign-up' },
-            { label: 'Sign in', route: '/auth/sign-in' },
-            { label: 'Forgot Password', route: '/auth/forgot-password' },
-            { label: 'New Password', route: '/profile/new-password' },
-            { label: 'Two Steps', route: '/auth/two-steps' },
-          ],
-        },
-        {
-          icon: 'assets/icons/heroicons/outline/cube.svg',
-          label: 'Components',
-          route: '/components',
-          children: [{ label: 'Table', route: '/components/table' }],
-        },
-      ],
-      role: "ADMIN"
-    }
   ];
 }

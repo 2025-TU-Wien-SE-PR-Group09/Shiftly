@@ -1,8 +1,4 @@
 import { Component, OnInit } from '@angular/core';
-import { CommonModule } from '@angular/common';
-import { CalendarEvent, CalendarModule, CalendarView } from 'angular-calendar';
-import { ButtonComponent } from '../../../../shared/components/button/button.component';
-import { FormsModule } from '@angular/forms';
 import {
   AdminEndpointService,
   DepartmentDetailRestResponseDto,
@@ -10,6 +6,12 @@ import {
   DepartmentShiftplanCalendarResponse,
 } from '../../../../rest_client';
 import { ToastrService } from 'ngx-toastr';
+import { CommonModule } from '@angular/common';
+import { CalendarEvent, CalendarModule, CalendarView } from 'angular-calendar';
+import { ButtonComponent } from '../../../../shared/components/button/button.component';
+import { FormsModule } from '@angular/forms';
+import { HttpContext } from '@angular/common/http';
+import { SKIP_EXCEPTION_INTERCEPTOR } from '../../../../core/interceptor/skip-exception-interceptor';
 
 @Component({
   selector: 'app-admin-home',
@@ -146,6 +148,11 @@ export class AdminHomeComponent implements OnInit {
     this._departmentService.getAllDepartments().subscribe({
       next: (data) => {
         this.departments = data;
+
+        if (this.departments.length > 0) {
+          this.selectedDepartment = this.departments[0];
+          this.loadScheduledShifts(true);
+        }
       },
     });
   }
@@ -158,9 +165,17 @@ export class AdminHomeComponent implements OnInit {
     });
   }
 
-  loadScheduledShifts() {
+  loadScheduledShifts(skipException: boolean = false) {
+    this.shiftPlan = undefined;
+
     if (this.selectedDepartment?.name) {
-      this._departmentService.getConcreteShiftplan(this.selectedDepartment.name).subscribe({
+      let req = this._departmentService.getConcreteShiftplan(this.selectedDepartment.name);
+      if (skipException) {
+        req =  this._departmentService.getConcreteShiftplan(this.selectedDepartment.name, 'body', false, {
+          context: new HttpContext().set(SKIP_EXCEPTION_INTERCEPTOR, true)
+        })
+      }
+      req.subscribe({
         next: (data) => {
           if (data.shifts) {
             this.shiftPlan = data;
