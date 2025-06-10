@@ -2,7 +2,7 @@
   <!-- Autocomplete zur Auswahl des Plans -->
   <div>
     <label for="shiftplan" class="text-foreground mb-1 block text-sm font-medium">Shiftplan blueprint</label>
-    <app-autocomplete id="shiftplan" [options]="shiftPlanDescriptions" (selected)="onShiftplanSelected($event)"> </app-autocomplete>
+    <app-autocomplete id="shiftplan" [charsTyped]="0" [options]="shiftPlanDescriptions" (selected)="onShiftplanSelected($event)"> </app-autocomplete>
   </div>
 
   <!-- Monat auswählen -->
