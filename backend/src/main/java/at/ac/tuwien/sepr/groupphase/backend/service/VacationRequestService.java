@@ -33,12 +33,30 @@ public interface VacationRequestService {
      */
     void deletePendingRequest(Long requestId, String userEmail);
 
+    /**
+     * Retrieves all pending vacation requests.
+     *
+     * @return a list of vacation request response data transfer objects for all pending requests
+     */
     List<VacationRequestResponseDto> getAllPendingRequests();
 
+    /**
+     * Updates the status of a vacation request.
+     *
+     * @param id         the ID of the vacation request to be updated
+     * @param newStatus  the new status to set for the vacation request
+     */
     void updateVacationRequestStatus(Long id, VacationStatus newStatus);
 
     List<VacationRequestResponseDto> getVacationRequestsByStatus(VacationStatus status);
 
+    /**
+     * Retrieves vacation requests by status and the supervisor's email.
+     *
+     * @param status the status of the vacation requests to retrieve
+     * @param supervisorEmail the email of the supervisor whose requests are to be retrieved
+     * @return a list of vacation request response data transfer objects matching the criteria
+     */
     List<VacationRequestResponseDto> getVacationRequestsByStatusAndSupervisor(VacationStatus status, String supervisorEmail);
 
 
