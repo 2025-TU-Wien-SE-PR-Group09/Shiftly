@@ -72,7 +72,7 @@ public class ApplicationUser {
         return "ApplicationUser{"
             + "email='" + email + '\''
             + ", password='" + passwordHash + '\''
-            + ", roles=" + roles
+            + ", roles=" + roles.stream().map(ApplicationRole::getName).toList()
             + ", firstName='" + firstName + '\''
             + ", lastName='" + lastName + '\''
             + '}';

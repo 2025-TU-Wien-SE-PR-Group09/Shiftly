@@ -254,12 +254,13 @@ public class ShiftPlanningServiceImpl implements ShiftPlanningService {
         plan.setStartDate(startDate);
         plan.setEndDate(endDate);
 
-        Predicate<ApplicationUser> isNotSupervisor =
-            u -> u.getRoles().stream().noneMatch(r -> r.getName().equals(Role.SUPERVISOR.name()));
+        Predicate<ApplicationUser> isEmployee =
+            u -> u.getRoles().stream()
+                .anyMatch(r -> r.getName().equals(Role.EMPLOYEE.name()));
         List<ApplicationUser> allUsers = department.getUsers().stream().toList();
 
         var justWorkers = allUsers.stream()
-            .filter(isNotSupervisor)
+            .filter(isEmployee)
             .toList();
 
         var rotatedPlan = shiftPlanRotationService.generateRotatingPlan(plan, blueprint, justWorkers);
