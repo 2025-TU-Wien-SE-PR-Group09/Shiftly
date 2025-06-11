@@ -38,7 +38,7 @@ public class ShiftPlanConstraintServiceImpl implements ShiftPlanConstraintServic
     @Override
     public ConcreteShiftPlan applyConstraints(ConcreteShiftPlan concreteShiftPlan) {
         Map<LocalDate, Set<ApplicationUser>> availableJumpersPerDay =
-            getAvailableJumperEmployeesPerDay(concreteShiftPlan.getStartDate());
+            getAvailableJumperEmployeesPerDay(concreteShiftPlan);
 
         Map<ApplicationUser, ApplicationUser> vacationReplacementMap = new HashMap<>();
 
@@ -75,6 +75,26 @@ public class ShiftPlanConstraintServiceImpl implements ShiftPlanConstraintServic
                         .withShift(shift)
                         .withUser(jumper)
                         .build());
+
+
+                    /*
+
+                    // Remove the overlap for the assigned user after assigning a jumper
+                    // This is in case there is funky behavior with multiple shifts on the same day
+                    // Might not be necessary
+
+                    overlap.remove(shiftDate);
+                    if (overlap.isEmpty()) {
+                        vacationReplacementMap.remove(assignedUser);
+
+                        for (int i = 0; i < 7; i++) {
+                            LocalDate day = weekStart.plusDays(i);
+                            if (day.isAfter(shiftDate)) {
+                                availableJumpersPerDay.get(day).add(jumper);
+                            }
+                        }
+                    }
+                     */
                 }
             }
         }
@@ -140,16 +160,22 @@ public class ShiftPlanConstraintServiceImpl implements ShiftPlanConstraintServic
     /**
      * Get a map of available jumper employees for each day of the week starting from the given date.
      *
-     * @param weekStart The start date of the week.
+     * @param concreteShiftPlan The ConcreteShiftPlan to get the available jumpers for.
      * @return A map where keys are LocalDate and values are sets of available ApplicationUser.
      */
-    private Map<LocalDate, Set<ApplicationUser>> getAvailableJumperEmployeesPerDay(LocalDate weekStart) {
+    private Map<LocalDate, Set<ApplicationUser>> getAvailableJumperEmployeesPerDay(ConcreteShiftPlan concreteShiftPlan) {
         List<ApplicationUser> jumperUsers = userRepository.findAllByRoleName("JUMPER");
+
+        var department = concreteShiftPlan.getDepartment();
+        var weekStart = concreteShiftPlan.getStartDate();
+        Set<ApplicationUser> jumperUsersInDepartment = jumperUsers.stream()
+            .filter(user -> user.getDepartment().equals(department))
+            .collect(Collectors.toSet());
 
         Map<LocalDate, Set<ApplicationUser>> result = new HashMap<>();
         for (int i = 0; i < 7; i++) {
             LocalDate day = weekStart.plusDays(i);
-            result.put(day, new HashSet<>(jumperUsers));
+            result.put(day, new HashSet<>(jumperUsersInDepartment));
         }
 
         LocalDate weekEnd = weekStart.plusDays(6);

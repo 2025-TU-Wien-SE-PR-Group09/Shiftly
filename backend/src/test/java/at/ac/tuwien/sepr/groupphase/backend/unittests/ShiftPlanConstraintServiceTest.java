@@ -45,8 +45,10 @@ public class ShiftPlanConstraintServiceTest {
     @Test
     void testJumperAssignedForAllVacationDaysOfEmployee() {
         // Arrange
-        ApplicationUser jumper = createJumper("jumper@shyft.local");
-        ApplicationUser max = createUser("max@shyft.local");
+        Department department = new Department();
+        department.setName("Production");
+        ApplicationUser jumper = createJumper("jumper@shyft.local", department);
+        ApplicationUser max = createUser("max@shyft.local", department);
 
         when(userRepository.findAllByRoleName("JUMPER"))
             .thenReturn(List.of(jumper));
@@ -71,6 +73,7 @@ public class ShiftPlanConstraintServiceTest {
         ConcreteShiftPlan plan = new ConcreteShiftPlan();
         plan.addScheduledShifts(List.of(shiftMonday, shiftTuesday));
         plan.setStartDate(weekStart);
+        plan.setDepartment(department);
 
         // Act
         ConcreteShiftPlan updatedPlan = serviceUnderTest.applyConstraints(plan);
@@ -79,7 +82,7 @@ public class ShiftPlanConstraintServiceTest {
         for (ScheduledShift shift : updatedPlan.getScheduledShifts()) {
             List<String> assignedEmails = shift.getAssignments().stream()
                 .map(a -> a.getUser().getEmail())
-                .collect(Collectors.toList());
+                .toList();
 
             assertTrue(assignedEmails.contains("jumper@shyft.local"));
             assertFalse(assignedEmails.contains("max@shyft.local"));
@@ -89,9 +92,14 @@ public class ShiftPlanConstraintServiceTest {
     @Test
     void testConflictWhenJumperAlreadyAssignedToOtherShiftSameDay() {
         // Arrange
-        ApplicationUser jumper = createJumper("jumper@shyft.local");
-        ApplicationUser max = createUser("max@shyft.local");
-        ApplicationUser tina = createUser("tina@shyft.local");
+        Department department = new Department();
+        department.setName("Production");
+        ApplicationUser jumper = createJumper("jumper@shyft.local", department);
+        ApplicationUser max = createUser("max@shyft.local", department);
+        ApplicationUser tina = createUser("tina@shyft.local", department);
+
+        when(userRepository.findAllByRoleName("JUMPER"))
+            .thenReturn(List.of(jumper));
 
         when(userRepository.findAllByRoleName("JUMPER"))
             .thenReturn(List.of(jumper));
@@ -135,8 +143,10 @@ public class ShiftPlanConstraintServiceTest {
     @Test
     void testJumperAssignedConsistentlyForAllVacationDays() {
         // Setup
-        ApplicationUser jumper1 = createJumper("jumper1@shift.local");
-        ApplicationUser max = createUser("max@shift.local");
+        Department department = new Department();
+        department.setName("Production");
+        ApplicationUser jumper1 = createJumper("jumper1@shift.local", department);
+        ApplicationUser max = createUser("max@shift.local", department);
 
         when(userRepository.findAllByRoleName("JUMPER")).thenReturn(List.of(jumper1));
 
@@ -160,6 +170,7 @@ public class ShiftPlanConstraintServiceTest {
         ConcreteShiftPlan plan = new ConcreteShiftPlan();
         plan.setStartDate(weekStart);
         plan.addScheduledShifts(List.of(mondayShift, tuesdayShift));
+        plan.setDepartment(department);
 
         // Action
         ConcreteShiftPlan updatedPlan = serviceUnderTest.applyConstraints(plan);
@@ -171,14 +182,15 @@ public class ShiftPlanConstraintServiceTest {
 
 
     // Helper
-    private ApplicationUser createUser(String email) {
+    private ApplicationUser createUser(String email, Department department) {
         ApplicationUser user = new ApplicationUser();
         user.setEmail(email);
+        user.setDepartment(department);
         return user;
     }
 
-    private ApplicationUser createJumper(String email) {
-        ApplicationUser jumper = createUser(email);
+    private ApplicationUser createJumper(String email, Department department) {
+        ApplicationUser jumper = createUser(email, department);
 
         ApplicationRole jumperRole = new ApplicationRole("JUMPER");
 
