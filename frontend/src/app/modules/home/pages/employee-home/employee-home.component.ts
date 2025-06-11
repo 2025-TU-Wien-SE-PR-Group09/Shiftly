@@ -2,7 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import {
   DepartmentDetailRestResponseDto,
   DepartmentService,
-  DepartmentShiftplanCalendarResponse, UserEndpointService,
+  DepartmentShiftplanCalendarResponse, UserEndpointService, UserProfileRestDto,
 } from '../../../../rest_client';
 import { ToastrService } from 'ngx-toastr';
 import { CalendarEvent, CalendarModule, CalendarView } from 'angular-calendar';
@@ -29,6 +29,7 @@ export class EmployeeHomeComponent implements OnInit{
   protected selectedDepartment: DepartmentDetailRestResponseDto | undefined;
   protected shiftPlan: DepartmentShiftplanCalendarResponse | undefined;
   code: string = 'test';
+  protected currentUser: UserProfileRestDto | undefined;
 
   view: CalendarView = CalendarView.Week;
   CalendarView = CalendarView; // Für Template-Zugriff
@@ -62,6 +63,7 @@ export class EmployeeHomeComponent implements OnInit{
   load() {
     this._userService.getCurrentUserProfile().subscribe({
       next: (value) => {
+        this.currentUser = value;
         var departmentName = value.department;
         if (departmentName) {
           console.log('department name: ', departmentName);
@@ -106,7 +108,8 @@ export class EmployeeHomeComponent implements OnInit{
     this.events = [];
 
     for (const shift of this.shiftPlan.shifts) {
-      if (!shift.day?.start || !shift.day?.end) {
+      //todo: delete the last check after fixing it in the backend
+      if (!shift.day?.start || !shift.day?.end || !shift.workers?.includes(<string>this.currentUser?.email)) {
         continue;
       }
 
