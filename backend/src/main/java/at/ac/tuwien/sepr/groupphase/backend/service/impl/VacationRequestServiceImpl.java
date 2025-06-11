@@ -16,7 +16,6 @@ import java.time.format.DateTimeFormatter;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
-import java.util.Set;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -185,7 +184,7 @@ public class VacationRequestServiceImpl implements VacationRequestService {
 
         String departmentName = supervisor.getDepartment().getName();
 
-        List<VacationRequest> requests = vacationRequestRepository.findByStatusAndEmployee_Department_Name(status, departmentName);
+        List<VacationRequest> requests = vacationRequestRepository.findByStatusAndEmployeeDepartmentName(status, departmentName);
 
         return requests.stream()
             .map(r -> new VacationRequestResponseDto(
