@@ -6,8 +6,12 @@ import at.ac.tuwien.sepr.groupphase.backend.exception.NotFoundException;
 import at.ac.tuwien.sepr.groupphase.backend.repository.SickLeaveCertificateRepository;
 import at.ac.tuwien.sepr.groupphase.backend.repository.UserRepository;
 import at.ac.tuwien.sepr.groupphase.backend.service.AuthService;
+import at.ac.tuwien.sepr.groupphase.backend.service.MailService;
 import at.ac.tuwien.sepr.groupphase.backend.service.SickLeaveCertificateService;
 import at.ac.tuwien.sepr.groupphase.backend.service.dto.sickleave.SickLeaveCertificateDto;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -15,6 +19,9 @@ import java.io.IOException;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
+
+
+import static at.ac.tuwien.sepr.groupphase.backend.util.DateFormatUtil.format;
 
 /**
  * Implementation of the SickLeaveCertificateService.
@@ -26,6 +33,10 @@ public class SickLeaveCertificateServiceImpl implements SickLeaveCertificateServ
     private final SickLeaveCertificateRepository certificateRepository;
     private final UserRepository userRepository;
     private final AuthService authService;
+    @Autowired
+    private MailService mailService;
+    private static final Logger LOG = LoggerFactory.getLogger(SickLeaveCertificateServiceImpl.class);
+
 
     public SickLeaveCertificateServiceImpl(SickLeaveCertificateRepository certificateRepository,
                                            UserRepository userRepository,
@@ -62,6 +73,25 @@ public class SickLeaveCertificateServiceImpl implements SickLeaveCertificateServ
         }
 
         certificateRepository.save(cert);
+
+
+        List<ApplicationUser> supervisors = userRepository.findSupervisorsByDepartment(user.getDepartment());
+        for (ApplicationUser supervisor : supervisors) {
+            try {
+                mailService.sendSimpleEmail(
+                    supervisor.getEmail(),
+                    "New Sick Leave Certificate",
+                    String.format("Employee %s %s reported a sick leave from %s to %s.",
+                        user.getFirstName(),
+                        user.getLastName(),
+                        format(startDate),
+                        format(endDate))
+                );
+                LOG.info("Successfully sent sick leave notification email to supervisor {}", supervisor.getEmail());
+            } catch (Exception e) {
+                LOG.warn("Failed to send sick leave email to supervisor {}: {}", supervisor.getEmail(), e.getMessage(), e);
+            }
+        }
 
         return new SickLeaveCertificateDto(
             cert.getId(),

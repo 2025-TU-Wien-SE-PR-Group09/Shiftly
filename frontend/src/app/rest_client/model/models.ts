@@ -13,6 +13,7 @@ export * from './departmentCreateRestDto';
 export * from './departmentDetailRestResponseDto';
 export * from './departmentEditRestDto';
 export * from './departmentShiftplanCalendarResponse';
+export * from './emailRestDto';
 export * from './employeeListItemResponseDto';
 export * from './employeeRestResponseDto';
 export * from './generateConcretePlanDto';
