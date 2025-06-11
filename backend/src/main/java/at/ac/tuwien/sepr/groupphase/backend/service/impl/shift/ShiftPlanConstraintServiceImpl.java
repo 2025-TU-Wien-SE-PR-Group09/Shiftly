@@ -75,6 +75,26 @@ public class ShiftPlanConstraintServiceImpl implements ShiftPlanConstraintServic
                         .withShift(shift)
                         .withUser(jumper)
                         .build());
+
+
+                    /*
+
+                    // Remove the overlap for the assigned user after assigning a jumper
+                    // This is in case there is funky behavior with multiple shifts on the same day
+                    // Might not be necessary
+
+                    overlap.remove(shiftDate);
+                    if (overlap.isEmpty()) {
+                        vacationReplacementMap.remove(assignedUser);
+
+                        for (int i = 0; i < 7; i++) {
+                            LocalDate day = weekStart.plusDays(i);
+                            if (day.isAfter(shiftDate)) {
+                                availableJumpersPerDay.get(day).add(jumper);
+                            }
+                        }
+                    }
+                     */
                 }
             }
         }
