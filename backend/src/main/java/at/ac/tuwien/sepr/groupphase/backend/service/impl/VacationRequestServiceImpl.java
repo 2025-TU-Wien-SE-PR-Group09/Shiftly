@@ -12,12 +12,10 @@ import at.ac.tuwien.sepr.groupphase.backend.service.dto.user.UserEmailDto;
 import at.ac.tuwien.sepr.groupphase.backend.service.dto.vacation.VacationRequestDto;
 import at.ac.tuwien.sepr.groupphase.backend.service.dto.vacation.VacationRequestResponseDto;
 import at.ac.tuwien.sepr.groupphase.backend.type.VacationStatus;
-
 import java.time.format.DateTimeFormatter;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -49,6 +47,9 @@ public class VacationRequestServiceImpl implements VacationRequestService {
         LocalDate end = vacationRequestDto.getEndDate();
 
 
+
+
+
         ApplicationUser employee = userRepository.findByEmail(vacationRequestDto.getEmployeeEmail())
             .orElseThrow(() -> new NotFoundException("Logged in user not found"));
 
@@ -58,13 +59,13 @@ public class VacationRequestServiceImpl implements VacationRequestService {
         LocalDate newEnd = vacationRequestDto.getEndDate();
 
         boolean overlaps = existingRequests.stream()
-            .filter(req -> req.getStatus() == VacationStatus.PENDING)
+            .filter(req -> req.getStatus() != VacationStatus.REJECTED)
             .anyMatch(req ->
                 !(newEnd.isBefore(req.getStartDate()) || newStart.isAfter(req.getEndDate()))
             );
 
         if (overlaps) {
-            throw new ConflictException("Vacation request overlaps with existing request");
+            throw new ConflictException("Vacation request overlaps with existing approved or pending request");
         }
 
 
@@ -128,5 +129,72 @@ public class VacationRequestServiceImpl implements VacationRequestService {
         vacationRequestRepository.delete(request);
     }
 
+    @Override
+    public List<VacationRequestResponseDto> getAllPendingRequests() {
+        return vacationRequestRepository.findAll().stream()
+            .filter(r -> r.getStatus() == VacationStatus.PENDING)
+            .map(r -> new VacationRequestResponseDto(
+                r.getId(),
+                r.getEmployee().getEmail(),
+                r.getStartDate(),
+                r.getEndDate(),
+                r.getStatus()))
+            .toList();
+    }
+
+    @Override
+    public void updateVacationRequestStatus(Long id, VacationStatus newStatus) {
+        VacationRequest request = vacationRequestRepository.findById(id)
+            .orElseThrow(() -> new NotFoundException("Vacation request not found"));
+
+        if (request.getStatus() != VacationStatus.PENDING) {
+            throw new ConflictException("Only pending requests can be updated");
+        }
+
+        if (newStatus != VacationStatus.APPROVED && newStatus != VacationStatus.REJECTED) {
+            throw new ConflictException("Invalid status transition");
+        }
+
+        request.setStatus(newStatus);
+        vacationRequestRepository.save(request);
+    }
+
+    @Override
+    public List<VacationRequestResponseDto> getVacationRequestsByStatus(VacationStatus status) {
+        return vacationRequestRepository.findAll().stream()
+            .filter(r -> r.getStatus() == status)
+            .map(r -> new VacationRequestResponseDto(
+                r.getId(),
+                r.getEmployee().getEmail(),
+                r.getStartDate(),
+                r.getEndDate(),
+                r.getStatus()
+            ))
+            .toList();
+    }
+
+    @Override
+    public List<VacationRequestResponseDto> getVacationRequestsByStatusAndSupervisor(VacationStatus status, String supervisorEmail) {
+        ApplicationUser supervisor = userRepository.findByEmail(supervisorEmail)
+            .orElseThrow(() -> new NotFoundException("Supervisor not found"));
+
+        if (supervisor.getDepartment() == null) {
+            throw new ConflictException("Supervisor is not assigned to any department");
+        }
+
+        String departmentName = supervisor.getDepartment().getName();
+
+        List<VacationRequest> requests = vacationRequestRepository.findByStatusAndEmployeeDepartmentName(status, departmentName);
+
+        return requests.stream()
+            .map(r -> new VacationRequestResponseDto(
+                r.getId(),
+                r.getEmployee().getEmail(),
+                r.getStartDate(),
+                r.getEndDate(),
+                r.getStatus()
+            ))
+            .toList();
+    }
 
 }

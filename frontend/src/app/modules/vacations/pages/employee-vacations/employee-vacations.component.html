@@ -65,9 +65,10 @@
           <td>{{ req.endDate | date:"dd.MM.yyyy"}}</td>
           <td>{{ req.status }}</td>
           <td>
-            <button *ngIf="req.id !== undefined" (click)="deleteButton(req)"
-                    class="bg-primary text-white px-4 py-2 rounded hover:opacity-90 transition"
-            >Delete</button>
+            <button *ngIf="req.id !== undefined && req.status === 'PENDING'" (click)="deleteButton(req)"
+                    class="bg-primary text-white px-4 py-2 rounded hover:opacity-90 transition">
+              Delete
+            </button>
           </td>
         </tr>
 

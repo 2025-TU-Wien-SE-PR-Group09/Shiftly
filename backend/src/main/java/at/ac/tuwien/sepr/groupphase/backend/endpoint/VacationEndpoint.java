@@ -1,11 +1,14 @@
 package at.ac.tuwien.sepr.groupphase.backend.endpoint;
 
+
 import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.vacation.VacationRequestResponseRestDto;
 import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.vacation.VacationRequestRestDto;
 import at.ac.tuwien.sepr.groupphase.backend.service.VacationRequestService;
+
 import at.ac.tuwien.sepr.groupphase.backend.service.dto.user.UserEmailDto;
 import at.ac.tuwien.sepr.groupphase.backend.service.dto.vacation.VacationRequestDto;
 import at.ac.tuwien.sepr.groupphase.backend.service.dto.vacation.VacationRequestResponseDto;
+import at.ac.tuwien.sepr.groupphase.backend.type.VacationStatus;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import jakarta.annotation.security.RolesAllowed;
@@ -22,8 +25,10 @@ import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 
@@ -78,6 +83,40 @@ public class VacationEndpoint {
         vacationRequestService.deletePendingRequest(id, principal.getName());
         return ResponseEntity.noContent().build();
     }
+
+    @GetMapping(path = "/pending", produces = MediaType.APPLICATION_JSON_VALUE)
+    @RolesAllowed("SUPERVISOR")
+    public List<VacationRequestResponseRestDto> getAllPendingRequests(Principal principal) {
+        System.out.println("Supervisor: " + principal.getName());
+        return vacationRequestService
+            .getVacationRequestsByStatusAndSupervisor(VacationStatus.PENDING, principal.getName())
+            .stream()
+            .map(VacationRequestResponseRestDto::from)
+            .toList();
+    }
+
+    @PutMapping(path = "/{id}/status")
+    @RolesAllowed("SUPERVISOR")
+    @Transactional
+    public ResponseEntity<Void> updateVacationRequestStatus(
+        @PathVariable("id") Long id,
+        @RequestParam("newStatus") VacationStatus newStatus) {
+        vacationRequestService.updateVacationRequestStatus(id, newStatus);
+        return ResponseEntity.noContent().build();
+    }
+
+    @GetMapping(value = "/approved", produces = MediaType.APPLICATION_JSON_VALUE)
+    @RolesAllowed("SUPERVISOR")
+    public List<VacationRequestResponseRestDto> getApprovedRequests(Principal principal) {
+        return vacationRequestService
+            .getVacationRequestsByStatusAndSupervisor(VacationStatus.APPROVED, principal.getName())
+            .stream()
+            .map(VacationRequestResponseRestDto::from)
+            .toList();
+    }
+
+
+
 
 
 }
