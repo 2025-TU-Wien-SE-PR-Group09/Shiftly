@@ -10,6 +10,7 @@ import at.ac.tuwien.sepr.groupphase.backend.entity.*;
 import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.user.ApplicationUserResponseDto;
 import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.department.DepartmentCreateRestDto;
 import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.department.DepartmentDetailRestResponseDto;
+import at.ac.tuwien.sepr.groupphase.backend.exception.ConflictException;
 import at.ac.tuwien.sepr.groupphase.backend.service.dto.department.DepartmentEditDto;
 import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.department.DepartmentEditRestDto;
 import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.employee.EmployeeListItemResponseDto;
@@ -155,6 +156,10 @@ public class DepartmentEndpoint {
 
         DepartmentDto department = departmentService.getDepartmentByName(departmentName)
             .orElseThrow(() -> new NotFoundException("Department not found!"));
+
+        if (department.plans().stream().anyMatch(p -> p.description().equals(blueprintDto.description()))) {
+            throw new ConflictException("A plan with the same description already exists for this department.");
+        }
 
         var mapped = ShiftRestMapper.mapFromRequest(department.name(), blueprintDto);
         return ShiftPlanningMapper.Plans.toResponse(shiftPlanningService.createPlanBlueprint(mapped));

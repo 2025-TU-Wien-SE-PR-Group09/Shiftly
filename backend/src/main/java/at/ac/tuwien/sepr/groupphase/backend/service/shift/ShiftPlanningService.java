@@ -12,8 +12,20 @@ import at.ac.tuwien.sepr.groupphase.backend.service.dto.shift.PlanBlueprintDto;
  */
 public interface ShiftPlanningService {
 
+    /**
+     * Creates a new plan blueprint based on the provided PlanBlueprintCreationDto.
+     *
+     * @param createPlanBlueprintDto the DTO containing the details for creating a plan blueprint
+     * @return the created PlanBlueprintDto
+     */
     PlanBlueprintDto createPlanBlueprint(PlanBlueprintCreationDto createPlanBlueprintDto);
 
+    /**
+     * Adds a shift to an existing plan blueprint.
+     *
+     * @param addShiftDto the DTO containing the details of the shift to be added
+     * @return the updated PlanBlueprintDto with the added shift
+     */
     PlanBlueprintDto addShiftToPlan(PlanBlueprintAddShiftDto addShiftDto);
 
     /**

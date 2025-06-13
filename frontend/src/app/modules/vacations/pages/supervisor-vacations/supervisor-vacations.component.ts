@@ -22,7 +22,9 @@ export class SupervisorVacationsComponent implements OnInit {
 
   vacationRequests: VacationRequestResponseRestDto[] = [];
   approvedRequests: VacationRequestResponseRestDto[] = [];
-  searchEmail: string = '';
+  searchEmailPending: string = '';
+
+  searchEmailApproved: string = '';
 
   constructor(
     private vacationService: VacationEndpointService,
@@ -64,13 +66,13 @@ export class SupervisorVacationsComponent implements OnInit {
 
   get filteredPendingRequests(): VacationRequestResponseRestDto[] {
     return this.vacationRequests.filter(r =>
-      !this.searchEmail || r.employeeEmail?.toLowerCase().includes(this.searchEmail.toLowerCase())
+      !this.searchEmailPending || r.employeeEmail?.toLowerCase().includes(this.searchEmailPending.toLowerCase())
     );
   }
 
   get filteredApprovedRequests(): VacationRequestResponseRestDto[] {
     return this.approvedRequests.filter(r =>
-      !this.searchEmail || r.employeeEmail?.toLowerCase().includes(this.searchEmail.toLowerCase())
+      !this.searchEmailApproved || r.employeeEmail?.toLowerCase().includes(this.searchEmailApproved.toLowerCase())
     );
   }
 
