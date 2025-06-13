@@ -22,6 +22,7 @@ public interface ShiftPlanningService {
 
     /**
      * Adds a shift to an existing plan blueprint.
+     *
      * @param addShiftDto the DTO containing the details of the shift to be added
      * @return the updated PlanBlueprintDto with the added shift
      */

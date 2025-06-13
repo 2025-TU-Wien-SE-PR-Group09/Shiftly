@@ -157,7 +157,7 @@ public class DepartmentEndpoint {
         DepartmentDto department = departmentService.getDepartmentByName(departmentName)
             .orElseThrow(() -> new NotFoundException("Department not found!"));
 
-        if(department.plans().stream().anyMatch(p -> p.description().equals(blueprintDto.description()))) {
+        if (department.plans().stream().anyMatch(p -> p.description().equals(blueprintDto.description()))) {
             throw new ConflictException("A plan with the same description already exists for this department.");
         }
 

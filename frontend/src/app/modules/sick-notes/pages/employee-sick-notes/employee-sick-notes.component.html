@@ -1,13 +1,14 @@
 <div class="p-6 flex flex-col lg:flex-row gap-6">
   <!-- Left: Upload Form -->
-  <div class="w-full lg:w-1/2">
+    <div class="w-full lg:w-1/2 border-muted/50 bg-background flex flex-col rounded-xl border p-6 mb-4">
+
     <h2 class="text-2xl font-bold mb-4 text-foreground">Submit Sick Note</h2>
 
     <form
       (ngSubmit)="uploadFile()"
-      class="space-y-4 rounded-xl border border-border bg-background p-6 shadow-md"
+      class="border bg-gray-100 rounded p-4 border-gray-300 dark:border-gray-600 dark:bg-gray-900 shadow mb-6"
     >
-      <div>
+      <div class="mb-2">
         <label for="startDate" class="block mb-1 font-medium text-foreground">Start Date</label>
         <input
           type="date"
@@ -19,7 +20,7 @@
         />
       </div>
 
-      <div>
+      <div class="mb-2">
         <label for="endDate" class="block mb-1 font-medium text-foreground">End Date</label>
         <input
           type="date"
@@ -31,7 +32,7 @@
         />
       </div>
 
-      <div>
+      <div class="mb-2">
         <label for="file" class="block mb-1 font-medium text-foreground">Upload Certificate</label>
         <input
           #fileInput
@@ -39,7 +40,7 @@
           id="file"
           accept=".pdf,.jpg,.jpeg,.png"
           (change)="onFileSelected($event)"
-          class="w-full rounded border border-border bg-muted text-foreground p-2"
+          class="w-full rounded border border-border bg-muted text-foreground p-2 hover:cursor-pointer"
           [disabled]="loading"
         />
         <p class="text-sm text-muted-foreground mt-1">
@@ -76,28 +77,26 @@
   </div>
 
   <!-- Right: Uploaded Certificates -->
-  <div class="w-full lg:w-1/2">
+  <div class="w-full lg:w-1/2 border-muted/50 bg-background flex flex-col rounded-xl border p-6 mb-4">
     <h2 class="text-2xl font-bold mb-4 text-foreground">Uploaded Certificates</h2>
 
-    <div class="border rounded border-border bg-background p-4 shadow-sm">
-      <table class="w-full text-left text-sm text-foreground">
+    <div class="border bg-gray-100 rounded p-4 border-gray-300 dark:border-gray-600 dark:bg-gray-900 shadow mb-6">
+      <table class="w-full text-left text-sm text-black dark:text-gray-400">
         <thead>
         <tr>
-          <th class="px-2 py-2">Uploaded</th>
-          <th class="px-2 py-2">Start</th>
-          <th class="px-2 py-2">End</th>
-          <th class="px-2 py-2">File</th>
-          <th class="px-2 py-2">Action</th>
+          <th class="pb-2">Uploaded</th>
+          <th class="pb-2">Start</th>
+          <th class="pb-2">End</th>
+          <th class="pb-2">Action</th>
         </tr>
         </thead>
         <tbody>
         <tr *ngFor="let note of sickNotes" class="hover:bg-muted/30 transition">
-          <td class="px-2 py-2">{{ note.uploadedAt | date:'dd.MM.yyyy' }}</td>
-          <td class="px-2 py-2">{{ note.startDate | date:'dd.MM.yyyy' }}</td>
-          <td class="px-2 py-2">{{ note.endDate | date:'dd.MM.yyyy' }}</td>
-          <td class="px-2 py-2">{{ note.fileName }}</td>
-          <td class="px-2 py-2">
-            <div class="flex flex-wrap justify-end gap-2">
+          <td class="py-1">{{ note.uploadedAt | date:'dd.MM.yyyy' }}</td>
+          <td class="py-1">{{ note.startDate | date:'dd.MM.yyyy' }}</td>
+          <td class="py-1">{{ note.endDate | date:'dd.MM.yyyy' }}</td>
+          <td class="py-1">
+            <div class="flex flex-wrap justify-start gap-2">
               <app-button
                 tone="primary"
                 impact="bold"
@@ -105,7 +104,10 @@
                 shape="rounded"
                 (click)="downloadFile(note)"
               >
-                Download
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-4">
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M3 16.5v2.25A2.25 2.25 0 0 0 5.25 21h13.5A2.25 2.25 0 0 0 21 18.75V16.5M16.5 12 12 16.5m0 0L7.5 12m4.5 4.5V3" />
+                </svg>
+
               </app-button>
               <app-button
                 tone="danger"
@@ -114,7 +116,10 @@
                 shape="rounded"
                 (click)="toggleConfirmDelete(note.id!)"
               >
-                Delete
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-4">
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M6 18 18 6M6 6l12 12" />
+                </svg>
+
               </app-button>
             </div>
           </td>

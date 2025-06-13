@@ -1,6 +1,12 @@
-<h1 class="text-foreground" style="font-size: 2rem;">{{ selectedDepartment?.name }}</h1>
+<div class="border-muted/50 bg-background flex min-w-full flex-col rounded-xl border p-2 px-6 pb-6">
 
-<div class="mb-4 flex justify-between">
+
+  <h1 class="text-foreground mt-2 text-3xl">Department {{ selectedDepartment?.name }}</h1>
+  <hr class="mt-5 mb-8 border-t border-foreground/50" />
+
+  <ng-container *ngIf="this.shiftPlan">
+
+  <div class="mb-4 flex justify-between">
   <div class="btn-group flex">
     <app-button
       tone="primary"
@@ -118,4 +124,20 @@
     (eventClicked)="handleEventClick($event)">
   </mwl-calendar-day-view>
 </ng-container>
+  </ng-container>
 
+
+  <ng-container *ngIf="!this.shiftPlan">
+    <p class="text-foreground flex items-center">
+      <svg xmlns="http://www.w3.org/2000/svg"
+           fill="none"
+           viewBox="0 0 24 24"
+           stroke-width="2"
+           stroke="currentColor"
+           class="w-8 h-8 text-red-500 mr-2">
+        <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
+      </svg>
+      No shift plan available for Department {{this.selectedDepartment?.name}}. Please ask a supervisor to generate a shift plan.
+    </p>
+  </ng-container>
+</div>
