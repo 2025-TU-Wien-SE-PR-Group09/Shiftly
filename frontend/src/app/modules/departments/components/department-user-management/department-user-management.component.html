@@ -23,35 +23,55 @@
 </div>
 
 <!-- Header -->
+<div class="border-muted/50 bg-background flex min-w-full flex-col rounded-xl border p-4 px-6 pb-6">
 <div class="mb-4 flex justify-between">
   <div class="inline-block">
-    <h3 class="text-foreground font-semibold">Employees of Department {{ departmentName }}</h3>
+    <h3 class="text-foreground font-semibold text-md">Employees of Department {{ departmentName }}</h3>
     <div class="text-muted-foreground space-x-1 text-xs font-medium">
       <span>Total:</span>
       <span class="text-foreground">{{ employees.length }}</span>
     </div>
-    <a [routerLink]="['/departments', this.departmentName!, 'shiftplan-editor']">Shiftplan</a>
   </div>
-  <app-button tone="primary" shape="rounded" impact="bold" size="medium" (click)="showForm = !showForm" class="mb-4">
-    + Invite Employee
-  </app-button>
+
+  <div class="flex flex-row">
+    <app-button tone="primary" shape="rounded" impact="bold" size="medium" (click)="showForm = !showForm" class="mb-4 mr-4">
+      + Invite Employee
+    </app-button>
+
+    <app-button tone="primary" shape="rounded" impact="bold" size="medium" [routerLink]="['/departments', this.departmentName!, 'shiftplan-editor']" class="mb-4">
+      <svg
+        xmlns="http://www.w3.org/2000/svg"
+        class="h-5 w-5"
+        fill="none"
+        viewBox="0 0 24 24"
+        stroke="currentColor"
+        stroke-width="1.5">
+        <path
+          stroke-linecap="round"
+          stroke-linejoin="round"
+          d="M8 7V3m8 4V3m-9 8h10M5.25 21h13.5a2.25 2.25 0 0 0 2.25-2.25V7.5A2.25 2.25 0 0 0 18.75 5.25H5.25A2.25 2.25 0 0 0 3 7.5v11.25A2.25 2.25 0 0 0 5.25 21z" />
+      </svg>
+      <span class="ml-2">Shiftplan</span>
+    </app-button>
+  </div>
+
 </div>
 
 <!-- Table -->
-<div class="border-muted/20 bg-background flex min-w-full flex-col rounded-xl border p-2">
+  <div class="border rounded p-4 bg-gray-100  border-gray-300 dark:border-gray-600 dark:bg-gray-900 shadow">
   <div class="overflow-x-auto px-5">
     <table
       class="text-muted-foreground table w-full table-auto border-collapse border-0 text-left align-middle leading-5">
-      <thead class="border-muted/20 text-muted-foreground border text-xs">
+      <thead class="text-muted-foreground text-sm">
         <tr>
-          <th class="px-2 py-3">Name</th>
-        <th class="px-2 py-3">E-Mail</th>
+          <th class="py-3">Name</th>
+        <th class="py-3">E-Mail</th>
         </tr>
       </thead>
       <tbody>
         <tr *ngFor="let emp of employees; let i = index" class="hover:bg-card/50">
-          <td class="px-2 py-3">{{ emp.firstName }} {{ emp.lastName }}</td>
-        <td class="px-2 py-3">{{ emp.email }}</td>
+          <td class="py-1">{{ emp.firstName }} {{ emp.lastName }}</td>
+        <td class="py-1">{{ emp.email }}</td>
         </tr>
 
         <tr *ngIf="employees.length === 0">
@@ -60,4 +80,6 @@
       </tbody>
     </table>
   </div>
+</div>
+
 </div>

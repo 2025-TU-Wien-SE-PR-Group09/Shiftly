@@ -9,6 +9,8 @@ import { CommonModule } from '@angular/common';
 import { CalendarEvent, CalendarModule, CalendarView } from 'angular-calendar';
 import { ButtonComponent } from '../../../../shared/components/button/button.component';
 import { FormsModule } from '@angular/forms';
+import { HttpContext } from '@angular/common/http';
+import { SKIP_EXCEPTION_INTERCEPTOR } from '../../../../core/interceptor/skip-exception-interceptor';
 
 @Component({
   selector: 'app-supervisor-home',
@@ -132,7 +134,9 @@ export class SupervisorHomeComponent implements OnInit{
     console.log("loadschedule");
     if (this.selectedDepartment?.name) {
       console.log("fetching plan");
-      this._departmentService.getConcreteShiftplan(this.selectedDepartment.name!).subscribe({
+      this._departmentService.getConcreteShiftplan(this.selectedDepartment.name!, 'body', false, {
+        context: new HttpContext().set(SKIP_EXCEPTION_INTERCEPTOR, true)
+      }).subscribe({
         next: (data) => {
           if (data.shifts) {
             this.shiftPlan = data;

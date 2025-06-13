@@ -25,23 +25,105 @@
 
 
 .cal-month-view .cal-cell-row:hover {
-  background-color: var(--color-background) !important;
+  background: var(--color-border) !important;
 }
 
 .cal-month-view .cal-cell:hover {
-  background-color: var(--color-background) !important;
+  background: var(--color-border) !important;
+}
+
+.cal-header:hover {
+  background: var(--color-border) !important;
+}
+
+.cal-header.cal-today {
+  background: var(--color-border) !important;
 }
 
 .cal-day-number, .cal-header, .cal-time{
   color: var(--color-foreground);
+  font-weight: normal !important;
+}
+
+.cal-out-month .cal-day-number, .cal-header, .cal-time{
+  opacity: 0.35 !important;
+}
+
+
+.cal-week-view {
+  border-color: var(--color-border) !important;
+}
+
+.cal-time-events {
+  border-color: var(--color-border) !important;
+}
+
+.cal-hour-segment {
+  border-color: var(--color-border) !important;
+}
+
+.cal-day-column {
+  border-color: var(--color-border) !important;
+}
+
+.cal-header {
+  border-color: var(--color-border) !important;
+  font-weight: normal !important;
+}
+
+.cal-header .cal-day-headers {
+  border-color: var(--color-border) !important;
+  font-weight: normal !important;
+}
+
+.cal-weekend {
+  font-weight: normal !important;
+}
+
+.cal-day-headers {
+  border-color: var(--color-border) !important;
+  font-weight: normal !important;
+
 }
 
 .cal-weekend {
   color: var(--color-primary) !important;
+  font-weight: normal !important;
+}
+
+body .cal-week-view .cal-header, .cal-header .cal-day-headers {
+  font-weight: 200 !important;
+  opacity: 1 !important;
+}
+
+body .cal-month-view .cal-header, .cal-header .cal-day-headers {
+  font-weight: 400 !important;
+  opacity: 1 !important;
 }
 
 .cal-month-view, .cal-week-view, .cal-day-view {
   background-color: initial;
+}
+
+.cal-hour-segment:hover {
+  background-color: var(--color-background) !important;
+}
+
+.cal-month-view .cal-day-cell.cal-today {
+  background-color: var(--color-border) !important;
+}
+
+.cal-days {
+  border-color: var(--color-border) !important;
+}
+
+.cal-cell {
+  border-color: var(--color-border) !important;
+}
+
+
+.cal-cell-row {
+  border-color: var(--color-border) !important;
 }
 
 .cal-month-view .cal-day-cell.cal-weekend .cal-day-number {
@@ -56,7 +138,11 @@
 }
 
 .cal-day-cell.cal-today, .cal-week-view .cal-header.cal-today{
-  background: var(--color-muted-foreground) !important;
+  background: var(--color-border) !important;
+}
+
+.cal-week-view .cal-header.cal-weekend span {
+  color: var(--color-primary);
 }
 
 

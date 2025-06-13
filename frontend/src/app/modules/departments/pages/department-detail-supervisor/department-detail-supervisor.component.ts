@@ -2,7 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import {
   DepartmentUserManagementComponent
 } from '../../components/department-user-management/department-user-management.component';
-import { DepartmentService, UserEndpointService, UserProfileRestDto } from '../../../../rest_client';
+import { UserEndpointService, UserProfileRestDto } from '../../../../rest_client';
 import { ToastrService } from 'ngx-toastr';
 
 @Component({
@@ -14,17 +14,13 @@ import { ToastrService } from 'ngx-toastr';
 export class DepartmentDetailSupervisorComponent implements OnInit {
   departmentName: string = '';
 
-  constructor(
-    private toastrService: ToastrService,
-    private userService: UserEndpointService,
-  ) {}
+  constructor(private toastrService: ToastrService, private userService: UserEndpointService) {}
 
   ngOnInit(): void {
     this.userService.getCurrentUserProfile().subscribe({
       next: (data: UserProfileRestDto) => {
         this.departmentName = data.department!;
-      }
+      },
     });
   }
-
 }
