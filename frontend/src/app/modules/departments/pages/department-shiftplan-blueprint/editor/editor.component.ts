@@ -4,9 +4,10 @@ import { FormArray, FormBuilder, FormGroup, ReactiveFormsModule, Validators } fr
 import { AddShiftToPlanBlueprintDto, DepartmentService, PlanBlueprintResponse } from 'src/app/rest_client';
 import { ToastrService } from 'ngx-toastr';
 import { AbstractControl, ValidationErrors, ValidatorFn } from '@angular/forms';
+import { ButtonComponent } from '../../../../../shared/components/button/button.component';
 @Component({
   selector: 'app-editor',
-  imports: [CommonModule, ReactiveFormsModule],
+  imports: [CommonModule, ReactiveFormsModule, ButtonComponent],
   templateUrl: './editor.component.html',
 })
 export class EditorComponent {
@@ -43,6 +44,8 @@ export class EditorComponent {
         shiftWeeks: this.fb.array([], this.minLengthFormArray(1)),
       }),
     );
+
+    this.addWeek(this.shifts.length-1)
   }
 
   removeShift(i: number) {
@@ -59,6 +62,8 @@ export class EditorComponent {
         shiftDays: this.fb.array([], this.minLengthFormArray(1)),
       }),
     );
+
+
   }
 
   removeWeek(shiftIndex: number, weekIndex: number) {
@@ -120,5 +125,39 @@ export class EditorComponent {
         this.resetFormCompletely();
       },
     });
+  }
+
+  copyDayToOthers(shiftIndex: number, weekIndex: number, weekday: string) {
+    const otherWeekdays = this.daysOfWeek.filter(d => d !== weekday)
+    const weekDaysData = this.getDays(shiftIndex, weekIndex).value
+    let startTime = "";
+    let endTime = "";
+
+    for(let weekDayData of weekDaysData) {
+      if(weekDayData.day === weekday) {
+        startTime = weekDayData.startTime;
+        endTime = weekDayData.endTime;
+      }
+    }
+
+    if(startTime === "" || endTime === "") {
+      this.toastr.error("Cannot copy time to other days because startTime and endTime is empty.", "Error occurred")
+      return;
+    }
+
+    for (let otherWeekday of otherWeekdays) {
+      const dayIndex = this.getDayIndex(shiftIndex, weekIndex, otherWeekday);
+      if (dayIndex >= 0) {
+        this.removeDay(shiftIndex, weekIndex, this.getDayIndex(shiftIndex, weekIndex, otherWeekday))
+      }
+
+      this.getDays(shiftIndex, weekIndex).push(
+        this.fb.group({
+          day: [otherWeekday, Validators.required],
+          startTime: [startTime, Validators.required],
+          endTime: [endTime, Validators.required],
+        }),
+      );
+    }
   }
 }

@@ -6,10 +6,10 @@ import { ToastrService } from 'ngx-toastr';
 import { PlanBlueprintComponent } from './plan-blueprint/plan-blueprint.component';
 import { CreateConcretePlanComponent } from './create-concrete-plan/create-concrete-plan.component';
 import { ButtonComponent } from '../../../../shared/components/button/button.component';
-import { ReactiveFormsModule } from '@angular/forms';
+import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 @Component({
   selector: 'app-department-shiftplan',
-  imports: [CommonModule, PlanBlueprintComponent, CreateConcretePlanComponent, ButtonComponent, ReactiveFormsModule],
+  imports: [CommonModule, PlanBlueprintComponent, CreateConcretePlanComponent, ButtonComponent, ReactiveFormsModule, FormsModule],
   templateUrl: './department-shiftplan-blueprint.component.html',
   styleUrl: './department-shiftplan-blueprint.component.css',
 })
@@ -20,6 +20,8 @@ export class DepartmentShiftplanBlueprintComponent {
   error: string | null = null;
   expanded: boolean[] = [];
   showForm: boolean = false;
+  showAddBlueprintForm: boolean = false;
+  newBlueprintName: string = "";
 
   constructor(
     private departmentService: DepartmentService,
@@ -43,5 +45,16 @@ export class DepartmentShiftplanBlueprintComponent {
         this.toastrService.error('Could not load shiftplan-blueprints!');
       },
     });
+  }
+
+  addBlueprint() {
+
+    this.departmentService.createShiftplanBlueprint(this.department.name!, {description: this.newBlueprintName, shifts: []}).subscribe({
+      next: () => {
+        this.toastrService.success('Shift blueprint created successfully.');
+        this.showAddBlueprintForm = false;
+        this.loadBlueprints();
+      }
+    })
   }
 }

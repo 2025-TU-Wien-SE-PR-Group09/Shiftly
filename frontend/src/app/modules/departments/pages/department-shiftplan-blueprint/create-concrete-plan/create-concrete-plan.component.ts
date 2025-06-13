@@ -44,7 +44,10 @@ export class CreateConcretePlanComponent {
     const dto = { startDate: this.selectedMonth };
 
     this.departmentService.generateConcretePlan(this.selectedPlan.id!, dto).subscribe({
-      next: (data) => this.toastrService.success('Plan generated successfully!')
+      next: (data) => {
+        this.toastrService.success('Plan generated successfully!');
+        this.onCancel.emit();
+        },
     });
   }
 

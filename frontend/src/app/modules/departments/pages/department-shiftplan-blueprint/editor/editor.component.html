@@ -7,24 +7,24 @@
       <div class="mb-4 flex items-center justify-between">
         <div class="flex items-center gap-2">
           <label>
-            Description
-            <input
-              formControlName="description"
-              type="text"
-              placeholder="Shift-Description"
-              class="text-primary w-40 border-b border-gray-400 bg-transparent font-semibold placeholder-gray-400 outline-none" />
+            Description:
           </label>
+          <input
+            formControlName="description"
+            type="text"
+            placeholder="Shift-Description"
+            class="text-primary w-40 border-b border-gray-400 bg-transparent font-semibold placeholder-gray-400 outline-none mr-8" />
           <label>
-            Manpower
-            <input
-              formControlName="manPower"
-              type="number"
-              min="1"
-              placeholder="2"
-              class="w-10 border-b border-gray-400 bg-transparent text-center text-sm outline-none" />
+            Manpower:
           </label>
+          <input
+            formControlName="manPower"
+            type="number"
+            min="1"
+            placeholder="2"
+            class="w-10 border-b border-gray-400 bg-transparent text-center text-sm outline-none max-w-32 ml-2" />
         </div>
-        <button type="button" (click)="removeShift(i)" class="text-gray-500 hover:text-red-500">
+        <button type="button" (click)="removeShift(i)" class="text-gray-500 hover:text-red-500 hover:cursor-pointer">
           <svg
             xmlns="http://www.w3.org/2000/svg"
             class="size-6"
@@ -69,20 +69,29 @@
                       type="time"
                       class="text-muted-foreground bg-transparent text-xs outline-none" />
                   </label>
-                  <button
-                    type="button"
-                    (click)="removeDay(i, j, getDayIndex(i, j, weekday))"
-                    class="mt-1 text-xs text-red-500">
-                    <svg
-                      xmlns="http://www.w3.org/2000/svg"
-                      fill="none"
-                      viewBox="0 0 24 24"
-                      stroke-width="1.5"
-                      stroke="currentColor"
-                      class="size-6">
-                      <path stroke-linecap="round" stroke-linejoin="round" d="M6 18 18 6M6 6l12 12" />
-                    </svg>
-                  </button>
+                  <div class="flex flex-row mt-1 justify-between items-center">
+
+                    <app-button full impact="none" tone="danger" shape="rounded" size="small" class="mr-2"
+                                (click)="removeDay(i, j, getDayIndex(i, j, weekday))" title="Remove day">
+                      <svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        fill="none"
+                        viewBox="0 0 24 24"
+                        stroke-width="1.5"
+                        stroke="currentColor"
+                        class="size-5">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M6 18 18 6M6 6l12 12" />
+                      </svg>
+                    </app-button>
+                    <app-button [type]="'button'" full impact="none" tone="success" shape="rounded" size="small" title="Copy to all other days"
+                    (click)="copyDayToOthers(i, j, weekday)">
+                      <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-5">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M11.35 3.836c-.065.21-.1.433-.1.664 0 .414.336.75.75.75h4.5a.75.75 0 0 0 .75-.75 2.25 2.25 0 0 0-.1-.664m-5.8 0A2.251 2.251 0 0 1 13.5 2.25H15c1.012 0 1.867.668 2.15 1.586m-5.8 0c-.376.023-.75.05-1.124.08C9.095 4.01 8.25 4.973 8.25 6.108V8.25m8.9-4.414c.376.023.75.05 1.124.08 1.131.094 1.976 1.057 1.976 2.192V16.5A2.25 2.25 0 0 1 18 18.75h-2.25m-7.5-10.5H4.875c-.621 0-1.125.504-1.125 1.125v11.25c0 .621.504 1.125 1.125 1.125h9.75c.621 0 1.125-.504 1.125-1.125V18.75m-7.5-10.5h6.375c.621 0 1.125.504 1.125 1.125v9.375m-8.25-3 1.5 1.5 3-3.75" />
+                      </svg>
+
+                    </app-button>
+
+                  </div>
                 </div>
               </ng-container>
               <ng-template #empty>
@@ -95,22 +104,21 @@
             </ng-container>
           </div>
 
-          <a type="button" (click)="removeWeek(i, j)" class="mt-2 text-xs text-red-500 hover:underline">Delete week</a>
+          <a type="button" (click)="removeWeek(i, j)" class="mt-2 text-xs text-red-500 hover:underline hover:cursor-pointer">- Delete week</a>
         </div>
 
-        <a type="button" (click)="addWeek(i)" class="mt-2 text-xs hover:underline">+ Add week</a>
+        <a type="button" (click)="addWeek(i)" class="mt-2 text-xs hover:underline hover:cursor-pointer">+ Add week</a>
       </div>
     </div>
   </div>
   <div class="mt-4 space-x-4">
-    <a *ngIf="shifts.length === 0" type="button" (click)="addShift()" class="text-primary text-sm hover:underline">
-      + Add Shift
-    </a>
+    <app-button *ngIf="shifts.length === 0"  full impact="bold" tone="primary" shape="rounded" size="medium" (click)="addShift()">+ Add Shift</app-button>
+
     <button
       *ngIf="shifts.length > 0"
       [disabled]="blueprintForm.invalid"
       type="submit"
-      class="bg-primary rounded px-4 py-2 text-sm text-white shadow disabled:bg-gray-400">
+      class="bg-primary rounded px-4 py-2 text-sm text-white shadow disabled:bg-gray-400 hover:cursor-pointer">
       Save
     </button>
   </div>
