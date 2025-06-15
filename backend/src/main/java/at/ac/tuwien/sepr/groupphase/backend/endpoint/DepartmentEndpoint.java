@@ -40,6 +40,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -50,6 +51,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.lang.invoke.MethodHandles;
+import java.security.Principal;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -115,8 +117,8 @@ public class DepartmentEndpoint {
         return userService.getAllAvailableUsers();
     }
 
-    //TODO; Fix all roles being allowed (needed because depID ist needed to load shiftPlan in calendar)
     @Transactional
+    // all roles can get information about a department because this is no confidential information
     @RolesAllowed({"ADMIN", "SUPERVISOR", "EMPLOYEE"})
     @Operation(summary = "Get department by name")
     @ApiResponse(responseCode = "200", description = "Get department by name")
@@ -241,13 +243,16 @@ public class DepartmentEndpoint {
     @PostMapping(path = "/{departmentName}/addEmployee/{employeeEmail}", produces = MediaType.APPLICATION_JSON_VALUE)
     public EmployeeRestResponseDto addEmployeeToDepartment(
         @PathVariable(name = "departmentName") String departmentName,
-        @PathVariable(name = "employeeEmail") String employeeEmail) {
-        LOGGER.trace("addEmployeeToDepartment({}, {})", departmentName, employeeEmail);
+        @PathVariable(name = "employeeEmail") String employeeEmail,
+        Principal principal) {
+        LOGGER.trace("addEmployeeToDepartment({}, {}, {})", departmentName, employeeEmail, principal);
 
         DepartmentDto department = departmentService.getDepartmentByName(departmentName)
             .orElseThrow(() -> new NotFoundException("Department not found!"));
 
-        // TODO: Verify if user has access to this department
+        if (!userService.getUserByEmail(new UserEmailDto(principal.getName())).deparmentName().equals(departmentName)) {
+            throw new AccessDeniedException("You do not have access to department " + departmentName + " !");
+        }
 
         EmployeeDto employee = new EmployeeDto(employeeEmail, department.name());
         employee = employeeService.convertUserToEmployee(employee);
@@ -264,13 +269,16 @@ public class DepartmentEndpoint {
     @GetMapping(path = "/{departmentName}/employees", produces = MediaType.APPLICATION_JSON_VALUE)
     @Transactional
     public List<EmployeeListItemResponseDto> getEmployeesOfDepartment(
-        @PathVariable(name = "departmentName") String departmentName) {
-        LOGGER.trace("getEmployeesOfDepartment({})", departmentName);
+        @PathVariable(name = "departmentName") String departmentName,
+        Principal principal) {
+        LOGGER.trace("getEmployeesOfDepartment({}, {})", departmentName, principal);
 
         DepartmentDto department = departmentService.getDepartmentByName(departmentName)
             .orElseThrow(() -> new NotFoundException("Department not found!"));
 
-        // TODO: Verify if user has access to this department
+        if (!userService.getUserByEmail(new UserEmailDto(principal.getName())).deparmentName().equals(departmentName)) {
+            throw new AccessDeniedException("You do not have access to department " + departmentName + " !");
+        }
 
         List<EmployeeListItemDto> employees = employeeService.getEmployeesOfDepartment(
             new DepartmentNameDto(department.name()));
@@ -287,10 +295,7 @@ public class DepartmentEndpoint {
     public ResponseEntity<DepartmentShiftplanCalendarResponse> getConcreteShiftplan(@PathVariable("departmentName") String name) {
         LOGGER.trace("getConcreteShiftplan({})", name);
 
-        var plan = shiftPlanningService.getCurrentConcretePlan(name);
-
-        //TODO: move to service/mapper
-        List<ScheduledShift> shifts = plan.getScheduledShifts();
+        List<ScheduledShift> shifts = shiftPlanningService.getCurrentConcretePlan(name).getScheduledShifts();
 
         DepartmentShiftplanCalendarResponse response = new DepartmentShiftplanCalendarResponse(
             shifts.stream()

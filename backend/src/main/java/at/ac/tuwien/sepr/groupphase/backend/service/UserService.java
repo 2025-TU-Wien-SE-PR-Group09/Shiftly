@@ -4,6 +4,8 @@ import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.user.ApplicationUserRes
 import at.ac.tuwien.sepr.groupphase.backend.entity.ApplicationUser;
 import at.ac.tuwien.sepr.groupphase.backend.service.dto.user.ChangePasswordDto;
 import at.ac.tuwien.sepr.groupphase.backend.service.dto.user.UserDataDto;
+import at.ac.tuwien.sepr.groupphase.backend.service.dto.user.UserDepartmentDto;
+import at.ac.tuwien.sepr.groupphase.backend.service.dto.user.UserEmailDto;
 import at.ac.tuwien.sepr.groupphase.backend.service.dto.user.UserProfileDto;
 import at.ac.tuwien.sepr.groupphase.backend.service.dto.user.UserRoleDto;
 import at.ac.tuwien.sepr.groupphase.backend.exception.NotFoundException;
@@ -68,4 +70,13 @@ public interface UserService {
      * @return a {@link List} containing all {@link ApplicationUser} objects that describe available users
      */
     List<ApplicationUserResponseDto> getAllAvailableUsers();
+
+    /**
+     * Retrieves a user by their email address.
+     *
+     * @param emailDto dto containing the email address of the user to retrieve
+     * @return a {@link UserProfileDto} containing the user's profile information
+     * @throws NotFoundException if no user with the given email exists
+     */
+    UserDepartmentDto getUserByEmail(UserEmailDto emailDto) throws NotFoundException;
 }

@@ -13,7 +13,6 @@ public class UserRoleDto {
     @NotNull(message = "Role must not be null")
     private Role role;
 
-    // TODO: make not nullable but keep in mind admin has no departmentId
     @NotNull
     private String departmentName;
 

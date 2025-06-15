@@ -63,7 +63,6 @@ class UserServiceTest {
     public void assignRoleToUserOK() {
         userService.createOrChangePassword(new UserDataDto(TestData.ADMIN_USER_EMAIL, TestData.ADMIN_PW,
             "Admin", "Test"));
-        // TODO: handle null for deparmtentId
         userService.assignRoleToUser(new UserRoleDto(TestData.ADMIN_USER_EMAIL, Role.ADMIN, null));
 
         UserDetails applicationUser = authService.loadUserByUsername(TestData.ADMIN_USER_EMAIL);
@@ -73,7 +72,6 @@ class UserServiceTest {
     @Test
     public void assignRoleToUserNonexistentUser() {
         assertThrows(NotFoundException.class,
-            // TODO: handle null for departmentId
             () -> userService.assignRoleToUser(new UserRoleDto("NONEXISTENT_MAIL@test.com", Role.ADMIN, null)));
     }
 
