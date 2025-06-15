@@ -74,8 +74,10 @@
   </div>
 </div>
 
+<div class="border-muted/50 bg-background flex min-w-full flex-col rounded-xl border p-4 px-6 pb-6">
+
 <!-- Header -->
-<div class="mb-4 flex justify-between">
+<div class="mb-4 flex justify-between text-md">
   <div class="inline-block">
     <h3 class="text-foreground font-semibold">Departments</h3>
     <div class="text-muted-foreground space-x-1 text-xs font-medium">
@@ -89,22 +91,22 @@
 </div>
 
 <!-- Table -->
-<div class="border-muted/20 bg-background flex min-w-full flex-col rounded-xl border p-2">
-  <div class="overflow-x-auto px-5">
-    <table
-      class="text-muted-foreground table w-full table-auto border-collapse border-0 text-left align-middle leading-5">
-      <thead class="border-muted/20 text-muted-foreground border text-xs">
+  <div class="border rounded p-4 bg-gray-100  border-gray-300 dark:border-gray-600 dark:bg-gray-900 shadow">
+    <div class="overflow-x-auto px-5">
+      <table
+        class="text-muted-foreground table w-full table-auto border-collapse border-0 text-left align-middle leading-5">
+        <thead class="text-muted-foreground text-sm">
       <tr>
-        <th class="px-2 py-3">Name</th>
-        <th class="px-2 py-3">Supervisor Email</th>
+        <th class="py-2">Name</th>
+        <th class="py-2">Supervisor Email</th>
       </tr>
       </thead>
       <tbody>
-      <tr *ngFor="let dept of departments; let i = index" class="hover:bg-card/50">
-        <td class="px-2 py-3">{{ dept.name }}</td>
-        <td class="px-2 py-3">{{ dept.supervisorEmail }}</td>
-        <td class="px-2 py-3" [routerLink]="['/departments', dept.name, 'shiftplan-editor']">
-          <app-button full impact="none" tone="light" shape="rounded" size="medium">
+      <tr *ngFor="let dept of departments; let i = index" class="hover:bg-card/50 text-sm">
+        <td class="py-1">{{ dept.name }}</td>
+        <td class="py-1">{{ dept.supervisorEmail }}</td>
+        <td class="py-1">
+          <app-button [routerLink]="['/departments', dept.name, 'shiftplan-editor']" full impact="none" tone="light" shape="rounded" size="small">
             <svg
               xmlns="http://www.w3.org/2000/svg"
               class="h-5 w-5 text-gray-600"
@@ -120,9 +122,9 @@
             <span class="ml-2">Shiftplan</span>
           </app-button>
         </td>
-        <td class="px-2 py-3">
+        <td class="py-1">
           <div class="flex space-x-2">
-            <app-button full impact="none" tone="light" shape="rounded" size="medium"
+            <app-button full impact="none" tone="light" shape="rounded" size="small"
               (click)="openFormEdit(dept.name)">
               <svg
                 xmlns="http://www.w3.org/2000/svg"
@@ -138,7 +140,7 @@
               </svg>
               <span class="ml-2">Edit</span>
             </app-button>
-            <app-button full impact="none" tone="danger" shape="rounded" size="medium"
+            <app-button full impact="none" tone="danger" shape="rounded" size="small"
               (click)="toggleConfirmDelete(dept.name!)">
               <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24"
                    stroke="currentColor" stroke-width="1.5">
@@ -180,4 +182,4 @@
     </div>
   </div>
 </div>
-
+</div>

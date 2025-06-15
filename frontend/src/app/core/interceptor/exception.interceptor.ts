@@ -32,12 +32,15 @@ export class ExceptionInterceptor implements HttpInterceptor {
           return throwError(() => error);
         }
 
+
         if (error.status === 401) {
           this.toastr.error('Your session has expired. Please log in again.');
           this.authService.logoutUser();            // drop any stale token
           this.router.navigate(['/auth/sign-in']).then();
           return EMPTY;
         }
+
+        // Workaround for not being able to change exception message in backend. DO NOT REMOVE
         if (error.status===413){
           this.toastr.error("File Size can not exceed 5MB","Error occurred")
           return EMPTY;
