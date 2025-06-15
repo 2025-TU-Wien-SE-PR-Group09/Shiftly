@@ -123,7 +123,8 @@ export class SupervisorHomeComponent implements OnInit{
         meta: {
           //todo: workers should become entity "worker" e.g. including the role
           //todo: 'springer' should be displayed visible in the calendar
-          workers: shift.workers
+          workers: shift.workers,
+          manpower: shift.manpower
         }
       });
     }

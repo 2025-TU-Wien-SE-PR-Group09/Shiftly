@@ -16,8 +16,6 @@ import at.ac.tuwien.sepr.groupphase.backend.service.dto.department.DepartmentCre
 import at.ac.tuwien.sepr.groupphase.backend.service.dto.Role;
 import at.ac.tuwien.sepr.groupphase.backend.service.dto.user.UserDataDto;
 import at.ac.tuwien.sepr.groupphase.backend.service.dto.user.UserRoleDto;
-import at.ac.tuwien.sepr.groupphase.backend.service.dto.shift.ShiftDayDto;
-import at.ac.tuwien.sepr.groupphase.backend.service.mapper.DepartmentMapper;
 import at.ac.tuwien.sepr.groupphase.backend.type.VacationStatus;
 import jakarta.transaction.Transactional;
 import org.slf4j.Logger;
@@ -31,6 +29,8 @@ import java.time.DayOfWeek;
 import java.time.Duration;
 import java.time.LocalDate;
 import java.time.LocalTime;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import static at.ac.tuwien.sepr.groupphase.backend.config.Constants.ADMIN_EMAIL;
@@ -73,122 +73,84 @@ public class StartupRunner implements CommandLineRunner {
             new UserDataDto(ADMIN_EMAIL, adminUserPassword, "Admin", "Shyft"));
         this.userService.assignRoleToUser(new UserRoleDto(ADMIN_EMAIL, Role.ADMIN, null));
 
-        var production = this.departmentService.getDepartmentByName("Produktion")
+        var production = this.departmentService.getDepartmentByName("Production")
             .flatMap(d -> departmentRepository.findById(d.name()));
 
         if (production.isEmpty()) {
-            this.userService.createUser(new UserDataDto(
-                "supervisor@shyft.local",
-                "password",
-                "Supervisor",
-                "Shyft"
-            ));
+            for (int i = 1; i <= 2; i++) {
+                this.userService.createUser(new UserDataDto(
+                    "supervisor"+i+"@shyft.local",
+                    "password",
+                    "Supervisor",
+                    "Shyft"+i
+                ));
+            }
 
             LOGGER.info("Department not found, creating department!");
-            var dep = this.departmentService.createDepartment(new DepartmentCreateDto("Produktion", "supervisor@shyft.local"));
+            var dep = this.departmentService.createDepartment(new DepartmentCreateDto("Production", "supervisor1@shyft.local"));
+            var dep2 = this.departmentService.createDepartment(new DepartmentCreateDto("Customer Support", "supervisor2@shyft.local"));
             var actDep = this.departmentRepository.findById(dep.getName()).orElseThrow(() -> new RuntimeException("Department not found"));
+            var actDep2 = this.departmentRepository.findById(dep2.getName()).orElseThrow(() -> new RuntimeException("Department not found"));
             createPlan(actDep);
+            createPlan(actDep2);
             createSecondPlan(actDep);
-            createUsers(actDep);
-            createVacations(actDep);
+            createSecondPlan(actDep2);
+            createUsers(actDep, "supervisor1@shyft.local",1);
+            createUsers(actDep2, "supervisor2@shyft.local", 10);
+            createVacations();
         } else {
             LOGGER.info("Department found: {}", production.get().getName());
             if (production.get().getPlans().isEmpty()) {
                 LOGGER.info("Department does not have a plan!");
                 createPlan(production.get());
                 createSecondPlan(production.get());
-                createVacations(production.get());
+                createVacations();
             } else {
                 LOGGER.info("Department has a plan!");
             }
         }
     }
 
-    private void createUsers(Department production) {
-        LOGGER.info("Creating default users");
-        this.userService.createUser(new UserDataDto(
-            "new_account@shyft.local",
-            "password",
-            "NewAccount",
-            "Shyft"
-        ));
-        this.userService.createUser(new UserDataDto(
-            "new_supervisor@shyft.local",
-            "password",
-            "NewSupervisor",
-            "Shyft"
-        ));
+    private void createUsers(Department production, String supervisorMail, int startC) {
+        // Neue Employees für Production
+        for (int i = startC; i < startC+5; i++) {
+            String email = "employee"+i+"@shyft.local";
+            this.userService.createUser(new UserDataDto(email, "password", "Firstname", "Lastname"));
 
-        this.departmentService.createDepartment(new DepartmentCreateDto("Controlling", "new_supervisor@shyft.local"));
-        var secondDepartment = this.departmentRepository.findByName("Controlling")
-            .orElseThrow(() -> new RuntimeException("Department Controlling not found"));
-        var newSupervisor = this.userRepository.findByEmail("new_supervisor@shyft.local").get();
-        newSupervisor.setDepartment(secondDepartment);
-        this.userRepository.save(newSupervisor);
-        this.userService.assignRoleToUser(new UserRoleDto("new_supervisor@shyft.local", Role.SUPERVISOR, secondDepartment.getName()));
-
-        // Neue Employees für Produktion
-        this.userService.createUser(new UserDataDto("employee1@shyft.local", "password", "Firstname", "Lastname"));
-        this.userService.createUser(new UserDataDto("employee2@shyft.local", "password", "Firstname", "Lastname"));
-        this.userService.createUser(new UserDataDto("employee3@shyft.local", "password", "Firstname", "Lastname"));
-        this.userService.createUser(new UserDataDto("employee4@shyft.local", "password", "Firstname", "Lastname"));
-        this.userService.createUser(new UserDataDto("employee5@shyft.local", "password", "Firstname", "Lastname"));
-
-        // Neue Jumper für Produktion
-        this.userService.createUser(new UserDataDto("jumper1@shyft.local", "password", "Jum", "Per"));
-        this.userService.createUser(new UserDataDto("jumper2@shyft.local", "password", "Jum", "Per"));
-
-        // Supervisor
-        ApplicationUser supervisor = this.userRepository.findByEmail("supervisor@shyft.local").orElseThrow();
-        supervisor.setDepartment(production);
-        this.userRepository.save(supervisor);
-        this.userService.assignRoleToUser(
-            new UserRoleDto("supervisor@shyft.local", Role.SUPERVISOR, production.getName())
-        );
-
-        // Neue Employees zuweisen
-        for (String email : List.of("employee1@shyft.local", "employee2@shyft.local", "employee3@shyft.local",
-            "employee4@shyft.local", "employee5@shyft.local")) {
             ApplicationUser user = this.userRepository.findByEmail(email).orElseThrow();
             user.setDepartment(production);
             this.userRepository.save(user);
             this.userService.assignRoleToUser(new UserRoleDto(email, Role.EMPLOYEE, production.getName()));
         }
 
-        // Neue Jumper zuweisen
-        for (String email : List.of("jumper1@shyft.local", "jumper2@shyft.local")) {
+        // Neue Jumper für Production
+        for (int i = startC; i < startC+2; i++) {
+            String email = "jumper"+i+"@shyft.local";
+            this.userService.createUser(new UserDataDto(email, "password", "Jum", "Per"));
+
             ApplicationUser user = this.userRepository.findByEmail(email).orElseThrow();
             user.setDepartment(production);
             this.userRepository.save(user);
             this.userService.assignRoleToUser(new UserRoleDto(email, Role.JUMPER, production.getName()));
         }
 
+        // Supervisor
+        ApplicationUser supervisor = this.userRepository.findByEmail(supervisorMail).orElseThrow();
+        supervisor.setDepartment(production);
+        this.userRepository.save(supervisor);
+        this.userService.assignRoleToUser(
+            new UserRoleDto(supervisorMail, Role.SUPERVISOR, production.getName())
+        );
+
         LOGGER.info("Default users created and assigned to production department");
     }
 
+
+
     private void createPlan(Department department) {
-        List<ShiftDayBlueprint> days = List.of(
-            new ShiftDayBlueprint.Builder().withDay(DayOfWeek.MONDAY)
-                .withStartTime(LocalTime.of(7, 0))
-                .withDuration(Duration.ofHours(8))
-                .build(),
-            new ShiftDayBlueprint.Builder().withDay(DayOfWeek.TUESDAY)
-                .withStartTime(LocalTime.of(7, 0))
-                .withDuration(Duration.ofHours(8))
-                .build(),
-            new ShiftDayBlueprint.Builder().withDay(DayOfWeek.WEDNESDAY)
-                .withStartTime(LocalTime.of(7, 0))
-                .withDuration(Duration.ofHours(8))
-                .build(),
-            new ShiftDayBlueprint.Builder().withDay(DayOfWeek.THURSDAY)
-                .withStartTime(LocalTime.of(7, 0))
-                .withDuration(Duration.ofHours(8))
-                .build(),
-            new ShiftDayBlueprint.Builder()
-                .withDay(DayOfWeek.FRIDAY)
-                .withStartTime(LocalTime.of(7, 0))
-                .withDuration(Duration.ofHours(8))
-                .build());
+        List<ShiftDayBlueprint> days = getListOfSameShiftdayDuringWeek(
+            LocalTime.of(7, 0),
+            Duration.ofHours(8));
 
         var plan = new PlanBlueprint.Builder()
             .withDepartment(department)
@@ -205,117 +167,80 @@ public class StartupRunner implements CommandLineRunner {
 
     }
 
-    private void createVacations(Department department) {
-        VacationRequest vacationRequest1 = new VacationRequest();
-        VacationRequest vacationRequest2 = new VacationRequest();
+    private List<ShiftDayBlueprint> getListOfSameShiftdayBlueprint(LocalTime startTime, Duration duration, List<DayOfWeek> days) {
+        List<ShiftDayBlueprint> earlyShiftDays = new ArrayList<>();
 
-        var employee1 = this.userRepository.findByEmail("employee4@shyft.local");
-        var employee2 = this.userRepository.findByEmail("employee5@shyft.local");
+        for (DayOfWeek day : days) {
+            earlyShiftDays.add(
+                new ShiftDayBlueprint.Builder().withDay(day)
+                    .withStartTime(startTime)
+                    .withDuration(duration)
+                    .build()
+            );
+        }
 
-        vacationRequest1.setEmployee(employee1.orElseThrow(() ->
+        return earlyShiftDays;
+    }
+
+    private List<ShiftDayBlueprint> getListOfSameShiftdayDuringWeek(LocalTime startTime, Duration duration) {
+        return this.getListOfSameShiftdayBlueprint(startTime, duration,
+            List.of(DayOfWeek.MONDAY, DayOfWeek.TUESDAY, DayOfWeek.WEDNESDAY, DayOfWeek.THURSDAY, DayOfWeek.FRIDAY));
+    }
+
+    private void createVacations() {
+        createVacation("employee4@shyft.local",
+            LocalDate.now().plusWeeks(5),
+            LocalDate.now().plusWeeks(6));
+        createVacation("employee5@shyft.local",
+            LocalDate.now().plusWeeks(5).plusDays(1),
+            LocalDate.now().plusWeeks(6).plusDays(1));
+
+        createVacation("employee10@shyft.local",
+            LocalDate.now().plusWeeks(5),
+            LocalDate.now().plusWeeks(6));
+        createVacation("employee11@shyft.local",
+            LocalDate.now().plusWeeks(5).plusDays(1),
+            LocalDate.now().plusWeeks(6).plusDays(1));
+        createVacation("employee12@shyft.local",
+            LocalDate.now().plusWeeks(5).plusDays(2),
+            LocalDate.now().plusWeeks(6).plusDays(2));
+        createVacation("employee13@shyft.local",
+            LocalDate.now().plusWeeks(5).plusDays(3),
+            LocalDate.now().plusWeeks(6).plusDays(3));
+    }
+
+    private void createVacation(String employeeMail, LocalDate from, LocalDate to) {
+        VacationRequest vacationRequest = new VacationRequest();
+
+        var employee = this.userRepository.findByEmail(employeeMail);
+
+        vacationRequest.setEmployee(employee.orElseThrow(() ->
             new RuntimeException("Startuprunner: Employee not found")));
-        vacationRequest2.setEmployee(employee2.orElseThrow(() ->
-            new RuntimeException("Startuprunner: Employee not found")));
 
-        vacationRequest1.setStartDate(LocalDate.of(2025, 7, 9));
-        vacationRequest1.setEndDate(LocalDate.of(2025, 7, 11));
-        vacationRequest1.setStatus(VacationStatus.APPROVED);
+        vacationRequest.setStartDate(from);
+        vacationRequest.setEndDate(to);
+        vacationRequest.setStatus(VacationStatus.APPROVED);
 
-        vacationRequest2.setStartDate(LocalDate.of(2025, 7, 7));
-        vacationRequest2.setEndDate(LocalDate.of(2025, 7, 10));
-        vacationRequest2.setStatus(VacationStatus.APPROVED);
-
-        this.vacationRequestRepository.save(vacationRequest1);
-        this.vacationRequestRepository.save(vacationRequest2);
+        this.vacationRequestRepository.save(vacationRequest);
     }
 
     private void createSecondPlan(Department department) {
-        List<ShiftDayBlueprint> earlyShiftDays = List.of(
-            new ShiftDayBlueprint.Builder().withDay(DayOfWeek.MONDAY)
-                .withStartTime(LocalTime.of(5, 30))
-                .withDuration(Duration.ofHours(8))
-                .build(),
-            new ShiftDayBlueprint.Builder().withDay(DayOfWeek.TUESDAY)
-                .withStartTime(LocalTime.of(5, 30))
-                .withDuration(Duration.ofHours(8))
-                .build(),
-            new ShiftDayBlueprint.Builder().withDay(DayOfWeek.WEDNESDAY)
-                .withStartTime(LocalTime.of(5, 30))
-                .withDuration(Duration.ofHours(8))
-                .build(),
-            new ShiftDayBlueprint.Builder().withDay(DayOfWeek.THURSDAY)
-                .withStartTime(LocalTime.of(5, 30))
-                .withDuration(Duration.ofHours(8))
-                .build(),
-            new ShiftDayBlueprint.Builder().withDay(DayOfWeek.FRIDAY)
-                .withStartTime(LocalTime.of(5, 30))
-                .withDuration(Duration.ofHours(8))
-                .build());
+        List<ShiftDayBlueprint> earlyShiftDays = getListOfSameShiftdayDuringWeek(
+            LocalTime.of(5, 30),
+            Duration.ofHours(8));
 
-        List<ShiftDayBlueprint> earlyShiftDays2 = List.of(
-            new ShiftDayBlueprint.Builder().withDay(DayOfWeek.MONDAY)
-                .withStartTime(LocalTime.of(5, 30))
-                .withDuration(Duration.ofHours(8))
-                .build(),
-            new ShiftDayBlueprint.Builder().withDay(DayOfWeek.TUESDAY)
-                .withStartTime(LocalTime.of(5, 30))
-                .withDuration(Duration.ofHours(8))
-                .build(),
-            new ShiftDayBlueprint.Builder().withDay(DayOfWeek.WEDNESDAY)
-                .withStartTime(LocalTime.of(5, 30))
-                .withDuration(Duration.ofHours(8))
-                .build(),
-            new ShiftDayBlueprint.Builder().withDay(DayOfWeek.THURSDAY)
-                .withStartTime(LocalTime.of(5, 30))
-                .withDuration(Duration.ofHours(8))
-                .build(),
-            new ShiftDayBlueprint.Builder().withDay(DayOfWeek.FRIDAY)
-                .withStartTime(LocalTime.of(5, 30))
-                .withDuration(Duration.ofHours(8))
-                .build());
+        List<ShiftDayBlueprint> earlyShiftDays2 = getListOfSameShiftdayDuringWeek(
+            LocalTime.of(5, 30),
+            Duration.ofHours(8));
 
-        List<ShiftDayBlueprint> lateShiftDays = List.of(
-            new ShiftDayBlueprint.Builder().withDay(DayOfWeek.MONDAY)
-                .withStartTime(LocalTime.of(14, 0))
-                .withDuration(Duration.ofHours(8))
-                .build(),
-            new ShiftDayBlueprint.Builder().withDay(DayOfWeek.TUESDAY)
-                .withStartTime(LocalTime.of(14, 0))
-                .withDuration(Duration.ofHours(8))
-                .build(),
-            new ShiftDayBlueprint.Builder().withDay(DayOfWeek.WEDNESDAY)
-                .withStartTime(LocalTime.of(14, 0))
-                .withDuration(Duration.ofHours(8))
-                .build(),
-            new ShiftDayBlueprint.Builder().withDay(DayOfWeek.THURSDAY)
-                .withStartTime(LocalTime.of(14, 0))
-                .withDuration(Duration.ofHours(8))
-                .build(),
-            new ShiftDayBlueprint.Builder().withDay(DayOfWeek.FRIDAY)
-                .withStartTime(LocalTime.of(14, 0))
-                .withDuration(Duration.ofHours(8))
-                .build());
-        List<ShiftDayBlueprint> lateShiftDays2 = List.of(
-            new ShiftDayBlueprint.Builder().withDay(DayOfWeek.MONDAY)
-                .withStartTime(LocalTime.of(14, 0))
-                .withDuration(Duration.ofHours(8))
-                .build(),
-            new ShiftDayBlueprint.Builder().withDay(DayOfWeek.TUESDAY)
-                .withStartTime(LocalTime.of(14, 0))
-                .withDuration(Duration.ofHours(8))
-                .build(),
-            new ShiftDayBlueprint.Builder().withDay(DayOfWeek.WEDNESDAY)
-                .withStartTime(LocalTime.of(14, 0))
-                .withDuration(Duration.ofHours(8))
-                .build(),
-            new ShiftDayBlueprint.Builder().withDay(DayOfWeek.THURSDAY)
-                .withStartTime(LocalTime.of(14, 0))
-                .withDuration(Duration.ofHours(8))
-                .build(),
-            new ShiftDayBlueprint.Builder().withDay(DayOfWeek.FRIDAY)
-                .withStartTime(LocalTime.of(14, 0))
-                .withDuration(Duration.ofHours(8))
-                .build());
+        List<ShiftDayBlueprint> lateShiftDays = getListOfSameShiftdayDuringWeek(
+            LocalTime.of(14, 0),
+            Duration.ofHours(8));
+
+        List<ShiftDayBlueprint> lateShiftDays2 = getListOfSameShiftdayDuringWeek(
+            LocalTime.of(14, 0),
+            Duration.ofHours(8));
+
 
         var plan = new PlanBlueprint.Builder()
             .withDepartment(department)

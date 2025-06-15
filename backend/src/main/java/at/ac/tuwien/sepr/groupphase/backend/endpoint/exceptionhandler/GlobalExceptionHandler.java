@@ -30,11 +30,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
-/**
- * Register all your Java exceptions here to map them into meaningful HTTP exceptions.
- * If you have special cases which are only important for specific endpoints, use ResponseStatusExceptions
- * https://www.baeldung.com/exception-handling-for-rest-with-spring#responsestatusexception
- */
 @ControllerAdvice
 public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
 

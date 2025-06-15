@@ -1,6 +1,7 @@
 package at.ac.tuwien.sepr.groupphase.backend.entity;
 
 import jakarta.persistence.CascadeType;
+import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
@@ -72,6 +73,10 @@ public class ConcreteShiftPlan {
             shift.setPlan(this);
             this.scheduledShifts.add(shift);
         }
+    }
+
+    public void setScheduledShifts(List<ScheduledShift> scheduledShifts) {
+        this.scheduledShifts = scheduledShifts;
     }
 
     public static class Builder {

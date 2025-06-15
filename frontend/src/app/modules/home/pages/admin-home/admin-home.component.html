@@ -148,7 +148,7 @@
       <button class="close-button text-gray-400 hover:text-gray-600 dark:text-gray-500 dark:hover:text-gray-300"
               (click)="selectedEvent = null">✕</button>
 
-      <h3 class="text-xl font-semibold mb-4 text-foreground">{{ selectedEvent.title }}</h3>
+      <h3 class="text-xl font-semibold mb-4 text-foreground">{{ selectedEvent.title }} ({{selectedEvent.meta?.workers?.length }} / {{selectedEvent.meta?.manpower}} employees available)</h3>
 
       <div class="workers-section mb-4">
         <h4 class="text-md font-medium mb-2 text-foreground">Assigned Employees:</h4>

@@ -151,6 +151,7 @@ public class ShiftPlanningMapper {
             return new DepartmentShiftplanCalendarResponse.ScheduledShift(
                 scheduledShift.getDescription(),
                 new DepartmentShiftplanCalendarResponse.Day(scheduledShift.getStart(), scheduledShift.getEnd()),
+                scheduledShift.getManpower(),
                 scheduledShift.getAssignments().stream()
                     .map(a -> a.getUser().getFirstName() + " "
                         + a.getUser().getLastName()

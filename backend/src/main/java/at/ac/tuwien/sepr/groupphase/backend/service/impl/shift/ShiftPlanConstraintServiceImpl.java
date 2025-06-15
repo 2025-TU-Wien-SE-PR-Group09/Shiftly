@@ -8,6 +8,7 @@ import at.ac.tuwien.sepr.groupphase.backend.exception.ConflictException;
 import at.ac.tuwien.sepr.groupphase.backend.repository.*;
 import at.ac.tuwien.sepr.groupphase.backend.service.shift.ShiftPlanConstraintService;
 import at.ac.tuwien.sepr.groupphase.backend.type.VacationStatus;
+import com.fasterxml.jackson.databind.util.ArrayIterator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
@@ -16,6 +17,7 @@ import java.lang.invoke.MethodHandles;
 import java.time.DayOfWeek;
 import java.time.LocalDate;
 import java.time.LocalTime;
+import java.time.temporal.ChronoUnit;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -42,11 +44,11 @@ public class ShiftPlanConstraintServiceImpl implements ShiftPlanConstraintServic
         Map<LocalDate, Set<ApplicationUser>> availableJumpersPerDay =
             getAvailableJumperEmployeesPerDay(concreteShiftPlan);
 
-        Map<ApplicationUser, ApplicationUser> vacationReplacementMap = new HashMap<>();
 
         for (ScheduledShift shift : concreteShiftPlan.getScheduledShifts()) {
             LocalDate shiftDate = shift.getStart().toLocalDate();
             LocalDate weekStart = shiftDate.with(DayOfWeek.MONDAY);
+            Set<ApplicationUser> availableJumpersToday = availableJumpersPerDay.get(shiftDate);
 
             List<ScheduledShiftAssignment> assignmentsCopy = new ArrayList<>(shift.getAssignments());
 
@@ -55,28 +57,20 @@ public class ShiftPlanConstraintServiceImpl implements ShiftPlanConstraintServic
                 List<LocalDate> overlap = getVacationOverlap(assignedUser, weekStart);
 
                 if (overlap != null && overlap.contains(shiftDate)) {
-                    ApplicationUser jumper = vacationReplacementMap.get(assignedUser);
+                    if(!availableJumpersToday.isEmpty()) {
+                        ApplicationUser jumper = availableJumpersToday.stream().findFirst().get();
 
-                    if (jumper == null) {
-                        Set<ApplicationUser> availableJumpersToday = availableJumpersPerDay.get(shiftDate);
-                        if (availableJumpersToday.isEmpty()) {
-                            throw new ConflictException("Not enough available jumper employees for " + shiftDate);
-                        }
-                        jumper = availableJumpersToday.iterator().next();
-                        vacationReplacementMap.put(assignedUser, jumper);
+                        availableJumpersPerDay.get(shiftDate).remove(jumper);
+
+                        shift.getAssignments().remove(assignment);
+                        shift.addAssignment(new ScheduledShiftAssignment.Builder()
+                            .withShift(shift)
+                            .withUser(jumper)
+                            .build());
                     }
-
-                    Set<ApplicationUser> availableJumpersToday = availableJumpersPerDay.get(shiftDate);
-                    if (!availableJumpersToday.contains(jumper)) {
-                        throw new ConflictException("Jumper " + jumper.getEmail() + " is already assigned to another shift on " + shiftDate);
+                    else {
+                        shift.getAssignments().remove(assignment);
                     }
-
-                    availableJumpersToday.remove(jumper);
-                    shift.getAssignments().remove(assignment);
-                    shift.addAssignment(new ScheduledShiftAssignment.Builder()
-                        .withShift(shift)
-                        .withUser(jumper)
-                        .build());
 
 
                     /*
@@ -181,7 +175,7 @@ public class ShiftPlanConstraintServiceImpl implements ShiftPlanConstraintServic
             .collect(Collectors.toSet());
 
         Map<LocalDate, Set<ApplicationUser>> result = new HashMap<>();
-        for (int i = 0; i < 7; i++) {
+        for (int i = 0; i < ChronoUnit.DAYS.between(concreteShiftPlan.getStartDate(), concreteShiftPlan.getEndDate()); i++) {
             LocalDate day = weekStart.plusDays(i);
             result.put(day, new HashSet<>(jumperUsersInDepartment));
         }
