@@ -15,6 +15,24 @@ export class PlanBlueprintComponent {
   @Input() plan!: PlanBlueprintResponse;
   @Output() planChanged = new EventEmitter<PlanBlueprintResponse>();
   planFinalized: boolean = false;
+  @Input() index: number = 0;
+  distinctColors = [
+    'rgba(230, 25, 75, 0.6)',   // Red
+    'rgba(60, 180, 75, 0.6)',   // Green
+    'rgba(255, 225, 25, 0.6)',  // Yellow
+    'rgba(0, 130, 200, 0.6)',   // Blue
+    'rgba(245, 130, 48, 0.6)',  // Orange
+    'rgba(145, 30, 180, 0.6)',  // Purple
+    'rgba(70, 240, 240, 0.6)',  // Cyan
+    'rgba(240, 50, 230, 0.6)',  // Magenta
+    'rgba(210, 245, 60, 0.6)',  // Lime
+    'rgba(250, 190, 190, 0.6)', // Light Pink
+    'rgba(0, 128, 128, 0.6)',   // Teal
+    'rgba(230, 190, 255, 0.6)', // Lavender
+    'rgba(170, 110, 40, 0.6)',  // Brown
+    'rgba(128, 0, 0, 0.6)',     // Maroon
+    'rgba(128, 128, 0, 0.6)'    // Olive
+  ];
 
   constructor(private route: ActivatedRoute, private router: Router) {}
 
