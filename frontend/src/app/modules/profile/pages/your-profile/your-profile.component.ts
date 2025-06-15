@@ -12,11 +12,13 @@ import { NgIf } from '@angular/common';
 })
 export class YourProfileComponent implements OnInit {
   userData: Partial<UserProfileRestDto> = {
-    name: '',
+    firstName: '',
+    lastName: '',
     email: '',
     role: '',
     department: ''
   };
+
 
   constructor(private router: Router,
               private userEndpoint: UserEndpointService) {}

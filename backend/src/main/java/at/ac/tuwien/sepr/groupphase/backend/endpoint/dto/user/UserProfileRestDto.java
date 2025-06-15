@@ -1,5 +1,6 @@
 package at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.user;
 
+import jakarta.persistence.Column;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
@@ -10,8 +11,13 @@ import jakarta.validation.constraints.Size;
  */
 public class UserProfileRestDto {
 
-    @Size(min = 4, max = 100)
-    private final String name;
+    @Column(nullable = false, length = 50)
+    @Size(max = 50)
+    private String firstName;
+
+    @Column(nullable = false, length = 50)
+    @Size(max = 50)
+    private String lastName;
 
     @NotNull(message = "Email must not be null")
     @Email(message = "Email must be a valid email address")
@@ -22,16 +28,22 @@ public class UserProfileRestDto {
     private final String department;
 
 
-    public UserProfileRestDto(String name, String email, String role, String department) {
-        this.name = name;
+    public UserProfileRestDto(String firstName, String lastName, String email, String role, String department) {
+        this.firstName = firstName;
+        this.lastName = lastName;
         this.email = email;
         this.role = role;
         this.department = department;
     }
 
-    public String getName() {
-        return name;
+    public String getFirstName() {
+        return firstName;
     }
+
+    public String getLastName() {
+        return lastName;
+    }
+
 
     public String getEmail() {
         return email;
@@ -49,7 +61,8 @@ public class UserProfileRestDto {
     @Override
     public String toString() {
         return "UserProfileRestDto{"
-            + "name='" + name + '\''
+            + "firstName='" + firstName + '\''
+            + "lastName='" + lastName + '\''
             + ", email='" + email + '\''
             + ", role='" + role + '\''
             + ", department='" + department + '\''
