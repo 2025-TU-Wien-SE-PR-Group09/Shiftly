@@ -25,6 +25,7 @@ import java.util.Optional;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
@@ -117,18 +118,18 @@ public class VacationRequestServiceImpl implements VacationRequestService {
 
     @Override
     public void deletePendingRequest(DeletePendingVacationRequestDto requestDto)
-        throws ConflictException, NotFoundException, IllegalStateException {
+        throws AccessDeniedException, NotFoundException {
         LOGGER.trace("deletePendingRequest({})", requestDto);
 
         VacationRequest request = vacationRequestRepository.findById(requestDto.requestId())
             .orElseThrow(() -> new NotFoundException("Vacation request not found"));
 
         if (!request.getEmployee().getEmail().equals(requestDto.userEmail())) {
-            throw new ConflictException("User is not the owner of this request");
+            throw new AccessDeniedException("User is not the owner of this request");
         }
 
         if (request.getStatus() != VacationStatus.PENDING) {
-            throw new IllegalStateException("Only pending requests can be deleted");
+            throw new ConflictException("Only pending requests can be deleted");
         }
 
         vacationRequestRepository.delete(request);
@@ -155,14 +156,14 @@ public class VacationRequestServiceImpl implements VacationRequestService {
 
     @Override
     public List<VacationRequestResponseDto> getVacationRequestsByStatusAndSupervisor(RetrieveVacationByStatusAndSupervisorDto retrieveDto)
-        throws NotFoundException, ConflictException {
+        throws NotFoundException {
         LOGGER.trace("getVacationRequestsByStatusAndSupervisor({})", retrieveDto);
 
         ApplicationUser supervisor = userRepository.findByEmail(retrieveDto.supervisorEmail())
             .orElseThrow(() -> new NotFoundException("Supervisor not found"));
 
         if (supervisor.getDepartment() == null) {
-            throw new ConflictException("Supervisor is not assigned to any department");
+            throw new NotFoundException("Supervisor is not assigned to any department");
         }
 
         String departmentName = supervisor.getDepartment().getName();

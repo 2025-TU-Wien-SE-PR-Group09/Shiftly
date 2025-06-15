@@ -19,6 +19,9 @@ import at.ac.tuwien.sepr.groupphase.backend.entity.ConcreteShiftPlan;
 import at.ac.tuwien.sepr.groupphase.backend.exception.NotFoundException;
 import at.ac.tuwien.sepr.groupphase.backend.service.DepartmentService;
 import at.ac.tuwien.sepr.groupphase.backend.service.EmployeeService;
+import at.ac.tuwien.sepr.groupphase.backend.service.dto.shift.ShiftBlueprintDto;
+import at.ac.tuwien.sepr.groupphase.backend.service.dto.user.UserDepartmentDto;
+import at.ac.tuwien.sepr.groupphase.backend.service.dto.user.UserProfileDto;
 import at.ac.tuwien.sepr.groupphase.backend.service.shift.ShiftPlanningService;
 import at.ac.tuwien.sepr.groupphase.backend.service.dto.shift.ConcretePlanGenerateDto;
 import at.ac.tuwien.sepr.groupphase.backend.service.UserService;
@@ -53,6 +56,7 @@ import org.springframework.web.bind.annotation.RestController;
 import java.lang.invoke.MethodHandles;
 import java.security.Principal;
 import java.util.List;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
 @Tag(name = "Department")
@@ -118,13 +122,13 @@ public class DepartmentEndpoint {
     }
 
     @Transactional
-    // all roles can get information about a department because this is no confidential information
     @RolesAllowed({"ADMIN", "SUPERVISOR", "EMPLOYEE"})
     @Operation(summary = "Get department by name")
     @ApiResponse(responseCode = "200", description = "Get department by name")
     @GetMapping(path = "/{departmentName}", produces = MediaType.APPLICATION_JSON_VALUE)
     public DepartmentDetailRestResponseDto getDepartmentByName(@PathVariable(name = "departmentName") String departmentName) {
         LOGGER.trace("getDepartmentByName({})", departmentName);
+        userService.checkAccessToDepartment(new DepartmentNameDto(departmentName));
 
         return departmentService.getDepartmentByName(departmentName).map(d ->
                 new DepartmentDetailRestResponseDto(
@@ -158,6 +162,7 @@ public class DepartmentEndpoint {
     public ResponseEntity<Void> editDepartment(@RequestBody @Valid DepartmentEditRestDto restDto)
         throws NotFoundException {
         LOGGER.trace("editDepartment({})", restDto);
+        userService.checkAccessToDepartment(new DepartmentNameDto(restDto.getOldName()));
 
         DepartmentEditDto serviceDto = new DepartmentEditDto(
             restDto.getOldName(),
@@ -176,6 +181,7 @@ public class DepartmentEndpoint {
         @PathVariable(name = "departmentName") String departmentName,
         @RequestBody @Valid CreatePlanBlueprintDto blueprintDto) {
         LOGGER.trace("createShiftplanBlueprint({}, {})", departmentName, blueprintDto);
+        userService.checkAccessToDepartment(new DepartmentNameDto(departmentName));
 
         DepartmentDto department = departmentService.getDepartmentByName(departmentName)
             .orElseThrow(() -> new NotFoundException("Department not found!"));
@@ -197,8 +203,9 @@ public class DepartmentEndpoint {
         @PathVariable(name = "departmentName") String departmentName,
         @RequestBody @Valid AddShiftToPlanBlueprintDto blueprintDto) {
         LOGGER.trace("addShiftToPlanBlueprint({}, {})", departmentName, blueprintDto);
+        userService.checkAccessToDepartment(new DepartmentNameDto(departmentName));
 
-        DepartmentDto department = departmentService.getDepartmentByName(departmentName)
+        departmentService.getDepartmentByName(departmentName)
             .orElseThrow(() -> new NotFoundException("Department not found!"));
 
         var mapped = ShiftRestMapper.mapFromRequest(blueprintDto);
@@ -213,6 +220,7 @@ public class DepartmentEndpoint {
     public List<PlanBlueprintResponse> getShiftplanBlueprints(
         @PathVariable(name = "departmentName") String departmentName) {
         LOGGER.trace("getShiftplanBlueprints({})", departmentName);
+        userService.checkAccessToDepartment(new DepartmentNameDto(departmentName));
 
         DepartmentDto department = departmentService.getDepartmentByName(departmentName)
             .orElseThrow(() -> new NotFoundException("Department not found!"));
@@ -228,6 +236,10 @@ public class DepartmentEndpoint {
     public ResponseEntity<Void> generateConcretePlan(
         @RequestBody @Valid GenerateConcretePlanDto generateConcretePlanDto, @PathVariable("id") Long id) {
         LOGGER.trace("generateConcretePlan({}, {})", generateConcretePlanDto, id);
+
+        DepartmentNameDto blueprintDepartment = shiftPlanningService.getDeparmentNameForShiftBlueprint(id)
+            .orElseThrow(() -> new NotFoundException("Blueprint not found!"));
+        userService.checkAccessToDepartment(blueprintDepartment);
 
         ConcretePlanGenerateDto mapped = ShiftRestMapper.mapFromRequest(id, generateConcretePlanDto);
 
@@ -246,13 +258,11 @@ public class DepartmentEndpoint {
         @PathVariable(name = "employeeEmail") String employeeEmail,
         Principal principal) {
         LOGGER.trace("addEmployeeToDepartment({}, {}, {})", departmentName, employeeEmail, principal);
+        userService.checkAccessToDepartment(new DepartmentNameDto(departmentName));
+
 
         DepartmentDto department = departmentService.getDepartmentByName(departmentName)
             .orElseThrow(() -> new NotFoundException("Department not found!"));
-
-        if (!userService.getUserByEmail(new UserEmailDto(principal.getName())).deparmentName().equals(departmentName)) {
-            throw new AccessDeniedException("You do not have access to department " + departmentName + " !");
-        }
 
         EmployeeDto employee = new EmployeeDto(employeeEmail, department.name());
         employee = employeeService.convertUserToEmployee(employee);
@@ -272,13 +282,10 @@ public class DepartmentEndpoint {
         @PathVariable(name = "departmentName") String departmentName,
         Principal principal) {
         LOGGER.trace("getEmployeesOfDepartment({}, {})", departmentName, principal);
+        userService.checkAccessToDepartment(new DepartmentNameDto(departmentName));
 
         DepartmentDto department = departmentService.getDepartmentByName(departmentName)
             .orElseThrow(() -> new NotFoundException("Department not found!"));
-
-        if (!userService.getUserByEmail(new UserEmailDto(principal.getName())).deparmentName().equals(departmentName)) {
-            throw new AccessDeniedException("You do not have access to department " + departmentName + " !");
-        }
 
         List<EmployeeListItemDto> employees = employeeService.getEmployeesOfDepartment(
             new DepartmentNameDto(department.name()));
@@ -292,8 +299,11 @@ public class DepartmentEndpoint {
     @ApiResponse(responseCode = "201", description = "Concrete shift plan in calendar format.")
     @GetMapping(path = "/{departmentName}/shiftplan",
         produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<DepartmentShiftplanCalendarResponse> getConcreteShiftplan(@PathVariable("departmentName") String name) {
-        LOGGER.trace("getConcreteShiftplan({})", name);
+    public ResponseEntity<DepartmentShiftplanCalendarResponse> getConcreteShiftplan(@PathVariable("departmentName") String name,
+                                                                                    Principal principal) {
+        LOGGER.trace("getConcreteShiftplan({}, {})", name, principal);
+
+        userService.checkAccessToDepartment(new DepartmentNameDto(name));
 
         List<ScheduledShift> shifts = shiftPlanningService.getCurrentConcretePlan(name).getScheduledShifts();
 
