@@ -160,13 +160,14 @@ public class UserServiceImpl implements UserService {
             .map(ApplicationRole::getName)
             .orElse("UNKNOWN");
 
-        // Name is derived from email prefix, department is left empty for now
         return new UserProfileDto(
-            currentEmail.split("@")[0],
+            user.getFirstName(),
+            user.getLastName(),
             user.getEmail(),
             role,
             user.getDepartment() == null ? "NONE" : user.getDepartment().getName()
         );
+
     }
 
     @Override

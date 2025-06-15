@@ -70,7 +70,8 @@ public class UserEndpoint {
         UserProfileDto serviceDto = userService.getCurrentUserProfile();
 
         return new UserProfileRestDto(
-            serviceDto.getName(),
+            serviceDto.getFirstName(),
+            serviceDto.getLastName(),
             serviceDto.getEmail(),
             serviceDto.getRole(),
             serviceDto.getDepartment()
