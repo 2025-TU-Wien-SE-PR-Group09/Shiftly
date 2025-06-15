@@ -2,6 +2,7 @@ package at.ac.tuwien.sepr.groupphase.backend.service;
 
 import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.user.ApplicationUserResponseDto;
 import at.ac.tuwien.sepr.groupphase.backend.entity.ApplicationUser;
+import at.ac.tuwien.sepr.groupphase.backend.service.dto.department.DepartmentNameDto;
 import at.ac.tuwien.sepr.groupphase.backend.service.dto.user.ChangePasswordDto;
 import at.ac.tuwien.sepr.groupphase.backend.service.dto.user.UserDataDto;
 import at.ac.tuwien.sepr.groupphase.backend.service.dto.user.UserDepartmentDto;
@@ -79,4 +80,12 @@ public interface UserService {
      * @throws NotFoundException if no user with the given email exists
      */
     UserDepartmentDto getUserByEmail(UserEmailDto emailDto) throws NotFoundException;
+
+    /**
+     * Checks if the currently authenticated user has access to the department of the given user.
+     *
+     * @param departmentNameDto the user department dto containing the user's email and department name
+     * @throws AccessDeniedException if the currently authenticated user does not have access to the department
+     */
+    void checkAccessToDepartment(DepartmentNameDto departmentNameDto) throws AccessDeniedException;
 }

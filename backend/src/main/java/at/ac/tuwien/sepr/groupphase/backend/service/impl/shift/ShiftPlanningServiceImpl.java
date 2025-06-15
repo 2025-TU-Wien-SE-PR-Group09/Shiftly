@@ -13,6 +13,7 @@ import at.ac.tuwien.sepr.groupphase.backend.repository.ConcreteShiftPlanReposito
 import at.ac.tuwien.sepr.groupphase.backend.repository.DepartmentRepository;
 import at.ac.tuwien.sepr.groupphase.backend.repository.PlanBlueprintRepository;
 import at.ac.tuwien.sepr.groupphase.backend.service.TimeService;
+import at.ac.tuwien.sepr.groupphase.backend.service.dto.department.DepartmentNameDto;
 import at.ac.tuwien.sepr.groupphase.backend.service.shift.ShiftPlanConstraintService;
 import at.ac.tuwien.sepr.groupphase.backend.service.shift.ShiftPlanRotationService;
 import at.ac.tuwien.sepr.groupphase.backend.service.shift.ShiftPlanningService;
@@ -272,6 +273,14 @@ public class ShiftPlanningServiceImpl implements ShiftPlanningService {
             .stream()
             .max(Comparator.comparing(ConcreteShiftPlan::getStartDate))
             .orElseThrow(() -> new NotFoundException(("No current concrete plan found for department with ID: " + departmentName)));
+    }
+
+    @Override
+    public Optional<DepartmentNameDto> getDeparmentNameForShiftBlueprint(Long id) {
+        LOGGER.trace("getDeparmentNameForShiftBlueprint({})", id);
+
+        return planBlueprintRepository.findById(id)
+            .map(p -> new DepartmentNameDto(p.getDepartment().getName()));
     }
 
 }

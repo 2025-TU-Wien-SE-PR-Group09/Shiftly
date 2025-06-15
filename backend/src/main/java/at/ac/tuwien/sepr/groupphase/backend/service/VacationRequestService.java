@@ -9,6 +9,7 @@ import at.ac.tuwien.sepr.groupphase.backend.type.VacationStatus;
 import at.ac.tuwien.sepr.groupphase.backend.service.dto.user.UserEmailDto;
 import at.ac.tuwien.sepr.groupphase.backend.service.dto.vacation.VacationRequestDto;
 import at.ac.tuwien.sepr.groupphase.backend.service.dto.vacation.VacationRequestResponseDto;
+import org.springframework.security.access.AccessDeniedException;
 
 import java.util.List;
 
@@ -36,12 +37,11 @@ public interface VacationRequestService {
      * Deletes a pending vacation request by its ID and the user's email.
      *
      * @param requestDto the data transfer object containing the ID of the vacation request to be deleted
-     * @throws ConflictException if the request cannot be deleted
+     * @throws AccessDeniedException if the user has no permissions to delete the vacation request
      * @throws NotFoundException if the vacation request with the given ID does not exist
-     * @throws IllegalStateException if the request is not in pending state
      */
     void deletePendingRequest(DeletePendingVacationRequestDto requestDto)
-        throws ConflictException, NotFoundException, IllegalStateException;
+        throws AccessDeniedException, NotFoundException;
 
     /**
      * Updates the status of a vacation request.
@@ -57,11 +57,10 @@ public interface VacationRequestService {
      *
      * @param retrieveDto the data transfer object containing the status and supervisor's email
      * @return a list of vacation request response data transfer objects matching the criteria
-     * @throws NotFoundException if the supervisor with the given email does not exist
-     * @throws ConflictException if the status is not valid or the supervisor does not have permission to view these requests
+     * @throws NotFoundException if the supervisor with the given email does not exist or does not have a valid department
      */
     List<VacationRequestResponseDto> getVacationRequestsByStatusAndSupervisor(RetrieveVacationByStatusAndSupervisorDto retrieveDto)
-        throws NotFoundException, ConflictException;
+        throws NotFoundException;
 }
 
 

@@ -1,6 +1,7 @@
 package at.ac.tuwien.sepr.groupphase.backend.service.impl;
 
 import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.user.ApplicationUserResponseDto;
+import at.ac.tuwien.sepr.groupphase.backend.service.dto.department.DepartmentNameDto;
 import at.ac.tuwien.sepr.groupphase.backend.service.dto.user.UserDataDto;
 import at.ac.tuwien.sepr.groupphase.backend.service.dto.user.UserDepartmentDto;
 import at.ac.tuwien.sepr.groupphase.backend.service.dto.user.UserEmailDto;
@@ -186,6 +187,15 @@ public class UserServiceImpl implements UserService {
             return new UserDepartmentDto(user.getEmail(), user.getDepartment().getName());
         } else {
             return new UserDepartmentDto(user.getEmail(), "NONE");
+        }
+    }
+
+    @Override
+    public void checkAccessToDepartment(DepartmentNameDto departmentNameDto) throws AccessDeniedException {
+        UserProfileDto currentUser = getCurrentUserProfile();
+
+        if (!currentUser.getRole().equals("ADMIN") && !currentUser.getDepartment().equals(departmentNameDto.name())) {
+            throw new AccessDeniedException("You do not have access to department " + departmentNameDto.name() + " !");
         }
     }
 

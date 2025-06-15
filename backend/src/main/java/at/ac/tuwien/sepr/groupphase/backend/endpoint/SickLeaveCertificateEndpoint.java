@@ -134,6 +134,7 @@ public class SickLeaveCertificateEndpoint {
         description = "List of sick leave certificates"
     )
     @GetMapping(path = "/admin/all", produces = MediaType.APPLICATION_JSON_VALUE)
+    @RolesAllowed({"ADMIN"})
     public ResponseEntity<List<SickLeaveCertificateRestDto>> getAllCertificates() {
         LOGGER.trace("getAllCertificates()");
 
