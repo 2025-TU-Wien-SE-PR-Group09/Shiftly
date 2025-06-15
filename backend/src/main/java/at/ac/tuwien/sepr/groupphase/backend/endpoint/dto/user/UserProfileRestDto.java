@@ -46,4 +46,13 @@ public class UserProfileRestDto {
     }
 
 
+    @Override
+    public String toString() {
+        return "UserProfileRestDto{"
+            + "name='" + name + '\''
+            + ", email='" + email + '\''
+            + ", role='" + role + '\''
+            + ", department='" + department + '\''
+            + '}';
+    }
 }

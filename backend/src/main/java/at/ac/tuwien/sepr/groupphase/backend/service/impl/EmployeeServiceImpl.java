@@ -14,13 +14,17 @@ import at.ac.tuwien.sepr.groupphase.backend.service.dto.employee.EmployeeDto;
 import at.ac.tuwien.sepr.groupphase.backend.service.dto.employee.EmployeeListItemDto;
 import at.ac.tuwien.sepr.groupphase.backend.service.dto.Role;
 import at.ac.tuwien.sepr.groupphase.backend.service.dto.user.UserRoleDto;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
+import java.lang.invoke.MethodHandles;
 import java.util.List;
 import java.util.Set;
 
 @Service
 public class EmployeeServiceImpl implements EmployeeService {
+    private static final Logger LOGGER = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
 
     private final UserRepository userRepository;
     private final DepartmentRepository departmentRepository;
@@ -36,6 +40,8 @@ public class EmployeeServiceImpl implements EmployeeService {
 
     @Override
     public EmployeeDto convertUserToEmployee(EmployeeDto employeeDto) throws ConflictException, NotFoundException {
+        LOGGER.trace("convertUserToEmployee({})", employeeDto);
+
         ApplicationUser applicationUser = userRepository.findByEmail(employeeDto.email())
             .orElseThrow(() -> new NotFoundException("Employee with email " + employeeDto.email() + " not found"));
 
@@ -60,6 +66,8 @@ public class EmployeeServiceImpl implements EmployeeService {
 
     @Override
     public List<EmployeeListItemDto> getEmployeesOfDepartment(DepartmentNameDto departmentName) {
+        LOGGER.trace("getEmployeesOfDepartment({})", departmentName);
+
         Department department = departmentRepository.findByName(departmentName.name())
             .orElseThrow(
                 () -> new NotFoundException("Department with name " + departmentName.name() + " not found"));

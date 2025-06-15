@@ -2,7 +2,7 @@ package at.ac.tuwien.sepr.groupphase.backend.unittests;
 
 import at.ac.tuwien.sepr.groupphase.backend.entity.*;
 import at.ac.tuwien.sepr.groupphase.backend.repository.*;
-import at.ac.tuwien.sepr.groupphase.backend.service.impl.TimeService;
+import at.ac.tuwien.sepr.groupphase.backend.service.TimeService;
 import at.ac.tuwien.sepr.groupphase.backend.service.impl.shift.ShiftPlanRotationServiceImpl;
 import at.ac.tuwien.sepr.groupphase.backend.service.shift.ShiftPlanRotationService;
 import io.jsonwebtoken.lang.Assert;

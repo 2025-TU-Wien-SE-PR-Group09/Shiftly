@@ -94,4 +94,18 @@ public class SickLeaveCertificateRestDto {
     public void setEndDate(LocalDate endDate) {
         this.endDate = endDate;
     }
+
+    @Override
+    public String toString() {
+        return "SickLeaveCertificateRestDto{"
+            + "id=" + id
+            + ", fileName='" + fileName + '\''
+            + ", fileType='" + fileType + '\''
+            + ", uploadedAt=" + uploadedAt
+            + ", employeeEmail='" + employeeEmail
+            + '\''
+            + ", startDate=" + startDate
+            + ", endDate=" + endDate
+            + '}';
+    }
 }

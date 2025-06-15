@@ -68,5 +68,11 @@ public class VacationRequestRestDto {
         return restDto;
     }
 
-
+    @Override
+    public String toString() {
+        return "VacationRequestRestDto{"
+            + "startDate=" + startDate
+            + ", endDate=" + endDate
+            + '}';
+    }
 }

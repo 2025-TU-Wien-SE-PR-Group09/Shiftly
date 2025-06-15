@@ -2,6 +2,8 @@ package at.ac.tuwien.sepr.groupphase.backend.service.impl;
 
 import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.user.ApplicationUserResponseDto;
 import at.ac.tuwien.sepr.groupphase.backend.service.dto.user.UserDataDto;
+import at.ac.tuwien.sepr.groupphase.backend.service.dto.user.UserDepartmentDto;
+import at.ac.tuwien.sepr.groupphase.backend.service.dto.user.UserEmailDto;
 import at.ac.tuwien.sepr.groupphase.backend.service.dto.user.UserProfileDto;
 import at.ac.tuwien.sepr.groupphase.backend.service.dto.user.UserRoleDto;
 import at.ac.tuwien.sepr.groupphase.backend.entity.ApplicationRole;
@@ -10,9 +12,11 @@ import at.ac.tuwien.sepr.groupphase.backend.exception.NotFoundException;
 import at.ac.tuwien.sepr.groupphase.backend.repository.RoleRepository;
 import at.ac.tuwien.sepr.groupphase.backend.repository.UserRepository;
 import at.ac.tuwien.sepr.groupphase.backend.service.UserService;
+import org.aspectj.weaver.ast.Not;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -28,8 +32,8 @@ import static at.ac.tuwien.sepr.groupphase.backend.config.Constants.ADMIN_EMAIL;
 
 @Service
 public class UserServiceImpl implements UserService {
-
     private static final Logger LOGGER = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
+
     private final UserRepository userRepository;
     private final RoleRepository roleRepository;
     private final PasswordEncoder passwordEncoder;
@@ -68,7 +72,7 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public void createUser(UserDataDto userData) {
+    public void createUser(UserDataDto userData) throws IllegalArgumentException {
         LOGGER.trace("createUser({})", userData);
         Optional<ApplicationUser> applicationUserOpt = userRepository.findByEmail(userData.getEmail());
         if (applicationUserOpt.isPresent()) {
@@ -112,7 +116,7 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public void changePasswordOfCurrentUser(ChangePasswordDto dto) {
+    public void changePasswordOfCurrentUser(ChangePasswordDto dto) throws NotFoundException, AccessDeniedException {
         LOGGER.trace("changePasswordOfCurrentUser({})", dto);
 
         String currentEmail = org.springframework.security.core.context.SecurityContextHolder
@@ -138,7 +142,7 @@ public class UserServiceImpl implements UserService {
 
 
     @Override
-    public UserProfileDto getCurrentUserProfile() {
+    public UserProfileDto getCurrentUserProfile() throws NotFoundException {
         LOGGER.trace("getCurrentUserProfile()");
 
         String currentEmail = SecurityContextHolder.getContext().getAuthentication().getName();
@@ -166,13 +170,29 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public List<ApplicationUserResponseDto> getAllAvailableUsers() {
+        LOGGER.trace("getAllAvailableUsers()");
+
         return userRepository.findAllWithNoRole().stream()
             .map(user -> new ApplicationUserResponseDto(user.getEmail()))
             .collect(Collectors.toList());
     }
 
     @Override
+    public UserDepartmentDto getUserByEmail(UserEmailDto emailDto) throws NotFoundException {
+        ApplicationUser user = userRepository.findByEmail(emailDto.email())
+            .orElseThrow(() -> new NotFoundException("User with email " + emailDto.email() + " not found."));
+
+        if (user.getDepartment() != null) {
+            return new UserDepartmentDto(user.getEmail(), user.getDepartment().getName());
+        } else {
+            return new UserDepartmentDto(user.getEmail(), "NONE");
+        }
+    }
+
+    @Override
     public List<ApplicationUserResponseDto> getAllSupervisors(boolean hasDepartment) {
+        LOGGER.trace("getAllSupervisors({})", hasDepartment);
+
         Stream<ApplicationUser> users = userRepository.findAllByRoleName("SUPERVISOR").stream();
 
         if (hasDepartment) {

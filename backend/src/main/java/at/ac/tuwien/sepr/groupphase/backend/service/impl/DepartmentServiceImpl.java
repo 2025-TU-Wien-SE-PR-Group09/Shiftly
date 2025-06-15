@@ -19,14 +19,18 @@ import at.ac.tuwien.sepr.groupphase.backend.service.dto.Role;
 import at.ac.tuwien.sepr.groupphase.backend.service.dto.user.UserEmailDto;
 import at.ac.tuwien.sepr.groupphase.backend.service.dto.user.UserRoleDto;
 import at.ac.tuwien.sepr.groupphase.backend.service.mapper.DepartmentMapper;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
+import java.lang.invoke.MethodHandles;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 
 @Service
 public class DepartmentServiceImpl implements DepartmentService {
+    private static final Logger LOGGER = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
 
     private final DepartmentRepository departmentRepository;
     private final UserRepository applicationUserRepository;
@@ -42,6 +46,8 @@ public class DepartmentServiceImpl implements DepartmentService {
 
     @Override
     public DepartmentCreateResponseDto createDepartment(DepartmentCreateDto dto) throws ConflictException {
+        LOGGER.trace("createDepartment({})", dto);
+
         if (departmentRepository.existsByName(dto.getName())) {
             throw new ConflictException("Department with name '" + dto.getName() + "' already exists");
         }
@@ -72,6 +78,8 @@ public class DepartmentServiceImpl implements DepartmentService {
 
     @Override
     public DepartmentEditResponseDto editDepartment(DepartmentEditDto dto) {
+        LOGGER.trace("editDepartment({})", dto);
+
         Department department = departmentRepository.findByName(dto.getOldName())
             .orElseThrow(() -> new NotFoundException("Department with name '" + dto.getOldName() + "' not found"));
 
@@ -122,6 +130,8 @@ public class DepartmentServiceImpl implements DepartmentService {
 
     @Override
     public List<DepartmentDetailResponseDto> getAllDepartments() {
+        LOGGER.trace("getAllDepartments()");
+
         return departmentRepository.findAll().stream()
             .map(dept -> new DepartmentDetailResponseDto(
                 dept.getName(),
@@ -131,12 +141,16 @@ public class DepartmentServiceImpl implements DepartmentService {
 
     @Override
     public Optional<DepartmentDto> getDepartmentByName(String departmentName) {
+        LOGGER.trace("getDepartmentByName({})", departmentName);
+
         return departmentRepository.findByName(departmentName)
             .map(DepartmentMapper::fromEntity);
     }
 
     @Override
     public Optional<UserEmailDto> getSupervisorByDepartmentName(String departmentName) {
+        LOGGER.trace("getSupervisorByDepartmentName({})", departmentName);
+
         Optional<Department> actDept = departmentRepository.findByName(departmentName);
 
         if (actDept.isPresent()) {
@@ -155,6 +169,8 @@ public class DepartmentServiceImpl implements DepartmentService {
 
     @Override
     public void deleteDepartmentByName(String departmentName) {
+        LOGGER.trace("deleteDepartmentByName({})", departmentName);
+
         Department department = departmentRepository.findByName(departmentName)
             .orElseThrow(() -> new NotFoundException("Department with name '" + departmentName + "' not found"));
 

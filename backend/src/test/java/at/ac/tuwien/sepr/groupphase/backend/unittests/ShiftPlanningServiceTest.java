@@ -1,10 +1,5 @@
 package at.ac.tuwien.sepr.groupphase.backend.unittests;
 
-import at.ac.tuwien.sepr.groupphase.backend.entity.Department;
-import at.ac.tuwien.sepr.groupphase.backend.entity.PlanBlueprint;
-import at.ac.tuwien.sepr.groupphase.backend.entity.ShiftBlueprint;
-import at.ac.tuwien.sepr.groupphase.backend.entity.ShiftDayBlueprint;
-import at.ac.tuwien.sepr.groupphase.backend.entity.ShiftWeekBlueprint;
 import at.ac.tuwien.sepr.groupphase.backend.exception.NotFoundException;
 import at.ac.tuwien.sepr.groupphase.backend.repository.ConcreteShiftPlanRepository;
 import at.ac.tuwien.sepr.groupphase.backend.repository.DepartmentRepository;
@@ -14,18 +9,12 @@ import at.ac.tuwien.sepr.groupphase.backend.repository.ShiftBlueprintRepository;
 import at.ac.tuwien.sepr.groupphase.backend.repository.ShiftDayBlueprintRepository;
 import at.ac.tuwien.sepr.groupphase.backend.repository.ShiftWeekBlueprintRepository;
 import at.ac.tuwien.sepr.groupphase.backend.service.dto.shift.PlanBlueprintCreationDto;
-import at.ac.tuwien.sepr.groupphase.backend.service.dto.shift.PlanBlueprintDto;
-import at.ac.tuwien.sepr.groupphase.backend.service.dto.shift.ShiftBlueprintDto;
 import at.ac.tuwien.sepr.groupphase.backend.service.impl.shift.ShiftPlanningServiceImpl;
-import at.ac.tuwien.sepr.groupphase.backend.service.impl.TimeService;
+import at.ac.tuwien.sepr.groupphase.backend.service.TimeService;
 import at.ac.tuwien.sepr.groupphase.backend.service.validator.ShiftPlanningValidatorImpl;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-import java.time.DayOfWeek;
-import java.time.Duration;
-import java.time.LocalDate;
-import java.time.LocalTime;
 import java.util.List;
 import java.util.Optional;
 

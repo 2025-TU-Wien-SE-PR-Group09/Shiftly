@@ -34,6 +34,8 @@ export class CustomHealthEndpointService extends BaseService {
     }
 
     /**
+     * Health check endpoint
+     * This endpoint is used to check the health of the application. It returns \&#39;OK\&#39; if the application is healthy, otherwise it returns an internal server error.
      * @param observe set whether or not to return the data Observable as the body, response or events. defaults to returning the body.
      * @param reportProgress flag to report request and response progress.
      */
@@ -83,6 +85,8 @@ export class CustomHealthEndpointService extends BaseService {
     }
 
     /**
+     * Prepare for shutdown
+     * This endpoint is called before the pod is shut down to change the liveness state.
      * @param observe set whether or not to return the data Observable as the body, response or events. defaults to returning the body.
      * @param reportProgress flag to report request and response progress.
      */

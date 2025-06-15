@@ -43,7 +43,7 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
     /**
      * Handles exceptions that only have one message.
      */
-    @ExceptionHandler(value = {NotFoundException.class, BadCredentialsException.class, UsernameNotFoundException.class})
+    @ExceptionHandler(value = {NotFoundException.class, BadCredentialsException.class, UsernameNotFoundException.class, SecurityException.class})
     protected ResponseEntity<Object> handleNotFound(Exception ex, WebRequest request) {
         LOGGER.warn(ex.getMessage());
         Map<String, Object> body = new LinkedHashMap<>();

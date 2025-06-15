@@ -21,8 +21,9 @@ public interface DepartmentService {
      * @param dto the department data transfer object containing the details of the department to be created
      * @return the details of the created department
      * @throws ConflictException if a department with the same name already exists
+     * @throws NotFoundException if the supervisor specified in the DTO does not exist
      */
-    DepartmentCreateResponseDto createDepartment(DepartmentCreateDto dto) throws ConflictException;
+    DepartmentCreateResponseDto createDepartment(DepartmentCreateDto dto) throws ConflictException, NotFoundException;
 
     /**
      * Edits an existing department.
@@ -30,8 +31,9 @@ public interface DepartmentService {
      * @param dto the department edit data transfer object containing the details of the department to be edited
      * @return the response containing the details of the edited department
      * @throws NotFoundException if the department to be edited does not exist
+     * @throws ConflictException if the new department data conflicts with an existing department
      */
-    DepartmentEditResponseDto editDepartment(DepartmentEditDto dto) throws NotFoundException;
+    DepartmentEditResponseDto editDepartment(DepartmentEditDto dto) throws NotFoundException, ConflictException;
 
     /**
      * Retrieves all departments.

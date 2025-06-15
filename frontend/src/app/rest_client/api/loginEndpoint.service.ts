@@ -38,6 +38,7 @@ export class LoginEndpointService extends BaseService {
     }
 
     /**
+     * Login a user
      * @param userDataLoginDto 
      * @param observe set whether or not to return the data Observable as the body, response or events. defaults to returning the body.
      * @param reportProgress flag to report request and response progress.

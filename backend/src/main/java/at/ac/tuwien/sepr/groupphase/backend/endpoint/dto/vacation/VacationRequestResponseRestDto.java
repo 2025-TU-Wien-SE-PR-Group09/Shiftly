@@ -62,4 +62,15 @@ public class VacationRequestResponseRestDto {
         response.setEmployeeEmail(dto.getEmployeeEmail());
         return response;
     }
+
+    @Override
+    public String toString() {
+        return "VacationRequestResponseRestDto{"
+            + "id=" + id
+            + ", startDate=" + startDate
+            + ", endDate=" + endDate
+            + ", status=" + status
+            + ", employeeEmail='" + employeeEmail + '\''
+            + '}';
+    }
 }

@@ -102,6 +102,8 @@ export class VacationEndpointService extends BaseService {
     }
 
     /**
+     * Delete a pending vacation request
+     * Deletes a vacation request that is in the pending state. The user must be authenticated and the request must be in pending status.
      * @param id 
      * @param observe set whether or not to return the data Observable as the body, response or events. defaults to returning the body.
      * @param reportProgress flag to report request and response progress.
@@ -154,6 +156,8 @@ export class VacationEndpointService extends BaseService {
     }
 
     /**
+     * Get all pending vacation requests for the supervisor
+     * Retrieves all vacation requests that are pending approval and assigned to the currently authenticated supervisor.
      * @param observe set whether or not to return the data Observable as the body, response or events. defaults to returning the body.
      * @param reportProgress flag to report request and response progress.
      */
@@ -203,6 +207,8 @@ export class VacationEndpointService extends BaseService {
     }
 
     /**
+     * Get all approved vacation requests for the supervisor
+     * Retrieves all vacation requests that have been approved and assigned to the currently authenticated supervisor.
      * @param observe set whether or not to return the data Observable as the body, response or events. defaults to returning the body.
      * @param reportProgress flag to report request and response progress.
      */
@@ -252,6 +258,8 @@ export class VacationEndpointService extends BaseService {
     }
 
     /**
+     * Get all vacation requests for the authenticated user
+     * Retrieves all vacation requests submitted by the currently authenticated user.
      * @param observe set whether or not to return the data Observable as the body, response or events. defaults to returning the body.
      * @param reportProgress flag to report request and response progress.
      */
@@ -301,6 +309,8 @@ export class VacationEndpointService extends BaseService {
     }
 
     /**
+     * Update the status of a vacation request
+     * Updates the status of a vacation request to either APPROVED or REJECTED. The user must be authenticated and have supervisor privileges.
      * @param id 
      * @param newStatus 
      * @param observe set whether or not to return the data Observable as the body, response or events. defaults to returning the body.

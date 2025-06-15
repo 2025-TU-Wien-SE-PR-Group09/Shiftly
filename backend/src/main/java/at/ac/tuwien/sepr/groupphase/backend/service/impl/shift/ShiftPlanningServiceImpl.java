@@ -4,23 +4,15 @@ import at.ac.tuwien.sepr.groupphase.backend.entity.ApplicationUser;
 import at.ac.tuwien.sepr.groupphase.backend.entity.ConcreteShiftPlan;
 import at.ac.tuwien.sepr.groupphase.backend.entity.Department;
 import at.ac.tuwien.sepr.groupphase.backend.entity.PlanBlueprint;
-import at.ac.tuwien.sepr.groupphase.backend.entity.ScheduledShift;
-import at.ac.tuwien.sepr.groupphase.backend.entity.ScheduledShiftAssignment;
-import at.ac.tuwien.sepr.groupphase.backend.entity.ShiftAssignmentAuditLog;
-import at.ac.tuwien.sepr.groupphase.backend.entity.ShiftAssignmentTrigger;
 import at.ac.tuwien.sepr.groupphase.backend.entity.ShiftBlueprint;
 import at.ac.tuwien.sepr.groupphase.backend.entity.ShiftDayBlueprint;
 import at.ac.tuwien.sepr.groupphase.backend.entity.ShiftWeekBlueprint;
 import at.ac.tuwien.sepr.groupphase.backend.exception.ConflictException;
 import at.ac.tuwien.sepr.groupphase.backend.exception.NotFoundException;
-import at.ac.tuwien.sepr.groupphase.backend.logic.RotatingShiftSlot;
-import at.ac.tuwien.sepr.groupphase.backend.logic.ShiftRotator;
 import at.ac.tuwien.sepr.groupphase.backend.repository.ConcreteShiftPlanRepository;
 import at.ac.tuwien.sepr.groupphase.backend.repository.DepartmentRepository;
 import at.ac.tuwien.sepr.groupphase.backend.repository.PlanBlueprintRepository;
-import at.ac.tuwien.sepr.groupphase.backend.repository.ScheduledShiftRepository;
-import at.ac.tuwien.sepr.groupphase.backend.repository.ShiftAssignmentAuditLogRepository;
-import at.ac.tuwien.sepr.groupphase.backend.service.impl.TimeService;
+import at.ac.tuwien.sepr.groupphase.backend.service.TimeService;
 import at.ac.tuwien.sepr.groupphase.backend.service.shift.ShiftPlanConstraintService;
 import at.ac.tuwien.sepr.groupphase.backend.service.shift.ShiftPlanRotationService;
 import at.ac.tuwien.sepr.groupphase.backend.service.shift.ShiftPlanningService;
@@ -29,10 +21,7 @@ import at.ac.tuwien.sepr.groupphase.backend.service.dto.shift.ConcretePlanGenera
 import at.ac.tuwien.sepr.groupphase.backend.service.dto.shift.PlanBlueprintAddShiftDto;
 import at.ac.tuwien.sepr.groupphase.backend.service.dto.shift.PlanBlueprintCreationDto;
 import at.ac.tuwien.sepr.groupphase.backend.service.dto.shift.PlanBlueprintDto;
-import at.ac.tuwien.sepr.groupphase.backend.service.impl.TimeService;
 import at.ac.tuwien.sepr.groupphase.backend.service.mapper.ShiftPlanningMapper;
-import at.ac.tuwien.sepr.groupphase.backend.service.shift.ShiftPlanConstraintService;
-import at.ac.tuwien.sepr.groupphase.backend.service.shift.ShiftPlanRotationService;
 import at.ac.tuwien.sepr.groupphase.backend.service.validator.ShiftPlanningValidator;
 import jakarta.transaction.Transactional;
 
@@ -42,15 +31,14 @@ import org.springframework.stereotype.Service;
 
 import java.lang.invoke.MethodHandles;
 import java.time.LocalDate;
-import java.time.LocalDateTime;
 import java.util.*;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.Predicate;
 
 @Service
 public class ShiftPlanningServiceImpl implements ShiftPlanningService {
-
     private static final Logger LOGGER = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
+
     private final PlanBlueprintRepository planBlueprintRepository;
     private final DepartmentRepository departmentRepository;
     private final TimeService timeService;
@@ -77,6 +65,8 @@ public class ShiftPlanningServiceImpl implements ShiftPlanningService {
 
     @Override
     public PlanBlueprintDto createPlanBlueprint(PlanBlueprintCreationDto createPlanBlueprintDto) {
+        LOGGER.trace("createPlanBlueprint({})", createPlanBlueprintDto);
+
         var dept = departmentRepository.findById(createPlanBlueprintDto.departmentName())
             .orElseThrow(() -> new NotFoundException("Department not found!"));
 
@@ -149,6 +139,8 @@ public class ShiftPlanningServiceImpl implements ShiftPlanningService {
 
     @Override
     public PlanBlueprintDto addShiftToPlan(PlanBlueprintAddShiftDto addShiftDto) {
+        LOGGER.trace("addShiftToPlan({})", addShiftDto);
+
         var plan = this.planBlueprintRepository.findById(addShiftDto.planId())
             .orElseThrow(() -> new NotFoundException("Plan not found!"));
 
@@ -234,6 +226,8 @@ public class ShiftPlanningServiceImpl implements ShiftPlanningService {
     @Override
     @Transactional
     public ConcreteShiftPlan generateConcreteQuarterlyPlan(ConcretePlanGenerateDto dto) {
+        LOGGER.trace("generateConcreteQuarterlyPlan({})", dto);
+
         PlanBlueprint blueprint = planBlueprintRepository.findById(dto.planBlueprintId())
             .orElseThrow(() -> new NotFoundException("Plan blueprint not found"));
 
@@ -272,6 +266,8 @@ public class ShiftPlanningServiceImpl implements ShiftPlanningService {
 
     @Override
     public ConcreteShiftPlan getCurrentConcretePlan(String departmentName) {
+        LOGGER.trace("getCurrentConcretePlan({})", departmentName);
+
         return concreteShiftPlanRepository.findByDepartmentName(departmentName)
             .stream()
             .max(Comparator.comparing(ConcreteShiftPlan::getStartDate))
