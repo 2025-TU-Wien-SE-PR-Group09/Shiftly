@@ -23,8 +23,15 @@
         </ng-container>
       </div>
     </div>
+
   </div>
 </div>
+
+<p *ngIf="!plan.shifts?.length"
+   class="text-sm text-gray-400 dark:text-gray-500 mb-8 ml-2">
+  This blueprint has no shifts yet. Add one to get started.
+</p>
+
 <app-editor
   [planId]="this.plan.id!"
   (shiftAdded)="onEditorChange($event)"

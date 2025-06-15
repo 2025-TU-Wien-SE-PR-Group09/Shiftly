@@ -46,6 +46,12 @@
           </app-plan-blueprint>
         </div>
       </div>
+
+      <p *ngIf="!shiftplans.length"
+         class="text-sm text-gray-400 dark:text-gray-500 mb-8 ml-2">
+        This department has no shiftplan blueprints yet. Create one to get started.
+      </p>
+
       <div class="max-w-fit mt-4">
         <app-button (click)="showAddBlueprintForm = true" full impact="bold" tone="primary" shape="rounded" size="medium">+ Add Blueprint</app-button>
 
