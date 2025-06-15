@@ -28,7 +28,7 @@ public class ShiftBlueprint {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(length = 255, nullable = false)
+    @Column(length = 100, nullable = false)
     private String description;
 
     @Column(nullable = false)
