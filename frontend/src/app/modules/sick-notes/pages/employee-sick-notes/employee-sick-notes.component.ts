@@ -65,7 +65,7 @@ export class EmployeeSickNotesComponent implements OnInit {
       return;
     }
 
-
+    this.loading = true;
 
     this.sickLeaveService
       .upload(

@@ -1,6 +1,7 @@
 package at.ac.tuwien.sepr.groupphase.backend.service;
 
 import at.ac.tuwien.sepr.groupphase.backend.service.dto.mail.SickLeaveEmailDto;
+import org.springframework.scheduling.annotation.Async;
 
 /**
  * Service interface for sending simple email messages.
@@ -21,6 +22,7 @@ public interface MailService {
      * @param subject the subject line of the email
      * @param text    the plain text content of the email
      */
+    @Async
     void sendSimpleEmail(String to, String subject, String text);
 
     /**
@@ -31,6 +33,7 @@ public interface MailService {
      *
      * @param dto the data transfer object containing all required email details
      */
+    @Async
     void sendSickLeaveNotification(SickLeaveEmailDto dto);
 
 }
