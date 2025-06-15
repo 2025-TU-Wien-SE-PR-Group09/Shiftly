@@ -11,7 +11,7 @@ import { AddShiftWeekBlueprintDto } from './addShiftWeekBlueprintDto';
 
 
 export interface AddShiftBlueprintDto { 
-    description?: string;
+    description: string;
     manPower?: number;
     shiftWeeks: Array<AddShiftWeekBlueprintDto>;
 }

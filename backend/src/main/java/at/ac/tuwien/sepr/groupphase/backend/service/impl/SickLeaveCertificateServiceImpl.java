@@ -9,23 +9,18 @@ import at.ac.tuwien.sepr.groupphase.backend.repository.UserRepository;
 import at.ac.tuwien.sepr.groupphase.backend.service.AuthService;
 import at.ac.tuwien.sepr.groupphase.backend.service.MailService;
 import at.ac.tuwien.sepr.groupphase.backend.service.SickLeaveCertificateService;
+import at.ac.tuwien.sepr.groupphase.backend.service.dto.mail.SickLeaveEmailDto;
 import at.ac.tuwien.sepr.groupphase.backend.service.dto.sickleave.SickLeaveCertificateDto;
 import at.ac.tuwien.sepr.groupphase.backend.service.dto.sickleave.SickLeaveCertificateUploadDto;
-import org.aspectj.weaver.ast.Not;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
 import java.lang.invoke.MethodHandles;
-import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
 
-
-import static at.ac.tuwien.sepr.groupphase.backend.util.DateFormatUtil.format;
 
 /**
  * Implementation of the SickLeaveCertificateService.
@@ -39,7 +34,7 @@ public class SickLeaveCertificateServiceImpl implements SickLeaveCertificateServ
     private final SickLeaveCertificateRepository certificateRepository;
     private final UserRepository userRepository;
     private final AuthService authService;
-    private MailService mailService;
+    private final MailService mailService;
 
 
     public SickLeaveCertificateServiceImpl(SickLeaveCertificateRepository certificateRepository,
@@ -79,20 +74,22 @@ public class SickLeaveCertificateServiceImpl implements SickLeaveCertificateServ
         List<ApplicationUser> supervisors = userRepository.findSupervisorsByDepartment(user.getDepartment());
         for (ApplicationUser supervisor : supervisors) {
             try {
-                mailService.sendSimpleEmail(
+                SickLeaveEmailDto mailDto = new SickLeaveEmailDto(
                     supervisor.getEmail(),
-                    "New Sick Leave Certificate",
-                    String.format("Employee %s %s reported a sick leave from %s to %s.",
-                        user.getFirstName(),
-                        user.getLastName(),
-                        format(uploadDto.startDate()),
-                        format(uploadDto.endDate()))
+                    user.getFirstName(),
+                    user.getLastName(),
+                    user.getDepartment().getName(),
+                    uploadDto.startDate(),
+                    uploadDto.endDate()
                 );
+
+                mailService.sendSickLeaveNotification(mailDto);
                 LOGGER.info("Successfully sent sick leave notification email to supervisor {}", supervisor.getEmail());
             } catch (Exception e) {
                 LOGGER.warn("Failed to send sick leave email to supervisor {}: {}", supervisor.getEmail(), e.getMessage(), e);
             }
         }
+
 
         return new SickLeaveCertificateDto(
             cert.getId(),

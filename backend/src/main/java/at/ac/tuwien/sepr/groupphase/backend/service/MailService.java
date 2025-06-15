@@ -1,5 +1,7 @@
 package at.ac.tuwien.sepr.groupphase.backend.service;
 
+import at.ac.tuwien.sepr.groupphase.backend.service.dto.mail.SickLeaveEmailDto;
+
 /**
  * Service interface for sending simple email messages.
  *
@@ -20,4 +22,15 @@ public interface MailService {
      * @param text    the plain text content of the email
      */
     void sendSimpleEmail(String to, String subject, String text);
+
+    /**
+     * Sends a formatted sick leave notification email to a supervisor.
+     *
+     * <p>The message includes the employee's name, department, and the sick leave period.
+     * </p>
+     *
+     * @param dto the data transfer object containing all required email details
+     */
+    void sendSickLeaveNotification(SickLeaveEmailDto dto);
+
 }
