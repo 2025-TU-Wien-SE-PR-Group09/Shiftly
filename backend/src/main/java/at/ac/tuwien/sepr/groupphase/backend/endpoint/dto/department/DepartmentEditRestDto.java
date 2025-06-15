@@ -1,5 +1,6 @@
 package at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.department;
 
+import jakarta.validation.constraints.Pattern;
 import jakarta.validation.constraints.Size;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Email;
@@ -14,6 +15,10 @@ public class DepartmentEditRestDto {
 
     @NotBlank(message = "New department name must not be blank")
     @Size(min = 1, max = 100, message = "New department name must be between 1 and 100 characters long")
+    @Pattern(
+        regexp = "^[A-Za-z0-9-_]{1,100}$",
+        message = "The new name can only contain characters A-Za-z0-9-_."
+    )
     private String newName;
 
     @NotBlank(message = "Supervisor email must not be blank")
