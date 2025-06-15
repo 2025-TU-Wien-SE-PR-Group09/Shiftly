@@ -27,7 +27,9 @@ export class SupervisorHomeComponent implements OnInit{
   ) {}
 
   protected selectedDepartment: DepartmentDetailRestResponseDto | undefined;
-  protected shiftPlan: DepartmentShiftplanCalendarResponse | undefined;
+  protected shiftPlan: DepartmentShiftplanCalendarResponse = {
+    shifts: []
+  };
   code: string = 'test';
 
   view: CalendarView = CalendarView.Month;
@@ -141,6 +143,7 @@ export class SupervisorHomeComponent implements OnInit{
         next: (data) => {
           if (data.shifts) {
             this.shiftPlan = data;
+            console.log(data)
             this.calculateEvents();
           }
         },
