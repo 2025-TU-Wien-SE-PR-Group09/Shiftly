@@ -11,7 +11,7 @@ public record DepartmentShiftplanCalendarResponse(List<ScheduledShift> shifts) {
     @Schema(description = "Scheduled shift details")
     public record ScheduledShift(String shiftDescription,
                                  Day day,
-                                 @Schema(description = "List of workers(email) assigned to the shift")
+                                 @Schema(description = "List of workers(email and name) assigned to the shift")
                                  List<String> workers) {
     }
 
