@@ -7,6 +7,7 @@ import at.ac.tuwien.sepr.groupphase.backend.service.dto.user.UserDataDto;
 import at.ac.tuwien.sepr.groupphase.backend.service.dto.user.UserProfileDto;
 import at.ac.tuwien.sepr.groupphase.backend.service.dto.user.UserRoleDto;
 import at.ac.tuwien.sepr.groupphase.backend.exception.NotFoundException;
+import org.springframework.security.access.AccessDeniedException;
 
 import java.util.List;
 
@@ -31,23 +32,27 @@ public interface UserService {
      * Change the password of the currently authenticated user.
      *
      * @param dto contains the old and new password
+     * @throws NotFoundException if the user does not exist
+     * @throws AccessDeniedException if the user is not allowed to change the password
      */
-    void changePasswordOfCurrentUser(ChangePasswordDto dto);
+    void changePasswordOfCurrentUser(ChangePasswordDto dto) throws NotFoundException, AccessDeniedException;
 
     /**
      * Retrieves the profile information of the currently authenticated user.
      *
      * @return a {@link UserProfileDto} containing user name, email, role, and department
+     * @throws NotFoundException if the user is not found
      */
-    UserProfileDto getCurrentUserProfile();
+    UserProfileDto getCurrentUserProfile() throws NotFoundException;
 
 
     /**
      * Create a new user with a given email and password. The email must not be used by any other user yet.
      *
      * @param userData {@link UserDataDto} object containing the username and password
+     * @throws IllegalArgumentException if an user with the given email already exists
      */
-    void createUser(UserDataDto userData);
+    void createUser(UserDataDto userData) throws IllegalArgumentException;
 
     /**
      * Retrieves all users who are supervisors.

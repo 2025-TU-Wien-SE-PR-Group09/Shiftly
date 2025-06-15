@@ -11,7 +11,7 @@ import java.time.LocalDate;
  * DTO for uploading a sick leave certificate (excluding the file itself).
  */
 @ValidSickLeaveDateRange
-public class SickLeaveCertificateUploadDto {
+public class SickLeaveCertificateUploadDatesDto {
 
     @NotNull(message = "Start date must not be null")
     @FutureOrPresent(message = "Start date must be in the present or future")
@@ -36,5 +36,13 @@ public class SickLeaveCertificateUploadDto {
 
     public void setEndDate(LocalDate endDate) {
         this.endDate = endDate;
+    }
+
+    @Override
+    public String toString() {
+        return "SickLeaveCertificateUploadDatesDto{" +
+            "startDate=" + startDate +
+            ", endDate=" + endDate +
+            '}';
     }
 }

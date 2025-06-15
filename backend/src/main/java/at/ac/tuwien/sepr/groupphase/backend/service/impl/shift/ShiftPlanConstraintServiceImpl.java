@@ -21,8 +21,8 @@ import java.util.stream.Collectors;
 
 @Service
 public class ShiftPlanConstraintServiceImpl implements ShiftPlanConstraintService {
-
     private static final Logger LOGGER = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
+
     private final UserRepository userRepository;
     private final VacationRequestRepository vacationRequestRepository;
     private final ScheduledShiftRepository scheduledShiftRepository;
@@ -37,6 +37,8 @@ public class ShiftPlanConstraintServiceImpl implements ShiftPlanConstraintServic
 
     @Override
     public ConcreteShiftPlan applyConstraints(ConcreteShiftPlan concreteShiftPlan) {
+        LOGGER.trace("applyConstraints({})", concreteShiftPlan);
+
         Map<LocalDate, Set<ApplicationUser>> availableJumpersPerDay =
             getAvailableJumperEmployeesPerDay(concreteShiftPlan);
 
@@ -110,6 +112,8 @@ public class ShiftPlanConstraintServiceImpl implements ShiftPlanConstraintServic
      * @return A list of available jumper employees.
      */
     private List<ApplicationUser> getAvailableJumperEmployees(LocalDate weekStart) {
+        LOGGER.trace("getAvailableJumperEmployees({})", weekStart);
+
         List<ApplicationUser> jumperUsers = userRepository.findAllByRoleName("JUMPER");
 
         LocalDate weekEnd = weekStart.plusDays(6);
@@ -138,6 +142,8 @@ public class ShiftPlanConstraintServiceImpl implements ShiftPlanConstraintServic
      * @return List of LocalDate representing the overlap period, or null if no overlap.
      */
     private List<LocalDate> getVacationOverlap(ApplicationUser user, LocalDate weekStart) {
+        LOGGER.trace("getVacationOverlap({}, {})", user, weekStart);
+
         LocalDate weekEnd = weekStart.plusDays(6);
 
         return vacationRequestRepository.findByEmployeeAndStatus(user, VacationStatus.APPROVED).stream()
@@ -164,6 +170,8 @@ public class ShiftPlanConstraintServiceImpl implements ShiftPlanConstraintServic
      * @return A map where keys are LocalDate and values are sets of available ApplicationUser.
      */
     private Map<LocalDate, Set<ApplicationUser>> getAvailableJumperEmployeesPerDay(ConcreteShiftPlan concreteShiftPlan) {
+        LOGGER.trace("getAvailableJumperEmployeesPerDay({})", concreteShiftPlan);
+
         List<ApplicationUser> jumperUsers = userRepository.findAllByRoleName("JUMPER");
 
         var department = concreteShiftPlan.getDepartment();

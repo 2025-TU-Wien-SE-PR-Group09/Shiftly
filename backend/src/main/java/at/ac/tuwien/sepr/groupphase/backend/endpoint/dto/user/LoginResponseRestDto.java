@@ -30,4 +30,11 @@ public class LoginResponseRestDto {
     public static LoginResponseRestDto from(LoginResponseDto loginDto) {
         return new LoginResponseRestDto(loginDto.getJwt());
     }
+
+    @Override
+    public String toString() {
+        return "LoginResponseRestDto{" +
+            "jwt='" + jwt + '\'' +
+            '}';
+    }
 }

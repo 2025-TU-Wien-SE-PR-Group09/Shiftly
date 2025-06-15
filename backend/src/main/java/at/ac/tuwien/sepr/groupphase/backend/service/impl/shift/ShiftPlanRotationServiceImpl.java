@@ -4,10 +4,13 @@ import at.ac.tuwien.sepr.groupphase.backend.entity.*;
 import at.ac.tuwien.sepr.groupphase.backend.logic.ShiftRotator;
 import at.ac.tuwien.sepr.groupphase.backend.repository.ConcreteShiftPlanRepository;
 import at.ac.tuwien.sepr.groupphase.backend.repository.ShiftAssignmentAuditLogRepository;
-import at.ac.tuwien.sepr.groupphase.backend.service.impl.TimeService;
+import at.ac.tuwien.sepr.groupphase.backend.service.TimeService;
 import at.ac.tuwien.sepr.groupphase.backend.service.shift.ShiftPlanRotationService;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
+import java.lang.invoke.MethodHandles;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -15,7 +18,7 @@ import java.util.List;
 
 @Service
 public class ShiftPlanRotationServiceImpl implements ShiftPlanRotationService {
-
+    private static final Logger LOGGER = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
 
     private final TimeService timeService;
     private final ConcreteShiftPlanRepository concreteShiftPlanRepository;
@@ -29,6 +32,8 @@ public class ShiftPlanRotationServiceImpl implements ShiftPlanRotationService {
 
     @Override
     public ConcreteShiftPlan generateRotatingPlan(ConcreteShiftPlan concreteShiftPlan, PlanBlueprint planBlueprint, List<ApplicationUser> employees) {
+        LOGGER.trace("generateRotatingPlan({}, {}, {})", concreteShiftPlan, planBlueprint, employees);
+
         ShiftRotator rotator = new ShiftRotator(planBlueprint);
         rotator.assignInitialUsers(employees);
 

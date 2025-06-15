@@ -4,6 +4,7 @@ package at.ac.tuwien.sepr.groupphase.backend.service;
 import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.user.UserDataLoginDto;
 import at.ac.tuwien.sepr.groupphase.backend.entity.ApplicationUser;
 import at.ac.tuwien.sepr.groupphase.backend.service.dto.user.LoginResponseDto;
+import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
@@ -29,7 +30,7 @@ public interface AuthService extends UserDetailsService {
      * @return {@link LoginResponseDto} containing the JWT, if successful
      * @throws org.springframework.security.authentication.BadCredentialsException if credentials are bad
      */
-    LoginResponseDto login(UserDataLoginDto userLoginDto);
+    LoginResponseDto login(UserDataLoginDto userLoginDto) throws BadCredentialsException;
 
     /**
      * Retrieve the currently authenticated user from the security context.
@@ -37,6 +38,6 @@ public interface AuthService extends UserDetailsService {
      * @return the authenticated {@link ApplicationUser}
      * @throws org.springframework.security.core.userdetails.UsernameNotFoundException if the user cannot be found
      */
-    ApplicationUser getCurrentUser();
+    ApplicationUser getCurrentUser() throws UsernameNotFoundException;
 
 }

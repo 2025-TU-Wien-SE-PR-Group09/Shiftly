@@ -1,4 +1,4 @@
-package at.ac.tuwien.sepr.groupphase.backend.service.impl;
+package at.ac.tuwien.sepr.groupphase.backend.service;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;

@@ -35,6 +35,8 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.annotation.security.RolesAllowed;
 import jakarta.transaction.Transactional;
 import jakarta.validation.Valid;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -47,13 +49,19 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.lang.invoke.MethodHandles;
 import java.util.List;
 import java.util.stream.Collectors;
 
 @Tag(name = "Department")
 @RestController
 @RequestMapping("/api/departments")
+@ApiResponse(responseCode = "403", description = "Access denied")
+@ApiResponse(responseCode = "404", description = "Given resource not found")
+@ApiResponse(responseCode = "400", description = "Invalid request data")
+@ApiResponse(responseCode = "409", description = "Conflict with existing data")
 public class DepartmentEndpoint {
+    private static final Logger LOGGER = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
 
     private final DepartmentService departmentService;
     private final EmployeeService employeeService;
@@ -76,6 +84,8 @@ public class DepartmentEndpoint {
     @ApiResponse(responseCode = "200", description = "List of all departments")
     @GetMapping(produces = MediaType.APPLICATION_JSON_VALUE)
     public List<DepartmentDetailRestResponseDto> getAllDepartments() {
+        LOGGER.trace("getAllDepartments()");
+
         return departmentService.getAllDepartments().stream()
             .map(dept -> new DepartmentDetailRestResponseDto(
                 dept.getName(),
@@ -88,6 +98,8 @@ public class DepartmentEndpoint {
     @ApiResponse(responseCode = "200", description = "List of all supervisors")
     @GetMapping(value = "/api/departments/supervisors", produces = MediaType.APPLICATION_JSON_VALUE)
     public List<ApplicationUserResponseDto> getAllAvailableSupervisors() {
+        LOGGER.trace("getAllAvailableSupervisors()");
+
         List<ApplicationUserResponseDto> availableUsers = userService.getAllAvailableUsers();
         availableUsers.addAll(userService.getAllSupervisors(false));
         return availableUsers;
@@ -98,6 +110,8 @@ public class DepartmentEndpoint {
     @ApiResponse(responseCode = "200", description = "List of all employees that can be invited to department")
     @GetMapping(value = "/api/departments/employees", produces = MediaType.APPLICATION_JSON_VALUE)
     public List<ApplicationUserResponseDto> getAllAvailableEmployees() {
+        LOGGER.trace("getAllAvailableEmployees()");
+
         return userService.getAllAvailableUsers();
     }
 
@@ -108,6 +122,8 @@ public class DepartmentEndpoint {
     @ApiResponse(responseCode = "200", description = "Get department by name")
     @GetMapping(path = "/{departmentName}", produces = MediaType.APPLICATION_JSON_VALUE)
     public DepartmentDetailRestResponseDto getDepartmentByName(@PathVariable(name = "departmentName") String departmentName) {
+        LOGGER.trace("getDepartmentByName({})", departmentName);
+
         return departmentService.getDepartmentByName(departmentName).map(d ->
                 new DepartmentDetailRestResponseDto(
                     d.name(),
@@ -123,6 +139,8 @@ public class DepartmentEndpoint {
     @ApiResponse(responseCode = "201", description = "New department created")
     @PostMapping(produces = MediaType.APPLICATION_JSON_VALUE, consumes = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<Void> createDepartment(@RequestBody @Valid DepartmentCreateRestDto restDto) {
+        LOGGER.trace("createDepartment({})", restDto);
+
         DepartmentCreateDto serviceDto = new DepartmentCreateDto(
             restDto.getName(),
             restDto.getSupervisorEmail());
@@ -137,6 +155,8 @@ public class DepartmentEndpoint {
     @PutMapping(produces = MediaType.APPLICATION_JSON_VALUE, consumes = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<Void> editDepartment(@RequestBody @Valid DepartmentEditRestDto restDto)
         throws NotFoundException {
+        LOGGER.trace("editDepartment({})", restDto);
+
         DepartmentEditDto serviceDto = new DepartmentEditDto(
             restDto.getOldName(),
             restDto.getNewName(),
@@ -153,6 +173,7 @@ public class DepartmentEndpoint {
     public PlanBlueprintResponse createShiftplanBlueprint(
         @PathVariable(name = "departmentName") String departmentName,
         @RequestBody @Valid CreatePlanBlueprintDto blueprintDto) {
+        LOGGER.trace("createShiftplanBlueprint({}, {})", departmentName, blueprintDto);
 
         DepartmentDto department = departmentService.getDepartmentByName(departmentName)
             .orElseThrow(() -> new NotFoundException("Department not found!"));
@@ -173,6 +194,7 @@ public class DepartmentEndpoint {
     public PlanBlueprintResponse addShiftToPlanBlueprint(
         @PathVariable(name = "departmentName") String departmentName,
         @RequestBody @Valid AddShiftToPlanBlueprintDto blueprintDto) {
+        LOGGER.trace("addShiftToPlanBlueprint({}, {})", departmentName, blueprintDto);
 
         DepartmentDto department = departmentService.getDepartmentByName(departmentName)
             .orElseThrow(() -> new NotFoundException("Department not found!"));
@@ -188,6 +210,7 @@ public class DepartmentEndpoint {
     @GetMapping(path = "/{departmentName}/shiftplanBlueprint", produces = MediaType.APPLICATION_JSON_VALUE)
     public List<PlanBlueprintResponse> getShiftplanBlueprints(
         @PathVariable(name = "departmentName") String departmentName) {
+        LOGGER.trace("getShiftplanBlueprints({})", departmentName);
 
         DepartmentDto department = departmentService.getDepartmentByName(departmentName)
             .orElseThrow(() -> new NotFoundException("Department not found!"));
@@ -202,6 +225,8 @@ public class DepartmentEndpoint {
     @PostMapping(path = "/{id}/generate-concrete-plan", consumes = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<Void> generateConcretePlan(
         @RequestBody @Valid GenerateConcretePlanDto generateConcretePlanDto, @PathVariable("id") Long id) {
+        LOGGER.trace("generateConcretePlan({}, {})", generateConcretePlanDto, id);
+
         ConcretePlanGenerateDto mapped = ShiftRestMapper.mapFromRequest(id, generateConcretePlanDto);
 
         shiftPlanningService.generateConcreteQuarterlyPlan(mapped);
@@ -217,6 +242,7 @@ public class DepartmentEndpoint {
     public EmployeeRestResponseDto addEmployeeToDepartment(
         @PathVariable(name = "departmentName") String departmentName,
         @PathVariable(name = "employeeEmail") String employeeEmail) {
+        LOGGER.trace("addEmployeeToDepartment({}, {})", departmentName, employeeEmail);
 
         DepartmentDto department = departmentService.getDepartmentByName(departmentName)
             .orElseThrow(() -> new NotFoundException("Department not found!"));
@@ -239,6 +265,7 @@ public class DepartmentEndpoint {
     @Transactional
     public List<EmployeeListItemResponseDto> getEmployeesOfDepartment(
         @PathVariable(name = "departmentName") String departmentName) {
+        LOGGER.trace("getEmployeesOfDepartment({})", departmentName);
 
         DepartmentDto department = departmentService.getDepartmentByName(departmentName)
             .orElseThrow(() -> new NotFoundException("Department not found!"));
@@ -258,6 +285,7 @@ public class DepartmentEndpoint {
     @GetMapping(path = "/{departmentName}/shiftplan",
         produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<DepartmentShiftplanCalendarResponse> getConcreteShiftplan(@PathVariable("departmentName") String name) {
+        LOGGER.trace("getConcreteShiftplan({})", name);
 
         var plan = shiftPlanningService.getCurrentConcretePlan(name);
 
@@ -277,6 +305,8 @@ public class DepartmentEndpoint {
     @Operation(summary = "Delete a department")
     @ApiResponse(responseCode = "200", description = "Department deleted successfully")
     public ResponseEntity<Void> deleteDepartment(@PathVariable("departmentName") String departmentName) {
+        LOGGER.trace("deleteDepartment({})", departmentName);
+
         departmentService.deleteDepartmentByName(departmentName);
         return ResponseEntity.ok().build();
     }

@@ -42,7 +42,7 @@ public class AuthServiceImpl implements AuthService {
     }
 
     @Override
-    public LoginResponseDto login(UserDataLoginDto userLoginDto) {
+    public LoginResponseDto login(UserDataLoginDto userLoginDto) throws BadCredentialsException {
         LOGGER.trace("login({})", userLoginDto);
         UserDetails userDetails = loadUserByUsername(userLoginDto.getEmail());
         if (userDetails != null
@@ -80,7 +80,8 @@ public class AuthServiceImpl implements AuthService {
     }
 
     @Override
-    public ApplicationUser getCurrentUser() {
+    public ApplicationUser getCurrentUser() throws UsernameNotFoundException {
+        LOGGER.trace("getCurrentUser()");
         var authentication = SecurityContextHolder.getContext().getAuthentication();
         if (authentication == null || !authentication.isAuthenticated()) {
             throw new UsernameNotFoundException("No authentication found");

@@ -18,4 +18,11 @@ public class MessageResponseDto {
     public void setMessage(String message) {
         this.message = message;
     }
+
+    @Override
+    public String toString() {
+        return "MessageResponseDto{" +
+            "message='" + message + '\'' +
+            '}';
+    }
 }
