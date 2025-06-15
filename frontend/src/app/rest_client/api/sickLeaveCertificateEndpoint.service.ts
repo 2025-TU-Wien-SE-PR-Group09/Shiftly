@@ -19,7 +19,7 @@ import { Observable }                                        from 'rxjs';
 // @ts-ignore
 import { SickLeaveCertificateRestDto } from '../model/sickLeaveCertificateRestDto';
 // @ts-ignore
-import { SickLeaveCertificateUploadDto } from '../model/sickLeaveCertificateUploadDto';
+import { SickLeaveCertificateUploadDatesDto } from '../model/sickLeaveCertificateUploadDatesDto';
 
 // @ts-ignore
 import { BASE_PATH, COLLECTION_FORMATS }                     from '../variables';
@@ -38,6 +38,8 @@ export class SickLeaveCertificateEndpointService extends BaseService {
     }
 
     /**
+     * Delete a sick leave certificate
+     * Deletes a sick leave certificate by its ID. Only the owner or an admin can perform this operation.
      * @param id 
      * @param observe set whether or not to return the data Observable as the body, response or events. defaults to returning the body.
      * @param reportProgress flag to report request and response progress.
@@ -90,6 +92,8 @@ export class SickLeaveCertificateEndpointService extends BaseService {
     }
 
     /**
+     * Download a sick leave certificate file
+     * Downloads the actual file content of a sick leave certificate by its ID. Only the owner or an admin can access it.
      * @param id 
      * @param observe set whether or not to return the data Observable as the body, response or events. defaults to returning the body.
      * @param reportProgress flag to report request and response progress.
@@ -194,6 +198,8 @@ export class SickLeaveCertificateEndpointService extends BaseService {
     }
 
     /**
+     * Get a sick leave certificate by ID
+     * Returns the metadata of a sick leave certificate by its ID. Only the owner or an admin can access it.
      * @param id 
      * @param observe set whether or not to return the data Observable as the body, response or events. defaults to returning the body.
      * @param reportProgress flag to report request and response progress.
@@ -247,6 +253,8 @@ export class SickLeaveCertificateEndpointService extends BaseService {
     }
 
     /**
+     * Get all sick leave certificates for the current user
+     * Returns a list of sick leave certificates belonging to the currently authenticated user.
      * @param observe set whether or not to return the data Observable as the body, response or events. defaults to returning the body.
      * @param reportProgress flag to report request and response progress.
      */
@@ -296,15 +304,17 @@ export class SickLeaveCertificateEndpointService extends BaseService {
     }
 
     /**
+     * Upload a sick leave certificate
+     * Uploads a sick leave certificate file for the currently authenticated user.
      * @param file 
      * @param uploadDto 
      * @param observe set whether or not to return the data Observable as the body, response or events. defaults to returning the body.
      * @param reportProgress flag to report request and response progress.
      */
-    public upload(file: Blob, uploadDto: SickLeaveCertificateUploadDto, observe?: 'body', reportProgress?: boolean, options?: {httpHeaderAccept?: 'application/json', context?: HttpContext, transferCache?: boolean}): Observable<SickLeaveCertificateRestDto>;
-    public upload(file: Blob, uploadDto: SickLeaveCertificateUploadDto, observe?: 'response', reportProgress?: boolean, options?: {httpHeaderAccept?: 'application/json', context?: HttpContext, transferCache?: boolean}): Observable<HttpResponse<SickLeaveCertificateRestDto>>;
-    public upload(file: Blob, uploadDto: SickLeaveCertificateUploadDto, observe?: 'events', reportProgress?: boolean, options?: {httpHeaderAccept?: 'application/json', context?: HttpContext, transferCache?: boolean}): Observable<HttpEvent<SickLeaveCertificateRestDto>>;
-    public upload(file: Blob, uploadDto: SickLeaveCertificateUploadDto, observe: any = 'body', reportProgress: boolean = false, options?: {httpHeaderAccept?: 'application/json', context?: HttpContext, transferCache?: boolean}): Observable<any> {
+    public upload(file: Blob, uploadDto: SickLeaveCertificateUploadDatesDto, observe?: 'body', reportProgress?: boolean, options?: {httpHeaderAccept?: 'application/json', context?: HttpContext, transferCache?: boolean}): Observable<SickLeaveCertificateRestDto>;
+    public upload(file: Blob, uploadDto: SickLeaveCertificateUploadDatesDto, observe?: 'response', reportProgress?: boolean, options?: {httpHeaderAccept?: 'application/json', context?: HttpContext, transferCache?: boolean}): Observable<HttpResponse<SickLeaveCertificateRestDto>>;
+    public upload(file: Blob, uploadDto: SickLeaveCertificateUploadDatesDto, observe?: 'events', reportProgress?: boolean, options?: {httpHeaderAccept?: 'application/json', context?: HttpContext, transferCache?: boolean}): Observable<HttpEvent<SickLeaveCertificateRestDto>>;
+    public upload(file: Blob, uploadDto: SickLeaveCertificateUploadDatesDto, observe: any = 'body', reportProgress: boolean = false, options?: {httpHeaderAccept?: 'application/json', context?: HttpContext, transferCache?: boolean}): Observable<any> {
         if (file === null || file === undefined) {
             throw new Error('Required parameter file was null or undefined when calling upload.');
         }

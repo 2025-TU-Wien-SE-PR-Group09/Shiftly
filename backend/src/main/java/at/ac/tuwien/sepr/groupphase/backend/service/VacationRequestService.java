@@ -41,7 +41,7 @@ public interface VacationRequestService {
      * @throws IllegalStateException if the request is not in pending state
      */
     void deletePendingRequest(DeletePendingVacationRequestDto requestDto)
-        throws ConflictException, NotFoundException, IllegalStateException ;
+        throws ConflictException, NotFoundException, IllegalStateException;
 
     /**
      * Updates the status of a vacation request.

@@ -33,8 +33,8 @@ public class LoginResponseRestDto {
 
     @Override
     public String toString() {
-        return "LoginResponseRestDto{" +
-            "jwt='" + jwt + '\'' +
-            '}';
+        return "LoginResponseRestDto{"
+            + "jwt='" + jwt + '\''
+            + '}';
     }
 }

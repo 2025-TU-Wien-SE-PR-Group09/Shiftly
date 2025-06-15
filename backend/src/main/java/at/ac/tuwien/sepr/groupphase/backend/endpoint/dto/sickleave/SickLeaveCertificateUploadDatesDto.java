@@ -40,9 +40,9 @@ public class SickLeaveCertificateUploadDatesDto {
 
     @Override
     public String toString() {
-        return "SickLeaveCertificateUploadDatesDto{" +
-            "startDate=" + startDate +
-            ", endDate=" + endDate +
-            '}';
+        return "SickLeaveCertificateUploadDatesDto{"
+            + "startDate=" + startDate
+            + ", endDate=" + endDate
+            + '}';
     }
 }

@@ -31,8 +31,8 @@ public class ChangePasswordRestDto {
 
     @Override
     public String toString() {
-        return "ChangePasswordRestDto{" +
-            "newPassword='" + newPassword + '\'' +
-            '}';
+        return "ChangePasswordRestDto{"
+            + "newPassword='" + newPassword + '\''
+            + '}';
     }
 }

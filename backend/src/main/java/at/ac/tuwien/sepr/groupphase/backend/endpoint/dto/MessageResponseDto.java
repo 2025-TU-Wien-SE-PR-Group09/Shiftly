@@ -21,8 +21,8 @@ public class MessageResponseDto {
 
     @Override
     public String toString() {
-        return "MessageResponseDto{" +
-            "message='" + message + '\'' +
-            '}';
+        return "MessageResponseDto{"
+            + "message='" + message + '\''
+            + '}';
     }
 }

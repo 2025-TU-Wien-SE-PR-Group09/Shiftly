@@ -45,7 +45,7 @@ public class VacationRequestServiceImpl implements VacationRequestService {
 
 
     @Override
-    public VacationRequestResponseDto createVacationRequest(VacationRequestDto vacationRequestDto) throws ConflictException{
+    public VacationRequestResponseDto createVacationRequest(VacationRequestDto vacationRequestDto) throws ConflictException {
         LOGGER.trace("createVacationRequest({})", vacationRequestDto);
 
         LocalDate start = vacationRequestDto.getStartDate();
@@ -155,7 +155,7 @@ public class VacationRequestServiceImpl implements VacationRequestService {
 
     @Override
     public List<VacationRequestResponseDto> getVacationRequestsByStatusAndSupervisor(RetrieveVacationByStatusAndSupervisorDto retrieveDto)
-        throws NotFoundException, ConflictException{
+        throws NotFoundException, ConflictException {
         LOGGER.trace("getVacationRequestsByStatusAndSupervisor({})", retrieveDto);
 
         ApplicationUser supervisor = userRepository.findByEmail(retrieveDto.supervisorEmail())

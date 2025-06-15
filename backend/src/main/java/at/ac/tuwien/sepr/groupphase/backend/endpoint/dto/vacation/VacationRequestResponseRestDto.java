@@ -65,12 +65,12 @@ public class VacationRequestResponseRestDto {
 
     @Override
     public String toString() {
-        return "VacationRequestResponseRestDto{" +
-            "id=" + id +
-            ", startDate=" + startDate +
-            ", endDate=" + endDate +
-            ", status=" + status +
-            ", employeeEmail='" + employeeEmail + '\'' +
-            '}';
+        return "VacationRequestResponseRestDto{"
+            + "id=" + id
+            + ", startDate=" + startDate
+            + ", endDate=" + endDate
+            + ", status=" + status
+            + ", employeeEmail='" + employeeEmail + '\''
+            + '}';
     }
 }

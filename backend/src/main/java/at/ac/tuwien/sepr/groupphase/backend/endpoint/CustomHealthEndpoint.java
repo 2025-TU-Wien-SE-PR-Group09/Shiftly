@@ -36,8 +36,8 @@ public class CustomHealthEndpoint {
     @GetMapping
     @Operation(
         summary = "Health check endpoint",
-        description = "This endpoint is used to check the health of the application. " +
-            "It returns 'OK' if the application is healthy, otherwise it returns an internal server error."
+        description = "This endpoint is used to check the health of the application. "
+            + "It returns 'OK' if the application is healthy, otherwise it returns an internal server error."
     )
     public ResponseEntity<String> getHealth() {
         LOGGER.trace("getHealth()");

@@ -153,8 +153,8 @@ public class SickLeaveCertificateEndpoint {
     @RolesAllowed({"EMPLOYEE", "ADMIN"})
     @Operation(
         summary = "Download a sick leave certificate file",
-        description = "Downloads the actual file content of a sick leave certificate by its ID. " +
-            "Only the owner or an admin can access it."
+        description = "Downloads the actual file content of a sick leave certificate by its ID. "
+            + "Only the owner or an admin can access it."
     )
     @ApiResponse(responseCode = "200", description = "Sick leave certificate file downloaded successfully")
     public ResponseEntity<byte[]> download(@PathVariable(name = "id") Long id) {
@@ -228,8 +228,8 @@ public class SickLeaveCertificateEndpoint {
     @RolesAllowed({"ADMIN", "EMPLOYEE"})
     @Operation(
         summary = "Delete a sick leave certificate",
-        description = "Deletes a sick leave certificate by its ID. " +
-            "Only the owner or an admin can perform this operation."
+        description = "Deletes a sick leave certificate by its ID. "
+            + "Only the owner or an admin can perform this operation."
     )
     @ApiResponse(responseCode = "204", description = "Sick leave certificate deleted successfully")
     public ResponseEntity<Void> deleteSickLeaveCertificate(@PathVariable(name = "id") Long id) {

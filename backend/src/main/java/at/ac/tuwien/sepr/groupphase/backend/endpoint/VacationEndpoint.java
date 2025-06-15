@@ -93,8 +93,8 @@ public class VacationEndpoint {
     @Transactional
     @Operation(
         summary = "Delete a pending vacation request",
-        description = "Deletes a vacation request that is in the pending state. " +
-            "The user must be authenticated and the request must be in pending status."
+        description = "Deletes a vacation request that is in the pending state. "
+            + "The user must be authenticated and the request must be in pending status."
     )
     public ResponseEntity<Void> deleteVacationRequest(@PathVariable(name = "id") Long id, Principal principal) {
         LOGGER.trace("deleteVacationRequest({}, {})", id, principal);
@@ -128,8 +128,8 @@ public class VacationEndpoint {
     @Transactional
     @Operation(
         summary = "Update the status of a vacation request",
-        description = "Updates the status of a vacation request to either APPROVED or REJECTED. " +
-            "The user must be authenticated and have supervisor privileges."
+        description = "Updates the status of a vacation request to either APPROVED or REJECTED. "
+            + "The user must be authenticated and have supervisor privileges."
     )
     @ApiResponse(responseCode = "204", description = "Vacation request status updated successfully")
     public ResponseEntity<Void> updateVacationRequestStatus(
