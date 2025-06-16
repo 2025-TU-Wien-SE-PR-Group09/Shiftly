@@ -4,7 +4,7 @@ import at.ac.tuwien.sepr.groupphase.backend.entity.PlanBlueprint;
 import at.ac.tuwien.sepr.groupphase.backend.entity.ShiftBlueprint;
 import at.ac.tuwien.sepr.groupphase.backend.entity.ShiftDayBlueprint;
 import at.ac.tuwien.sepr.groupphase.backend.entity.ShiftWeekBlueprint;
-import at.ac.tuwien.sepr.groupphase.backend.service.dto.shift.ShiftWeekBlueprintDto;
+import org.springframework.stereotype.Service;
 
 import java.time.DayOfWeek;
 import java.time.Duration;
@@ -14,9 +14,6 @@ import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-
-import org.springframework.stereotype.Service;
-
 import java.util.Optional;
 
 @Service
@@ -71,9 +68,9 @@ public class ShiftPlanningValidatorImpl implements ShiftPlanningValidator {
                     endBsec += 24 * 3600;
                 }
 
-                if (startAsec < endBsec && endAsec > startBsec) {
+                if (startAsec + 30 * 60 < endBsec && endAsec > startBsec + 30 * 60) {
                     String message = String.format(
-                        "Shift overlap on %s: A shift from %s to %s overlaps with another from %s to %s in this plan.",
+                        "Shift overlap on %s: A shift from %s to %s overlaps with another from %s to %s in this plan. Overlap of max. 30mins is allowed",
                         key.day(), startA, endA, startB, endB
                     );
                     errors.add(message);

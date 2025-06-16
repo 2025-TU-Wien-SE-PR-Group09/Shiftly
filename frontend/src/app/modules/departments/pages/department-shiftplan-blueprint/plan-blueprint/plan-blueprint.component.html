@@ -10,7 +10,7 @@
               class="border-border bg-card flex sm:min-w-[80px] lg:min-w-[100px] 3xl:min-w-[120px] flex-col items-start rounded-md border p-3 shadow transition hover:shadow-md">
               <span class="text-foreground text-sm font-medium">{{ day.day }}</span>
               <span class="text-muted-foreground text-xs">
-                {{ getHourMinute(day.startTime) }} – {{ formatDuration(day.duration) }}
+                {{ getHourMinute(day.startTime) }} – {{ formatDuration(day.startTime, day.duration) }}
               </span>
             </div>
           </ng-container>

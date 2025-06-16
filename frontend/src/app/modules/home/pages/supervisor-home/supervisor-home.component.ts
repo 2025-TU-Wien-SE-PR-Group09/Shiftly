@@ -27,9 +27,7 @@ export class SupervisorHomeComponent implements OnInit{
   ) {}
 
   protected selectedDepartment: DepartmentDetailRestResponseDto | undefined;
-  protected shiftPlan: DepartmentShiftplanCalendarResponse = {
-    shifts: []
-  };
+  shiftPlan: DepartmentShiftplanCalendarResponse | undefined;
   code: string = 'test';
   protected missingShifts: {shift: string, start: number, end:number}[] = [];
 
@@ -153,10 +151,6 @@ export class SupervisorHomeComponent implements OnInit{
                 if(shiftStartDate[shift.shiftDescription!] == undefined) {
                   shiftStartDate[shift.shiftDescription!] = [[Date.parse(shift.day?.start!), Date.parse(shift.day?.end!)]]
                 } else {
-                  console.log(shiftStartDate[shift.shiftDescription!][shiftStartDate[shift.shiftDescription!].length - 1][1]+oneDayInMs)
-                  console.log(Date.parse(shift.day?.end!))
-                  console.log("a")
-
                   if(shiftStartDate[shift.shiftDescription!][shiftStartDate[shift.shiftDescription!].length - 1][1]+oneDayInMs >= Date.parse(shift.day?.end!)) {
                     shiftStartDate[shift.shiftDescription!][shiftStartDate[shift.shiftDescription!].length - 1][1] =  Date.parse(shift.day?.end!)
                   } else {
