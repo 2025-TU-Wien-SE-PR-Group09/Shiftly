@@ -34,7 +34,7 @@ public class TimeServiceImpl implements TimeService {
         if(month.getDayOfWeek() == DayOfWeek.MONDAY) {
             return month;
         }
-        
+
         return month.with(TemporalAdjusters.next(DayOfWeek.MONDAY));
     }
 }

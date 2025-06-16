@@ -4,6 +4,7 @@ import at.ac.tuwien.sepr.groupphase.backend.entity.ApplicationUser;
 import at.ac.tuwien.sepr.groupphase.backend.entity.ConcreteShiftPlan;
 import at.ac.tuwien.sepr.groupphase.backend.entity.Department;
 import at.ac.tuwien.sepr.groupphase.backend.entity.PlanBlueprint;
+import at.ac.tuwien.sepr.groupphase.backend.entity.ScheduledShift;
 import at.ac.tuwien.sepr.groupphase.backend.entity.ShiftBlueprint;
 import at.ac.tuwien.sepr.groupphase.backend.entity.ShiftDayBlueprint;
 import at.ac.tuwien.sepr.groupphase.backend.entity.ShiftWeekBlueprint;
@@ -24,7 +25,6 @@ import at.ac.tuwien.sepr.groupphase.backend.service.dto.shift.PlanBlueprintCreat
 import at.ac.tuwien.sepr.groupphase.backend.service.dto.shift.PlanBlueprintDto;
 import at.ac.tuwien.sepr.groupphase.backend.service.mapper.ShiftPlanningMapper;
 import at.ac.tuwien.sepr.groupphase.backend.service.validator.ShiftPlanningValidator;
-import jakarta.transaction.Transactional;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -34,6 +34,7 @@ import java.lang.invoke.MethodHandles;
 import java.time.LocalDate;
 import java.util.*;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.Predicate;
 
 @Service
@@ -235,10 +236,16 @@ public class ShiftPlanningServiceImpl implements ShiftPlanningService {
         LocalDate startDate = timeService.nextMondayInMonth(dto.startDate()
             .orElseThrow(() -> new ConflictException("Start date is required")));
 
+        AtomicReference<List<ScheduledShift>> shiftsFromOlderShiftplan = new AtomicReference<>(new ArrayList<>());
+
         concreteShiftPlanRepository.findByDepartmentName(department.getName()).stream()
             .min((a, b) -> b.getEndDate().compareTo(a.getEndDate())).ifPresent(concreteShiftPlan -> {
                 if (concreteShiftPlan.getEndDate().isAfter(startDate)) {
-                    throw new ConflictException("A concrete plan for this department already exists for the specified period.");
+                    shiftsFromOlderShiftplan.set(concreteShiftPlan.getScheduledShifts().stream()
+                        .filter(scheduledShift -> scheduledShift.getEnd().isBefore(startDate.atStartOfDay()))
+                        .toList());
+
+                    concreteShiftPlanRepository.delete(concreteShiftPlan);
                 }
             });
 
@@ -259,6 +266,7 @@ public class ShiftPlanningServiceImpl implements ShiftPlanningService {
 
         var rotatedPlan = shiftPlanRotationService.generateRotatingPlan(plan, blueprint, justWorkers);
         var planWithConstraints = shiftPlanConstraintService.applyConstraints(rotatedPlan);
+        planWithConstraints.addScheduledShifts(shiftsFromOlderShiftplan.get());
 
         return planWithConstraints;
     }
