@@ -4,8 +4,9 @@ import at.ac.tuwien.sepr.groupphase.backend.entity.ApplicationUser;
 import at.ac.tuwien.sepr.groupphase.backend.entity.ConcreteShiftPlan;
 import at.ac.tuwien.sepr.groupphase.backend.entity.ScheduledShift;
 import at.ac.tuwien.sepr.groupphase.backend.entity.ScheduledShiftAssignment;
-import at.ac.tuwien.sepr.groupphase.backend.exception.ConflictException;
-import at.ac.tuwien.sepr.groupphase.backend.repository.*;
+import at.ac.tuwien.sepr.groupphase.backend.repository.ScheduledShiftRepository;
+import at.ac.tuwien.sepr.groupphase.backend.repository.UserRepository;
+import at.ac.tuwien.sepr.groupphase.backend.repository.VacationRequestRepository;
 import at.ac.tuwien.sepr.groupphase.backend.service.shift.ShiftPlanConstraintService;
 import at.ac.tuwien.sepr.groupphase.backend.type.VacationStatus;
 import org.slf4j.Logger;
@@ -16,7 +17,14 @@ import java.lang.invoke.MethodHandles;
 import java.time.DayOfWeek;
 import java.time.LocalDate;
 import java.time.LocalTime;
-import java.util.*;
+import java.time.temporal.ChronoUnit;
+import java.util.ArrayList;
+import java.util.Comparator;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 @Service
@@ -41,62 +49,72 @@ public class ShiftPlanConstraintServiceImpl implements ShiftPlanConstraintServic
 
         Map<LocalDate, Set<ApplicationUser>> availableJumpersPerDay =
             getAvailableJumperEmployeesPerDay(concreteShiftPlan);
-
         Map<ApplicationUser, ApplicationUser> vacationReplacementMap = new HashMap<>();
+
 
         for (ScheduledShift shift : concreteShiftPlan.getScheduledShifts()) {
             LocalDate shiftDate = shift.getStart().toLocalDate();
             LocalDate weekStart = shiftDate.with(DayOfWeek.MONDAY);
+            Set<ApplicationUser> availableJumpersToday = availableJumpersPerDay.get(shiftDate);
 
+            // Sort assignments by the number of overlaps of the user who is assigned to the shift.
+            // This way, we can prioritize users with more overlaps when assigning jumpers.
+            List<ApplicationUser> employees = shift.getAssignments().stream().map(ScheduledShiftAssignment::getUser).distinct().toList();
+            HashMap<ApplicationUser, List<LocalDate>> overlaps = new HashMap<>();
+            for (ApplicationUser employee : employees) {
+                overlaps.put(employee, getVacationOverlap(employee, weekStart));
+            }
             List<ScheduledShiftAssignment> assignmentsCopy = new ArrayList<>(shift.getAssignments());
+            assignmentsCopy.sort(Comparator.comparingInt(a -> overlaps.get(((ScheduledShiftAssignment) a).getUser()) == null ? 0 : overlaps.get(((ScheduledShiftAssignment) a).getUser()).size()).reversed());
 
             for (ScheduledShiftAssignment assignment : assignmentsCopy) {
                 ApplicationUser assignedUser = assignment.getUser();
-                List<LocalDate> overlap = getVacationOverlap(assignedUser, weekStart);
+                List<LocalDate> overlap = overlaps.get(assignedUser);
 
                 if (overlap != null && overlap.contains(shiftDate)) {
-                    ApplicationUser jumper = vacationReplacementMap.get(assignedUser);
+                    if (!availableJumpersToday.isEmpty()) {
+                        ApplicationUser jumper = null;
 
-                    if (jumper == null) {
-                        Set<ApplicationUser> availableJumpersToday = availableJumpersPerDay.get(shiftDate);
-                        if (availableJumpersToday.isEmpty()) {
-                            throw new ConflictException("Not enough available jumper employees for " + shiftDate);
-                        }
-                        jumper = availableJumpersToday.iterator().next();
-                        vacationReplacementMap.put(assignedUser, jumper);
-                    }
+                        // Check if the assigned user has a vacation replacement already
+                        if (vacationReplacementMap.containsKey(assignedUser)) {
+                            jumper = vacationReplacementMap.get(assignedUser);
+                        } else {
+                            // Find a jumper who is available on all overlap days
+                            for (ApplicationUser jumperCandidate : availableJumpersToday) {
+                                boolean availableOnAllDays = true;
 
-                    Set<ApplicationUser> availableJumpersToday = availableJumpersPerDay.get(shiftDate);
-                    if (!availableJumpersToday.contains(jumper)) {
-                        throw new ConflictException("Jumper " + jumper.getEmail() + " is already assigned to another shift on " + shiftDate);
-                    }
+                                for (LocalDate date : overlap) {
+                                    if (!availableJumpersPerDay.get(date).contains(jumperCandidate)) {
+                                        availableOnAllDays = false;
+                                    }
+                                }
 
-                    availableJumpersToday.remove(jumper);
-                    shift.getAssignments().remove(assignment);
-                    shift.addAssignment(new ScheduledShiftAssignment.Builder()
-                        .withShift(shift)
-                        .withUser(jumper)
-                        .build());
+                                if (!availableOnAllDays) {
+                                    jumper = jumperCandidate;
+                                    break;
+                                }
+                            }
 
-
-                    /*
-
-                    // Remove the overlap for the assigned user after assigning a jumper
-                    // This is in case there is funky behavior with multiple shifts on the same day
-                    // Might not be necessary
-
-                    overlap.remove(shiftDate);
-                    if (overlap.isEmpty()) {
-                        vacationReplacementMap.remove(assignedUser);
-
-                        for (int i = 0; i < 7; i++) {
-                            LocalDate day = weekStart.plusDays(i);
-                            if (day.isAfter(shiftDate)) {
-                                availableJumpersPerDay.get(day).add(jumper);
+                            // If no jumper was found, use the first available jumper
+                            // As an optimization, when no jumper is found to be free on all days, we can try to find
+                            // two jumpers that are available on the overlap days.
+                            if (jumper != null) {
+                                vacationReplacementMap.put(assignedUser, jumper);
+                            } else {
+                                jumper = availableJumpersToday.stream().findFirst().get();
                             }
                         }
+
+                        availableJumpersPerDay.get(shiftDate).remove(jumper);
+
+                        shift.getAssignments().remove(assignment);
+                        shift.addAssignment(new ScheduledShiftAssignment.Builder()
+                            .withShift(shift)
+                            .withUser(jumper)
+                            .build());
+                    } else {
+                        shift.getAssignments().remove(assignment);
                     }
-                     */
                 }
             }
         }
@@ -181,7 +199,7 @@ public class ShiftPlanConstraintServiceImpl implements ShiftPlanConstraintServic
             .collect(Collectors.toSet());
 
         Map<LocalDate, Set<ApplicationUser>> result = new HashMap<>();
-        for (int i = 0; i < 7; i++) {
+        for (int i = 0; i < ChronoUnit.DAYS.between(concreteShiftPlan.getStartDate(), concreteShiftPlan.getEndDate()); i++) {
             LocalDate day = weekStart.plusDays(i);
             result.put(day, new HashSet<>(jumperUsersInDepartment));
         }

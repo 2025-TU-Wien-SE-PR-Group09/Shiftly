@@ -55,6 +55,7 @@ public class ShiftPlanRotationServiceImpl implements ShiftPlanRotationService {
                         .withEnd(shiftEnd)
                         .withDescription(slot.blueprint().getDescription())
                         .withPlan(concreteShiftPlan)
+                        .withManpower(slot.blueprint().getManPower())
                         .build();
 
                     for (ApplicationUser user : slot.assignedUsers()) {

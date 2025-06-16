@@ -73,6 +73,7 @@ public class ShiftPlanConstraintServiceTest {
         ConcreteShiftPlan plan = new ConcreteShiftPlan();
         plan.addScheduledShifts(List.of(shiftMonday, shiftTuesday));
         plan.setStartDate(weekStart);
+        plan.setEndDate(weekStart.plusMonths(3));
         plan.setDepartment(department);
 
         // Act
@@ -87,57 +88,6 @@ public class ShiftPlanConstraintServiceTest {
             assertTrue(assignedEmails.contains("jumper@shyft.local"));
             assertFalse(assignedEmails.contains("max@shyft.local"));
         }
-    }
-
-    @Test
-    void testConflictWhenJumperAlreadyAssignedToOtherShiftSameDay() {
-        // Arrange
-        Department department = new Department();
-        department.setName("Production");
-        ApplicationUser jumper = createJumper("jumper@shyft.local", department);
-        ApplicationUser max = createUser("max@shyft.local", department);
-        ApplicationUser tina = createUser("tina@shyft.local", department);
-
-        when(userRepository.findAllByRoleName("JUMPER"))
-            .thenReturn(List.of(jumper));
-
-        when(userRepository.findAllByRoleName("JUMPER"))
-            .thenReturn(List.of(jumper));
-
-        LocalDate weekStart = LocalDate.of(2025, 6, 2);
-
-        // Max vacation on Monday and Tuesday
-        VacationRequest vacationRequestMax = new VacationRequest();
-        vacationRequestMax.setEmployee(max);
-        vacationRequestMax.setStartDate(weekStart);
-        vacationRequestMax.setEndDate(weekStart.plusDays(1));
-        vacationRequestMax.setStatus(VacationStatus.APPROVED);
-        when(vacationRequestRepository.findByEmployeeAndStatus(max, VacationStatus.APPROVED))
-            .thenReturn(List.of(vacationRequestMax));
-
-        // Tina vacation on Tuesday and Wednesday
-        VacationRequest vacationRequestTina = new VacationRequest();
-        vacationRequestTina.setEmployee(tina);
-        vacationRequestTina.setStartDate(weekStart.plusDays(1));
-        vacationRequestTina.setEndDate(weekStart.plusDays(2));
-        vacationRequestTina.setStatus(VacationStatus.APPROVED);
-        when(vacationRequestRepository.findByEmployeeAndStatus(tina, VacationStatus.APPROVED))
-            .thenReturn(List.of(vacationRequestTina));
-
-        // Jumper already assigned to a shift on Tuesday
-        ScheduledShift existingShift = createShift(weekStart.plusDays(1).atTime(8, 0), jumper);
-        when(scheduledShiftRepository.findByStartBetween(any(), any()))
-            .thenReturn(List.of(existingShift));
-
-        // Plan with shifts for Max and Tina
-        ScheduledShift shiftMaxTuesday = createShift(weekStart.plusDays(1).atTime(8, 0), max);
-        ScheduledShift shiftTinaTuesday = createShift(weekStart.plusDays(1).atTime(10, 0), tina);
-        ConcreteShiftPlan plan = new ConcreteShiftPlan();
-        plan.addScheduledShifts(List.of(shiftMaxTuesday, shiftTinaTuesday));
-        plan.setStartDate(weekStart);
-
-        // Act & Assert
-        assertThrows(ConflictException.class, () -> serviceUnderTest.applyConstraints(plan));
     }
 
     @Test
@@ -169,6 +119,7 @@ public class ShiftPlanConstraintServiceTest {
         ScheduledShift tuesdayShift = createShift(weekStart.plusDays(1).atTime(8, 0), max);
         ConcreteShiftPlan plan = new ConcreteShiftPlan();
         plan.setStartDate(weekStart);
+        plan.setEndDate(weekStart.plusMonths(3));
         plan.addScheduledShifts(List.of(mondayShift, tuesdayShift));
         plan.setDepartment(department);
 

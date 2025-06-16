@@ -27,8 +27,11 @@ export class SupervisorHomeComponent implements OnInit{
   ) {}
 
   protected selectedDepartment: DepartmentDetailRestResponseDto | undefined;
-  protected shiftPlan: DepartmentShiftplanCalendarResponse | undefined;
+  protected shiftPlan: DepartmentShiftplanCalendarResponse = {
+    shifts: []
+  };
   code: string = 'test';
+  protected missingShifts: {shift: string, start: number, end:number}[] = [];
 
   view: CalendarView = CalendarView.Month;
   CalendarView = CalendarView; // Für Template-Zugriff
@@ -123,7 +126,8 @@ export class SupervisorHomeComponent implements OnInit{
         meta: {
           //todo: workers should become entity "worker" e.g. including the role
           //todo: 'springer' should be displayed visible in the calendar
-          workers: shift.workers
+          workers: shift.workers,
+          manpower: shift.manpower
         }
       });
     }
@@ -140,6 +144,51 @@ export class SupervisorHomeComponent implements OnInit{
         next: (data) => {
           if (data.shifts) {
             this.shiftPlan = data;
+            let shiftStartDate: Record<string, number[][]> = {};
+            const oneDayInMs = 24 * 60 * 60 * 1000; // milliseconds in a day
+
+            for (let shift of this.shiftPlan!.shifts!) {
+
+              if (shift.workers?.length! < shift.manpower!) {
+                if(shiftStartDate[shift.shiftDescription!] == undefined) {
+                  shiftStartDate[shift.shiftDescription!] = [[Date.parse(shift.day?.start!), Date.parse(shift.day?.end!)]]
+                } else {
+                  console.log(shiftStartDate[shift.shiftDescription!][shiftStartDate[shift.shiftDescription!].length - 1][1]+oneDayInMs)
+                  console.log(Date.parse(shift.day?.end!))
+                  console.log("a")
+
+                  if(shiftStartDate[shift.shiftDescription!][shiftStartDate[shift.shiftDescription!].length - 1][1]+oneDayInMs >= Date.parse(shift.day?.end!)) {
+                    shiftStartDate[shift.shiftDescription!][shiftStartDate[shift.shiftDescription!].length - 1][1] =  Date.parse(shift.day?.end!)
+                  } else {
+                    shiftStartDate[shift.shiftDescription!][shiftStartDate[shift.shiftDescription!].length] = [Date.parse(shift.day?.start!), Date.parse(shift.day?.start!)]
+                  }
+                }
+              }
+            }
+
+            for (let shift in shiftStartDate) {
+              for (let lMissingDates of shiftStartDate[shift]) {
+                if(lMissingDates[1] - lMissingDates[0] <= oneDayInMs) {
+                  this.missingShifts.push(
+                    {
+                      shift: shift,
+                      start: lMissingDates[0],
+                      end: -1
+                    }
+                  )
+                } else {
+                  this.missingShifts.push(
+                    {
+                      shift: shift,
+                      start: lMissingDates[0],
+                      end: lMissingDates[1]
+                    }
+                  )
+                }
+              }
+            }
+            console.log(shiftStartDate);
+
             this.calculateEvents();
           }
         },

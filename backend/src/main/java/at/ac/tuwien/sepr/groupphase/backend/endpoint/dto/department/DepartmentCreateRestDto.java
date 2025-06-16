@@ -13,8 +13,8 @@ public class DepartmentCreateRestDto {
     @NotBlank(message = "Department name must not be blank")
     @Size(min = 1, max = 100, message = "Department name must be between 1 and 100 characters long")
     @Pattern(
-        regexp = "^[A-Za-z0-9-_]{1,100}$",
-        message = "The name can only contain characters A-Za-z0-9-_."
+        regexp = "^[A-Za-z0-9-_ ]{1,100}$",
+        message = "The name can only contain characters A-Za-z0-9-_ ."
     )
     private String name;
 

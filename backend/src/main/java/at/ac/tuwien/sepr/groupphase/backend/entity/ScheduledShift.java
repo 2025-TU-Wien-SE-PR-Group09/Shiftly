@@ -34,6 +34,9 @@ public class ScheduledShift {
     @Column(nullable = false)
     private String description;
 
+    @Column(nullable = false)
+    private int manpower;
+
     @OneToMany(mappedBy = "scheduledShift", cascade = CascadeType.ALL, orphanRemoval = true)
     private Set<ScheduledShiftAssignment> assignments = new HashSet<>();
 
@@ -90,6 +93,14 @@ public class ScheduledShift {
         assignment.setScheduledShift(this);
     }
 
+    public int getManpower() {
+        return manpower;
+    }
+
+    public void setManpower(int manpower) {
+        this.manpower = manpower;
+    }
+
     public void setAssignments(Set<ScheduledShiftAssignment> assignments) {
         this.assignments = assignments;
     }
@@ -109,6 +120,11 @@ public class ScheduledShift {
 
         public Builder withStart(LocalDateTime start) {
             shift.setStart(start);
+            return this;
+        }
+
+        public Builder withManpower(int manpower) {
+            shift.setManpower(manpower);
             return this;
         }
 

@@ -64,6 +64,7 @@ public class ScheduledShiftAssignment {
         this.id.setUserEmail(email);
     }
 
+
     public static class Builder {
         private final ScheduledShiftAssignment assignment = new ScheduledShiftAssignment();
 

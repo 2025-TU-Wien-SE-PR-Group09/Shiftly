@@ -225,7 +225,6 @@ public class ShiftPlanningServiceImpl implements ShiftPlanningService {
 
 
     @Override
-    @Transactional
     public ConcreteShiftPlan generateConcreteQuarterlyPlan(ConcretePlanGenerateDto dto) {
         LOGGER.trace("generateConcreteQuarterlyPlan({})", dto);
 
