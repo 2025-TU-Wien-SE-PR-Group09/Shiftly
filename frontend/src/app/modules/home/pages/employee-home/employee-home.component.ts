@@ -110,8 +110,8 @@ export class EmployeeHomeComponent implements OnInit{
     this.events = [];
 
     for (const shift of this.shiftPlan.shifts) {
-      //todo: delete the last check after fixing it in the backend
-      if (!shift.day?.start || !shift.day?.end || !shift.workers?.includes(<string>this.currentUser?.email)) {
+      console.log(shift.workers)
+      if (!shift.day?.start || !shift.day?.end) {
         continue;
       }
 
