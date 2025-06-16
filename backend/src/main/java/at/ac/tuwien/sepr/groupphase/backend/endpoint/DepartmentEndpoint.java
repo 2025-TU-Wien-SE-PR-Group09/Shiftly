@@ -1,37 +1,34 @@
 package at.ac.tuwien.sepr.groupphase.backend.endpoint;
 
-import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.shift.CreatePlanBlueprintDto;
-import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.shift.PlanBlueprintResponse;
-import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.department.DepartmentShiftplanCalendarResponse;
-import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.shift.AddShiftToPlanBlueprintDto;
-import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.shift.GenerateConcretePlanDto;
-import at.ac.tuwien.sepr.groupphase.backend.endpoint.mapper.ShiftRestMapper;
-import at.ac.tuwien.sepr.groupphase.backend.entity.*;
-import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.user.ApplicationUserResponseDto;
 import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.department.DepartmentCreateRestDto;
 import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.department.DepartmentDetailRestResponseDto;
-import at.ac.tuwien.sepr.groupphase.backend.exception.ConflictException;
-import at.ac.tuwien.sepr.groupphase.backend.service.dto.department.DepartmentEditDto;
 import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.department.DepartmentEditRestDto;
+import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.department.DepartmentShiftplanCalendarResponse;
 import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.employee.EmployeeListItemResponseDto;
 import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.employee.EmployeeRestResponseDto;
-import at.ac.tuwien.sepr.groupphase.backend.entity.ConcreteShiftPlan;
+import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.shift.AddShiftToPlanBlueprintDto;
+import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.shift.CreatePlanBlueprintDto;
+import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.shift.GenerateConcretePlanDto;
+import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.shift.PlanBlueprintResponse;
+import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.user.ApplicationUserResponseDto;
+import at.ac.tuwien.sepr.groupphase.backend.endpoint.mapper.ShiftRestMapper;
+import at.ac.tuwien.sepr.groupphase.backend.entity.ScheduledShift;
+import at.ac.tuwien.sepr.groupphase.backend.exception.ConflictException;
 import at.ac.tuwien.sepr.groupphase.backend.exception.NotFoundException;
 import at.ac.tuwien.sepr.groupphase.backend.service.DepartmentService;
 import at.ac.tuwien.sepr.groupphase.backend.service.EmployeeService;
-import at.ac.tuwien.sepr.groupphase.backend.service.dto.shift.ShiftBlueprintDto;
-import at.ac.tuwien.sepr.groupphase.backend.service.dto.user.UserDepartmentDto;
-import at.ac.tuwien.sepr.groupphase.backend.service.dto.user.UserProfileDto;
-import at.ac.tuwien.sepr.groupphase.backend.service.shift.ShiftPlanningService;
-import at.ac.tuwien.sepr.groupphase.backend.service.dto.shift.ConcretePlanGenerateDto;
 import at.ac.tuwien.sepr.groupphase.backend.service.UserService;
 import at.ac.tuwien.sepr.groupphase.backend.service.dto.department.DepartmentCreateDto;
 import at.ac.tuwien.sepr.groupphase.backend.service.dto.department.DepartmentDto;
+import at.ac.tuwien.sepr.groupphase.backend.service.dto.department.DepartmentEditDto;
 import at.ac.tuwien.sepr.groupphase.backend.service.dto.department.DepartmentNameDto;
 import at.ac.tuwien.sepr.groupphase.backend.service.dto.employee.EmployeeDto;
 import at.ac.tuwien.sepr.groupphase.backend.service.dto.employee.EmployeeListItemDto;
+import at.ac.tuwien.sepr.groupphase.backend.service.dto.shift.ConcretePlanGenerateDto;
 import at.ac.tuwien.sepr.groupphase.backend.service.dto.user.UserEmailDto;
+import at.ac.tuwien.sepr.groupphase.backend.service.dto.user.UserProfileDto;
 import at.ac.tuwien.sepr.groupphase.backend.service.mapper.ShiftPlanningMapper;
+import at.ac.tuwien.sepr.groupphase.backend.service.shift.ShiftPlanningService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -43,7 +40,6 @@ import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.access.AccessDeniedException;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -56,7 +52,6 @@ import org.springframework.web.bind.annotation.RestController;
 import java.lang.invoke.MethodHandles;
 import java.security.Principal;
 import java.util.List;
-import java.util.Objects;
 import java.util.stream.Collectors;
 
 @Tag(name = "Department")
@@ -305,7 +300,21 @@ public class DepartmentEndpoint {
 
         userService.checkAccessToDepartment(new DepartmentNameDto(name));
 
-        List<ScheduledShift> shifts = shiftPlanningService.getCurrentConcretePlan(name).getScheduledShifts();
+        UserProfileDto currentUser = userService.getCurrentUserProfile();
+        List<ScheduledShift> shifts;
+
+        if (currentUser.getRole().equals("EMPLOYEE")) {
+            shifts = shiftPlanningService.getCurrentConcretePlan(name)
+                .getScheduledShifts().stream()
+                .filter(s -> s.getAssignments()
+                    .stream()
+                    .map(a -> a.getUser().getEmail())
+                    .anyMatch(userEmail -> userEmail.equals(principal.getName())))
+                .toList();
+        } else {
+            shifts = shiftPlanningService.getCurrentConcretePlan(name)
+                .getScheduledShifts();
+        }
 
         DepartmentShiftplanCalendarResponse response = new DepartmentShiftplanCalendarResponse(
             shifts.stream()
