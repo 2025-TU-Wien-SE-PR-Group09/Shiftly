@@ -59,8 +59,15 @@ public class SickLeaveCertificateServiceImpl implements SickLeaveCertificateServ
         ApplicationUser user = userRepository.findByEmail(uploadDto.email())
             .orElseThrow(() -> new NotFoundException("User not found"));
 
+        String generatedFileName = String.format("SickNote_%s_%s%s",
+            uploadDto.startDate(),
+            uploadDto.endDate(),
+            getFileExtension(uploadDto.file().getOriginalFilename())
+        );
+
+
         SickLeaveCertificate cert = new SickLeaveCertificate();
-        cert.setFileName(uploadDto.file().getOriginalFilename());
+        cert.setFileName(generatedFileName);
         cert.setFileType(uploadDto.file().getContentType());
         cert.setUploadedAt(LocalDateTime.now());
         cert.setEmployee(user);
@@ -166,5 +173,13 @@ public class SickLeaveCertificateServiceImpl implements SickLeaveCertificateServ
 
         certificateRepository.delete(cert);
     }
+
+    private String getFileExtension(String filename) {
+        if (filename == null || !filename.contains(".")) {
+            return "";
+        }
+        return filename.substring(filename.lastIndexOf("."));
+    }
+
 
 }
