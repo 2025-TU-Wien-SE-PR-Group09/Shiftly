@@ -1,9 +1,9 @@
 <div class="border-muted/50 bg-background flex min-w-full flex-col rounded-xl border p-6 mb-4">
 
-<h2 class="text-lg font-bold mb-4 text-black dark:text-white">Pending Vacation Requests</h2>
+  <h2 class="text-lg font-bold mb-4 text-black dark:text-white">Pending Vacation Requests</h2>
 
   <div class="mb-4 flex flex-row justify-items-start items-center">
-    <label class=" text-md block mb-1 text-foreground mr-4">Filter by employee email</label>
+    <label class="text-md block mb-1 text-foreground mr-4">Filter by employee email</label>
     <input
       type="text"
       [(ngModel)]="searchEmailPending"
@@ -43,38 +43,41 @@
     </table>
   </div>
 </div>
-<div class="border-muted/50 bg-background flex min-w-full flex-col rounded-xl border p-6">
 
-  <h2 class="text-lg font-bold mb-4 text-black dark:text-white">Approved Vacation Requests</h2>
+<div class="border-muted/50 bg-background flex min-w-full flex-col rounded-xl border p-6 mt-6">
+
+  <h2 class="text-lg font-bold mb-4 text-black dark:text-white">Vacation History</h2>
 
   <div class="mb-4 flex flex-row justify-items-start items-center">
-    <label class=" text-md block mb-1 text-foreground mr-4">Filter by employee email</label>
+    <label class="text-md block mb-1 text-foreground mr-4">Filter by employee email</label>
     <input
       type="text"
-      [(ngModel)]="searchEmailApproved"
+      [(ngModel)]="searchEmailFinished"
       placeholder="Enter email..."
       class="max-w-md p-2 border rounded border-gray-300 bg-background text-black dark:bg-gray-800 dark:text-white"
     />
   </div>
 
-  <div class="border rounded p-4 bg-gray-100  border-gray-300 dark:border-gray-600 dark:bg-gray-900 shadow">
+  <div class="border rounded p-4 bg-gray-100 border-gray-300 dark:border-gray-600 dark:bg-gray-900 shadow">
     <table class="w-full text-left text-sm text-black dark:text-gray-400">
       <thead>
       <tr>
         <th class="pb-2">Employee</th>
         <th class="pb-2">Start</th>
         <th class="pb-2">End</th>
+        <th class="pb-2">Status</th>
       </tr>
       </thead>
       <tbody>
-      <tr *ngFor="let req of filteredApprovedRequests">
+      <tr *ngFor="let req of filteredFinishedRequests">
         <td>{{ req.employeeEmail }}</td>
         <td>{{ req.startDate | date: 'dd.MM.yyyy' }}</td>
         <td>{{ req.endDate | date: 'dd.MM.yyyy' }}</td>
+        <td>{{ req.status }}</td>
       </tr>
-      <tr *ngIf="filteredApprovedRequests.length === 0">
-        <td colspan="3" class="text-center py-4 text-gray-500 dark:text-gray-400">
-          No matching approved vacation requests.
+      <tr *ngIf="filteredFinishedRequests.length === 0">
+        <td colspan="4" class="text-center py-4 text-gray-500 dark:text-gray-400">
+          No matching vacation requests.
         </td>
       </tr>
       </tbody>

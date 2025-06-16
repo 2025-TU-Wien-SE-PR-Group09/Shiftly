@@ -17,7 +17,7 @@ export interface ScheduledShift {
     shiftDescription?: string;
     day?: Day;
     /**
-     * List of workers(email) assigned to the shift
+     * List of workers(email and name) assigned to the shift
      */
     workers?: Array<string>;
 }
