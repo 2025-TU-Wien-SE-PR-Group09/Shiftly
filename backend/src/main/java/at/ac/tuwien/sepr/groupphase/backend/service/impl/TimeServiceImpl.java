@@ -31,6 +31,10 @@ public class TimeServiceImpl implements TimeService {
     @Override
     public LocalDate nextMondayInMonth(LocalDate month) {
         LOGGER.trace("nextMondayInMonth({})", month);
+        if(month.getDayOfWeek() == DayOfWeek.MONDAY) {
+            return month;
+        }
+        
         return month.with(TemporalAdjusters.next(DayOfWeek.MONDAY));
     }
 }
