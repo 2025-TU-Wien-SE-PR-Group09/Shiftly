@@ -71,9 +71,9 @@ public class ShiftPlanningValidatorImpl implements ShiftPlanningValidator {
                     endBsec += 24 * 3600;
                 }
 
-                if (startAsec < endBsec && endAsec > startBsec) {
+                if (startAsec + 30*60 < endBsec && endAsec> startBsec+ 30*60 ) {
                     String message = String.format(
-                        "Shift overlap on %s: A shift from %s to %s overlaps with another from %s to %s in this plan.",
+                        "Shift overlap on %s: A shift from %s to %s overlaps with another from %s to %s in this plan. Overlap of max. 30mins is allowed",
                         key.day(), startA, endA, startB, endB
                     );
                     errors.add(message);
