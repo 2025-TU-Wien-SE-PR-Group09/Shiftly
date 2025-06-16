@@ -1,15 +1,14 @@
 package at.ac.tuwien.sepr.groupphase.backend.service.impl.shift;
 
-import at.ac.tuwien.sepr.groupphase.backend.entity.ApplicationRole;
 import at.ac.tuwien.sepr.groupphase.backend.entity.ApplicationUser;
 import at.ac.tuwien.sepr.groupphase.backend.entity.ConcreteShiftPlan;
 import at.ac.tuwien.sepr.groupphase.backend.entity.ScheduledShift;
 import at.ac.tuwien.sepr.groupphase.backend.entity.ScheduledShiftAssignment;
-import at.ac.tuwien.sepr.groupphase.backend.exception.ConflictException;
-import at.ac.tuwien.sepr.groupphase.backend.repository.*;
+import at.ac.tuwien.sepr.groupphase.backend.repository.ScheduledShiftRepository;
+import at.ac.tuwien.sepr.groupphase.backend.repository.UserRepository;
+import at.ac.tuwien.sepr.groupphase.backend.repository.VacationRequestRepository;
 import at.ac.tuwien.sepr.groupphase.backend.service.shift.ShiftPlanConstraintService;
 import at.ac.tuwien.sepr.groupphase.backend.type.VacationStatus;
-import com.fasterxml.jackson.databind.util.ArrayIterator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
@@ -19,9 +18,14 @@ import java.time.DayOfWeek;
 import java.time.LocalDate;
 import java.time.LocalTime;
 import java.time.temporal.ChronoUnit;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Comparator;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 @Service
 public class ShiftPlanConstraintServiceImpl implements ShiftPlanConstraintService {
@@ -58,17 +62,17 @@ public class ShiftPlanConstraintServiceImpl implements ShiftPlanConstraintServic
             List<ApplicationUser> employees = shift.getAssignments().stream().map(ScheduledShiftAssignment::getUser).distinct().toList();
             HashMap<ApplicationUser, List<LocalDate>> overlaps = new HashMap<>();
             for (ApplicationUser employee : employees) {
-                overlaps.put(employee,  getVacationOverlap(employee, weekStart));
+                overlaps.put(employee, getVacationOverlap(employee, weekStart));
             }
             List<ScheduledShiftAssignment> assignmentsCopy = new ArrayList<>(shift.getAssignments());
-            assignmentsCopy.sort(Comparator.comparingInt(a -> overlaps.get(((ScheduledShiftAssignment)a).getUser()) == null ? 0 : overlaps.get(((ScheduledShiftAssignment)a).getUser()).size()).reversed());
+            assignmentsCopy.sort(Comparator.comparingInt(a -> overlaps.get(((ScheduledShiftAssignment) a).getUser()) == null ? 0 : overlaps.get(((ScheduledShiftAssignment) a).getUser()).size()).reversed());
 
             for (ScheduledShiftAssignment assignment : assignmentsCopy) {
                 ApplicationUser assignedUser = assignment.getUser();
                 List<LocalDate> overlap = overlaps.get(assignedUser);
 
                 if (overlap != null && overlap.contains(shiftDate)) {
-                    if(!availableJumpersToday.isEmpty()) {
+                    if (!availableJumpersToday.isEmpty()) {
                         ApplicationUser jumper = null;
 
                         // Check if the assigned user has a vacation replacement already
@@ -81,7 +85,7 @@ public class ShiftPlanConstraintServiceImpl implements ShiftPlanConstraintServic
 
                                 for (LocalDate date : overlap) {
                                     if (!availableJumpersPerDay.get(date).contains(jumperCandidate)) {
-                                       availableOnAllDays = false;
+                                        availableOnAllDays = false;
                                     }
                                 }
 
@@ -96,8 +100,7 @@ public class ShiftPlanConstraintServiceImpl implements ShiftPlanConstraintServic
                             // two jumpers that are available on the overlap days.
                             if (jumper != null) {
                                 vacationReplacementMap.put(assignedUser, jumper);
-                            }
-                            else {
+                            } else {
                                 jumper = availableJumpersToday.stream().findFirst().get();
                             }
                         }
@@ -109,8 +112,7 @@ public class ShiftPlanConstraintServiceImpl implements ShiftPlanConstraintServic
                             .withShift(shift)
                             .withUser(jumper)
                             .build());
-                    }
-                    else {
+                    } else {
                         shift.getAssignments().remove(assignment);
                     }
                 }

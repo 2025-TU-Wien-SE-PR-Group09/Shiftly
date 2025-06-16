@@ -152,16 +152,14 @@ export class SupervisorHomeComponent implements OnInit{
               if (shift.workers?.length! < shift.manpower!) {
                 if(shiftStartDate[shift.shiftDescription!] == undefined) {
                   shiftStartDate[shift.shiftDescription!] = [[Date.parse(shift.day?.start!), Date.parse(shift.day?.end!)]]
-                }
-                else {
+                } else {
                   console.log(shiftStartDate[shift.shiftDescription!][shiftStartDate[shift.shiftDescription!].length - 1][1]+oneDayInMs)
                   console.log(Date.parse(shift.day?.end!))
                   console.log("a")
 
                   if(shiftStartDate[shift.shiftDescription!][shiftStartDate[shift.shiftDescription!].length - 1][1]+oneDayInMs >= Date.parse(shift.day?.end!)) {
                     shiftStartDate[shift.shiftDescription!][shiftStartDate[shift.shiftDescription!].length - 1][1] =  Date.parse(shift.day?.end!)
-                  }
-                  else {
+                  } else {
                     shiftStartDate[shift.shiftDescription!][shiftStartDate[shift.shiftDescription!].length] = [Date.parse(shift.day?.start!), Date.parse(shift.day?.start!)]
                   }
                 }
@@ -178,8 +176,7 @@ export class SupervisorHomeComponent implements OnInit{
                       end: -1
                     }
                   )
-                }
-                else {
+                } else {
                   this.missingShifts.push(
                     {
                       shift: shift,

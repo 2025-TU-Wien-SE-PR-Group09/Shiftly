@@ -105,9 +105,11 @@ public class ApplicationUser {
 
     @Override
     public boolean equals(Object o) {
-        if (o == null || getClass() != o.getClass()) return false;
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
         ApplicationUser that = (ApplicationUser) o;
-        return Objects.equals(email, that.email) ;
+        return Objects.equals(email, that.email);
     }
 
     @Override

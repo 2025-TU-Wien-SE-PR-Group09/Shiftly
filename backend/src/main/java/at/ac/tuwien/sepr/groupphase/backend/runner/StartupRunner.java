@@ -10,12 +10,12 @@ import at.ac.tuwien.sepr.groupphase.backend.repository.PlanBlueprintRepository;
 import at.ac.tuwien.sepr.groupphase.backend.repository.UserRepository;
 import at.ac.tuwien.sepr.groupphase.backend.repository.VacationRequestRepository;
 import at.ac.tuwien.sepr.groupphase.backend.service.DepartmentService;
-import at.ac.tuwien.sepr.groupphase.backend.service.shift.ShiftPlanningService;
 import at.ac.tuwien.sepr.groupphase.backend.service.UserService;
-import at.ac.tuwien.sepr.groupphase.backend.service.dto.department.DepartmentCreateDto;
 import at.ac.tuwien.sepr.groupphase.backend.service.dto.Role;
+import at.ac.tuwien.sepr.groupphase.backend.service.dto.department.DepartmentCreateDto;
 import at.ac.tuwien.sepr.groupphase.backend.service.dto.user.UserDataDto;
 import at.ac.tuwien.sepr.groupphase.backend.service.dto.user.UserRoleDto;
+import at.ac.tuwien.sepr.groupphase.backend.service.shift.ShiftPlanningService;
 import at.ac.tuwien.sepr.groupphase.backend.type.VacationStatus;
 import jakarta.transaction.Transactional;
 import org.slf4j.Logger;
@@ -30,7 +30,6 @@ import java.time.Duration;
 import java.time.LocalDate;
 import java.time.LocalTime;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 import static at.ac.tuwien.sepr.groupphase.backend.config.Constants.ADMIN_EMAIL;
@@ -79,10 +78,10 @@ public class StartupRunner implements CommandLineRunner {
         if (production.isEmpty()) {
             for (int i = 1; i <= 2; i++) {
                 this.userService.createUser(new UserDataDto(
-                    "supervisor"+i+"@shyft.local",
+                    "supervisor" + i + "@shyft.local",
                     "password",
                     "Supervisor",
-                    "Shyft"+i
+                    "Shyft" + i
                 ));
             }
 
@@ -95,7 +94,7 @@ public class StartupRunner implements CommandLineRunner {
             createPlan(actDep2);
             createSecondPlan(actDep);
             createSecondPlan(actDep2);
-            createUsers(actDep, "supervisor1@shyft.local",1);
+            createUsers(actDep, "supervisor1@shyft.local", 1);
             createUsers(actDep2, "supervisor2@shyft.local", 10);
             createVacations();
         } else {
@@ -113,8 +112,8 @@ public class StartupRunner implements CommandLineRunner {
 
     private void createUsers(Department production, String supervisorMail, int startC) {
         // Neue Employees für Production
-        for (int i = startC; i < startC+5; i++) {
-            String email = "employee"+i+"@shyft.local";
+        for (int i = startC; i < startC + 5; i++) {
+            String email = "employee" + i + "@shyft.local";
             this.userService.createUser(new UserDataDto(email, "password", "Firstname", "Lastname"));
 
             ApplicationUser user = this.userRepository.findByEmail(email).orElseThrow();
@@ -124,8 +123,8 @@ public class StartupRunner implements CommandLineRunner {
         }
 
         // Neue Jumper für Production
-        for (int i = startC; i < startC+2; i++) {
-            String email = "jumper"+i+"@shyft.local";
+        for (int i = startC; i < startC + 2; i++) {
+            String email = "jumper" + i + "@shyft.local";
             this.userService.createUser(new UserDataDto(email, "password", "Jum", "Per"));
 
             ApplicationUser user = this.userRepository.findByEmail(email).orElseThrow();
@@ -144,7 +143,6 @@ public class StartupRunner implements CommandLineRunner {
 
         LOGGER.info("Default users created and assigned to production department");
     }
-
 
 
     private void createPlan(Department department) {
