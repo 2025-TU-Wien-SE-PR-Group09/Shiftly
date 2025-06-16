@@ -1,6 +1,7 @@
 package at.ac.tuwien.sepr.groupphase.backend.service.impl;
 
 import at.ac.tuwien.sepr.groupphase.backend.service.MailService;
+import at.ac.tuwien.sepr.groupphase.backend.service.dto.mail.SickLeaveEmailDto;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -9,6 +10,8 @@ import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.stereotype.Service;
 
 import java.lang.invoke.MethodHandles;
+
+import static at.ac.tuwien.sepr.groupphase.backend.util.DateFormatUtil.format;
 
 
 @Service
@@ -32,4 +35,22 @@ public class MailServiceImpl implements MailService {
         message.setText(text);
         mailSender.send(message);
     }
+
+    @Override
+    public void sendSickLeaveNotification(SickLeaveEmailDto dto) {
+        LOGGER.trace("sendSickLeaveNotification({})", dto);
+
+        String subject = "New Sick Leave Certificate";
+        String text = String.format(
+            "Employee %s %s reported a sick leave from %s to %s.",
+            dto.getEmployeeFirstName(),
+            dto.getEmployeeLastName(),
+            format(dto.getStartDate()),
+            format(dto.getEndDate())
+        );
+
+        sendSimpleEmail(dto.getSupervisorEmail(), subject, text);
+    }
+
+
 }
