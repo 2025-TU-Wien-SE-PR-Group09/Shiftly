@@ -268,6 +268,28 @@ public class DepartmentEndpoint {
         return new EmployeeRestResponseDto(employee.email(), department.name());
     }
 
+    @Transactional
+    @RolesAllowed({"SUPERVISOR"})
+    @Operation(summary = "Remove an employee from a department")
+    @ApiResponse(responseCode = "204", description = "Successfully removed employee from department")
+    @PostMapping(path = "/{departmentName}/removeEmployee/{employeeEmail}")
+    public ResponseEntity<Void> removeEmployeeFromDepartment(
+        @PathVariable(name = "departmentName") String departmentName,
+        @PathVariable(name = "employeeEmail") String employeeEmail,
+        Principal principal) {
+        LOGGER.trace("removeEmployeeFromDepartment({}, {}, {})", departmentName, employeeEmail, principal);
+        userService.checkAccessToDepartment(new DepartmentNameDto(departmentName));
+
+
+        DepartmentDto department = departmentService.getDepartmentByName(departmentName)
+            .orElseThrow(() -> new NotFoundException("Department not found!"));
+
+        EmployeeDto employee = new EmployeeDto(employeeEmail, department.name());
+        departmentService.removeEmployeeFromDepartment(employee);
+
+        return ResponseEntity.noContent().build();
+    }
+
     @RolesAllowed({"SUPERVISOR"})
     @Operation(summary = "List all employees of a department")
     @ApiResponse(responseCode = "200", description = "List all employees of a department")

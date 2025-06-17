@@ -21,9 +21,11 @@ import { AutocompleteComponent } from '../../../../shared/components/autocomplet
 export class DepartmentUserManagementComponent implements OnChanges, OnInit {
   @Input() departmentName: string = '';
   employees: EmployeeListItemResponseDto[] = [];
+  supervisorEmail: String | null = null;
   showForm: boolean = false;
   newEmployeeMail: string = '';
   possibleEmployeeMails: string[] = [];
+  confirmingRemoveEmployee: EmployeeListItemResponseDto | null = null;
 
   constructor(
     private departmentService: DepartmentService,
@@ -54,6 +56,12 @@ export class DepartmentUserManagementComponent implements OnChanges, OnInit {
         this.employees = employees;
       },
     });
+
+    this.departmentService.getDepartmentByName(this.departmentName).subscribe({
+      next: (department) => {
+        this.supervisorEmail = department.supervisorEmail;
+      }
+    });
   }
 
   inviteEmployee() {
@@ -70,4 +78,35 @@ export class DepartmentUserManagementComponent implements OnChanges, OnInit {
       },
     });
   }
+
+  toggleConfirmRemoveEmployee(emp: EmployeeListItemResponseDto): void {
+    this.confirmingRemoveEmployee = emp;
+  }
+
+  cancelRemoveEmployee(): void {
+    this.confirmingRemoveEmployee = null;
+  }
+
+  confirmRemoveEmployee(): void {
+    if (this.confirmingRemoveEmployee) {
+      this.departmentService.removeEmployeeFromDepartment(
+        this.departmentName,
+        this.confirmingRemoveEmployee.email!
+      ).subscribe({
+        next: () => {
+          this.toastrService.success(
+            `Employee "${this.confirmingRemoveEmployee!.firstName} ${this.confirmingRemoveEmployee!.lastName}" removed successfully`,
+            'Success'
+          );
+          this.employees = this.employees.filter(e => e.email !== this.confirmingRemoveEmployee!.email);
+          this.confirmingRemoveEmployee = null;
+        },
+        error: () => {
+          // TODO handle error properly
+          this.toastrService.error('Failed to remove employee.', 'Error');
+        },
+      });
+    }
+  }
+
 }

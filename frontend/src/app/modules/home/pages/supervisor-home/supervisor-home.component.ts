@@ -143,7 +143,7 @@ export class SupervisorHomeComponent implements OnInit{
           if (data.shifts) {
             this.shiftPlan = data;
             let shiftStartDate: Record<string, number[][]> = {};
-            const oneDayInMs = 24 * 60 * 60 * 1000; // milliseconds in a day
+            const oneDayInMs = 24 * 60 * 60 * 1000 * 3; // milliseconds in a day TODO: find better solution for weekends
 
             for (let shift of this.shiftPlan!.shifts!) {
 
@@ -154,7 +154,7 @@ export class SupervisorHomeComponent implements OnInit{
                   if(shiftStartDate[shift.shiftDescription!][shiftStartDate[shift.shiftDescription!].length - 1][1]+oneDayInMs >= Date.parse(shift.day?.end!)) {
                     shiftStartDate[shift.shiftDescription!][shiftStartDate[shift.shiftDescription!].length - 1][1] =  Date.parse(shift.day?.end!)
                   } else {
-                    shiftStartDate[shift.shiftDescription!][shiftStartDate[shift.shiftDescription!].length] = [Date.parse(shift.day?.start!), Date.parse(shift.day?.start!)]
+                    shiftStartDate[shift.shiftDescription!][shiftStartDate[shift.shiftDescription!].length] = [Date.parse(shift.day?.start!), Date.parse(shift.day?.end!)]
                   }
                 }
               }

@@ -250,7 +250,7 @@ public class ShiftPlanningServiceImpl implements ShiftPlanningService {
             });
 
         ConcreteShiftPlan plan = new ConcreteShiftPlan();
-        LocalDate endDate = startDate.plusWeeks(11);
+        LocalDate endDate = startDate.plusWeeks(12).minusDays(1);
         plan.setDepartment(department);
         plan.setStartDate(startDate);
         plan.setEndDate(endDate);

@@ -16,6 +16,7 @@ import at.ac.tuwien.sepr.groupphase.backend.service.UserService;
 import at.ac.tuwien.sepr.groupphase.backend.service.dto.department.DepartmentCreateDto;
 import at.ac.tuwien.sepr.groupphase.backend.service.dto.department.DepartmentDto;
 import at.ac.tuwien.sepr.groupphase.backend.service.dto.Role;
+import at.ac.tuwien.sepr.groupphase.backend.service.dto.employee.EmployeeDto;
 import at.ac.tuwien.sepr.groupphase.backend.service.dto.user.UserEmailDto;
 import at.ac.tuwien.sepr.groupphase.backend.service.dto.user.UserRoleDto;
 import at.ac.tuwien.sepr.groupphase.backend.service.mapper.DepartmentMapper;
@@ -93,6 +94,8 @@ public class DepartmentServiceImpl implements DepartmentService {
 
         if (newSupervisor.getDepartment() != null
             && !newSupervisor.getDepartment().getName().equals(department.getName())) {
+            // TODO does this make sense? The second condition checks if the supervisor is
+            //  already assigned to the current department
             throw new ConflictException("Supervisor '" + newSupervisor.getEmail()
                 + "' is already assigned to another department");
         }
@@ -183,6 +186,26 @@ public class DepartmentServiceImpl implements DepartmentService {
 
         // Delete the department from the database
         departmentRepository.delete(department);
+    }
+
+    @Override
+    public void removeEmployeeFromDepartment(EmployeeDto employee) {
+        LOGGER.trace("removeEmployeeFromDepartment({})", employee);
+
+        ApplicationUser user = applicationUserRepository.findById(employee.email())
+            .orElseThrow(() -> new NotFoundException("User with email '" + employee.email() + "' not found"));
+
+        Department department = departmentRepository.findByName(employee.departmentName())
+            .orElseThrow(() -> new NotFoundException("Department with name '" + employee.departmentName() + "' not found"));
+
+        if (user.getDepartment() == null || !user.getDepartment().getName().equals(department.getName())) {
+            throw new NotFoundException("User '" + user.getEmail() + "' is not part of department '" + department.getName() + "'");
+        }
+
+        user.getAssignments().clear();
+        user.setDepartment(null);
+        user.getRoles().removeIf(role -> role.getName().equals("EMPLOYEE"));
+        applicationUserRepository.save(user);
     }
 
 
