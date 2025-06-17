@@ -55,7 +55,8 @@ public class ShiftPlanConstraintServiceImpl implements ShiftPlanConstraintServic
         for (ScheduledShift shift : concreteShiftPlan.getScheduledShifts()) {
             LocalDate shiftDate = shift.getStart().toLocalDate();
             LocalDate weekStart = shiftDate.with(DayOfWeek.MONDAY);
-            Set<ApplicationUser> availableJumpersToday = availableJumpersPerDay.get(shiftDate);
+
+            LOGGER.info(shiftDate.toString());
 
             // Sort assignments by the number of overlaps of the user who is assigned to the shift.
             // This way, we can prioritize users with more overlaps when assigning jumpers.
@@ -65,6 +66,29 @@ public class ShiftPlanConstraintServiceImpl implements ShiftPlanConstraintServic
                 overlaps.put(employee, getVacationOverlap(employee, weekStart));
             }
             List<ScheduledShiftAssignment> assignmentsCopy = new ArrayList<>(shift.getAssignments());
+
+            if (shift.getManpower() > assignmentsCopy.size()) {
+                // If the shift has more manpower than assignments, we need to add jumpers
+                int requiredJumpers = shift.getManpower() - assignmentsCopy.size();
+
+                // Add jumpers to the shift until the required manpower is reached
+                for (int i = 0; i < requiredJumpers; i++) {
+                    var placeholderUser = new ApplicationUser();
+                    placeholderUser.setEmail("placeholder-jumper-" + i + "@" + shift.getPlan().getDepartment().getName() + ".com");
+                    placeholderUser.setFirstName("Placeholder");
+                    placeholderUser.setLastName("Jumper " + i);
+
+                    assignmentsCopy.add(new ScheduledShiftAssignment.Builder()
+                        .withShift(shift)
+                        .withUser(placeholderUser)
+                        .build());
+
+                    overlaps.put(placeholderUser, List.of(shiftDate)); // No vacation overlap for placeholder jumpers
+                }
+            }
+
+            Set<ApplicationUser> availableJumpersToday = availableJumpersPerDay.get(shiftDate);
+
             assignmentsCopy.sort(Comparator.comparingInt(a -> overlaps.get(((ScheduledShiftAssignment) a).getUser()) == null ? 0 : overlaps.get(((ScheduledShiftAssignment) a).getUser()).size()).reversed());
 
             for (ScheduledShiftAssignment assignment : assignmentsCopy) {
@@ -199,12 +223,14 @@ public class ShiftPlanConstraintServiceImpl implements ShiftPlanConstraintServic
             .collect(Collectors.toSet());
 
         Map<LocalDate, Set<ApplicationUser>> result = new HashMap<>();
-        for (int i = 0; i < ChronoUnit.DAYS.between(concreteShiftPlan.getStartDate(), concreteShiftPlan.getEndDate()); i++) {
+        for (int i = 0; i <= ChronoUnit.DAYS.between(concreteShiftPlan.getStartDate(), concreteShiftPlan.getEndDate()); i++) {
             LocalDate day = weekStart.plusDays(i);
             result.put(day, new HashSet<>(jumperUsersInDepartment));
         }
 
         LocalDate weekEnd = weekStart.plusDays(6);
+        // TODO this is problematic if we ever allow to edit a concrete shift plan
+        // TODO as it will take into account shifts that were in the old plan
         List<ScheduledShift> shiftsInWeek = scheduledShiftRepository.findByStartBetween(
             weekStart.atStartOfDay(),
             weekEnd.atTime(LocalTime.MAX)

@@ -8,6 +8,7 @@ import at.ac.tuwien.sepr.groupphase.backend.exception.ConflictException;
 import at.ac.tuwien.sepr.groupphase.backend.exception.NotFoundException;
 import at.ac.tuwien.sepr.groupphase.backend.service.dto.department.DepartmentCreateDto;
 import at.ac.tuwien.sepr.groupphase.backend.service.dto.department.DepartmentDto;
+import at.ac.tuwien.sepr.groupphase.backend.service.dto.employee.EmployeeDto;
 import at.ac.tuwien.sepr.groupphase.backend.service.dto.user.UserEmailDto;
 
 import java.util.List;
@@ -67,4 +68,12 @@ public interface DepartmentService {
      * @throws NotFoundException if no department with the given name exists
      */
     void deleteDepartmentByName(String departmentName) throws NotFoundException;
+
+    /**
+     * Removes an employee from a department.
+     *
+     * @param employee the employee data transfer object containing the details of the employee to be removed
+     * @throws NotFoundException if the employee does not exist or the department does not exist
+     */
+    void removeEmployeeFromDepartment(EmployeeDto employee) throws NotFoundException;
 }

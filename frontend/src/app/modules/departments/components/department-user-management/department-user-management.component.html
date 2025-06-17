@@ -65,13 +65,21 @@
       <thead class="text-muted-foreground text-sm">
         <tr>
           <th class="pb-3">Name</th>
-        <th class="pb-3">E-Mail</th>
+          <th class="pb-3">E-Mail</th>
+          <th class="pb-3">Actions</th>
         </tr>
       </thead>
       <tbody>
         <tr *ngFor="let emp of employees; let i = index" class="hover:bg-card/50">
           <td class="py-1">{{ emp.firstName }} {{ emp.lastName }}</td>
-        <td class="py-1">{{ emp.email }}</td>
+          <td class="py-1">{{ emp.email }}</td>
+          <td class="py-1">
+            <app-button tone="danger" shape="rounded" impact="bold" size="medium"
+              *ngIf="emp.email !== supervisorEmail"
+              (click)="toggleConfirmRemoveEmployee(emp)">
+              Remove
+            </app-button>
+          </td>
         </tr>
 
         <tr *ngIf="employees.length === 0">
@@ -80,6 +88,31 @@
       </tbody>
     </table>
   </div>
+  </div>
 </div>
 
+<!-- Modal for delete employee confirmation -->
+<div
+  *ngIf="confirmingRemoveEmployee !== null"
+  class="fixed inset-0 z-50 flex items-center justify-center bg-black/50">
+  <div class="bg-background border border-border rounded-lg p-6 shadow-lg w-full max-w-md">
+    <h2 class="text-xl font-bold text-foreground mb-4">Remove Employee</h2>
+    <p class="text-foreground mb-6 text-center">
+      Are you sure you want to remove employee
+      <br><br>
+      "{{ confirmingRemoveEmployee?.firstName }} {{ confirmingRemoveEmployee?.lastName }}"
+      <br><br>
+      from department "{{ departmentName }}"?
+      <br><br>
+      This also removes all shift assignments of this employee in the department.
+    </p>
+    <div class="flex justify-end space-x-2">
+      <app-button tone="warning" shape="rounded" impact="bold" size="medium" (click)="cancelRemoveEmployee()">
+        Cancel
+      </app-button>
+      <app-button tone="danger" shape="rounded" impact="bold" size="medium" (click)="confirmRemoveEmployee()">
+        Remove
+      </app-button>
+    </div>
+  </div>
 </div>
