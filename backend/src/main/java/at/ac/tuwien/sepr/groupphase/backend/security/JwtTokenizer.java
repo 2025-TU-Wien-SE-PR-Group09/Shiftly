@@ -36,4 +36,20 @@ public class JwtTokenizer {
         var token = builder.signWith(key, Jwts.SIG.HS512).compact();
         return securityProperties.getAuthTokenPrefix() + token;
     }
+
+    public String generateInvitationToken(String email) {
+        byte[] signingKey = securityProperties.getJwtSecret().getBytes();
+        SecretKey key = Keys.hmacShaKeyFor(signingKey);
+
+        return Jwts.builder()
+            .header().add("typ", "INVITATION").and()
+            .issuer(securityProperties.getJwtIssuer())
+            .audience().add(securityProperties.getJwtAudience()).and()
+            .subject(email)
+            .issuedAt(new Date())
+            .expiration(new Date(System.currentTimeMillis() + 86400000)) // 24 Stunden
+            .claim("purpose", "invitation")
+            .signWith(key, Jwts.SIG.HS512)
+            .compact();
+    }
 }

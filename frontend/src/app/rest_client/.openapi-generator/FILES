@@ -39,6 +39,7 @@ model/messageResponseDto.ts
 model/models.ts
 model/planBlueprintResponse.ts
 model/registerRestDto.ts
+model/registerTokenRequestDto.ts
 model/scheduledShift.ts
 model/shiftDayBlueprintDto.ts
 model/shiftDayResponseDto.ts
@@ -47,6 +48,7 @@ model/shiftWeekResponseDto.ts
 model/sickLeaveCertificateRestDto.ts
 model/sickLeaveCertificateUploadDatesDto.ts
 model/userDataLoginDto.ts
+model/userInviteRequestDto.ts
 model/userProfileRestDto.ts
 model/vacationRequestResponseRestDto.ts
 model/vacationRequestRestDto.ts

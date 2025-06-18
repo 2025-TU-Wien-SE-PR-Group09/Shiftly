@@ -2,8 +2,23 @@
 
 
 <div class="flex flex-row justify-between items-center">
-  <div class="code-display">
-    <h1 class="text-foreground" style="font-size: 2rem;">Auth Code: {{ code }}</h1>
+  <div class="invite-user flex flex-row items-center gap-2">
+    <input
+      type="email"
+      [(ngModel)]="emailToInvite"
+      placeholder="E-Mail-Adresse"
+      class="border rounded px-3 py-2 text-background bg-foreground border-gray-300 focus:outline-none focus:ring-indigo-500"
+    />
+
+    <app-button
+      tone="primary"
+      impact="bold"
+      shape="rounded"
+      size="medium"
+      (click)="inviteUser()"
+    >
+      Invite
+    </app-button>
   </div>
 
   <div class="min-w-xs">

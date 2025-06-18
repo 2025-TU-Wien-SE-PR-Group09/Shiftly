@@ -19,12 +19,10 @@ public class UserDataDto {
 
     @NotNull(message = "First name must not be null")
     @Size(max = 50, min = 1, message = "First name must be between 1 and 50 characters long")
-    @Email(message = "First name must be a valid email address")
     private final String firstName;
 
     @NotNull(message = "Last name must not be null")
     @Size(max = 50, min = 1, message = "Last name must be between 1 and 50 characters long")
-    @Email(message = "Last name must be a valid email address")
     private final String lastName;
 
     public String getEmail() {

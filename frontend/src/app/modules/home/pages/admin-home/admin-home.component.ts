@@ -3,7 +3,7 @@ import {
   AdminEndpointService,
   DepartmentDetailRestResponseDto,
   DepartmentService,
-  DepartmentShiftplanCalendarResponse,
+  DepartmentShiftplanCalendarResponse, RegistrationEndpointService, UserInviteRequestDto,
 } from '../../../../rest_client';
 import { ToastrService } from 'ngx-toastr';
 import { CommonModule } from '@angular/common';
@@ -26,6 +26,7 @@ export class AdminHomeComponent implements OnInit {
     private _adminService: AdminEndpointService,
     private _departmentService: DepartmentService,
     private readonly _toastr: ToastrService,
+    private _registrationService: RegistrationEndpointService,
   ) { }
 
   protected departments: DepartmentDetailRestResponseDto[] = [];
@@ -36,6 +37,8 @@ export class AdminHomeComponent implements OnInit {
   view: CalendarView = CalendarView.Month;
   CalendarView = CalendarView; // Für Template-Zugriff
   viewDate: Date = new Date();
+
+  emailToInvite: string = ''; // Das kommt neu dazu
 
   events: CalendarEvent[] = [
     {
@@ -72,6 +75,27 @@ export class AdminHomeComponent implements OnInit {
     } else {
       this.selectedEvent = event.event;
     }
+  }
+
+  inviteUser() {
+    if (!this.emailToInvite) {
+      this._toastr.error('Bitte gib eine E-Mail-Adresse ein.');
+      return;
+    }
+
+    const request: UserInviteRequestDto = {
+      email: this.emailToInvite,
+    };
+
+    this._registrationService.inviteUser(request).subscribe({
+      next: () => {
+        this._toastr.success('Einladung wurde erfolgreich versendet.');
+        this.emailToInvite = '';
+      },
+      error: () => {
+        this._toastr.error('Fehler beim Versenden der Einladung.');
+      }
+    });
   }
 
 

@@ -1,7 +1,11 @@
 package at.ac.tuwien.sepr.groupphase.backend.service;
 
 import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.user.ApplicationUserResponseDto;
+import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.user.RegisterRestDto;
+import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.user.RegisterTokenRequestDto;
 import at.ac.tuwien.sepr.groupphase.backend.entity.ApplicationUser;
+import at.ac.tuwien.sepr.groupphase.backend.exception.TokenAlreadyUsedException;
+import at.ac.tuwien.sepr.groupphase.backend.exception.TokenExpiredException;
 import at.ac.tuwien.sepr.groupphase.backend.service.dto.department.DepartmentNameDto;
 import at.ac.tuwien.sepr.groupphase.backend.service.dto.user.ChangePasswordDto;
 import at.ac.tuwien.sepr.groupphase.backend.service.dto.user.UserDataDto;
@@ -88,4 +92,36 @@ public interface UserService {
      * @throws AccessDeniedException if the currently authenticated user does not have access to the department
      */
     void checkAccessToDepartment(DepartmentNameDto departmentNameDto) throws AccessDeniedException;
+
+
+    /**
+     * Creates an invitation for a new user and sends an email with the invitation link.
+     *
+     * @param email Email address of the user to be invited
+     * @throws IllegalArgumentException if the email address is already in use
+     */
+    void createInvitation(String email) throws IllegalArgumentException;
+
+    /**
+     * Validates if an invitation token is valid.
+     *
+     * @param token The token to validate
+     * @return The email address associated with this token
+     * @throws NotFoundException         if the token does not exist
+     * @throws TokenExpiredException     if the token has expired
+     * @throws TokenAlreadyUsedException if the token was already used
+     */
+    String validateInvitationToken(String token) throws NotFoundException, TokenExpiredException, TokenAlreadyUsedException;
+
+    /**
+     * Registers a new user with an invitation token.
+     *
+     * @param userData User data for registration
+     * @param token    The invitation token
+     * @throws NotFoundException         if the token does not exist
+     * @throws TokenExpiredException     if the token has expired
+     * @throws TokenAlreadyUsedException if the token was already used
+     * @throws IllegalArgumentException  if the email address does not match the token
+     */
+    void registerUserWithToken(RegisterTokenRequestDto userData, String token) throws NotFoundException, TokenExpiredException, TokenAlreadyUsedException, IllegalArgumentException;
 }
