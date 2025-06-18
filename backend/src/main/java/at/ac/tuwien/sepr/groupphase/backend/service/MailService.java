@@ -1,5 +1,6 @@
 package at.ac.tuwien.sepr.groupphase.backend.service;
 
+import at.ac.tuwien.sepr.groupphase.backend.service.dto.mail.ScheduleAssignmentEmailDto;
 import at.ac.tuwien.sepr.groupphase.backend.service.dto.mail.SickLeaveEmailDto;
 import org.springframework.scheduling.annotation.Async;
 
@@ -35,5 +36,16 @@ public interface MailService {
      */
     @Async
     void sendSickLeaveNotification(SickLeaveEmailDto dto);
+
+    /**
+     * Sends an email notification to an employee informing them about a new schedule assignment.
+     *
+     * <p>This method is executed asynchronously and does not block the calling thread.</p>
+     *
+     * @param dto a {@link ScheduleAssignmentEmailDto} containing the employee's email, name, and assignment details
+     */
+    @Async
+    void sendScheduleAssignmentNotification(ScheduleAssignmentEmailDto dto);
+
 
 }
