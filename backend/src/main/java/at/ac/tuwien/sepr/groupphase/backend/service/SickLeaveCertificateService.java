@@ -53,5 +53,16 @@ public interface SickLeaveCertificateService {
      * @throws SecurityException if the user is not allowed to delete it
      */
     void deleteSickLeaveCertificate(Long id);
+
+    /**
+     * Retrieves all sick leave certificates of users in the same department as the supervisor.
+     *
+     * @param supervisorEmail Email of the logged-in supervisor
+     * @return list of SickLeaveCertificateDto without file data
+     */
+    List<SickLeaveCertificateDto> getAllForSupervisor(String supervisorEmail);
+
+
+
 }
 

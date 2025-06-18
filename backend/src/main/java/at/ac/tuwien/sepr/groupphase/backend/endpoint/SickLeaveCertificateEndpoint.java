@@ -247,4 +247,25 @@ public class SickLeaveCertificateEndpoint {
         return ResponseEntity.noContent().build();
     }
 
+
+    @GetMapping(path = "/supervisor", produces = MediaType.APPLICATION_JSON_VALUE)
+    @RolesAllowed({"SUPERVISOR"})
+    @Operation(
+        summary = "Get sick leave certificates of employees in the supervisor's department",
+        description = "Returns metadata of sick leave certificates for all employees in the same department as the currently logged-in supervisor. File content is excluded."
+    )
+    @ApiResponse(
+        responseCode = "200",
+        description = "List of sick leave certificates for supervisor's department"
+    )
+    public ResponseEntity<List<SickLeaveCertificateRestDto>> getSickLeavesForSupervisor() {
+        LOGGER.trace("getSickLeavesForSupervisor()");
+
+        var supervisorEmail = authService.getCurrentUser().getEmail();
+        var dtos = certificateService.getAllForSupervisor(supervisorEmail);
+        var restDtos = dtos.stream().map(mapper::toRest).toList();
+        return ResponseEntity.ok(restDtos);
+    }
+
+
 }

@@ -12,15 +12,21 @@ import at.ac.tuwien.sepr.groupphase.backend.service.SickLeaveCertificateService;
 import at.ac.tuwien.sepr.groupphase.backend.service.dto.mail.SickLeaveEmailDto;
 import at.ac.tuwien.sepr.groupphase.backend.service.dto.sickleave.SickLeaveCertificateDto;
 import at.ac.tuwien.sepr.groupphase.backend.service.dto.sickleave.SickLeaveCertificateUploadDto;
+import org.aspectj.weaver.ast.Not;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
 import java.lang.invoke.MethodHandles;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
 
+
+import static at.ac.tuwien.sepr.groupphase.backend.util.DateFormatUtil.format;
 
 /**
  * Implementation of the SickLeaveCertificateService.
@@ -96,7 +102,6 @@ public class SickLeaveCertificateServiceImpl implements SickLeaveCertificateServ
                 LOGGER.warn("Failed to send sick leave email to supervisor {}: {}", supervisor.getEmail(), e.getMessage(), e);
             }
         }
-
 
         return new SickLeaveCertificateDto(
             cert.getId(),
@@ -176,6 +181,30 @@ public class SickLeaveCertificateServiceImpl implements SickLeaveCertificateServ
             return "";
         }
         return filename.substring(filename.lastIndexOf("."));
+    }
+
+
+    @Override
+    public List<SickLeaveCertificateDto> getAllForSupervisor(String supervisorEmail) {
+        LOGGER.trace("getAllForSupervisor({})", supervisorEmail);
+
+        ApplicationUser supervisor = userRepository.findByEmail(supervisorEmail)
+            .orElseThrow(() -> new NotFoundException("Supervisor not found"));
+
+        String departmentName = supervisor.getDepartment().getName();
+
+        return certificateRepository.findAll().stream()
+            .filter(cert -> cert.getEmployee().getDepartment().getName().equals(departmentName))
+            .map(cert -> new SickLeaveCertificateDto(
+                cert.getId(),
+                null,
+                null,
+                cert.getUploadedAt(),
+                cert.getEmployee().getEmail(),
+                cert.getStartDate(),
+                cert.getEndDate()
+            ))
+            .toList();
     }
 
 
