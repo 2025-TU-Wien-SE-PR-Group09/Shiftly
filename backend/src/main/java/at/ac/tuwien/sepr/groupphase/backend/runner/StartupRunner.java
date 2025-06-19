@@ -31,6 +31,7 @@ import java.time.LocalDate;
 import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 
 import static at.ac.tuwien.sepr.groupphase.backend.config.Constants.ADMIN_EMAIL;
 
@@ -46,6 +47,9 @@ public class StartupRunner implements CommandLineRunner {
     private final VacationRequestRepository vacationRequestRepository;
 
     private static final Logger LOGGER = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
+
+    private final String[] firstNames = new String[]{"John", "Jane", "Max", "Anna", "Tom", "Lisa", "Mike", "Sara", "Alex", "Emma",
+        "David", "Laura", "Chris", "Nina", "Paul", "Eva", "Mark", "Lena", "Tim", "Julia"};
 
     @Value("${admin.user.password}")
     private String adminUserPassword;
@@ -76,26 +80,31 @@ public class StartupRunner implements CommandLineRunner {
             .flatMap(d -> departmentRepository.findById(d.name()));
 
         if (production.isEmpty()) {
-            for (int i = 1; i <= 2; i++) {
-                this.userService.createUser(new UserDataDto(
-                    "supervisor" + i + "@shyft.local",
-                    "password",
-                    "Supervisor",
-                    "Shyft" + i
-                ));
-            }
+            this.userService.createUser(new UserDataDto(
+                "alex_doe@shyft.local",
+                "password",
+                "Alex",
+                "Doe"
+            ));
+            this.userService.createUser(new UserDataDto(
+                "julia_doe@shyft.local",
+                "password",
+                "Julia",
+                "Doe"
+            ));
+
 
             LOGGER.info("Department not found, creating department!");
-            var dep = this.departmentService.createDepartment(new DepartmentCreateDto("Production", "supervisor1@shyft.local"));
-            var dep2 = this.departmentService.createDepartment(new DepartmentCreateDto("Customer Support", "supervisor2@shyft.local"));
+            var dep = this.departmentService.createDepartment(new DepartmentCreateDto("Production", "alex_doe@shyft.local"));
+            var dep2 = this.departmentService.createDepartment(new DepartmentCreateDto("Customer Support", "julia_doe@shyft.local"));
             var actDep = this.departmentRepository.findById(dep.getName()).orElseThrow(() -> new RuntimeException("Department not found"));
             var actDep2 = this.departmentRepository.findById(dep2.getName()).orElseThrow(() -> new RuntimeException("Department not found"));
             createPlan(actDep);
             createPlan(actDep2);
             createSecondPlan(actDep);
             createSecondPlan(actDep2);
-            createUsers(actDep, "supervisor1@shyft.local", 1);
-            createUsers(actDep2, "supervisor2@shyft.local", 10);
+            createUsers(actDep, "alex_doe@shyft.local", 0);
+            createUsers(actDep2, "julia_doe@shyft.local", 10);
             createVacations();
         } else {
             LOGGER.info("Department found: {}", production.get().getName());
@@ -113,8 +122,8 @@ public class StartupRunner implements CommandLineRunner {
     private void createUsers(Department production, String supervisorMail, int startC) {
         // Neue Employees für Production
         for (int i = startC; i < startC + 5; i++) {
-            String email = "employee" + i + "@shyft.local";
-            this.userService.createUser(new UserDataDto(email, "password", "Firstname", "Lastname"));
+            String email = firstNames[i].toLowerCase(Locale.ROOT) + "_doe@shyft.local";
+            this.userService.createUser(new UserDataDto(email, "password", firstNames[i], "Doe"));
 
             ApplicationUser user = this.userRepository.findByEmail(email).orElseThrow();
             user.setDepartment(production);
@@ -123,9 +132,9 @@ public class StartupRunner implements CommandLineRunner {
         }
 
         // Neue Jumper für Production
-        for (int i = startC; i < startC + 2; i++) {
-            String email = "jumper" + i + "@shyft.local";
-            this.userService.createUser(new UserDataDto(email, "password", "Jum", "Per"));
+        for (int i = startC + 5; i < startC + 7; i++) {
+            String email = firstNames[i].toLowerCase(Locale.ROOT) + "_doe@shyft.local";
+            this.userService.createUser(new UserDataDto(email, "password", firstNames[i], "Doe"));
 
             ApplicationUser user = this.userRepository.findByEmail(email).orElseThrow();
             user.setDepartment(production);
@@ -186,23 +195,23 @@ public class StartupRunner implements CommandLineRunner {
     }
 
     private void createVacations() {
-        createVacation("employee4@shyft.local",
+        createVacation("john_doe@shyft.local",
             LocalDate.now().plusWeeks(5),
             LocalDate.now().plusWeeks(6));
-        createVacation("employee5@shyft.local",
+        createVacation("jane_doe@shyft.local",
             LocalDate.now().plusWeeks(5).plusDays(1),
             LocalDate.now().plusWeeks(6).plusDays(1));
 
-        createVacation("employee10@shyft.local",
+        createVacation("david_doe@shyft.local",
             LocalDate.now().plusWeeks(5),
             LocalDate.now().plusWeeks(6));
-        createVacation("employee11@shyft.local",
+        createVacation("laura_doe@shyft.local",
             LocalDate.now().plusWeeks(5).plusDays(1),
             LocalDate.now().plusWeeks(6).plusDays(1));
-        createVacation("employee12@shyft.local",
+        createVacation("chris_doe@shyft.local",
             LocalDate.now().plusWeeks(5).plusDays(2),
             LocalDate.now().plusWeeks(6).plusDays(2));
-        createVacation("employee13@shyft.local",
+        createVacation("nina_doe@shyft.local",
             LocalDate.now().plusWeeks(5).plusDays(3),
             LocalDate.now().plusWeeks(6).plusDays(3));
     }
