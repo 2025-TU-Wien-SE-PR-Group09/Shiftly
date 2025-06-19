@@ -28,6 +28,7 @@ export * from './shiftDayResponseDto';
 export * from './shiftResponseDto';
 export * from './shiftWeekResponseDto';
 export * from './sickLeaveCertificateRestDto';
+export * from './sickLeaveCertificateSupervisorRestDto';
 export * from './sickLeaveCertificateUploadDatesDto';
 export * from './userDataLoginDto';
 export * from './userInviteRequestDto';

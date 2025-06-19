@@ -46,6 +46,7 @@ model/shiftDayResponseDto.ts
 model/shiftResponseDto.ts
 model/shiftWeekResponseDto.ts
 model/sickLeaveCertificateRestDto.ts
+model/sickLeaveCertificateSupervisorRestDto.ts
 model/sickLeaveCertificateUploadDatesDto.ts
 model/userDataLoginDto.ts
 model/userInviteRequestDto.ts
@@ -53,5 +54,4 @@ model/userProfileRestDto.ts
 model/vacationRequestResponseRestDto.ts
 model/vacationRequestRestDto.ts
 param.ts
-provide-api.ts
 variables.ts
