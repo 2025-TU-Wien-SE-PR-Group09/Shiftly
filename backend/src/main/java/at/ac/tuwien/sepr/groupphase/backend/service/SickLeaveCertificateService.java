@@ -1,10 +1,10 @@
 package at.ac.tuwien.sepr.groupphase.backend.service;
 
-import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.sickleave.SickLeaveCertificateUploadDatesDto;
 import at.ac.tuwien.sepr.groupphase.backend.entity.SickLeaveCertificate;
 import at.ac.tuwien.sepr.groupphase.backend.exception.ConflictException;
 import at.ac.tuwien.sepr.groupphase.backend.exception.NotFoundException;
 import at.ac.tuwien.sepr.groupphase.backend.service.dto.sickleave.SickLeaveCertificateDto;
+import at.ac.tuwien.sepr.groupphase.backend.service.dto.sickleave.SickLeaveCertificateSupervisorDto;
 import at.ac.tuwien.sepr.groupphase.backend.service.dto.sickleave.SickLeaveCertificateUploadDto;
 
 import java.util.List;
@@ -53,5 +53,17 @@ public interface SickLeaveCertificateService {
      * @throws SecurityException if the user is not allowed to delete it
      */
     void deleteSickLeaveCertificate(Long id);
+
+    /**
+     * Retrieves all sick leave certificates of users in the same department as the supervisor.
+     *
+     * @param supervisorEmail Email of the logged-in supervisor
+     * @return list of SickLeaveCertificateDto without file data
+     */
+    List<SickLeaveCertificateSupervisorDto> getAllForSupervisor(String supervisorEmail);
+
+
+
+
 }
 

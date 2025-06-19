@@ -11,6 +11,7 @@ import at.ac.tuwien.sepr.groupphase.backend.service.MailService;
 import at.ac.tuwien.sepr.groupphase.backend.service.SickLeaveCertificateService;
 import at.ac.tuwien.sepr.groupphase.backend.service.dto.mail.SickLeaveEmailDto;
 import at.ac.tuwien.sepr.groupphase.backend.service.dto.sickleave.SickLeaveCertificateDto;
+import at.ac.tuwien.sepr.groupphase.backend.service.dto.sickleave.SickLeaveCertificateSupervisorDto;
 import at.ac.tuwien.sepr.groupphase.backend.service.dto.sickleave.SickLeaveCertificateUploadDto;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -21,6 +22,8 @@ import java.lang.invoke.MethodHandles;
 import java.time.LocalDateTime;
 import java.util.List;
 
+
+import static at.ac.tuwien.sepr.groupphase.backend.util.DateFormatUtil.format;
 
 /**
  * Implementation of the SickLeaveCertificateService.
@@ -96,7 +99,6 @@ public class SickLeaveCertificateServiceImpl implements SickLeaveCertificateServ
                 LOGGER.warn("Failed to send sick leave email to supervisor {}: {}", supervisor.getEmail(), e.getMessage(), e);
             }
         }
-
 
         return new SickLeaveCertificateDto(
             cert.getId(),
@@ -177,6 +179,29 @@ public class SickLeaveCertificateServiceImpl implements SickLeaveCertificateServ
         }
         return filename.substring(filename.lastIndexOf("."));
     }
+
+
+    @Override
+    public List<SickLeaveCertificateSupervisorDto> getAllForSupervisor(String supervisorEmail) {
+        LOGGER.trace("getAllForSupervisor({})", supervisorEmail);
+
+        ApplicationUser supervisor = userRepository.findByEmail(supervisorEmail)
+            .orElseThrow(() -> new NotFoundException("Supervisor not found"));
+
+        String departmentName = supervisor.getDepartment().getName();
+
+        return certificateRepository.findAll().stream()
+            .filter(cert -> cert.getEmployee().getDepartment().getName().equals(departmentName))
+            .map(cert -> new SickLeaveCertificateSupervisorDto(
+                cert.getId(),
+                cert.getUploadedAt(),
+                cert.getEmployee().getEmail(),
+                cert.getStartDate(),
+                cert.getEndDate()
+            ))
+            .toList();
+    }
+
 
 
 }
