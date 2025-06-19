@@ -11,18 +11,57 @@ public class ShiftRotator {
     private final Queue<RotatingShiftSlot> rotationQueue = new LinkedList<>();
     private final List<RotatingShiftSlot> slotsInRotationOrder;
     private final List<RotatingShiftSlot> slotsInNaturalOrder;
+    private InitialShiftAssignmentStrategy initialShiftAssignmentStrategy;
     private final int shifts;
-    private final int totalManPower;
+
+    public static final InitialShiftAssignmentStrategy FAIR_GREEDY = (slots, users) -> {
+        if (users.isEmpty() || slots.isEmpty()) return;
+
+        List<ApplicationUser> userPool = new ArrayList<>(users);
+        int userIndex = 0;
+
+        int totalAssignments = Math.min(
+            userPool.size(),
+            slots.stream().mapToInt(RotatingShiftSlot::getManpower).sum()
+        );
+
+        int assigned = 0;
+        int slotIndex = 0;
+
+        while (assigned < totalAssignments) {
+            RotatingShiftSlot slot = slots.get(slotIndex % slots.size());
+
+            if (slot.assignedUsers.size() < slot.getManpower()) {
+                slot.assignedUsers.add(userPool.get(userIndex));
+                assigned++;
+                userIndex++;
+            }
+
+            slotIndex++;
+        }
+    };
+    public static final InitialShiftAssignmentStrategy FILL_ASSIGNMENT = (slots, users) -> {
+
+        var totalManPower = slots.stream().mapToInt(RotatingShiftSlot::getManpower).sum();
+
+        Iterator<ApplicationUser> userIterator = users.stream().limit(totalManPower).iterator();
+
+        for (RotatingShiftSlot slot : slots) {
+            for (int i = 0; i < slot.getManpower() && userIterator.hasNext(); i++) {
+                slot.assignedUsers.add(userIterator.next());
+            }
+        }
+    };
+
 
     public ShiftRotator(PlanBlueprint blueprint) {
+
         if (blueprint.getShifts().isEmpty()) {
             throw new IllegalArgumentException("Blueprint must contain at least one shift.");
         }
 
+        this.initialShiftAssignmentStrategy = FAIR_GREEDY;
         this.shifts = blueprint.getShifts().size();
-        this.totalManPower = blueprint.getShifts().stream()
-            .mapToInt(ShiftBlueprint::getManPower)
-            .sum();
 
         List<RotatingShiftSlot> allSlotsBase = blueprint.getShifts().stream()
             .flatMap(shift -> shift.getShiftWeeks().stream()
@@ -49,6 +88,11 @@ public class ShiftRotator {
         linkSlots();
     }
 
+    public ShiftRotator(PlanBlueprint blueprint, InitialShiftAssignmentStrategy initialShiftAssignmentStrategy) {
+        this(blueprint);
+        this.initialShiftAssignmentStrategy = initialShiftAssignmentStrategy;
+    }
+
     private void linkSlots() {
         int size = slotsInNaturalOrder.size();
         for (int i = 0; i < size; i++) {
@@ -64,13 +108,8 @@ public class ShiftRotator {
     }
 
     public void assignInitialUsers(List<ApplicationUser> users) {
-        Iterator<ApplicationUser> userIterator = users.stream().limit(totalManPower).toList().iterator();
-        slotsInRotationOrder.stream().limit(slotsInRotationOrder.size())
-            .forEach(slot -> {
-                for (int i = 0; i < slot.getManpower() && userIterator.hasNext(); i++) {
-                    slot.assignedUsers.add(userIterator.next());
-                }
-            });
+        var slots = slotsInRotationOrder.stream().limit(slotsInRotationOrder.size()).toList();
+        this.initialShiftAssignmentStrategy.assign(slots, users);
     }
 
     public List<CurrentShiftSlot> getNextCycle() {
