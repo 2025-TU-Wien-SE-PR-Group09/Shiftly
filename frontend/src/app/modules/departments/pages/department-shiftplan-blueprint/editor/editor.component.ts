@@ -17,21 +17,21 @@ export class EditorComponent {
   blueprintForm: FormGroup;
   daysOfWeek = ['MONDAY', 'TUESDAY', 'WEDNESDAY', 'THURSDAY', 'FRIDAY', 'SATURDAY', 'SUNDAY'];
   distinctColors = [
-    'rgba(230, 25, 75, 0.6)',   // Red
-    'rgba(60, 180, 75, 0.6)',   // Green
-    'rgba(255, 225, 25, 0.6)',  // Yellow
-    'rgba(0, 130, 200, 0.6)',   // Blue
-    'rgba(245, 130, 48, 0.6)',  // Orange
-    'rgba(145, 30, 180, 0.6)',  // Purple
-    'rgba(70, 240, 240, 0.6)',  // Cyan
-    'rgba(240, 50, 230, 0.6)',  // Magenta
-    'rgba(210, 245, 60, 0.6)',  // Lime
+    'rgba(230, 25, 75, 0.6)', // Red
+    'rgba(60, 180, 75, 0.6)', // Green
+    'rgba(255, 225, 25, 0.6)', // Yellow
+    'rgba(0, 130, 200, 0.6)', // Blue
+    'rgba(245, 130, 48, 0.6)', // Orange
+    'rgba(145, 30, 180, 0.6)', // Purple
+    'rgba(70, 240, 240, 0.6)', // Cyan
+    'rgba(240, 50, 230, 0.6)', // Magenta
+    'rgba(210, 245, 60, 0.6)', // Lime
     'rgba(250, 190, 190, 0.6)', // Light Pink
-    'rgba(0, 128, 128, 0.6)',   // Teal
+    'rgba(0, 128, 128, 0.6)', // Teal
     'rgba(230, 190, 255, 0.6)', // Lavender
-    'rgba(170, 110, 40, 0.6)',  // Brown
-    'rgba(128, 0, 0, 0.6)',     // Maroon
-    'rgba(128, 128, 0, 0.6)'    // Olive
+    'rgba(170, 110, 40, 0.6)', // Brown
+    'rgba(128, 0, 0, 0.6)', // Maroon
+    'rgba(128, 128, 0, 0.6)', // Olive
   ];
   @Input() amountShiftWeeks: number = 1;
 
@@ -55,17 +55,17 @@ export class EditorComponent {
   }
 
   addShift() {
-    this.shifts.push(
-      this.fb.group({
-        description: ['', Validators.required],
-        manPower: [1, [Validators.required, Validators.min(1)]],
-        shiftWeeks: this.fb.array([], this.minLengthFormArray(1)),
-      }),
-    );
+    const newShift = this.fb.group({
+      description: ['', [Validators.required, Validators.minLength(3), Validators.maxLength(255)]],
 
-    // Add same amount of weeks to created shift as the first shift has
+      manPower: [1, [Validators.required, Validators.min(1)]],
+      shiftWeeks: this.fb.array([], this.minLengthFormArray(1)),
+    });
+
+    this.shifts.push(newShift);
+
     for (let i = 0; i < this.amountShiftWeeks; i++) {
-      this.addWeek(this.shifts.length-1)
+      this.addWeek(this.shifts.length - 1);
     }
   }
 
@@ -80,11 +80,13 @@ export class EditorComponent {
   addWeek(shiftIndex: number) {
     this.getWeeks(shiftIndex).push(
       this.fb.group({
-        shiftDays: this.fb.array([], this.minLengthFormArray(1)),
+        shiftDays: this.fb.array([], [this.minLengthFormArray(1), this.exactWeeklyHoursValidator(40)]),
       }),
     );
+  }
 
-
+  hasFixedWeekCount(): boolean {
+    return this.amountShiftWeeks !== 1;
   }
 
   removeWeek(shiftIndex: number, weekIndex: number) {
@@ -148,28 +150,55 @@ export class EditorComponent {
     });
   }
 
-  copyDayToOthers(shiftIndex: number, weekIndex: number, weekday: string) {
-    const otherWeekdays = this.daysOfWeek.filter(d => d !== weekday)
-    const weekDaysData = this.getDays(shiftIndex, weekIndex).value
-    let startTime = "";
-    let endTime = "";
+  exactWeeklyHoursValidator(expectedHours: number): ValidatorFn {
+    return (control: AbstractControl): ValidationErrors | null => {
+      if (!(control instanceof FormArray)) return null;
 
-    for(let weekDayData of weekDaysData) {
-      if(weekDayData.day === weekday) {
+      let totalMinutes = 0;
+
+      for (const dayCtrl of control.controls) {
+        const start = dayCtrl.get('startTime')?.value;
+        const end = dayCtrl.get('endTime')?.value;
+
+        if (start && end) {
+          const [sh, sm] = start.split(':').map(Number);
+          const [eh, em] = end.split(':').map(Number);
+          const duration = eh * 60 + em - (sh * 60 + sm);
+          if (duration > 0) totalMinutes += duration;
+        }
+      }
+
+      const totalHours = totalMinutes / 60;
+      if (totalHours !== expectedHours) {
+        return { exactWeeklyHours: totalHours };
+      }
+
+      return null;
+    };
+  }
+
+  copyDayToOthers(shiftIndex: number, weekIndex: number, weekday: string) {
+    const otherWeekdays = this.daysOfWeek.filter((d) => d !== weekday);
+    const weekDaysData = this.getDays(shiftIndex, weekIndex).value;
+    let startTime = '';
+    let endTime = '';
+
+    for (let weekDayData of weekDaysData) {
+      if (weekDayData.day === weekday) {
         startTime = weekDayData.startTime;
         endTime = weekDayData.endTime;
       }
     }
 
-    if(startTime === "" || endTime === "") {
-      this.toastr.error("Cannot copy time to other days because startTime and endTime is empty.", "Error occurred")
+    if (startTime === '' || endTime === '') {
+      this.toastr.error('Cannot copy time to other days because startTime and endTime is empty.', 'Error occurred');
       return;
     }
 
     for (let otherWeekday of otherWeekdays) {
       const dayIndex = this.getDayIndex(shiftIndex, weekIndex, otherWeekday);
       if (dayIndex >= 0) {
-        this.removeDay(shiftIndex, weekIndex, this.getDayIndex(shiftIndex, weekIndex, otherWeekday))
+        this.removeDay(shiftIndex, weekIndex, this.getDayIndex(shiftIndex, weekIndex, otherWeekday));
       }
 
       this.getDays(shiftIndex, weekIndex).push(
