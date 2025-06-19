@@ -2,15 +2,16 @@ import { Component, OnInit } from '@angular/core';
 import {
   DepartmentDetailRestResponseDto,
   DepartmentService,
-  DepartmentShiftplanCalendarResponse, UserEndpointService, UserProfileRestDto,
+  DepartmentShiftplanCalendarResponse, UserEndpointService, UserProfileRestDto, ICalService,
 } from '../../../../rest_client';
 import { ToastrService } from 'ngx-toastr';
 import { CalendarEvent, CalendarModule, CalendarView } from 'angular-calendar';
 import { ButtonComponent } from '../../../../shared/components/button/button.component';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { HttpContext } from '@angular/common/http';
+import { HttpContext, HttpClient } from '@angular/common/http';
 import { SKIP_EXCEPTION_INTERCEPTOR } from '../../../../core/interceptor/skip-exception-interceptor';
+import { environment } from '../../../../../environments/environment';
 
 
 
@@ -26,12 +27,16 @@ export class EmployeeHomeComponent implements OnInit{
     private _userService: UserEndpointService,
     private _departmentService: DepartmentService,
     private readonly _toastr: ToastrService,
+    private _icalService: ICalService,
+    private _httpClient: HttpClient,
   ) {}
 
   protected selectedDepartment: DepartmentDetailRestResponseDto | undefined;
   protected shiftPlan: DepartmentShiftplanCalendarResponse | undefined;
   code: string = 'test';
   protected currentUser: UserProfileRestDto | undefined;
+  protected subscriptionUrl: string = '';
+  protected showSubscriptionUrl: boolean = false;
 
   view: CalendarView = CalendarView.Week;
   CalendarView = CalendarView; // Für Template-Zugriff
@@ -148,5 +153,83 @@ export class EmployeeHomeComponent implements OnInit{
         },
       });
     }
+  }
+
+  /**
+   * Downloads the employee's shifts as an iCal file
+   */
+  downloadMyShifts(): void {
+    this._icalService.downloadEmployeeShiftsIcal('response').subscribe({
+      next: (response) => {
+        if (!response.body) {
+          this._toastr.error('Empty response received', 'Error');
+          return;
+        }
+
+        // Convert the response body to a blob
+        const blob = new Blob([response.body], { type: 'text/calendar' });
+
+        // Create a URL for the blob
+        const url = window.URL.createObjectURL(blob);
+
+        // Create a temporary anchor element
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = 'my_shifts.ics';
+
+        // Append to the document, click it, and remove it
+        document.body.appendChild(a);
+        a.click();
+        window.URL.revokeObjectURL(url);
+        document.body.removeChild(a);
+
+        this._toastr.success('My shifts downloaded successfully', 'Success');
+      },
+      error: (err) => {
+        console.error('Error downloading my shifts', err);
+        this._toastr.error('Failed to download my shifts', 'Error');
+      }
+    });
+  }
+
+  /**
+   * Generates and displays the subscription URL for the employee's shifts calendar
+   */
+  getSubscriptionUrl(): void {
+    // Call the backend to generate a personal subscription URL with token
+    const baseUrl = environment.basePath || window.location.origin;
+    this._httpClient.get<string>(`${baseUrl}/api/ical/employee/shifts/subscription-url`, { responseType: 'text' as 'json' }).subscribe({
+      next: (response: string) => {
+        this.subscriptionUrl = response;
+        this.showSubscriptionUrl = true;
+        this._toastr.success('Subscription URL generated successfully', 'Success');
+      },
+      error: (err: any) => {
+        console.error('Error generating subscription URL', err);
+        this._toastr.error('Failed to generate subscription URL', 'Error');
+      }
+    });
+  }
+
+  /**
+   * Copies the subscription URL to the clipboard
+   */
+  copySubscriptionUrl(): void {
+    navigator.clipboard.writeText(this.subscriptionUrl).then(
+      () => {
+        this._toastr.success('Subscription URL copied to clipboard', 'Success');
+      },
+      (err) => {
+        console.error('Could not copy text: ', err);
+        this._toastr.error('Failed to copy subscription URL', 'Error');
+      }
+    );
+  }
+
+  /**
+   * Hides the subscription URL
+   */
+  hideSubscriptionUrl(): void {
+    this.showSubscriptionUrl = false;
   }
 }

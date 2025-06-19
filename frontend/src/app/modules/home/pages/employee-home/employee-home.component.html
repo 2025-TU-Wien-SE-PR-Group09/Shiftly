@@ -62,6 +62,33 @@
     </app-button>
   </div>
 
+    <div class="btn-group flex ml-4">
+      <app-button
+        tone="light"
+        shape="rounded"
+        impact="bold"
+        size="medium"
+        (click)="downloadMyShifts()"
+      >
+        <span class="flex items-center">
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
+          </svg>
+          Download Calendar
+        </span>
+      </app-button>
+
+    <app-button
+      tone="light"
+      shape="rounded"
+      impact="bold"
+      size="medium"
+      (click)="getSubscriptionUrl()"
+    >
+      Get Subscription URL
+    </app-button>
+  </div>
+
   <!-- Modal Overlay -->
   <div class="modal-overlay" *ngIf="selectedEvent" (click)="selectedEvent = null">
     <div class="modal-content bg-white dark:bg-slate-800 text-foreground" (click)="$event.stopPropagation()">
@@ -140,4 +167,32 @@
       No shift plan available for Department {{this.selectedDepartment?.name}}. Please ask a supervisor to generate a shift plan.
     </p>
   </ng-container>
+
+<!-- Subscription URL Modal -->
+<div class="modal-overlay" *ngIf="showSubscriptionUrl" (click)="hideSubscriptionUrl()">
+  <div class="modal-content bg-white dark:bg-slate-800 text-foreground" (click)="$event.stopPropagation()">
+    <button class="close-button text-gray-400 hover:text-gray-600 dark:text-gray-500 dark:hover:text-gray-300"
+            (click)="hideSubscriptionUrl()">✕</button>
+
+    <h3 class="text-xl font-semibold mb-4 text-foreground">My Shifts Calendar Subscription URL</h3>
+
+    <p class="text-sm text-gray-600 dark:text-gray-400 mb-4">
+      Use this URL to subscribe to your shifts calendar in your preferred calendar application:
+    </p>
+
+    <div class="mb-4">
+      <input
+        type="text"
+        class="w-full p-2 border border-gray-300 rounded text-sm bg-gray-50 dark:bg-gray-700 dark:border-gray-600 dark:text-white"
+        [value]="subscriptionUrl"
+        readonly
+      />
+    </div>
+
+    <button (click)="copySubscriptionUrl()"
+            class="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded text-sm">
+      Copy URL
+    </button>
+  </div>
+</div>
 </div>

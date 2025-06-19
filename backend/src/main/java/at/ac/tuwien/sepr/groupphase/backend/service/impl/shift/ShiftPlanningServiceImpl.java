@@ -358,4 +358,14 @@ public class ShiftPlanningServiceImpl implements ShiftPlanningService {
             .filter(c -> !c.isOverwritten()).toList();
     }
 
+    @Override
+    public ConcreteShiftPlan getCurrentConcretePlanWithShifts(String departmentName) {
+        LOGGER.trace("getCurrentConcretePlanWithShifts({})", departmentName);
+
+        return concreteShiftPlanRepository.findByDepartmentNameWithShifts(departmentName)
+            .stream()
+            .max(Comparator.comparing(ConcreteShiftPlan::getStartDate))
+            .orElseThrow(() -> new NotFoundException(("No current concrete plan found for department with ID: " + departmentName)));
+    }
+
 }

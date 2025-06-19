@@ -3,7 +3,7 @@ import {
   AdminEndpointService,
   DepartmentDetailRestResponseDto,
   DepartmentService,
-  DepartmentShiftplanCalendarResponse, RegistrationEndpointService, UserInviteRequestDto,
+  DepartmentShiftplanCalendarResponse, RegistrationEndpointService, UserInviteRequestDto, ICalService,
 } from '../../../../rest_client';
 import { ToastrService } from 'ngx-toastr';
 import { CommonModule } from '@angular/common';
@@ -26,13 +26,15 @@ export class AdminHomeComponent implements OnInit {
     private _adminService: AdminEndpointService,
     private _departmentService: DepartmentService,
     private readonly _toastr: ToastrService,
-    private _registrationService: RegistrationEndpointService,
+    private _icalService: ICalService,
   ) { }
 
   protected departments: DepartmentDetailRestResponseDto[] = [];
   protected selectedDepartment: DepartmentDetailRestResponseDto | undefined;
   protected shiftPlan: DepartmentShiftplanCalendarResponse | undefined;
   code: string = 'test';
+  protected subscriptionUrl: string = '';
+  protected showSubscriptionUrl: boolean = false;
 
   view: CalendarView = CalendarView.Month;
   CalendarView = CalendarView; // Für Template-Zugriff
@@ -212,5 +214,88 @@ export class AdminHomeComponent implements OnInit {
 
   onDepartmentChanged() {
     this.loadScheduledShifts();
+  }
+
+  /**
+   * Downloads the department's shifts as an iCal file
+   */
+  downloadCalendar(): void {
+    if (!this.selectedDepartment?.name) {
+      this._toastr.error('No department selected', 'Error');
+      return;
+    }
+
+    const departmentName = this.selectedDepartment.name;
+
+    this._icalService.downloadIcalForDepartmentShiftplan(departmentName, 'response').subscribe({
+      next: (response) => {
+        if (!response.body) {
+          this._toastr.error('Empty response received', 'Error');
+          return;
+        }
+
+        // Convert the response body to a blob
+        const blob = new Blob([response.body], { type: 'text/calendar' });
+
+        // Create a URL for the blob
+        const url = window.URL.createObjectURL(blob);
+
+        // Create a temporary anchor element
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = `${departmentName}-calendar.ics`;
+
+        // Append to the document, click it, and remove it
+        document.body.appendChild(a);
+        a.click();
+        window.URL.revokeObjectURL(url);
+        document.body.removeChild(a);
+
+        this._toastr.success('Calendar downloaded successfully', 'Success');
+      },
+      error: (err) => {
+        console.error('Error downloading calendar', err);
+        this._toastr.error('Failed to download calendar', 'Error');
+      }
+    });
+  }
+
+  /**
+   * Generates and displays the subscription URL for the department's shifts calendar
+   */
+  getSubscriptionUrl(): void {
+    if (!this.selectedDepartment?.name) {
+      this._toastr.error('No department selected', 'Error');
+      return;
+    }
+
+    const departmentName = this.selectedDepartment.name;
+
+    // Generate the subscription URL
+    const baseUrl = environment.basePath || window.location.origin;
+    this.subscriptionUrl = `${baseUrl}/api/ical/department/${departmentName}/shiftplan`;
+    this.showSubscriptionUrl = true;
+  }
+
+  /**
+   * Copies the subscription URL to the clipboard
+   */
+  copySubscriptionUrl(): void {
+    navigator.clipboard.writeText(this.subscriptionUrl).then(
+      () => {
+        this._toastr.success('Subscription URL copied to clipboard', 'Success');
+      },
+      (err) => {
+        console.error('Could not copy text: ', err);
+        this._toastr.error('Failed to copy subscription URL', 'Error');
+      }
+    );
+  }
+
+  /**
+   * Hides the subscription URL
+   */
+  hideSubscriptionUrl(): void {
+    this.showSubscriptionUrl = false;
   }
 }

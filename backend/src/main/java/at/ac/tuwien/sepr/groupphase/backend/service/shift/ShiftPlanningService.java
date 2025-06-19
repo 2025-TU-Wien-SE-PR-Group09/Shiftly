@@ -63,4 +63,13 @@ public interface ShiftPlanningService {
      * @return a ConcreteShiftPlan containing all plans for the specified department
      */
     List<ConcreteShiftPlan> getAllNotOverridenPlans(String departmentName);
+
+    /**
+     * Retrieves the current concrete plan for a department with eagerly loaded shifts and assignments.
+     * This method prevents LazyInitializationException by using JOIN FETCH.
+     *
+     * @param departmentName the name of the department for which to retrieve the current concrete plan
+     * @return the current ConcreteShiftPlan with all shifts and assignments loaded
+     */
+    ConcreteShiftPlan getCurrentConcretePlanWithShifts(String departmentName);
 }

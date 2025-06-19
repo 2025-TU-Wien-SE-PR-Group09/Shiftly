@@ -21,143 +21,213 @@
     </app-button>
   </div>
 
-  <div class="min-w-xs">
-    <label for="departmentSelect" class="block text-sm font-medium text-foreground">Select Department:</label>
-    <select id="departmentSelect" [(ngModel)]="selectedDepartment"   (ngModelChange)="onDepartmentChanged()"
-            class="mt-1 block w-auto max-w-xs pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm rounded-md text-background bg-foreground">
-      <option *ngFor="let department of departments" [ngValue]="department">
-        {{ department.name }}
-      </option>
-    </select>
-  </div>
-</div>
-
-<hr class="mt-5 mb-8 border-t border-foreground/50" />
-
-
-<ng-container *ngIf="departments.length > 0 && shiftPlan && shiftPlan.shifts && shiftPlan.shifts.length > 0">
-  <div class="mb-4 flex justify-between">
-    <div class="btn-group">
-      <app-button
-        tone="primary"
-        impact="bold"
-        mwlCalendarPreviousView
-        [view]="view"
-        [(viewDate)]="viewDate"
-        (viewDateChange)="closeOpenMonthViewDay()"
-      >Previous
-      </app-button>
-
-      <app-button
-        tone="primary"
-        mwlCalendarToday
-        [(viewDate)]="viewDate"
-      >Today
-      </app-button>
-
-      <app-button
-        tone="primary"
-        impact="bold"
-        mwlCalendarNextView
-        [view]="view"
-        [(viewDate)]="viewDate"
-        (viewDateChange)="closeOpenMonthViewDay()"
-      >Next
-      </app-button>
+    <div class="min-w-xs">
+      <label for="departmentSelect" class="block text-sm font-medium text-foreground">Select Department:</label>
+      <select id="departmentSelect" [(ngModel)]="selectedDepartment"   (ngModelChange)="onDepartmentChanged()"
+              class="mt-1 block w-auto max-w-xs pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm rounded-md text-background bg-foreground">
+        <option *ngFor="let department of departments" [ngValue]="department">
+          {{ department.name }}
+        </option>
+      </select>
     </div>
-
-    <div class="col-md-4">
-      <h3 class="text-foreground">{{ viewDate | calendarDate:(view + 'ViewTitle'):'en' }}</h3>
-    </div>
-
-    <div class="btn-group ml-4">
-      <app-button
-        tone="primary"
-        shape="rounded"
-        impact="bold"
-        size="medium"
-        (click)="setView(CalendarView.Month)"
-      >
-        Month
-      </app-button>
-
-      <app-button
-        tone="primary"
-        shape="rounded"
-        impact="bold"
-        size="medium"
-        (click)="setView(CalendarView.Week)"
-      >
-        Week
-      </app-button>
-    </div>
-
   </div>
 
-  <ng-template #eventTemplate let-event="event">
-    <div class="text-sm">
-      <strong>{{ event.title }}</strong>
-      <span class="text-xs text-gray-300">Assigned:</span>
-      <ul class="list-disc list-inside text-xs text-gray-100">
-        <li *ngFor="let worker of event.meta.workers">{{ worker }}</li>
-      </ul>
+  <hr class="mt-5 mb-8 border-t border-foreground/50" />
+
+
+  <ng-container *ngIf="departments.length > 0 && shiftPlan && shiftPlan.shifts && shiftPlan.shifts.length > 0">
+    <div class="mb-4 flex justify-between">
+      <div class="btn-group">
+        <app-button
+          tone="primary"
+          impact="bold"
+          mwlCalendarPreviousView
+          [view]="view"
+          [(viewDate)]="viewDate"
+          (viewDateChange)="closeOpenMonthViewDay()"
+        >Previous
+        </app-button>
+
+        <app-button
+          tone="primary"
+          mwlCalendarToday
+          [(viewDate)]="viewDate"
+        >Today
+        </app-button>
+
+        <app-button
+          tone="primary"
+          impact="bold"
+          mwlCalendarNextView
+          [view]="view"
+          [(viewDate)]="viewDate"
+          (viewDateChange)="closeOpenMonthViewDay()"
+        >Next
+        </app-button>
+      </div>
+
+      <div class="col-md-4">
+        <h3 class="text-foreground">{{ viewDate | calendarDate:(view + 'ViewTitle'):'en' }}</h3>
+      </div>
+
+      <div class="btn-group ml-4">
+        <app-button
+          tone="primary"
+          shape="rounded"
+          impact="bold"
+          size="medium"
+          (click)="setView(CalendarView.Month)"
+        >
+          Month
+        </app-button>
+
+        <app-button
+          tone="primary"
+          shape="rounded"
+          impact="bold"
+          size="medium"
+          (click)="setView(CalendarView.Week)"
+        >
+          Week
+        </app-button>
+      </div>
+
+      <div class="btn-group flex ml-4">
+        <app-button
+          tone="light"
+          shape="rounded"
+          impact="bold"
+          size="medium"
+          (click)="downloadCalendar()"
+        >
+        <span class="flex items-center">
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
+          </svg>
+          Download Calendar
+        </span>
+        </app-button>
+
+        <app-button
+          tone="light"
+          shape="rounded"
+          impact="bold"
+          size="medium"
+          (click)="getSubscriptionUrl()"
+        >
+        <span class="flex items-center">
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+          </svg>
+          Subscribe
+        </span>
+        </app-button>
+      </div>
+
     </div>
-  </ng-template>
-  <ng-container *ngIf="view === CalendarView.Month">
-    <mwl-calendar-month-view
-      [viewDate]="viewDate"
-      [events]="events"
-      (eventClicked)="handleEventClick($event)">
-    </mwl-calendar-month-view>
+
+    <ng-template #eventTemplate let-event="event">
+      <div class="text-sm">
+        <strong>{{ event.title }}</strong>
+        <span class="text-xs text-gray-300">Assigned:</span>
+        <ul class="list-disc list-inside text-xs text-gray-100">
+          <li *ngFor="let worker of event.meta.workers">{{ worker }}</li>
+        </ul>
+      </div>
+    </ng-template>
+    <ng-container *ngIf="view === CalendarView.Month">
+      <mwl-calendar-month-view
+        [viewDate]="viewDate"
+        [events]="events"
+        (eventClicked)="handleEventClick($event)">
+      </mwl-calendar-month-view>
+    </ng-container>
+
+    <ng-container *ngIf="view === CalendarView.Week">
+      <mwl-calendar-week-view
+        [viewDate]="viewDate"
+        [events]="events"
+        (eventClicked)="handleEventClick($event)">
+      </mwl-calendar-week-view>
+    </ng-container>
+
+    <ng-container *ngIf="view === CalendarView.Day">
+      <mwl-calendar-day-view
+        [viewDate]="viewDate"
+        [events]="events"
+        (eventClicked)="handleEventClick($event)">
+      </mwl-calendar-day-view>
+    </ng-container>
+
   </ng-container>
 
-  <ng-container *ngIf="view === CalendarView.Week">
-    <mwl-calendar-week-view
-      [viewDate]="viewDate"
-      [events]="events"
-      (eventClicked)="handleEventClick($event)">
-    </mwl-calendar-week-view>
+  <ng-container *ngIf="departments.length <= 0">
+    <p class="text-foreground flex items-center">
+      <svg xmlns="http://www.w3.org/2000/svg"
+           fill="none"
+           viewBox="0 0 24 24"
+           stroke-width="2"
+           stroke="currentColor"
+           class="w-8 h-8 text-red-500 mr-2">
+        <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
+      </svg>
+      No department available. Please create one.
+    </p>
   </ng-container>
 
-  <ng-container *ngIf="view === CalendarView.Day">
-    <mwl-calendar-day-view
-      [viewDate]="viewDate"
-      [events]="events"
-      (eventClicked)="handleEventClick($event)">
-    </mwl-calendar-day-view>
+  <ng-container *ngIf="this.departments.length > 0 && (shiftPlan === undefined || shiftPlan?.shifts === undefined || shiftPlan!.shifts!.length <= 0)">
+    <p class="text-foreground flex items-center">
+      <svg xmlns="http://www.w3.org/2000/svg"
+           fill="none"
+           viewBox="0 0 24 24"
+           stroke-width="2"
+           stroke="currentColor"
+           class="w-8 h-8 text-red-500 mr-2">
+        <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
+      </svg>
+      No shift plan available for {{this.selectedDepartment?.name}}. Please generate a shift plan.
+    </p>
   </ng-container>
 
-</ng-container>
+  <!-- Subscription URL Modal -->
+  <div class="modal-overlay" *ngIf="showSubscriptionUrl" (click)="hideSubscriptionUrl()">
+    <div class="modal-content bg-white dark:bg-slate-800 text-foreground" (click)="$event.stopPropagation()">
+      <button class="close-button text-gray-400 hover:text-gray-600 dark:text-gray-500 dark:hover:text-gray-300"
+              (click)="hideSubscriptionUrl()">✕</button>
 
-<ng-container *ngIf="departments.length <= 0">
-  <p class="text-foreground flex items-center">
-    <svg xmlns="http://www.w3.org/2000/svg"
-         fill="none"
-         viewBox="0 0 24 24"
-         stroke-width="2"
-         stroke="currentColor"
-         class="w-8 h-8 text-red-500 mr-2">
-      <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
-    </svg>
-    No department available. Please create one.
-  </p>
-</ng-container>
+      <h3 class="text-xl font-semibold mb-4 text-foreground">Calendar Subscription URL</h3>
 
-<ng-container *ngIf="!this.shiftPlan || !this.shiftPlan.shifts || this.shiftPlan.shifts.length <= 0">
-  <p class="text-foreground flex items-center">
-    <svg xmlns="http://www.w3.org/2000/svg"
-         fill="none"
-         viewBox="0 0 24 24"
-         stroke-width="2"
-         stroke="currentColor"
-         class="w-8 h-8 text-red-500 mr-2">
-      <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
-    </svg>
-    No shift plan available for {{this.selectedDepartment?.name}}. Please generate a shift plan.
-  </p>
-</ng-container>
+      <div class="mb-4">
+        <p class="text-sm text-gray-600 dark:text-gray-400 mb-2">
+          Use this URL to subscribe to the department's shifts calendar in your favorite calendar application:
+        </p>
+        <div class="flex items-center">
+          <input type="text"
+                 [value]="subscriptionUrl"
+                 readonly
+                 class="w-full p-2 border rounded-l text-sm bg-gray-50 dark:bg-slate-700 text-foreground" />
+          <button (click)="copySubscriptionUrl()"
+                  class="p-2 bg-blue-500 text-white rounded-r hover:bg-blue-600">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 5H6a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2v-1M8 5a2 2 0 002 2h2a2 2 0 002-2M8 5a2 2 0 012-2h2a2 2 0 012 2" />
+            </svg>
+          </button>
+        </div>
+      </div>
 
-  <!-- Modal Overlay -->
+      <div>
+        <h4 class="text-md font-medium mb-2 text-foreground">How to use:</h4>
+        <ol class="list-decimal pl-5 text-sm text-gray-600 dark:text-gray-400">
+          <li class="mb-1">Copy the URL above</li>
+          <li class="mb-1">Open your calendar application (Google Calendar, Outlook, Apple Calendar, etc.)</li>
+          <li class="mb-1">Find the option to add a calendar by URL or subscribe to a calendar</li>
+          <li class="mb-1">Paste the URL and save</li>
+        </ol>
+      </div>
+    </div>
+  </div>
+
+  <!-- Event Modal Overlay -->
   <div class="modal-overlay" *ngIf="selectedEvent" (click)="selectedEvent = null">
     <div class="modal-content bg-white dark:bg-slate-800 text-foreground" (click)="$event.stopPropagation()">
       <button class="close-button text-gray-400 hover:text-gray-600 dark:text-gray-500 dark:hover:text-gray-300"

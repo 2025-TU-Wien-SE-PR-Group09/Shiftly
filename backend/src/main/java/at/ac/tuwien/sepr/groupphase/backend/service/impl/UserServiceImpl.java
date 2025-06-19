@@ -233,6 +233,16 @@ public class UserServiceImpl implements UserService {
             .collect(Collectors.toList());
     }
 
+    @Override
+    public String getDepartmentForUser(String userEmail) throws NotFoundException {
+        LOGGER.trace("getDepartmentForUser({})", userEmail);
+
+        ApplicationUser user = userRepository.findByEmail(userEmail)
+            .orElseThrow(() -> new NotFoundException("User with email " + userEmail + " not found."));
+
+        return user.getDepartment() != null ? user.getDepartment().getName() : null;
+    }
+
 
     // Aktualisiere den Konstruktor entsprechend mit den neuen Abhängigkeiten
 
