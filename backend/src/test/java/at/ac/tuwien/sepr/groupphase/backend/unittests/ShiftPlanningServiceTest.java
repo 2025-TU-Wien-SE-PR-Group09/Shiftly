@@ -8,6 +8,7 @@ import at.ac.tuwien.sepr.groupphase.backend.repository.ScheduledShiftRepository;
 import at.ac.tuwien.sepr.groupphase.backend.repository.ShiftBlueprintRepository;
 import at.ac.tuwien.sepr.groupphase.backend.repository.ShiftDayBlueprintRepository;
 import at.ac.tuwien.sepr.groupphase.backend.repository.ShiftWeekBlueprintRepository;
+import at.ac.tuwien.sepr.groupphase.backend.service.MailService;
 import at.ac.tuwien.sepr.groupphase.backend.service.dto.shift.PlanBlueprintCreationDto;
 import at.ac.tuwien.sepr.groupphase.backend.service.impl.shift.ShiftPlanningServiceImpl;
 import at.ac.tuwien.sepr.groupphase.backend.service.TimeService;
@@ -34,6 +35,7 @@ class ShiftPlanningServiceTest {
     private PlanBlueprintRepository planBlueprintRepository;
     private ScheduledShiftRepository scheduledShiftRepository;
     private ConcreteShiftPlanRepository concreteShiftPlanRepository;
+    private MailService mailService;
 
     @BeforeEach
     void setUp() {
@@ -45,6 +47,7 @@ class ShiftPlanningServiceTest {
         planBlueprintRepository = mock(PlanBlueprintRepository.class);
         scheduledShiftRepository = mock(ScheduledShiftRepository.class);
         concreteShiftPlanRepository = mock(ConcreteShiftPlanRepository.class);
+        mailService = mock(MailService.class);
 
 
         shiftPlanningService = new ShiftPlanningServiceImpl(
@@ -55,7 +58,8 @@ class ShiftPlanningServiceTest {
             null,
             concreteShiftPlanRepository,
             null,
-            scheduledShiftRepository
+            scheduledShiftRepository,
+            mailService
         );
     }
 
@@ -141,7 +145,6 @@ class ShiftPlanningServiceTest {
      */
 
 
-
     @Test
     void createPlan_Blueprint_withMissingDepartment_shouldThrowNotFound() {
         var departmentId = "asdf";
@@ -150,7 +153,6 @@ class ShiftPlanningServiceTest {
         assertThrows(NotFoundException.class, () -> shiftPlanningService.createPlanBlueprint(createPlanBlueprintDto));
 
     }
-
 
 
 }

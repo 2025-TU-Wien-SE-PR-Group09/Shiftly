@@ -59,10 +59,19 @@ public class MailServiceImpl implements MailService {
         String subject = "New Shift Assignments – " + dto.getDepartmentName();
         String text = String.format(
             """
-                You have been assigned new shifts in the %s department.
+                    Hello %s,
 
-                Please check your calendar in the system for details about your schedule.""",
-            dto.getDepartmentName()
+                    You have been assigned new shifts in the %s department from %s to %s.
+
+                    Please check your calendar in the system for detailed shift times.
+
+                    Best Regards,
+                    Scheduling Team
+                """,
+            dto.getEmployeeFirstName(),
+            dto.getDepartmentName(),
+            format(dto.getStartDate()),
+            format(dto.getEndDate())
         );
         sendSimpleEmail(dto.getRecipientMail(), subject, text);
     }

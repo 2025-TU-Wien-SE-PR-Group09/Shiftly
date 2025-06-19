@@ -2,7 +2,6 @@ package at.ac.tuwien.sepr.groupphase.backend.unittests;
 
 import at.ac.tuwien.sepr.groupphase.backend.entity.*;
 import at.ac.tuwien.sepr.groupphase.backend.repository.*;
-import at.ac.tuwien.sepr.groupphase.backend.service.MailService;
 import at.ac.tuwien.sepr.groupphase.backend.service.TimeService;
 import at.ac.tuwien.sepr.groupphase.backend.service.impl.shift.ShiftPlanRotationServiceImpl;
 import at.ac.tuwien.sepr.groupphase.backend.service.shift.ShiftPlanRotationService;
@@ -34,14 +33,12 @@ public class ShiftPlanRotationServiceTests {
         when(timeService.now()).thenReturn(LocalDateTime.of(2025, 6, 8, 22, 0));
         concreteShiftPlanRepository = mock(ConcreteShiftPlanRepository.class);
         shiftAssignmentAuditLogRepository = mock(ShiftAssignmentAuditLogRepository.class);
-        MailService mailService = mock(MailService.class);
 
 
         serviceUnderTest = new ShiftPlanRotationServiceImpl(
             timeService,
             concreteShiftPlanRepository,
-            shiftAssignmentAuditLogRepository,
-            mailService);
+            shiftAssignmentAuditLogRepository);
     }
 
     // Plan: EarlyWeek1:[X] -> LateWeek1:[X]
