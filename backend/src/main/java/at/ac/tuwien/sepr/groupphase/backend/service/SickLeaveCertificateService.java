@@ -1,10 +1,10 @@
 package at.ac.tuwien.sepr.groupphase.backend.service;
 
-import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.sickleave.SickLeaveCertificateUploadDatesDto;
 import at.ac.tuwien.sepr.groupphase.backend.entity.SickLeaveCertificate;
 import at.ac.tuwien.sepr.groupphase.backend.exception.ConflictException;
 import at.ac.tuwien.sepr.groupphase.backend.exception.NotFoundException;
 import at.ac.tuwien.sepr.groupphase.backend.service.dto.sickleave.SickLeaveCertificateDto;
+import at.ac.tuwien.sepr.groupphase.backend.service.dto.sickleave.SickLeaveCertificateSupervisorDto;
 import at.ac.tuwien.sepr.groupphase.backend.service.dto.sickleave.SickLeaveCertificateUploadDto;
 
 import java.util.List;
@@ -60,7 +60,8 @@ public interface SickLeaveCertificateService {
      * @param supervisorEmail Email of the logged-in supervisor
      * @return list of SickLeaveCertificateDto without file data
      */
-    List<SickLeaveCertificateDto> getAllForSupervisor(String supervisorEmail);
+    List<SickLeaveCertificateSupervisorDto> getAllForSupervisor(String supervisorEmail);
+
 
 
 

@@ -1,5 +1,6 @@
 package at.ac.tuwien.sepr.groupphase.backend.endpoint;
 
+import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.sickleave.SickLeaveCertificateSupervisorRestDto;
 import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.sickleave.SickLeaveCertificateUploadDatesDto;
 import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.sickleave.SickLeaveCertificateRestDto;
 import at.ac.tuwien.sepr.groupphase.backend.endpoint.mapper.SickLeaveCertificateMapper;
@@ -10,9 +11,6 @@ import at.ac.tuwien.sepr.groupphase.backend.service.SickLeaveCertificateService;
 import at.ac.tuwien.sepr.groupphase.backend.service.dto.sickleave.SickLeaveCertificateDto;
 import at.ac.tuwien.sepr.groupphase.backend.service.dto.sickleave.SickLeaveCertificateUploadDto;
 import io.swagger.v3.oas.annotations.Operation;
-import io.swagger.v3.oas.annotations.media.ArraySchema;
-import io.swagger.v3.oas.annotations.media.Content;
-import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import jakarta.annotation.security.RolesAllowed;
 import jakarta.validation.Valid;
@@ -258,14 +256,17 @@ public class SickLeaveCertificateEndpoint {
         responseCode = "200",
         description = "List of sick leave certificates for supervisor's department"
     )
-    public ResponseEntity<List<SickLeaveCertificateRestDto>> getSickLeavesForSupervisor() {
+    public ResponseEntity<List<SickLeaveCertificateSupervisorRestDto>> getSickLeavesForSupervisor() {
         LOGGER.trace("getSickLeavesForSupervisor()");
 
         var supervisorEmail = authService.getCurrentUser().getEmail();
         var dtos = certificateService.getAllForSupervisor(supervisorEmail);
-        var restDtos = dtos.stream().map(mapper::toRest).toList();
+        var restDtos = dtos.stream()
+            .map(SickLeaveCertificateSupervisorRestDto::from)
+            .toList();
         return ResponseEntity.ok(restDtos);
     }
+
 
 
 }

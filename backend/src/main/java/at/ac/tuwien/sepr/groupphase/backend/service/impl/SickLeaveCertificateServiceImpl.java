@@ -11,17 +11,14 @@ import at.ac.tuwien.sepr.groupphase.backend.service.MailService;
 import at.ac.tuwien.sepr.groupphase.backend.service.SickLeaveCertificateService;
 import at.ac.tuwien.sepr.groupphase.backend.service.dto.mail.SickLeaveEmailDto;
 import at.ac.tuwien.sepr.groupphase.backend.service.dto.sickleave.SickLeaveCertificateDto;
+import at.ac.tuwien.sepr.groupphase.backend.service.dto.sickleave.SickLeaveCertificateSupervisorDto;
 import at.ac.tuwien.sepr.groupphase.backend.service.dto.sickleave.SickLeaveCertificateUploadDto;
-import org.aspectj.weaver.ast.Not;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
 import java.lang.invoke.MethodHandles;
-import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
 
@@ -185,7 +182,7 @@ public class SickLeaveCertificateServiceImpl implements SickLeaveCertificateServ
 
 
     @Override
-    public List<SickLeaveCertificateDto> getAllForSupervisor(String supervisorEmail) {
+    public List<SickLeaveCertificateSupervisorDto> getAllForSupervisor(String supervisorEmail) {
         LOGGER.trace("getAllForSupervisor({})", supervisorEmail);
 
         ApplicationUser supervisor = userRepository.findByEmail(supervisorEmail)
@@ -195,10 +192,8 @@ public class SickLeaveCertificateServiceImpl implements SickLeaveCertificateServ
 
         return certificateRepository.findAll().stream()
             .filter(cert -> cert.getEmployee().getDepartment().getName().equals(departmentName))
-            .map(cert -> new SickLeaveCertificateDto(
+            .map(cert -> new SickLeaveCertificateSupervisorDto(
                 cert.getId(),
-                null,
-                null,
                 cert.getUploadedAt(),
                 cert.getEmployee().getEmail(),
                 cert.getStartDate(),
@@ -206,6 +201,7 @@ public class SickLeaveCertificateServiceImpl implements SickLeaveCertificateServ
             ))
             .toList();
     }
+
 
 
 }
