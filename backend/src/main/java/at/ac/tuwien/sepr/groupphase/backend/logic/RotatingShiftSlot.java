@@ -5,17 +5,14 @@ import at.ac.tuwien.sepr.groupphase.backend.entity.ShiftBlueprint;
 import at.ac.tuwien.sepr.groupphase.backend.entity.ShiftDayBlueprint;
 import at.ac.tuwien.sepr.groupphase.backend.entity.ShiftWeekBlueprint;
 
-import java.util.ArrayDeque;
-import java.util.Deque;
-import java.util.List;
-import java.util.Objects;
+import java.util.*;
 import java.util.stream.Collectors;
 
 public class RotatingShiftSlot {
 
     private final ShiftBlueprint blueprint;
     private final ShiftWeekBlueprint week;
-    private final int manpower;
+    private int manpower;
 
     public final Deque<ApplicationUser> assignedUsers = new ArrayDeque<>();
 
@@ -36,64 +33,53 @@ public class RotatingShiftSlot {
         this.next = next;
     }
 
-    public int rotate() {
-        if (assignedUsers.isEmpty()) {
-            return 0;
-        }
-        int extraRotationsPerformed = 0;
 
-        for (int i = 0; i < Math.min(manpower, next.manpower); i++) {
+    public void rotateSimple(int min) {
+        if (assignedUsers.isEmpty()) {
+            return;
+        }
+
+        int assigned = assignedUsers.size();
+
+        for (int i = 0; i < Math.min(min, assigned); i++) {
+            ApplicationUser user = assignedUsers.removeLast();
+            if (next.assignedUsers.size() >= next.manpower) {
+                next.rotateSimple(1);
+            }
+            next.assignedUsers.addFirst(user);
+        }
+    }
+
+    public boolean trySqueeze(ApplicationUser user) {
+        if (assignedUsers.size() < manpower) {
+            assignedUsers.addFirst(user);
+            return true;
+        }
+
+        return false;
+    }
+
+
+    public List<ApplicationUser> rotate() {
+        if (assignedUsers.isEmpty()) {
+            return List.of();
+        }
+
+        List<ApplicationUser> overflow = new ArrayList<>();
+
+        for (int i = 0; i < manpower; i++) {
             if (assignedUsers.isEmpty()) {
                 break;
             }
             ApplicationUser user = assignedUsers.removeLast();
-            if (next.manpower <= next.assignedUsers.size()) {
-                // this means we need to rotate the next to make space
-                if (!fillFromPrevious(user)) {
-                    extraRotationsPerformed += next.pureRotateOne();
-                    next.assignedUsers.addFirst(user);
-                }
+            if (next.assignedUsers.size() < next.manpower) {
+                next.assignedUsers.addFirst(user);
                 continue;
             }
-            next.assignedUsers.addFirst(user);
+            overflow.add(user);
         }
 
-        while (!assignedUsers.isEmpty() && assignedUsers.size() < manpower) {
-            ApplicationUser overflow = assignedUsers.removeLast();
-            if (!fillFromPrevious(overflow)) {
-                break;
-            }
-        }
-        return extraRotationsPerformed;
-    }
-
-    private int pureRotateOne() {
-        if (assignedUsers.isEmpty()) {
-            return 0;
-        }
-        int extraRotationsPerformed = 1;
-        ApplicationUser user = assignedUsers.removeLast();
-        if (next.manpower <= next.assignedUsers.size()) {
-            extraRotationsPerformed += next.pureRotateOne();
-        }
-        next.assignedUsers.addFirst(user);
-        return extraRotationsPerformed;
-    }
-
-    private boolean fillFromPrevious(ApplicationUser user) {
-        RotatingShiftSlot target = this.previous;
-        while (target != null && target != this) {
-            if (target.assignedUsers.size() < target.manpower) {
-                target.assignedUsers.addLast(user);
-                return true;
-            }
-            target = target.previous;
-        }
-        return false;
-    }
-
-    public List<ShiftDayBlueprint> getDays() {
-        return week.getDays();
+        return overflow;
     }
 
     public String description() {
@@ -126,6 +112,14 @@ public class RotatingShiftSlot {
 
     public int getManpower() {
         return manpower;
+    }
+
+    public List<ApplicationUser> getAssignedUsers() {
+        return new ArrayList<>(assignedUsers);
+    }
+
+    public void setManpower(int manpower) {
+        this.manpower = manpower;
     }
 
     @Override

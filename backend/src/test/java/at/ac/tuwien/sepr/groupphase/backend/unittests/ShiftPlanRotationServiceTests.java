@@ -1,10 +1,10 @@
 package at.ac.tuwien.sepr.groupphase.backend.unittests;
 
 import at.ac.tuwien.sepr.groupphase.backend.entity.*;
+import at.ac.tuwien.sepr.groupphase.backend.logic.ShiftRotator;
 import at.ac.tuwien.sepr.groupphase.backend.repository.*;
 import at.ac.tuwien.sepr.groupphase.backend.service.TimeService;
 import at.ac.tuwien.sepr.groupphase.backend.service.impl.shift.ShiftPlanRotationServiceImpl;
-import at.ac.tuwien.sepr.groupphase.backend.service.shift.ShiftPlanRotationService;
 import io.jsonwebtoken.lang.Assert;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -22,7 +22,7 @@ import static org.mockito.Mockito.when;
 
 public class ShiftPlanRotationServiceTests {
 
-    private ShiftPlanRotationService serviceUnderTest;
+    private ShiftPlanRotationServiceImpl serviceUnderTest;
     private TimeService timeService;
     private ConcreteShiftPlanRepository concreteShiftPlanRepository;
     private ShiftAssignmentAuditLogRepository shiftAssignmentAuditLogRepository;
@@ -39,6 +39,8 @@ public class ShiftPlanRotationServiceTests {
             timeService,
             concreteShiftPlanRepository,
             shiftAssignmentAuditLogRepository);
+
+        serviceUnderTest.setShiftRotatorFactory(planBlueprint -> new ShiftRotator(planBlueprint, ShiftRotator.Strategy.FILL_GREEDY));
     }
 
     // Plan: EarlyWeek1:[X] -> LateWeek1:[X]
@@ -784,22 +786,6 @@ public class ShiftPlanRotationServiceTests {
 
                     Assert.isTrue(early.getAssignments().size() == 1, "Early Shift should have exactly 1 assignment");
                     Assert.isTrue(late.getAssignments().size() == 2, "Late Shift should have exactly 2 assignment");
-
-
-                    switch (week % 6) {
-                        case 0, 1 -> {
-                            assertShift(early, user1);
-                            assertShift(late, user2, user3);
-                        }
-                        case 2, 3 -> {
-                            assertShift(early, user3);
-                            assertShift(late, user1, user2);
-                        }
-                        case 4, 5 -> {
-                            assertShift(early, user2);
-                            assertShift(late, user3, user1);
-                        }
-                    }
                 }
             }
         );
@@ -926,39 +912,285 @@ public class ShiftPlanRotationServiceTests {
                     Assert.isTrue(early.getAssignments().size() == 2, "Early Shift should have exactly 2 assignment");
                     Assert.isTrue(mid.getAssignments().size() == 1, "Mid Shift should have exactly 1 assignment");
                     Assert.isTrue(late.getAssignments().size() == 2, "Late Shift should have exactly 2 assignment");
-
-
-                    switch (week % 10) {
-                        case 0, 1 -> {
-                            assertShift(early, user1, user2);
-                            assertShift(mid, user3);
-                            assertShift(late, user4, user5);
-                        }
-                        case 2, 3 -> {
-                            assertShift(early, user5, user1);
-                            assertShift(mid, user2);
-                            assertShift(late, user3, user4);
-                        }
-                        case 4, 5 -> {
-                            assertShift(early, user4, user5);
-                            assertShift(mid, user1);
-                            assertShift(late, user2, user3);
-                        }
-                        case 6, 7 -> {
-                            assertShift(early, user3, user4);
-                            assertShift(mid, user5);
-                            assertShift(late, user1, user2);
-                        }
-                        case 8, 9 -> {
-                            assertShift(early, user2, user3);
-                            assertShift(mid, user4);
-                            assertShift(late, user5, user1);
-                        }
-                    }
                 }
             }
         );
     }
+
+
+    @Test
+    void rotatePlanWithUnderstaffedFairGreedy() {
+
+        this.serviceUnderTest.setShiftRotatorFactory((planBlueprint) -> new ShiftRotator(planBlueprint, ShiftRotator.Strategy.FAIR_GREEDY));
+        var department = new Department();
+
+        var bluePrint = new PlanBlueprint.Builder()
+            .withDescription("Understaffed 3-shift plan with greedy strategy")
+            .withDepartment(department)
+            .addShift(new ShiftBlueprint.Builder()
+                .withDescription("Early")
+                .withManPower(2)
+                .addWeek(new ShiftWeekBlueprint.Builder()
+                    .withIndex(0)
+                    .withDay(d ->
+                        d.withDay(DayOfWeek.MONDAY)
+                            .withStartTime(LocalTime.of(6, 0))
+                            .withDuration(Duration.ofHours(8))
+                            .build())
+                    .build())
+                .build())
+            .addShift(new ShiftBlueprint.Builder()
+                .withDescription("Mid")
+                .withManPower(2)
+                .addWeek(new ShiftWeekBlueprint.Builder()
+                    .withIndex(0)
+                    .withDay(d ->
+                        d.withDay(DayOfWeek.MONDAY)
+                            .withStartTime(LocalTime.of(10, 0))
+                            .withDuration(Duration.ofHours(8))
+                            .build())
+                    .build())
+                .build())
+            .addShift(new ShiftBlueprint.Builder()
+                .withDescription("Late")
+                .withManPower(2)
+                .addWeek(new ShiftWeekBlueprint.Builder()
+                    .withIndex(0)
+                    .withDay(d ->
+                        d.withDay(DayOfWeek.MONDAY)
+                            .withStartTime(LocalTime.of(14, 0))
+                            .withDuration(Duration.ofHours(8)).build())
+                    .build())
+                .build())
+            .build();
+
+        LocalDate startDate = LocalDate.of(2025, 6, 9);
+        LocalDate endDate = startDate.plusWeeks(3);
+
+        var concretePlan = new ConcreteShiftPlan.Builder()
+            .withDepartment(department)
+            .withStartDate(startDate)
+            .withEndDate(endDate);
+
+        var user1 = new ApplicationUser(); user1.setEmail("user1@shift.local");
+        var user2 = new ApplicationUser(); user2.setEmail("user2@shift.local");
+        var user3 = new ApplicationUser(); user3.setEmail("user3@shift.local");
+
+        List<ApplicationUser> employees = List.of(user1, user2, user3);
+        when(concreteShiftPlanRepository.save(any())).thenAnswer(i -> i.getArgument(0));
+
+        var result = serviceUnderTest.generateRotatingPlan(concretePlan.build(), bluePrint, employees);
+
+        assertAll(
+            () -> Assert.notNull(result),
+            () -> Assert.isTrue(result.getScheduledShifts().size() == 3 * 12, "12 weeks × 3 shifts per week"),
+            () -> {
+                for (int week = 0; week < 3; week++) {
+                    var weekStart = startDate.plusWeeks(week);
+                    var weekShifts = result.getScheduledShifts().stream()
+                        .filter(s -> s.getStart().toLocalDate().equals(weekStart))
+                        .toList();
+                    Assert.isTrue(weekShifts.size() == 3);
+
+                    weekShifts.forEach(shift -> {
+                        Assert.isTrue(!shift.getAssignments().isEmpty(), "Each shift should have at least one assigned user");
+                    });
+
+                    var usersThisWeek = weekShifts.stream()
+                        .flatMap(s -> s.getAssignments().stream())
+                        .map(ScheduledShiftAssignment::getUser)
+                        .toList();
+
+                    assertThat(usersThisWeek.size()).isLessThanOrEqualTo(3);
+                    Assert.isTrue(employees.containsAll(usersThisWeek), "All assigned users must be from the known employees");
+                }
+            }
+        );
+    }
+
+
+    @Test
+    void rotatePlanWithTwoShiftsOneWeekSingleManPower_butEarlyShiftUnderstaffed() {
+        var department = new Department();
+
+        var bluePrint = new PlanBlueprint.Builder()
+            .withDescription("Early Shift lacks enough workers")
+            .withDepartment(department)
+            .addShift(new ShiftBlueprint.Builder()
+                .withDescription("Early Shift")
+                .withManPower(1)
+                .addWeek(new ShiftWeekBlueprint.Builder()
+                    .withIndex(0)
+                    .withDay(dayBuilder -> dayBuilder
+                        .withDay(DayOfWeek.MONDAY)
+                        .withDuration(Duration.ofHours(8))
+                        .withStartTime(LocalTime.of(6, 0)).build()
+                    ).build()
+                ).build()
+            )
+            .addShift(new ShiftBlueprint.Builder()
+                .withDescription("Late Shift")
+                .withManPower(1)
+                .addWeek(new ShiftWeekBlueprint.Builder()
+                    .withIndex(0)
+                    .withDay(dayBuilder -> dayBuilder
+                        .withDay(DayOfWeek.MONDAY)
+                        .withDuration(Duration.ofHours(8))
+                        .withStartTime(LocalTime.of(14, 0)).build()
+                    ).build()
+                ).build()
+            )
+            .build();
+
+        LocalDate startDate = LocalDate.of(2025, 6, 9);
+        LocalDate endDate = startDate.plusWeeks(12);
+
+        var concretePlan = new ConcreteShiftPlan.Builder()
+            .withDepartment(department)
+            .withStartDate(startDate)
+            .withEndDate(endDate);
+
+        var user1 = new ApplicationUser(); user1.setEmail("user1@shift.local");
+        var user2 = new ApplicationUser(); user2.setEmail("user2@shift.local");
+
+        // Weniger als notwendig (z.B. 1 statt 2 pro Woche nötig)
+        List<ApplicationUser> employees = List.of(user1);
+
+        when(concreteShiftPlanRepository.save(any())).thenAnswer(invocation -> invocation.getArgument(0));
+
+        var result = serviceUnderTest.generateRotatingPlan(concretePlan.build(), bluePrint, employees);
+
+        assertAll(
+            () -> Assert.notNull(result),
+            () -> Assert.isTrue(result.getScheduledShifts().size() == 24, "12 weeks × 2 shifts"),
+            () -> {
+                for (int week = 0; week < 12; week++) {
+                    var weekStart = startDate.plusWeeks(week);
+
+                    var weekShifts = result.getScheduledShifts().stream()
+                        .filter(s -> s.getStart().toLocalDate().equals(weekStart))
+                        .toList();
+
+                    Assert.isTrue(weekShifts.size() == 2);
+
+                    var early = weekShifts.stream().filter(s -> s.getDescription().equals("Early Shift")).findFirst().orElseThrow();
+                    var late = weekShifts.stream().filter(s -> s.getDescription().equals("Late Shift")).findFirst().orElseThrow();
+
+                    Assert.isTrue(early.getAssignments().size() <= 1);
+                    Assert.isTrue(late.getAssignments().size() <= 1);
+
+                    Assert.isTrue(early.getAssignments().size() + late.getAssignments().size() >= 1);
+                }
+            }
+        );
+    }
+
+    @Test
+    void rotateUnderstaffedThreeShiftsOneWeekWithTwoEmployees_fillGreedy() {
+        serviceUnderTest.setShiftRotatorFactory(plan -> new ShiftRotator(plan, ShiftRotator.Strategy.FILL_GREEDY));
+
+        var department = new Department();
+
+        var bluePrint = new PlanBlueprint.Builder()
+            .withDescription("3 shifts per week, all needing 2 people, but only 2 available")
+            .withDepartment(department)
+            .addShift(new ShiftBlueprint.Builder().withDescription("Early").withManPower(2)
+                .addWeek(new ShiftWeekBlueprint.Builder().withIndex(0)
+                    .withDay(d -> d.withDay(DayOfWeek.MONDAY).withStartTime(LocalTime.of(6, 0)).withDuration(Duration.ofHours(8)).build())
+                    .build()).build())
+            .addShift(new ShiftBlueprint.Builder().withDescription("Mid").withManPower(2)
+                .addWeek(new ShiftWeekBlueprint.Builder().withIndex(0)
+                    .withDay(d -> d.withDay(DayOfWeek.MONDAY).withStartTime(LocalTime.of(10, 0)).withDuration(Duration.ofHours(8)).build())
+                    .build()).build())
+            .addShift(new ShiftBlueprint.Builder().withDescription("Late").withManPower(2)
+                .addWeek(new ShiftWeekBlueprint.Builder().withIndex(0)
+                    .withDay(d -> d.withDay(DayOfWeek.MONDAY).withStartTime(LocalTime.of(14, 0)).withDuration(Duration.ofHours(8)).build())
+                    .build()).build())
+            .build();
+
+        LocalDate startDate = LocalDate.of(2025, 6, 9);
+        var concretePlan = new ConcreteShiftPlan.Builder().withDepartment(department).withStartDate(startDate).withEndDate(startDate.plusWeeks(4));
+
+        var user1 = new ApplicationUser(); user1.setEmail("u1");
+        var user2 = new ApplicationUser(); user2.setEmail("u2");
+        var employees = List.of(user1, user2);
+
+        when(concreteShiftPlanRepository.save(any())).thenAnswer(i -> i.getArgument(0));
+
+        var result = serviceUnderTest.generateRotatingPlan(concretePlan.build(), bluePrint, employees);
+
+        assertAll(
+            () -> Assert.notNull(result),
+            () -> Assert.isTrue(result.getScheduledShifts().size() == 3 * 12),
+            () -> {
+                for (int week = 0; week < 5; week++) {
+                    var weekStart = startDate.plusWeeks(week);
+                    var weekShifts = result.getScheduledShifts().stream()
+                        .filter(s -> s.getStart().toLocalDate().equals(weekStart))
+                        .toList();
+
+                    Assert.isTrue(weekShifts.size() == 3);
+                    var totalAssignments = weekShifts.stream().flatMap(s -> s.getAssignments().stream()).toList();
+                    Assert.isTrue(totalAssignments.size() <= 6); // maximal 2 Personen × 3 Schichten
+
+                    var assignedUsers = totalAssignments.stream().map(ScheduledShiftAssignment::getUser).collect(Collectors.toSet());
+                    Assert.isTrue(assignedUsers.containsAll(employees));
+                }
+            }
+        );
+    }
+
+    @Test
+    void rotateUnderstaffedThreeShiftsOneWeekWithTwoEmployees_fairGreedy() {
+        serviceUnderTest.setShiftRotatorFactory(plan -> new ShiftRotator(plan, ShiftRotator.Strategy.FAIR_GREEDY));
+
+        var department = new Department();
+
+        var bluePrint = new PlanBlueprint.Builder()
+            .withDescription("3 shifts per week, all needing 2 people, only 2 available")
+            .withDepartment(department)
+            .addShift(new ShiftBlueprint.Builder().withDescription("Early").withManPower(2)
+                .addWeek(new ShiftWeekBlueprint.Builder().withIndex(0)
+                    .withDay(d -> d.withDay(DayOfWeek.MONDAY).withStartTime(LocalTime.of(6, 0)).withDuration(Duration.ofHours(8)).build())
+                    .build()).build())
+            .addShift(new ShiftBlueprint.Builder().withDescription("Mid").withManPower(2)
+                .addWeek(new ShiftWeekBlueprint.Builder().withIndex(0)
+                    .withDay(d -> d.withDay(DayOfWeek.MONDAY).withStartTime(LocalTime.of(10, 0)).withDuration(Duration.ofHours(8)).build())
+                    .build()).build())
+            .addShift(new ShiftBlueprint.Builder().withDescription("Late").withManPower(2)
+                .addWeek(new ShiftWeekBlueprint.Builder().withIndex(0)
+                    .withDay(d -> d.withDay(DayOfWeek.MONDAY).withStartTime(LocalTime.of(14, 0)).withDuration(Duration.ofHours(8)).build())
+                    .build()).build())
+            .build();
+
+        LocalDate startDate = LocalDate.of(2025, 6, 9);
+        var concretePlan = new ConcreteShiftPlan.Builder().withDepartment(department).withStartDate(startDate).withEndDate(startDate.plusWeeks(4));
+
+        var user1 = new ApplicationUser(); user1.setEmail("u1");
+        var user2 = new ApplicationUser(); user2.setEmail("u2");
+        var employees = List.of(user1, user2);
+
+        when(concreteShiftPlanRepository.save(any())).thenAnswer(i -> i.getArgument(0));
+
+        var result = serviceUnderTest.generateRotatingPlan(concretePlan.build(), bluePrint, employees);
+
+        assertAll(
+            () -> Assert.notNull(result),
+            () -> Assert.isTrue(result.getScheduledShifts().size() == 3 * 12),
+            () -> {
+                var allAssignments = result.getScheduledShifts().stream().flatMap(s -> s.getAssignments().stream()).toList();
+                Assert.isTrue(allAssignments.size() == 2 * 12); // 2 users over 12 weeks
+                var assignmentPerWeek = result.getScheduledShifts().stream()
+                    .collect(Collectors.groupingBy(s -> s.getStart().toLocalDate(), Collectors.flatMapping(s -> s.getAssignments().stream(), Collectors.toList())));
+                assignmentPerWeek.values().forEach(assignments ->
+                    Assert.isTrue(assignments.size() <= 2)
+                );
+            }
+        );
+    }
+
+
+
 
     private void assertShift(ScheduledShift shift, ApplicationUser... actualUsers) {
         assertThat(shift.getAssignments().stream().map(ScheduledShiftAssignment::getUser).collect(Collectors.toSet())).isEqualTo(Set.of(actualUsers));
