@@ -1,7 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule, DatePipe, NgIf } from '@angular/common';
 import { ButtonComponent } from '../../../../shared/components/button/button.component';
-import { SickLeaveCertificateEndpointService, SickLeaveCertificateRestDto } from '../../../../rest_client';
+import { SickLeaveCertificateEndpointService, SickLeaveCertificateRestDto, SickLeaveCertificateSupervisorRestDto } from '../../../../rest_client';
 import { ToastrService } from 'ngx-toastr';
 import { FormsModule } from '@angular/forms';
 
@@ -13,13 +13,13 @@ import { FormsModule } from '@angular/forms';
   standalone: true,
 })
 export class SupervisorSickNotesComponent implements OnInit {
-  sickNotes: SickLeaveCertificateRestDto[] = [];
+  sickNotes: SickLeaveCertificateSupervisorRestDto[] = [];
   confirmingDeleteId: number | null = null;
 
   constructor(
     private sickLeaveService: SickLeaveCertificateEndpointService,
     private toastr: ToastrService
-  ) {}
+  ) { }
 
   ngOnInit(): void {
     this.loadCertificates();
@@ -27,8 +27,13 @@ export class SupervisorSickNotesComponent implements OnInit {
 
   loadCertificates(): void {
     this.sickLeaveService.getSickLeavesForSupervisor().subscribe({
-      next: (data: SickLeaveCertificateRestDto[]) => (this.sickNotes = data),
-      error: () => this.toastr.error('Could not load certificates.'),
+      next: (data) => {
+        this.sickNotes = data;
+      },
+      error: (err) => {
+        console.error('Fehler beim Laden:', err);
+        this.toastr.error('Etwas ist schiefgelaufen');
+      },
     });
   }
 

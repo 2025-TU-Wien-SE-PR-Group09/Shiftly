@@ -19,6 +19,8 @@ import { Observable }                                        from 'rxjs';
 // @ts-ignore
 import { SickLeaveCertificateRestDto } from '../model/sickLeaveCertificateRestDto';
 // @ts-ignore
+import { SickLeaveCertificateSupervisorRestDto } from '../model/sickLeaveCertificateSupervisorRestDto';
+// @ts-ignore
 import { SickLeaveCertificateUploadDatesDto } from '../model/sickLeaveCertificateUploadDatesDto';
 
 // @ts-ignore
@@ -309,9 +311,9 @@ export class SickLeaveCertificateEndpointService extends BaseService {
      * @param observe set whether or not to return the data Observable as the body, response or events. defaults to returning the body.
      * @param reportProgress flag to report request and response progress.
      */
-    public getSickLeavesForSupervisor(observe?: 'body', reportProgress?: boolean, options?: {httpHeaderAccept?: 'application/json', context?: HttpContext, transferCache?: boolean}): Observable<Array<SickLeaveCertificateRestDto>>;
-    public getSickLeavesForSupervisor(observe?: 'response', reportProgress?: boolean, options?: {httpHeaderAccept?: 'application/json', context?: HttpContext, transferCache?: boolean}): Observable<HttpResponse<Array<SickLeaveCertificateRestDto>>>;
-    public getSickLeavesForSupervisor(observe?: 'events', reportProgress?: boolean, options?: {httpHeaderAccept?: 'application/json', context?: HttpContext, transferCache?: boolean}): Observable<HttpEvent<Array<SickLeaveCertificateRestDto>>>;
+    public getSickLeavesForSupervisor(observe?: 'body', reportProgress?: boolean, options?: {httpHeaderAccept?: 'application/json', context?: HttpContext, transferCache?: boolean}): Observable<Array<SickLeaveCertificateSupervisorRestDto>>;
+    public getSickLeavesForSupervisor(observe?: 'response', reportProgress?: boolean, options?: {httpHeaderAccept?: 'application/json', context?: HttpContext, transferCache?: boolean}): Observable<HttpResponse<Array<SickLeaveCertificateSupervisorRestDto>>>;
+    public getSickLeavesForSupervisor(observe?: 'events', reportProgress?: boolean, options?: {httpHeaderAccept?: 'application/json', context?: HttpContext, transferCache?: boolean}): Observable<HttpEvent<Array<SickLeaveCertificateSupervisorRestDto>>>;
     public getSickLeavesForSupervisor(observe: any = 'body', reportProgress: boolean = false, options?: {httpHeaderAccept?: 'application/json', context?: HttpContext, transferCache?: boolean}): Observable<any> {
 
         let localVarHeaders = this.defaultHeaders;
@@ -341,7 +343,7 @@ export class SickLeaveCertificateEndpointService extends BaseService {
 
         let localVarPath = `/api/sick-leave/supervisor`;
         const { basePath, withCredentials } = this.configuration;
-        return this.httpClient.request<Array<SickLeaveCertificateRestDto>>('get', `${basePath}${localVarPath}`,
+        return this.httpClient.request<Array<SickLeaveCertificateSupervisorRestDto>>('get', `${basePath}${localVarPath}`,
             {
                 context: localVarHttpContext,
                 responseType: <any>responseType_,
