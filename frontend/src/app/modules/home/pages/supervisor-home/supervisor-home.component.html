@@ -17,7 +17,7 @@
   <h1 class="text-foreground mt-2 text-3xl">Department {{ selectedDepartment?.name }}</h1>
   <hr class="mt-5 mb-8 border-t border-foreground/50" />
 
-  <ng-container *ngIf="this.shiftPlan">
+  <ng-container *ngIf="this.shiftPlan && this.shiftPlan.shifts && this.shiftPlan.shifts.length > 0">
     <div class="mb-4 flex justify-between">
       <div class="btn-group flex">
         <app-button
@@ -140,7 +140,7 @@
     </ng-container>
   </ng-container>
 
-  <ng-container *ngIf="!this.shiftPlan">
+  <ng-container *ngIf="!this.shiftPlan || !this.shiftPlan.shifts || this.shiftPlan.shifts.length <= 0">
     <p class="text-foreground flex items-center">
       <svg xmlns="http://www.w3.org/2000/svg"
            fill="none"

@@ -5,6 +5,7 @@ import at.ac.tuwien.sepr.groupphase.backend.entity.ConcreteShiftPlan;
 import at.ac.tuwien.sepr.groupphase.backend.entity.Department;
 import at.ac.tuwien.sepr.groupphase.backend.entity.PlanBlueprint;
 import at.ac.tuwien.sepr.groupphase.backend.entity.ScheduledShift;
+import at.ac.tuwien.sepr.groupphase.backend.entity.ScheduledShiftAssignment;
 import at.ac.tuwien.sepr.groupphase.backend.entity.ShiftBlueprint;
 import at.ac.tuwien.sepr.groupphase.backend.entity.ShiftDayBlueprint;
 import at.ac.tuwien.sepr.groupphase.backend.entity.ShiftWeekBlueprint;
@@ -13,6 +14,7 @@ import at.ac.tuwien.sepr.groupphase.backend.exception.NotFoundException;
 import at.ac.tuwien.sepr.groupphase.backend.repository.ConcreteShiftPlanRepository;
 import at.ac.tuwien.sepr.groupphase.backend.repository.DepartmentRepository;
 import at.ac.tuwien.sepr.groupphase.backend.repository.PlanBlueprintRepository;
+import at.ac.tuwien.sepr.groupphase.backend.repository.ScheduledShiftRepository;
 import at.ac.tuwien.sepr.groupphase.backend.service.TimeService;
 import at.ac.tuwien.sepr.groupphase.backend.service.dto.department.DepartmentNameDto;
 import at.ac.tuwien.sepr.groupphase.backend.service.shift.ShiftPlanConstraintService;
@@ -48,6 +50,7 @@ public class ShiftPlanningServiceImpl implements ShiftPlanningService {
     private final ShiftPlanRotationService shiftPlanRotationService;
     private final ShiftPlanConstraintService shiftPlanConstraintService;
     private final ConcreteShiftPlanRepository concreteShiftPlanRepository;
+    private final ScheduledShiftRepository scheduledShiftRepository;
 
     public ShiftPlanningServiceImpl(TimeService timeService,
                                     ShiftPlanningValidator shiftPlanningValidator,
@@ -55,7 +58,7 @@ public class ShiftPlanningServiceImpl implements ShiftPlanningService {
                                     DepartmentRepository departmentRepository,
                                     ShiftPlanRotationService shiftPlanRotationService,
                                     ConcreteShiftPlanRepository concreteShiftPlanRepository,
-                                    ShiftPlanConstraintService shiftPlanConstraintService) {
+                                    ShiftPlanConstraintService shiftPlanConstraintService, ScheduledShiftRepository scheduledShiftRepository) {
         this.planBlueprintRepository = planBlueprintRepository;
         this.timeService = timeService;
         this.departmentRepository = departmentRepository;
@@ -63,6 +66,7 @@ public class ShiftPlanningServiceImpl implements ShiftPlanningService {
         this.shiftPlanConstraintService = shiftPlanConstraintService;
         this.shiftPlanRotationService = shiftPlanRotationService;
         this.concreteShiftPlanRepository = concreteShiftPlanRepository;
+        this.scheduledShiftRepository = scheduledShiftRepository;
     }
 
     @Override
@@ -238,14 +242,37 @@ public class ShiftPlanningServiceImpl implements ShiftPlanningService {
 
         AtomicReference<List<ScheduledShift>> shiftsFromOlderShiftplan = new AtomicReference<>(new ArrayList<>());
 
+        AtomicReference<ConcreteShiftPlan> concreteShiftPlanO = new AtomicReference<>(null);
+
         concreteShiftPlanRepository.findByDepartmentName(department.getName()).stream()
             .min((a, b) -> b.getEndDate().compareTo(a.getEndDate())).ifPresent(concreteShiftPlan -> {
                 if (concreteShiftPlan.getEndDate().isAfter(startDate)) {
-                    shiftsFromOlderShiftplan.set(concreteShiftPlan.getScheduledShifts().stream()
+                    List<ScheduledShift> scheduledShifts = (concreteShiftPlan.getScheduledShifts().stream()
                         .filter(scheduledShift -> scheduledShift.getEnd().isBefore(startDate.atStartOfDay()))
                         .toList());
 
-                    concreteShiftPlanRepository.delete(concreteShiftPlan);
+                    List<ScheduledShift> newScheduledShifts = new ArrayList<>(scheduledShifts.size());
+                    for (ScheduledShift scheduledShift : scheduledShifts) {
+                        ScheduledShift newScheduledShift = new ScheduledShift();
+                        newScheduledShift.setStart(scheduledShift.getStart());
+                        newScheduledShift.setEnd(scheduledShift.getEnd());
+                        newScheduledShift.setDescription(scheduledShift.getDescription());
+                        newScheduledShift.setManpower(scheduledShift.getManpower());
+
+                        ArrayList<ScheduledShiftAssignment> scheduledShiftAssignments = new ArrayList<>();
+                        for (ScheduledShiftAssignment scheduledShiftAssignment : scheduledShift.getAssignments()) {
+                            ScheduledShiftAssignment newAssignment = new ScheduledShiftAssignment();
+                            newAssignment.setUser(scheduledShiftAssignment.getUser());
+                            newAssignment.setScheduledShift(newScheduledShift);
+                            scheduledShiftAssignments.add(newAssignment);
+                        }
+
+                        newScheduledShift.setAssignments(Set.copyOf(scheduledShiftAssignments));
+                        newScheduledShifts.add(newScheduledShift);
+                    }
+
+                    concreteShiftPlan.setOverwritten(true);
+                    shiftsFromOlderShiftplan.set(newScheduledShifts);
                 }
             });
 
@@ -266,7 +293,11 @@ public class ShiftPlanningServiceImpl implements ShiftPlanningService {
 
         var rotatedPlan = shiftPlanRotationService.generateRotatingPlan(plan, blueprint, justWorkers);
         var planWithConstraints = shiftPlanConstraintService.applyConstraints(rotatedPlan);
-        planWithConstraints.addScheduledShifts(shiftsFromOlderShiftplan.get());
+        List<ScheduledShift> shiftsFromOldPlan = shiftsFromOlderShiftplan.get();
+        for (ScheduledShift scheduledShift : shiftsFromOldPlan) {
+            scheduledShift.setPlan(planWithConstraints);
+        }
+        planWithConstraints.addScheduledShifts(shiftsFromOldPlan);
 
         return planWithConstraints;
     }
@@ -288,6 +319,14 @@ public class ShiftPlanningServiceImpl implements ShiftPlanningService {
 
         return planBlueprintRepository.findById(id)
             .map(p -> new DepartmentNameDto(p.getDepartment().getName()));
+    }
+
+    @Override
+    public List<ConcreteShiftPlan> getAllNotOverridenPlans(String departmentName) {
+        LOGGER.trace("getAllPlans({})", departmentName);
+
+        return concreteShiftPlanRepository.findByDepartmentName(departmentName).stream()
+            .filter(c -> !c.isOverwritten()).toList();
     }
 
 }

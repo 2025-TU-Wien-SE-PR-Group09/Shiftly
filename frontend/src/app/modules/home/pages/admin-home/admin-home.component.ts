@@ -169,9 +169,9 @@ export class AdminHomeComponent implements OnInit {
     this.shiftPlan = undefined;
 
     if (this.selectedDepartment?.name) {
-      let req = this._departmentService.getConcreteShiftplan(this.selectedDepartment.name);
+      let req = this._departmentService.getConcreteShiftplans(this.selectedDepartment.name);
       if (skipException) {
-        req =  this._departmentService.getConcreteShiftplan(this.selectedDepartment.name, 'body', false, {
+        req =  this._departmentService.getConcreteShiftplans(this.selectedDepartment.name, 'body', false, {
           context: new HttpContext().set(SKIP_EXCEPTION_INTERCEPTOR, true)
         })
       }

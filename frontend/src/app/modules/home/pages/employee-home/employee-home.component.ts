@@ -137,7 +137,7 @@ export class EmployeeHomeComponent implements OnInit{
     console.log('loadschedule');
     if (this.selectedDepartment?.name) {
       console.log('fetching plan');
-      this._departmentService.getConcreteShiftplan(this.selectedDepartment.name!, 'body', false, {
+      this._departmentService.getConcreteShiftplans(this.selectedDepartment.name!, 'body', false, {
         context: new HttpContext().set(SKIP_EXCEPTION_INTERCEPTOR, true)
       }).subscribe({
         next: (data) => {

@@ -651,12 +651,12 @@ export class DepartmentService extends BaseService {
      * @param observe set whether or not to return the data Observable as the body, response or events. defaults to returning the body.
      * @param reportProgress flag to report request and response progress.
      */
-    public getConcreteShiftplan(departmentName: string, observe?: 'body', reportProgress?: boolean, options?: {httpHeaderAccept?: 'application/json', context?: HttpContext, transferCache?: boolean}): Observable<DepartmentShiftplanCalendarResponse>;
-    public getConcreteShiftplan(departmentName: string, observe?: 'response', reportProgress?: boolean, options?: {httpHeaderAccept?: 'application/json', context?: HttpContext, transferCache?: boolean}): Observable<HttpResponse<DepartmentShiftplanCalendarResponse>>;
-    public getConcreteShiftplan(departmentName: string, observe?: 'events', reportProgress?: boolean, options?: {httpHeaderAccept?: 'application/json', context?: HttpContext, transferCache?: boolean}): Observable<HttpEvent<DepartmentShiftplanCalendarResponse>>;
-    public getConcreteShiftplan(departmentName: string, observe: any = 'body', reportProgress: boolean = false, options?: {httpHeaderAccept?: 'application/json', context?: HttpContext, transferCache?: boolean}): Observable<any> {
+    public getConcreteShiftplans(departmentName: string, observe?: 'body', reportProgress?: boolean, options?: {httpHeaderAccept?: 'application/json', context?: HttpContext, transferCache?: boolean}): Observable<DepartmentShiftplanCalendarResponse>;
+    public getConcreteShiftplans(departmentName: string, observe?: 'response', reportProgress?: boolean, options?: {httpHeaderAccept?: 'application/json', context?: HttpContext, transferCache?: boolean}): Observable<HttpResponse<DepartmentShiftplanCalendarResponse>>;
+    public getConcreteShiftplans(departmentName: string, observe?: 'events', reportProgress?: boolean, options?: {httpHeaderAccept?: 'application/json', context?: HttpContext, transferCache?: boolean}): Observable<HttpEvent<DepartmentShiftplanCalendarResponse>>;
+    public getConcreteShiftplans(departmentName: string, observe: any = 'body', reportProgress: boolean = false, options?: {httpHeaderAccept?: 'application/json', context?: HttpContext, transferCache?: boolean}): Observable<any> {
         if (departmentName === null || departmentName === undefined) {
-            throw new Error('Required parameter departmentName was null or undefined when calling getConcreteShiftplan.');
+            throw new Error('Required parameter departmentName was null or undefined when calling getConcreteShiftplans.');
         }
 
         let localVarHeaders = this.defaultHeaders;
@@ -684,7 +684,7 @@ export class DepartmentService extends BaseService {
             }
         }
 
-        let localVarPath = `/api/departments/${this.configuration.encodeParam({name: "departmentName", value: departmentName, in: "path", style: "simple", explode: false, dataType: "string", dataFormat: undefined})}/shiftplan`;
+        let localVarPath = `/api/departments/${this.configuration.encodeParam({name: "departmentName", value: departmentName, in: "path", style: "simple", explode: false, dataType: "string", dataFormat: undefined})}/shiftplans`;
         const { basePath, withCredentials } = this.configuration;
         return this.httpClient.request<DepartmentShiftplanCalendarResponse>('get', `${basePath}${localVarPath}`,
             {
