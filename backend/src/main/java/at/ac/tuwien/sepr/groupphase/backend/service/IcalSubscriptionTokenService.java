@@ -45,6 +45,7 @@ public interface IcalSubscriptionTokenService {
      * @param userEmail the email address of the user
      * @return true if the token was deleted, false if no token existed
      */
+    
     boolean deleteToken(String userEmail);
 
     /**
@@ -62,4 +63,4 @@ public interface IcalSubscriptionTokenService {
      * @return a list of all tokens
      */
     List<IcalSubscriptionToken> getAllTokens();
-} 
+}
