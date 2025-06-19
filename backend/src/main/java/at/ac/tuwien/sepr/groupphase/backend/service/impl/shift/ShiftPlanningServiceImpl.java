@@ -14,9 +14,11 @@ import at.ac.tuwien.sepr.groupphase.backend.exception.NotFoundException;
 import at.ac.tuwien.sepr.groupphase.backend.repository.ConcreteShiftPlanRepository;
 import at.ac.tuwien.sepr.groupphase.backend.repository.DepartmentRepository;
 import at.ac.tuwien.sepr.groupphase.backend.repository.PlanBlueprintRepository;
+import at.ac.tuwien.sepr.groupphase.backend.service.MailService;
 import at.ac.tuwien.sepr.groupphase.backend.repository.ScheduledShiftRepository;
 import at.ac.tuwien.sepr.groupphase.backend.service.TimeService;
 import at.ac.tuwien.sepr.groupphase.backend.service.dto.department.DepartmentNameDto;
+import at.ac.tuwien.sepr.groupphase.backend.service.dto.mail.ScheduleAssignmentEmailDto;
 import at.ac.tuwien.sepr.groupphase.backend.service.shift.ShiftPlanConstraintService;
 import at.ac.tuwien.sepr.groupphase.backend.service.shift.ShiftPlanRotationService;
 import at.ac.tuwien.sepr.groupphase.backend.service.shift.ShiftPlanningService;
@@ -38,6 +40,7 @@ import java.util.*;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.Predicate;
+import java.util.stream.Collectors;
 
 @Service
 public class ShiftPlanningServiceImpl implements ShiftPlanningService {
@@ -51,6 +54,7 @@ public class ShiftPlanningServiceImpl implements ShiftPlanningService {
     private final ShiftPlanConstraintService shiftPlanConstraintService;
     private final ConcreteShiftPlanRepository concreteShiftPlanRepository;
     private final ScheduledShiftRepository scheduledShiftRepository;
+    private final MailService mailService;
 
     public ShiftPlanningServiceImpl(TimeService timeService,
                                     ShiftPlanningValidator shiftPlanningValidator,
@@ -58,7 +62,9 @@ public class ShiftPlanningServiceImpl implements ShiftPlanningService {
                                     DepartmentRepository departmentRepository,
                                     ShiftPlanRotationService shiftPlanRotationService,
                                     ConcreteShiftPlanRepository concreteShiftPlanRepository,
-                                    ShiftPlanConstraintService shiftPlanConstraintService, ScheduledShiftRepository scheduledShiftRepository) {
+                                    ShiftPlanConstraintService shiftPlanConstraintService,
+                                    ScheduledShiftRepository scheduledShiftRepository,
+                                    MailService mailService) {
         this.planBlueprintRepository = planBlueprintRepository;
         this.timeService = timeService;
         this.departmentRepository = departmentRepository;
@@ -67,6 +73,7 @@ public class ShiftPlanningServiceImpl implements ShiftPlanningService {
         this.shiftPlanRotationService = shiftPlanRotationService;
         this.concreteShiftPlanRepository = concreteShiftPlanRepository;
         this.scheduledShiftRepository = scheduledShiftRepository;
+        this.mailService = mailService;
     }
 
     @Override
@@ -298,6 +305,28 @@ public class ShiftPlanningServiceImpl implements ShiftPlanningService {
             scheduledShift.setPlan(planWithConstraints);
         }
         planWithConstraints.addScheduledShifts(shiftsFromOldPlan);
+
+        // Get all distinct users from the plan (assigned to any shift)
+        Set<ApplicationUser> notifiedUsers = planWithConstraints.getScheduledShifts().stream()
+            .flatMap(shift -> shift.getAssignments().stream())
+            .map(assignment -> assignment.getUser())
+            .collect(Collectors.toSet());
+
+        for (ApplicationUser user : notifiedUsers) {
+            try {
+                ScheduleAssignmentEmailDto emailDto = new ScheduleAssignmentEmailDto(
+                    user.getEmail(),
+                    user.getFirstName(),
+                    startDate,
+                    endDate,
+                    department.getName()
+                );
+                mailService.sendScheduleAssignmentNotification(emailDto);
+                LOGGER.info("Sent schedule assignment mail to {}", user.getEmail());
+            } catch (Exception e) {
+                LOGGER.warn("Failed to send schedule mail to {}: {}", user.getEmail(), e.getMessage(), e);
+            }
+        }
 
         return planWithConstraints;
     }

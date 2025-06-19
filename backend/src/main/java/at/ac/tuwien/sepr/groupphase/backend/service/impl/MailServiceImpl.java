@@ -1,6 +1,7 @@
 package at.ac.tuwien.sepr.groupphase.backend.service.impl;
 
 import at.ac.tuwien.sepr.groupphase.backend.service.MailService;
+import at.ac.tuwien.sepr.groupphase.backend.service.dto.mail.ScheduleAssignmentEmailDto;
 import at.ac.tuwien.sepr.groupphase.backend.service.dto.mail.SickLeaveEmailDto;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -50,6 +51,29 @@ public class MailServiceImpl implements MailService {
         );
 
         sendSimpleEmail(dto.getSupervisorEmail(), subject, text);
+    }
+
+    @Override
+    public void sendScheduleAssignmentNotification(ScheduleAssignmentEmailDto dto) {
+        LOGGER.trace("sendScheduleAssignmentNotification({})", dto);
+        String subject = "New Shift Assignments – " + dto.getDepartmentName();
+        String text = String.format(
+            """
+                    Hello %s,
+
+                    You have been assigned new shifts in the %s department from %s to %s.
+
+                    Please check your calendar in the system for detailed shift times.
+
+                    Best Regards,
+                    Scheduling Team
+                """,
+            dto.getEmployeeFirstName(),
+            dto.getDepartmentName(),
+            format(dto.getStartDate()),
+            format(dto.getEndDate())
+        );
+        sendSimpleEmail(dto.getRecipientMail(), subject, text);
     }
 
 

@@ -24,10 +24,12 @@ public class ShiftPlanRotationServiceImpl implements ShiftPlanRotationService {
     private final ConcreteShiftPlanRepository concreteShiftPlanRepository;
     private final ShiftAssignmentAuditLogRepository shiftAssignmentAuditLogRepository;
 
+
     public ShiftPlanRotationServiceImpl(TimeService timeService, ConcreteShiftPlanRepository concreteShiftPlanRepository, ShiftAssignmentAuditLogRepository shiftAssignmentAuditLogRepository) {
         this.timeService = timeService;
         this.concreteShiftPlanRepository = concreteShiftPlanRepository;
         this.shiftAssignmentAuditLogRepository = shiftAssignmentAuditLogRepository;
+
     }
 
     @Override
@@ -39,6 +41,7 @@ public class ShiftPlanRotationServiceImpl implements ShiftPlanRotationService {
 
         List<ScheduledShift> allShifts = new ArrayList<>();
         List<ShiftAssignmentAuditLog> logs = new ArrayList<>();
+
 
         for (int weekOffset = 0; weekOffset < 12; weekOffset++) {
             LocalDate weekStart = concreteShiftPlan.getStartDate().plusWeeks(weekOffset);
@@ -67,6 +70,8 @@ public class ShiftPlanRotationServiceImpl implements ShiftPlanRotationService {
                             .withTrigger(ShiftAssignmentTrigger.INITIAL_ASSIGNMENT_ALGORITHM)
                             .withShift(shift)
                             .build());
+
+
                     }
 
                     allShifts.add(shift);
@@ -77,6 +82,7 @@ public class ShiftPlanRotationServiceImpl implements ShiftPlanRotationService {
         concreteShiftPlan.addScheduledShifts(allShifts);
         ConcreteShiftPlan result = concreteShiftPlanRepository.save(concreteShiftPlan);
         shiftAssignmentAuditLogRepository.saveAll(logs);
+
 
         return result;
 

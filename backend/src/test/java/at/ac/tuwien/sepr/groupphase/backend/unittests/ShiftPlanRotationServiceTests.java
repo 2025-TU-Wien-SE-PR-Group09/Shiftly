@@ -23,14 +23,14 @@ import static org.mockito.Mockito.when;
 public class ShiftPlanRotationServiceTests {
 
     private ShiftPlanRotationService serviceUnderTest;
-    private  TimeService timeService;
+    private TimeService timeService;
     private ConcreteShiftPlanRepository concreteShiftPlanRepository;
-    private  ShiftAssignmentAuditLogRepository shiftAssignmentAuditLogRepository;
+    private ShiftAssignmentAuditLogRepository shiftAssignmentAuditLogRepository;
 
     @BeforeEach
     void setUp() {
         timeService = mock(TimeService.class);
-        when(timeService.now()).thenReturn(LocalDateTime.of(2025,6,8,22,0));
+        when(timeService.now()).thenReturn(LocalDateTime.of(2025, 6, 8, 22, 0));
         concreteShiftPlanRepository = mock(ConcreteShiftPlanRepository.class);
         shiftAssignmentAuditLogRepository = mock(ShiftAssignmentAuditLogRepository.class);
 
@@ -44,7 +44,7 @@ public class ShiftPlanRotationServiceTests {
     // Plan: EarlyWeek1:[X] -> LateWeek1:[X]
     // Initial: [user1]-> [user2]
     @Test
-    void rotatePlanWithTwoShiftsOneWeekSingleManPower(){
+    void rotatePlanWithTwoShiftsOneWeekSingleManPower() {
         //act
 
         var department = new Department();
@@ -57,10 +57,10 @@ public class ShiftPlanRotationServiceTests {
                 .withManPower(1)
                 .addWeek(new ShiftWeekBlueprint.Builder()
                     .withIndex(0)
-                    .withDay( dayBuilder -> dayBuilder
+                    .withDay(dayBuilder -> dayBuilder
                         .withDay(DayOfWeek.MONDAY)
                         .withDuration(Duration.ofHours(8))
-                        .withStartTime(LocalTime.of(6,0)).build()
+                        .withStartTime(LocalTime.of(6, 0)).build()
                     ).build()
                 ).build()
             )
@@ -69,10 +69,10 @@ public class ShiftPlanRotationServiceTests {
                 .withManPower(1)
                 .addWeek(new ShiftWeekBlueprint.Builder()
                     .withIndex(0)
-                    .withDay( dayBuilder -> dayBuilder
+                    .withDay(dayBuilder -> dayBuilder
                         .withDay(DayOfWeek.MONDAY)
                         .withDuration(Duration.ofHours(8))
-                        .withStartTime(LocalTime.of(14,0)).build()
+                        .withStartTime(LocalTime.of(14, 0)).build()
                     ).build()
                 ).build()
             )
@@ -103,7 +103,7 @@ public class ShiftPlanRotationServiceTests {
             () -> Assert.notNull(result),
             () -> Assert.notNull(result.getScheduledShifts()),
             () -> Assert.isTrue(result.getScheduledShifts().size() == 24, "There should be 24 Shifts generated"),
-           () ->{
+            () -> {
                 for (int week = 0; week < 12; week++) {
                     LocalDate weekStart = startDate.plusWeeks(week);
 
@@ -113,8 +113,8 @@ public class ShiftPlanRotationServiceTests {
 
                     Assert.isTrue(weekShifts.size() == 2);
 
-                    var early = weekShifts.stream().filter(s -> s.getDescription() .equals("Early Shift")).findFirst().orElseThrow();
-                    var late = weekShifts.stream().filter(s -> s.getDescription() .equals("Late Shift")).findFirst().orElseThrow();
+                    var early = weekShifts.stream().filter(s -> s.getDescription().equals("Early Shift")).findFirst().orElseThrow();
+                    var late = weekShifts.stream().filter(s -> s.getDescription().equals("Late Shift")).findFirst().orElseThrow();
 
                     Assert.isTrue(early.getAssignments().size() == 1, "Early Shift should have exactly 1 assignment");
                     Assert.isTrue(late.getAssignments().size() == 1, "Late Shift should have exactly 1 assignment");
@@ -137,7 +137,7 @@ public class ShiftPlanRotationServiceTests {
     // Plan: EarlyWeek1:[X] -> LateWeek1:[X, X]
     // Initial: [user1]-> [user2, user3]
     @Test
-    void rotatePlanWithTwoShiftsOneWeekDifferentManPower(){
+    void rotatePlanWithTwoShiftsOneWeekDifferentManPower() {
         //act
 
         var department = new Department();
@@ -150,10 +150,10 @@ public class ShiftPlanRotationServiceTests {
                 .withManPower(1)
                 .addWeek(new ShiftWeekBlueprint.Builder()
                     .withIndex(0)
-                    .withDay( dayBuilder -> dayBuilder
+                    .withDay(dayBuilder -> dayBuilder
                         .withDay(DayOfWeek.MONDAY)
                         .withDuration(Duration.ofHours(8))
-                        .withStartTime(LocalTime.of(6,0)).build()
+                        .withStartTime(LocalTime.of(6, 0)).build()
                     ).build()
                 ).build()
             )
@@ -162,10 +162,10 @@ public class ShiftPlanRotationServiceTests {
                 .withManPower(2)
                 .addWeek(new ShiftWeekBlueprint.Builder()
                     .withIndex(0)
-                    .withDay( dayBuilder -> dayBuilder
+                    .withDay(dayBuilder -> dayBuilder
                         .withDay(DayOfWeek.MONDAY)
                         .withDuration(Duration.ofHours(8))
-                        .withStartTime(LocalTime.of(14,0)).build()
+                        .withStartTime(LocalTime.of(14, 0)).build()
                     ).build()
                 ).build()
             )
@@ -198,7 +198,7 @@ public class ShiftPlanRotationServiceTests {
             () -> Assert.notNull(result),
             () -> Assert.notNull(result.getScheduledShifts()),
             () -> Assert.isTrue(result.getScheduledShifts().size() == 24, "There should be 24 Shifts generated"),
-            () ->{
+            () -> {
                 for (int week = 0; week < 12; week++) {
                     LocalDate weekStart = startDate.plusWeeks(week);
 
@@ -208,14 +208,14 @@ public class ShiftPlanRotationServiceTests {
 
                     Assert.isTrue(weekShifts.size() == 2);
 
-                    var early = weekShifts.stream().filter(s -> s.getDescription() .equals("Early Shift")).findFirst().orElseThrow();
-                    var late = weekShifts.stream().filter(s -> s.getDescription() .equals("Late Shift")).findFirst().orElseThrow();
+                    var early = weekShifts.stream().filter(s -> s.getDescription().equals("Early Shift")).findFirst().orElseThrow();
+                    var late = weekShifts.stream().filter(s -> s.getDescription().equals("Late Shift")).findFirst().orElseThrow();
 
                     Assert.isTrue(early.getAssignments().size() == 1, "Early Shift should have exactly 1 assignment");
                     Assert.isTrue(late.getAssignments().size() == 2, "Late Shift should have exactly 2 assignment");
 
 
-                    switch (week % 3 ){
+                    switch (week % 3) {
                         case 0 -> {
                             assertShift(early, user1);
                             assertShift(late, user2, user3);
@@ -233,10 +233,11 @@ public class ShiftPlanRotationServiceTests {
             }
         );
     }
+
     // Plan: EarlyWeek1:[X,X] -> LateWeek1:[X, X]
     // Initial: [user1,user2]-> [user3, user4]
     @Test
-    void rotatePlanWithTwoShiftsOneWeekSameManPower2(){
+    void rotatePlanWithTwoShiftsOneWeekSameManPower2() {
         //act
 
         var department = new Department();
@@ -249,10 +250,10 @@ public class ShiftPlanRotationServiceTests {
                 .withManPower(2)
                 .addWeek(new ShiftWeekBlueprint.Builder()
                     .withIndex(0)
-                    .withDay( dayBuilder -> dayBuilder
+                    .withDay(dayBuilder -> dayBuilder
                         .withDay(DayOfWeek.MONDAY)
                         .withDuration(Duration.ofHours(8))
-                        .withStartTime(LocalTime.of(6,0)).build()
+                        .withStartTime(LocalTime.of(6, 0)).build()
                     ).build()
                 ).build()
             )
@@ -261,10 +262,10 @@ public class ShiftPlanRotationServiceTests {
                 .withManPower(2)
                 .addWeek(new ShiftWeekBlueprint.Builder()
                     .withIndex(0)
-                    .withDay( dayBuilder -> dayBuilder
+                    .withDay(dayBuilder -> dayBuilder
                         .withDay(DayOfWeek.MONDAY)
                         .withDuration(Duration.ofHours(8))
-                        .withStartTime(LocalTime.of(14,0)).build()
+                        .withStartTime(LocalTime.of(14, 0)).build()
                     ).build()
                 ).build()
             )
@@ -299,7 +300,7 @@ public class ShiftPlanRotationServiceTests {
             () -> Assert.notNull(result),
             () -> Assert.notNull(result.getScheduledShifts()),
             () -> Assert.isTrue(result.getScheduledShifts().size() == 24, "There should be 24 Shifts generated"),
-            () ->{
+            () -> {
                 for (int week = 0; week < 12; week++) {
                     LocalDate weekStart = startDate.plusWeeks(week);
 
@@ -309,18 +310,18 @@ public class ShiftPlanRotationServiceTests {
 
                     Assert.isTrue(weekShifts.size() == 2);
 
-                    var early = weekShifts.stream().filter(s -> s.getDescription() .equals("Early Shift")).findFirst().orElseThrow();
-                    var late = weekShifts.stream().filter(s -> s.getDescription() .equals("Late Shift")).findFirst().orElseThrow();
+                    var early = weekShifts.stream().filter(s -> s.getDescription().equals("Early Shift")).findFirst().orElseThrow();
+                    var late = weekShifts.stream().filter(s -> s.getDescription().equals("Late Shift")).findFirst().orElseThrow();
 
                     Assert.isTrue(early.getAssignments().size() == 2, "Early Shift should have exactly 2 assignment");
                     Assert.isTrue(late.getAssignments().size() == 2, "Late Shift should have exactly 2 assignment");
 
-                    switch (week % 2){
+                    switch (week % 2) {
                         case 0 -> {
                             assertShift(early, user1, user2);
                             assertShift(late, user3, user4);
                         }
-                        case  1 -> {
+                        case 1 -> {
                             assertShift(early, user3, user4);
                             assertShift(late, user1, user2);
                         }
@@ -333,7 +334,7 @@ public class ShiftPlanRotationServiceTests {
     // Plan: EarlyWeek1:[X,X] -> MidWeek1:[X,X] -> LateWeek1:[X, X]
     // Initial: [user1,user2]-> [user3, user4] -> [user5, user6]
     @Test
-    void rotatePlanWithThreeShiftsOneWeekSameManPower2(){
+    void rotatePlanWithThreeShiftsOneWeekSameManPower2() {
         //act
 
         var department = new Department();
@@ -346,10 +347,10 @@ public class ShiftPlanRotationServiceTests {
                 .withManPower(2)
                 .addWeek(new ShiftWeekBlueprint.Builder()
                     .withIndex(0)
-                    .withDay( dayBuilder -> dayBuilder
+                    .withDay(dayBuilder -> dayBuilder
                         .withDay(DayOfWeek.MONDAY)
                         .withDuration(Duration.ofHours(8))
-                        .withStartTime(LocalTime.of(6,0)).build()
+                        .withStartTime(LocalTime.of(6, 0)).build()
                     ).build()
                 ).build()
             ).
@@ -358,10 +359,10 @@ public class ShiftPlanRotationServiceTests {
                 .withManPower(2)
                 .addWeek(new ShiftWeekBlueprint.Builder()
                     .withIndex(0)
-                    .withDay( dayBuilder -> dayBuilder
+                    .withDay(dayBuilder -> dayBuilder
                         .withDay(DayOfWeek.MONDAY)
                         .withDuration(Duration.ofHours(8))
-                        .withStartTime(LocalTime.of(10,0)).build()
+                        .withStartTime(LocalTime.of(10, 0)).build()
                     ).build()
                 ).build()
             )
@@ -370,10 +371,10 @@ public class ShiftPlanRotationServiceTests {
                 .withManPower(2)
                 .addWeek(new ShiftWeekBlueprint.Builder()
                     .withIndex(0)
-                    .withDay( dayBuilder -> dayBuilder
+                    .withDay(dayBuilder -> dayBuilder
                         .withDay(DayOfWeek.MONDAY)
                         .withDuration(Duration.ofHours(8))
-                        .withStartTime(LocalTime.of(14,0)).build()
+                        .withStartTime(LocalTime.of(14, 0)).build()
                     ).build()
                 ).build()
             )
@@ -412,7 +413,7 @@ public class ShiftPlanRotationServiceTests {
             () -> Assert.notNull(result),
             () -> Assert.notNull(result.getScheduledShifts()),
             () -> Assert.isTrue(result.getScheduledShifts().size() == 36, "There should be 36 Shifts generated"),
-            () ->{
+            () -> {
                 for (int week = 0; week < 12; week++) {
                     LocalDate weekStart = startDate.plusWeeks(week);
 
@@ -422,26 +423,26 @@ public class ShiftPlanRotationServiceTests {
 
                     Assert.isTrue(weekShifts.size() == 3);
 
-                    var early = weekShifts.stream().filter(s -> s.getDescription() .equals("Early Shift")).findFirst().orElseThrow();
-                    var mid = weekShifts.stream().filter(s -> s.getDescription() .equals("Mid Shift")).findFirst().orElseThrow();
-                    var late = weekShifts.stream().filter(s -> s.getDescription() .equals("Late Shift")).findFirst().orElseThrow();
+                    var early = weekShifts.stream().filter(s -> s.getDescription().equals("Early Shift")).findFirst().orElseThrow();
+                    var mid = weekShifts.stream().filter(s -> s.getDescription().equals("Mid Shift")).findFirst().orElseThrow();
+                    var late = weekShifts.stream().filter(s -> s.getDescription().equals("Late Shift")).findFirst().orElseThrow();
 
                     Assert.isTrue(early.getAssignments().size() == 2, "Early Shift should have exactly 2 assignment");
                     Assert.isTrue(mid.getAssignments().size() == 2, "Mid Shift should have exactly 2 assignment");
                     Assert.isTrue(late.getAssignments().size() == 2, "Late Shift should have exactly 2 assignment");
 
-                    switch (week % 3){
+                    switch (week % 3) {
                         case 0 -> {
                             assertShift(early, user1, user2);
                             assertShift(mid, user3, user4);
                             assertShift(late, user5, user6);
                         }
-                        case  1 -> {
+                        case 1 -> {
                             assertShift(early, user5, user6);
                             assertShift(mid, user1, user2);
                             assertShift(late, user3, user4);
                         }
-                        case 2 ->{
+                        case 2 -> {
                             assertShift(early, user3, user4);
                             assertShift(mid, user5, user6);
                             assertShift(late, user1, user2);
@@ -455,7 +456,7 @@ public class ShiftPlanRotationServiceTests {
     // Plan: EarlyWeek1:[X] -> MidWeek1:[X] -> LateWeek1:[X]
     // Initial: [user1]-> [user2] -> [user3]
     @Test
-    void rotatePlanWithThreeShiftsOneWeekSameManPower(){
+    void rotatePlanWithThreeShiftsOneWeekSameManPower() {
 
         var department = new Department();
 
@@ -467,10 +468,10 @@ public class ShiftPlanRotationServiceTests {
                 .withManPower(1)
                 .addWeek(new ShiftWeekBlueprint.Builder()
                     .withIndex(0)
-                    .withDay( dayBuilder -> dayBuilder
+                    .withDay(dayBuilder -> dayBuilder
                         .withDay(DayOfWeek.MONDAY)
                         .withDuration(Duration.ofHours(8))
-                        .withStartTime(LocalTime.of(6,0)).build()
+                        .withStartTime(LocalTime.of(6, 0)).build()
                     ).build()
                 )
                 .build()
@@ -480,10 +481,10 @@ public class ShiftPlanRotationServiceTests {
                 .withManPower(1)
                 .addWeek(new ShiftWeekBlueprint.Builder()
                     .withIndex(0)
-                    .withDay( dayBuilder -> dayBuilder
+                    .withDay(dayBuilder -> dayBuilder
                         .withDay(DayOfWeek.MONDAY)
                         .withDuration(Duration.ofHours(8))
-                        .withStartTime(LocalTime.of(10,0)).build()
+                        .withStartTime(LocalTime.of(10, 0)).build()
                     ).build()
                 )
                 .build()
@@ -493,10 +494,10 @@ public class ShiftPlanRotationServiceTests {
                 .withManPower(1)
                 .addWeek(new ShiftWeekBlueprint.Builder()
                     .withIndex(0)
-                    .withDay( dayBuilder -> dayBuilder
+                    .withDay(dayBuilder -> dayBuilder
                         .withDay(DayOfWeek.MONDAY)
                         .withDuration(Duration.ofHours(8))
-                        .withStartTime(LocalTime.of(14,0)).build()
+                        .withStartTime(LocalTime.of(14, 0)).build()
                     ).build()
                 )
                 .build()
@@ -529,7 +530,7 @@ public class ShiftPlanRotationServiceTests {
             () -> Assert.notNull(result),
             () -> Assert.notNull(result.getScheduledShifts()),
             () -> Assert.isTrue(result.getScheduledShifts().size() == 36, "There should be 36 Shifts generated"),
-            () ->{
+            () -> {
                 for (int week = 0; week < 12; week++) {
                     LocalDate weekStart = startDate.plusWeeks(week);
 
@@ -539,16 +540,16 @@ public class ShiftPlanRotationServiceTests {
 
                     Assert.isTrue(weekShifts.size() == 3, "There should be 3 shifts per week");
 
-                    var early = weekShifts.stream().filter(s -> s.getDescription() .equals("Early Shift")).findFirst().orElseThrow();
-                    var mid = weekShifts.stream().filter(s -> s.getDescription() .equals("Mid Shift")).findFirst().orElseThrow();
-                    var late = weekShifts.stream().filter(s -> s.getDescription() .equals("Late Shift")).findFirst().orElseThrow();
+                    var early = weekShifts.stream().filter(s -> s.getDescription().equals("Early Shift")).findFirst().orElseThrow();
+                    var mid = weekShifts.stream().filter(s -> s.getDescription().equals("Mid Shift")).findFirst().orElseThrow();
+                    var late = weekShifts.stream().filter(s -> s.getDescription().equals("Late Shift")).findFirst().orElseThrow();
 
                     Assert.isTrue(early.getAssignments().size() == 1, "Early Shift should have exactly 1 assignment");
                     Assert.isTrue(mid.getAssignments().size() == 1, "Mid Shift should have exactly 1 assignment");
                     Assert.isTrue(late.getAssignments().size() == 1, "Late Shift should have exactly 1 assignment");
 
 
-                    switch (week % 3 ){
+                    switch (week % 3) {
                         case 0 -> {
                             assertShift(early, user1);
                             assertShift(mid, user2);
@@ -573,7 +574,7 @@ public class ShiftPlanRotationServiceTests {
     // Plan: EarlyWeek1:[X,X] ->EarlyWeek2:[X,X] -> LateWeek1:[X, X] -> LateWeek1:[X, X]
     // Initial: [user1,user2]-> [user3, user4]
     @Test
-    void rotatePlanWithTwoShiftsTwoWeekSameManPower(){
+    void rotatePlanWithTwoShiftsTwoWeekSameManPower() {
         //act
 
         var department = new Department();
@@ -586,17 +587,17 @@ public class ShiftPlanRotationServiceTests {
                 .withManPower(2)
                 .addWeek(new ShiftWeekBlueprint.Builder()
                     .withIndex(0)
-                    .withDay( dayBuilder -> dayBuilder
+                    .withDay(dayBuilder -> dayBuilder
                         .withDay(DayOfWeek.MONDAY)
                         .withDuration(Duration.ofHours(8))
-                        .withStartTime(LocalTime.of(6,0)).build()
+                        .withStartTime(LocalTime.of(6, 0)).build()
                     ).build()
                 ).addWeek(new ShiftWeekBlueprint.Builder()
                     .withIndex(1)
-                    .withDay( dayBuilder -> dayBuilder
+                    .withDay(dayBuilder -> dayBuilder
                         .withDay(DayOfWeek.MONDAY)
                         .withDuration(Duration.ofHours(8))
-                        .withStartTime(LocalTime.of(6,0)).build()
+                        .withStartTime(LocalTime.of(6, 0)).build()
                     ).build()
                 )
                 .build()
@@ -606,18 +607,18 @@ public class ShiftPlanRotationServiceTests {
                 .withManPower(2)
                 .addWeek(new ShiftWeekBlueprint.Builder()
                     .withIndex(0)
-                    .withDay( dayBuilder -> dayBuilder
+                    .withDay(dayBuilder -> dayBuilder
                         .withDay(DayOfWeek.MONDAY)
                         .withDuration(Duration.ofHours(8))
-                        .withStartTime(LocalTime.of(14,0)).build()
+                        .withStartTime(LocalTime.of(14, 0)).build()
                     ).build()
                 )
                 .addWeek(new ShiftWeekBlueprint.Builder()
                     .withIndex(1)
-                    .withDay( dayBuilder -> dayBuilder
+                    .withDay(dayBuilder -> dayBuilder
                         .withDay(DayOfWeek.MONDAY)
                         .withDuration(Duration.ofHours(8))
-                        .withStartTime(LocalTime.of(14,0)).build()
+                        .withStartTime(LocalTime.of(14, 0)).build()
                     ).build()
                 )
                 .build()
@@ -653,7 +654,7 @@ public class ShiftPlanRotationServiceTests {
             () -> Assert.notNull(result),
             () -> Assert.notNull(result.getScheduledShifts()),
             () -> Assert.isTrue(result.getScheduledShifts().size() == 24, "There should be 24 Shifts generated"),
-            () ->{
+            () -> {
                 for (int week = 0; week < 12; week++) {
                     LocalDate weekStart = startDate.plusWeeks(week);
 
@@ -663,8 +664,8 @@ public class ShiftPlanRotationServiceTests {
 
                     Assert.isTrue(weekShifts.size() == 2);
 
-                    var early = weekShifts.stream().filter(s -> s.getDescription() .equals("Early Shift")).findFirst().orElseThrow();
-                    var late = weekShifts.stream().filter(s -> s.getDescription() .equals("Late Shift")).findFirst().orElseThrow();
+                    var early = weekShifts.stream().filter(s -> s.getDescription().equals("Early Shift")).findFirst().orElseThrow();
+                    var late = weekShifts.stream().filter(s -> s.getDescription().equals("Late Shift")).findFirst().orElseThrow();
 
                     Assert.isTrue(early.getAssignments().size() == 2, "Early Shift should have exactly 2 assignment");
                     Assert.isTrue(late.getAssignments().size() == 2, "Late Shift should have exactly 2 assignment");
@@ -674,12 +675,12 @@ public class ShiftPlanRotationServiceTests {
 
                     switch (week % 4) {
                         case 0, 1 -> {
-                          assertShift(early, user1, user2);
-                          assertShift(late, user3, user4);
+                            assertShift(early, user1, user2);
+                            assertShift(late, user3, user4);
                         }
                         case 2, 3 -> {
-                           assertShift(early, user3, user4);
-                           assertShift(late, user1, user2);
+                            assertShift(early, user3, user4);
+                            assertShift(late, user1, user2);
                         }
                     }
                 }
@@ -690,8 +691,8 @@ public class ShiftPlanRotationServiceTests {
     // Plan: EarlyWeek1:[X] -> EarlyWeek2:[X] -> LateWeek1:[X, X] -> LateWeek2:[X, X]
     // Initial: [user1]-> [] -> [user2, user3] -> [ , ]
     @Test
-    void rotatePlanWithTwoShiftsTwoWeekDifferentManPower(){
-                //act
+    void rotatePlanWithTwoShiftsTwoWeekDifferentManPower() {
+        //act
 
         var department = new Department();
 
@@ -703,17 +704,17 @@ public class ShiftPlanRotationServiceTests {
                 .withManPower(1)
                 .addWeek(new ShiftWeekBlueprint.Builder()
                     .withIndex(0)
-                    .withDay( dayBuilder -> dayBuilder
+                    .withDay(dayBuilder -> dayBuilder
                         .withDay(DayOfWeek.MONDAY)
                         .withDuration(Duration.ofHours(8))
-                        .withStartTime(LocalTime.of(6,0)).build()
+                        .withStartTime(LocalTime.of(6, 0)).build()
                     ).build()
                 ).addWeek(new ShiftWeekBlueprint.Builder()
                     .withIndex(1)
-                    .withDay( dayBuilder -> dayBuilder
+                    .withDay(dayBuilder -> dayBuilder
                         .withDay(DayOfWeek.MONDAY)
                         .withDuration(Duration.ofHours(8))
-                        .withStartTime(LocalTime.of(6,0)).build()
+                        .withStartTime(LocalTime.of(6, 0)).build()
                     ).build()
                 )
                 .build()
@@ -723,18 +724,18 @@ public class ShiftPlanRotationServiceTests {
                 .withManPower(2)
                 .addWeek(new ShiftWeekBlueprint.Builder()
                     .withIndex(0)
-                    .withDay( dayBuilder -> dayBuilder
+                    .withDay(dayBuilder -> dayBuilder
                         .withDay(DayOfWeek.MONDAY)
                         .withDuration(Duration.ofHours(8))
-                        .withStartTime(LocalTime.of(14,0)).build()
+                        .withStartTime(LocalTime.of(14, 0)).build()
                     ).build()
                 )
                 .addWeek(new ShiftWeekBlueprint.Builder()
                     .withIndex(1)
-                    .withDay( dayBuilder -> dayBuilder
+                    .withDay(dayBuilder -> dayBuilder
                         .withDay(DayOfWeek.MONDAY)
                         .withDuration(Duration.ofHours(8))
-                        .withStartTime(LocalTime.of(14,0)).build()
+                        .withStartTime(LocalTime.of(14, 0)).build()
                     ).build()
                 )
                 .build()
@@ -768,7 +769,7 @@ public class ShiftPlanRotationServiceTests {
             () -> Assert.notNull(result),
             () -> Assert.notNull(result.getScheduledShifts()),
             () -> Assert.isTrue(result.getScheduledShifts().size() == 24, "There should be 24 Shifts generated"),
-            () ->{
+            () -> {
                 for (int week = 0; week < 12; week++) {
                     LocalDate weekStart = startDate.plusWeeks(week);
 
@@ -778,23 +779,23 @@ public class ShiftPlanRotationServiceTests {
 
                     Assert.isTrue(weekShifts.size() == 2);
 
-                    var early = weekShifts.stream().filter(s -> s.getDescription() .equals("Early Shift")).findFirst().orElseThrow();
-                    var late = weekShifts.stream().filter(s -> s.getDescription() .equals("Late Shift")).findFirst().orElseThrow();
+                    var early = weekShifts.stream().filter(s -> s.getDescription().equals("Early Shift")).findFirst().orElseThrow();
+                    var late = weekShifts.stream().filter(s -> s.getDescription().equals("Late Shift")).findFirst().orElseThrow();
 
                     Assert.isTrue(early.getAssignments().size() == 1, "Early Shift should have exactly 1 assignment");
                     Assert.isTrue(late.getAssignments().size() == 2, "Late Shift should have exactly 2 assignment");
 
 
-                    switch (week % 6 ){
-                        case 0,1 -> {
+                    switch (week % 6) {
+                        case 0, 1 -> {
                             assertShift(early, user1);
                             assertShift(late, user2, user3);
                         }
-                        case 2,3 -> {
+                        case 2, 3 -> {
                             assertShift(early, user3);
                             assertShift(late, user1, user2);
                         }
-                        case 4,5 -> {
+                        case 4, 5 -> {
                             assertShift(early, user2);
                             assertShift(late, user3, user1);
                         }
@@ -807,7 +808,7 @@ public class ShiftPlanRotationServiceTests {
     // Plan: EarlyWeek1:[X,X] -> EarlyWeek2:[X,X] -> EarlyWeek3:[X,X] -> MidWeek1:[X] -> MidWeek2:[X] -> MidWeek3:[X] -> LateWeek1:[X, X] -> LateWeek2:[X, X] -> LateWeek3:[X, X]
     // Initial: [user1]-> [] -> [user2, user3] -> [ , ]
     @Test
-    void rotatePlanWithThreeShiftsTwoWeeksDifferentManPower(){
+    void rotatePlanWithThreeShiftsTwoWeeksDifferentManPower() {
 
         var department = new Department();
 
@@ -819,17 +820,17 @@ public class ShiftPlanRotationServiceTests {
                 .withManPower(2)
                 .addWeek(new ShiftWeekBlueprint.Builder()
                     .withIndex(0)
-                    .withDay( dayBuilder -> dayBuilder
+                    .withDay(dayBuilder -> dayBuilder
                         .withDay(DayOfWeek.MONDAY)
                         .withDuration(Duration.ofHours(8))
-                        .withStartTime(LocalTime.of(6,0)).build()
+                        .withStartTime(LocalTime.of(6, 0)).build()
                     ).build()
                 ).addWeek(new ShiftWeekBlueprint.Builder()
                     .withIndex(1)
-                    .withDay( dayBuilder -> dayBuilder
+                    .withDay(dayBuilder -> dayBuilder
                         .withDay(DayOfWeek.MONDAY)
                         .withDuration(Duration.ofHours(8))
-                        .withStartTime(LocalTime.of(6,0)).build()
+                        .withStartTime(LocalTime.of(6, 0)).build()
                     ).build()
                 )
                 .build()
@@ -839,18 +840,18 @@ public class ShiftPlanRotationServiceTests {
                 .withManPower(1)
                 .addWeek(new ShiftWeekBlueprint.Builder()
                     .withIndex(0)
-                    .withDay( dayBuilder -> dayBuilder
+                    .withDay(dayBuilder -> dayBuilder
                         .withDay(DayOfWeek.MONDAY)
                         .withDuration(Duration.ofHours(8))
-                        .withStartTime(LocalTime.of(10,0)).build()
+                        .withStartTime(LocalTime.of(10, 0)).build()
                     ).build()
                 )
                 .addWeek(new ShiftWeekBlueprint.Builder()
                     .withIndex(1)
-                    .withDay( dayBuilder -> dayBuilder
+                    .withDay(dayBuilder -> dayBuilder
                         .withDay(DayOfWeek.MONDAY)
                         .withDuration(Duration.ofHours(8))
-                        .withStartTime(LocalTime.of(10,0)).build()
+                        .withStartTime(LocalTime.of(10, 0)).build()
                     ).build()
                 )
                 .build()
@@ -860,18 +861,18 @@ public class ShiftPlanRotationServiceTests {
                 .withManPower(2)
                 .addWeek(new ShiftWeekBlueprint.Builder()
                     .withIndex(0)
-                    .withDay( dayBuilder -> dayBuilder
+                    .withDay(dayBuilder -> dayBuilder
                         .withDay(DayOfWeek.MONDAY)
                         .withDuration(Duration.ofHours(8))
-                        .withStartTime(LocalTime.of(14,0)).build()
+                        .withStartTime(LocalTime.of(14, 0)).build()
                     ).build()
                 )
                 .addWeek(new ShiftWeekBlueprint.Builder()
                     .withIndex(1)
-                    .withDay( dayBuilder -> dayBuilder
+                    .withDay(dayBuilder -> dayBuilder
                         .withDay(DayOfWeek.MONDAY)
                         .withDuration(Duration.ofHours(8))
-                        .withStartTime(LocalTime.of(14,0)).build()
+                        .withStartTime(LocalTime.of(14, 0)).build()
                     ).build()
                 )
                 .build()
@@ -908,7 +909,7 @@ public class ShiftPlanRotationServiceTests {
             () -> Assert.notNull(result),
             () -> Assert.notNull(result.getScheduledShifts()),
             () -> Assert.isTrue(result.getScheduledShifts().size() == 36, "There should be 36 Shifts generated"),
-            () ->{
+            () -> {
                 for (int week = 0; week < 12; week++) {
                     LocalDate weekStart = startDate.plusWeeks(week);
 
@@ -918,37 +919,37 @@ public class ShiftPlanRotationServiceTests {
 
                     Assert.isTrue(weekShifts.size() == 3, "There should be 3 shifts per week");
 
-                    var early = weekShifts.stream().filter(s -> s.getDescription() .equals("Early Shift")).findFirst().orElseThrow();
-                    var mid = weekShifts.stream().filter(s -> s.getDescription() .equals("Mid Shift")).findFirst().orElseThrow();
-                    var late = weekShifts.stream().filter(s -> s.getDescription() .equals("Late Shift")).findFirst().orElseThrow();
+                    var early = weekShifts.stream().filter(s -> s.getDescription().equals("Early Shift")).findFirst().orElseThrow();
+                    var mid = weekShifts.stream().filter(s -> s.getDescription().equals("Mid Shift")).findFirst().orElseThrow();
+                    var late = weekShifts.stream().filter(s -> s.getDescription().equals("Late Shift")).findFirst().orElseThrow();
 
                     Assert.isTrue(early.getAssignments().size() == 2, "Early Shift should have exactly 2 assignment");
                     Assert.isTrue(mid.getAssignments().size() == 1, "Mid Shift should have exactly 1 assignment");
                     Assert.isTrue(late.getAssignments().size() == 2, "Late Shift should have exactly 2 assignment");
 
 
-                    switch (week % 10 ){
-                        case 0,1 -> {
+                    switch (week % 10) {
+                        case 0, 1 -> {
                             assertShift(early, user1, user2);
                             assertShift(mid, user3);
                             assertShift(late, user4, user5);
                         }
-                        case 2,3 -> {
+                        case 2, 3 -> {
                             assertShift(early, user5, user1);
                             assertShift(mid, user2);
                             assertShift(late, user3, user4);
                         }
-                        case 4,5 -> {
+                        case 4, 5 -> {
                             assertShift(early, user4, user5);
                             assertShift(mid, user1);
                             assertShift(late, user2, user3);
                         }
-                        case 6,7 -> {
+                        case 6, 7 -> {
                             assertShift(early, user3, user4);
                             assertShift(mid, user5);
                             assertShift(late, user1, user2);
                         }
-                        case 8,9 -> {
+                        case 8, 9 -> {
                             assertShift(early, user2, user3);
                             assertShift(mid, user4);
                             assertShift(late, user5, user1);
