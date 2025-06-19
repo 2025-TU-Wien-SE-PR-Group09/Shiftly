@@ -79,7 +79,7 @@ public class ShiftRotator {
     }
 
     public void assignInitialUsers(List<ApplicationUser> users) {
-        var slots = slotsInRotationOrder.stream().limit(slotsInRotationOrder.size()).toList();
+        var slots = slotsInRotationOrder.stream().limit(shifts).toList();
         this.initialShiftAssignmentStrategy.assign(slots, users);
         alignManpowerPerShiftToFirstWeekAssignments();
     }
