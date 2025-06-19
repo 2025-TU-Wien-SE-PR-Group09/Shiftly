@@ -4,15 +4,10 @@ import at.ac.tuwien.sepr.groupphase.backend.entity.ScheduledShift;
 import at.ac.tuwien.sepr.groupphase.backend.entity.ScheduledShiftAssignment;
 import at.ac.tuwien.sepr.groupphase.backend.service.IcalService;
 import at.ac.tuwien.sepr.groupphase.backend.service.dto.ConcreteShiftPlanIcalDto;
-import net.fortuna.ical4j.model.Calendar;
-import net.fortuna.ical4j.model.DateTime;
+import net.fortuna.ical4j.model.*;
 import net.fortuna.ical4j.model.component.VEvent;
-import net.fortuna.ical4j.model.property.CalScale;
-import net.fortuna.ical4j.model.property.Description;
-import net.fortuna.ical4j.model.property.ProdId;
-import net.fortuna.ical4j.model.property.Uid;
-import net.fortuna.ical4j.model.property.Version;
-import net.fortuna.ical4j.model.property.XProperty;
+import net.fortuna.ical4j.model.component.VTimeZone;
+import net.fortuna.ical4j.model.property.*;
 import net.fortuna.ical4j.util.RandomUidGenerator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -37,6 +32,13 @@ public class IcalServiceImpl implements IcalService {
         calendar.getProperties().add(new ProdId("-//Shyft//iCal4j 3.2.10//EN"));
         calendar.getProperties().add(Version.VERSION_2_0);
         calendar.getProperties().add(CalScale.GREGORIAN);
+        ZoneId zoneId = ZoneId.of("Europe/Vienna"); // oder ZoneId.systemDefault()
+        TimeZoneRegistry registry = TimeZoneRegistryFactory.getInstance().createRegistry();
+        TimeZone tz = registry.getTimeZone(zoneId.getId());
+        VTimeZone vTimeZone = tz.getVTimeZone();
+        calendar.getComponents().add(vTimeZone);
+        calendar.getProperties().add(new XProperty("X-WR-TIMEZONE", ZoneId.systemDefault().getId()));
+
 
         int eventCount = 0;
         for (ScheduledShift shift : shiftPlanDto.scheduledShifts()) {
@@ -44,11 +46,14 @@ public class IcalServiceImpl implements IcalService {
                 shift.getAssignments() != null ? shift.getAssignments().size() : 0);
 
             // Convert LocalDateTime to Date
-            Date startDate = Date.from(shift.getStart().atZone(ZoneId.systemDefault()).toInstant());
-            Date endDate = Date.from(shift.getEnd().atZone(ZoneId.systemDefault()).toInstant());
+            DateTime startDateTime = new DateTime(Date.from(shift.getStart().atZone(zoneId).toInstant()));
+            DateTime endDateTime = new DateTime(Date.from(shift.getEnd().atZone(zoneId).toInstant()));
+            startDateTime.setTimeZone(tz);
+            endDateTime.setTimeZone(tz);
 
-            // Create event with shift description as title
-            VEvent event = new VEvent(new DateTime(startDate), new DateTime(endDate), shift.getDescription());
+            VEvent event = new VEvent(startDateTime, endDateTime, shift.getDescription());
+            event.getProperties().add(new TzId(tz.getID())); // explizit TZID setzen
+
 
             // Add unique ID
             Uid uid = uidGenerator.generateUid();

@@ -32,6 +32,11 @@ public class IcalSubscriptionToken {
     @Column(name = "token", nullable = false, length = 255, unique = true)
     private String token;
 
+
+    @NotNull
+    @Column(name = "calendarFILE", nullable = false)
+    private byte[] calendarFile;
+
     @NotNull
     @Column(name = "created_at", nullable = false, updatable = false)
     private LocalDateTime createdAt;
@@ -104,6 +109,10 @@ public class IcalSubscriptionToken {
         return Objects.equals(id, that.id) && Objects.equals(userEmail, that.userEmail) && Objects.equals(token, that.token);
     }
 
+    public void setCalendarFile(byte[] calendarFile) {
+        this.calendarFile = calendarFile;
+    }
+
     @Override
     public int hashCode() {
         return Objects.hash(id, userEmail, token);
@@ -119,4 +128,4 @@ public class IcalSubscriptionToken {
             ", lastAccessedAt=" + lastAccessedAt +
             '}';
     }
-} 
+}
