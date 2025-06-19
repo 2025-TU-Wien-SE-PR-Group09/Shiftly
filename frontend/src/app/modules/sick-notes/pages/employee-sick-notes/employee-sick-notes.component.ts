@@ -55,11 +55,19 @@ export class EmployeeSickNotesComponent implements OnInit {
     }
 
     if (!this.startDate || !this.endDate) {
-      this.toastr.warning('Please provide both start and end dates.');
+      this.toastr.warning('Please provide both start and end dates and make sure the days exist.');
       return;
     }
     const start = new Date(this.startDate);
     const end = new Date(this.endDate);
+
+    const maxDate = new Date('9999-12-31T23:59:59Z');
+
+    if (start > maxDate || end > maxDate) {
+      this.toastr.warning('Dates cannot be later than 31.12.9999.');
+      return;
+    }
+
     if (start > end) {
       this.toastr.error('Start date cannot be after end date.');
       return;
@@ -91,6 +99,8 @@ export class EmployeeSickNotesComponent implements OnInit {
           setTimeout(() => {
             this.uploadSuccess = false;
           }, 5000);
+        }, error: (err) => {
+          this.loading = false;
         },
         complete: () => {
           this.loading = false;

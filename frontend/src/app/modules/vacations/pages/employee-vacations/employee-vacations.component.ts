@@ -38,7 +38,16 @@ export class EmployeeVacationsComponent implements OnInit {
 
   submitVacationRequest(): void {
     if (!this.startDate || !this.endDate) {
-      this.toastr.error('Please select both start and end dates.');
+      this.toastr.error('Please provide both start and end dates and make sure the days exist.');
+      return;
+    }
+
+    const start = new Date(this.startDate);
+    const end = new Date(this.endDate);
+    const maxDate = new Date('9999-12-31T23:59:59Z');
+
+    if (start > maxDate || end > maxDate) {
+      this.toastr.warning('Dates cannot be later than 31.12.9999.');
       return;
     }
 
