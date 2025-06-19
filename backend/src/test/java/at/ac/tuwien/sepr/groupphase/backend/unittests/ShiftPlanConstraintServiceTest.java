@@ -60,7 +60,7 @@ public class ShiftPlanConstraintServiceTest {
         vacationRequest.setStartDate(weekStart);
         vacationRequest.setEndDate(weekStart.plusDays(1));
         vacationRequest.setStatus(VacationStatus.APPROVED);
-        when(vacationRequestRepository.findByEmployeeAndStatus(max, VacationStatus.APPROVED))
+        when(vacationRequestRepository.findByEmployeeEmailAndStatus(max.getEmail(), VacationStatus.APPROVED))
             .thenReturn(List.of(vacationRequest));
 
         // No other jumper shifts scheduled
@@ -107,7 +107,7 @@ public class ShiftPlanConstraintServiceTest {
         vacationRequest.setStartDate(weekStart);
         vacationRequest.setEndDate(weekStart.plusDays(1));
         vacationRequest.setStatus(VacationStatus.APPROVED);
-        when(vacationRequestRepository.findByEmployeeAndStatus(max, VacationStatus.APPROVED))
+        when(vacationRequestRepository.findByEmployeeEmailAndStatus(max.getEmail(), VacationStatus.APPROVED))
             .thenReturn(List.of(vacationRequest));
 
         // No other jumper shifts scheduled

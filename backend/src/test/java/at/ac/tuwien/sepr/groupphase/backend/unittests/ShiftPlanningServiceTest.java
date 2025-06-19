@@ -54,7 +54,8 @@ class ShiftPlanningServiceTest {
             departmentRepository,
             null,
             concreteShiftPlanRepository,
-            null
+            null,
+            scheduledShiftRepository
         );
     }
 

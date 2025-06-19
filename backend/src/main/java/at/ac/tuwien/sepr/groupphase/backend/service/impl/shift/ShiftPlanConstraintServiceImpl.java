@@ -4,6 +4,8 @@ import at.ac.tuwien.sepr.groupphase.backend.entity.ApplicationUser;
 import at.ac.tuwien.sepr.groupphase.backend.entity.ConcreteShiftPlan;
 import at.ac.tuwien.sepr.groupphase.backend.entity.ScheduledShift;
 import at.ac.tuwien.sepr.groupphase.backend.entity.ScheduledShiftAssignment;
+import at.ac.tuwien.sepr.groupphase.backend.entity.ScheduledShiftAssignmentId;
+import at.ac.tuwien.sepr.groupphase.backend.entity.VacationRequest;
 import at.ac.tuwien.sepr.groupphase.backend.repository.ScheduledShiftRepository;
 import at.ac.tuwien.sepr.groupphase.backend.repository.UserRepository;
 import at.ac.tuwien.sepr.groupphase.backend.repository.VacationRequestRepository;
@@ -19,6 +21,7 @@ import java.time.LocalDate;
 import java.time.LocalTime;
 import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -26,6 +29,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 @Service
 public class ShiftPlanConstraintServiceImpl implements ShiftPlanConstraintService {
@@ -51,22 +55,29 @@ public class ShiftPlanConstraintServiceImpl implements ShiftPlanConstraintServic
             getAvailableJumperEmployeesPerDay(concreteShiftPlan);
         Map<ApplicationUser, ApplicationUser> vacationReplacementMap = new HashMap<>();
 
+        HashMap<ApplicationUser, List<LocalDate>> overlaps = new HashMap<>();
+        concreteShiftPlan.getScheduledShifts()
+            .stream()
+            .map(ScheduledShift::getAssignments)
+            .flatMap(Collection::stream)
+            .map(ScheduledShiftAssignment::getUser).distinct()
+            .forEach(u -> {
+                List<VacationRequest> vacationRequests = vacationRequestRepository.findByEmployeeEmailAndStatus(u.getEmail(), VacationStatus.APPROVED);
+
+                overlaps.put(u, getVacationOverlap(vacationRequests,
+                    concreteShiftPlan.getStartDate(),
+                    concreteShiftPlan.getEndDate()));
+            });
+
+
+
 
         for (ScheduledShift shift : concreteShiftPlan.getScheduledShifts()) {
             LocalDate shiftDate = shift.getStart().toLocalDate();
-            LocalDate weekStart = shiftDate.with(DayOfWeek.MONDAY);
-
-            LOGGER.info(shiftDate.toString());
-
-            // Sort assignments by the number of overlaps of the user who is assigned to the shift.
-            // This way, we can prioritize users with more overlaps when assigning jumpers.
-            List<ApplicationUser> employees = shift.getAssignments().stream().map(ScheduledShiftAssignment::getUser).distinct().toList();
-            HashMap<ApplicationUser, List<LocalDate>> overlaps = new HashMap<>();
-            for (ApplicationUser employee : employees) {
-                overlaps.put(employee, getVacationOverlap(employee, weekStart));
-            }
             List<ScheduledShiftAssignment> assignmentsCopy = new ArrayList<>(shift.getAssignments());
 
+            // Reduction from missing employee problem
+            // to find jumper for worker in vacation problem
             if (shift.getManpower() > assignmentsCopy.size()) {
                 // If the shift has more manpower than assignments, we need to add jumpers
                 int requiredJumpers = shift.getManpower() - assignmentsCopy.size();
@@ -89,6 +100,8 @@ public class ShiftPlanConstraintServiceImpl implements ShiftPlanConstraintServic
 
             Set<ApplicationUser> availableJumpersToday = availableJumpersPerDay.get(shiftDate);
 
+            // Sort assignments by the number of overlaps of the user who is assigned to the shift.
+            // This way, we can prioritize users with more overlaps when assigning jumpers.
             assignmentsCopy.sort(Comparator.comparingInt(a -> overlaps.get(((ScheduledShiftAssignment) a).getUser()) == null ? 0 : overlaps.get(((ScheduledShiftAssignment) a).getUser()).size()).reversed());
 
             for (ScheduledShiftAssignment assignment : assignmentsCopy) {
@@ -100,7 +113,8 @@ public class ShiftPlanConstraintServiceImpl implements ShiftPlanConstraintServic
                         ApplicationUser jumper = null;
 
                         // Check if the assigned user has a vacation replacement already
-                        if (vacationReplacementMap.containsKey(assignedUser)) {
+                        // todo: overlap is wrong. a shift is only a day and not a week
+                        if (vacationReplacementMap.containsKey(assignedUser) && availableJumpersToday.contains(vacationReplacementMap.get(assignedUser))) {
                             jumper = vacationReplacementMap.get(assignedUser);
                         } else {
                             // Find a jumper who is available on all overlap days
@@ -132,10 +146,19 @@ public class ShiftPlanConstraintServiceImpl implements ShiftPlanConstraintServic
                         availableJumpersPerDay.get(shiftDate).remove(jumper);
 
                         shift.getAssignments().remove(assignment);
-                        shift.addAssignment(new ScheduledShiftAssignment.Builder()
+
+                        LOGGER.info(assignment.toString());
+                        LOGGER.info(jumper.getEmail());
+                        LOGGER.info(shiftDate.toString());
+
+                        new ScheduledShiftAssignment.Builder()
+                                .withId(new ScheduledShiftAssignmentId(
+                                    assignment.getId().getScheduledShiftId(),
+                                    jumper.getEmail()
+                                ))
                             .withShift(shift)
                             .withUser(jumper)
-                            .build());
+                            .build();
                     } else {
                         shift.getAssignments().remove(assignment);
                     }
@@ -177,18 +200,16 @@ public class ShiftPlanConstraintServiceImpl implements ShiftPlanConstraintServic
 
 
     /**
-     * Get the vacation overlap for a specific user in a given week.
+     * Get the vacation overlap for a list of vacations in a given week.
      *
-     * @param user      The user to check.
+     * @param vacationRequests      The vacation requests to verify
      * @param weekStart The start date of the week to check.
      * @return List of LocalDate representing the overlap period, or null if no overlap.
      */
-    private List<LocalDate> getVacationOverlap(ApplicationUser user, LocalDate weekStart) {
-        LOGGER.trace("getVacationOverlap({}, {})", user, weekStart);
+    private List<LocalDate> getVacationOverlap(List<VacationRequest> vacationRequests, LocalDate weekStart, LocalDate weekEnd) {
+        LOGGER.trace("getVacationOverlap({}, {})", vacationRequests, weekStart);
 
-        LocalDate weekEnd = weekStart.plusDays(6);
-
-        return vacationRequestRepository.findByEmployeeAndStatus(user, VacationStatus.APPROVED).stream()
+        return vacationRequests.stream()
             .filter(request ->
                 request.getStartDate().isBefore(weekEnd.plusDays(1))
                     && request.getEndDate().isAfter(weekStart.minusDays(1)))

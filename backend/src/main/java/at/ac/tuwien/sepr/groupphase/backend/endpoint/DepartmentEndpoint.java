@@ -12,6 +12,7 @@ import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.shift.GenerateConcreteP
 import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.shift.PlanBlueprintResponse;
 import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.user.ApplicationUserResponseDto;
 import at.ac.tuwien.sepr.groupphase.backend.endpoint.mapper.ShiftRestMapper;
+import at.ac.tuwien.sepr.groupphase.backend.entity.ConcreteShiftPlan;
 import at.ac.tuwien.sepr.groupphase.backend.entity.ScheduledShift;
 import at.ac.tuwien.sepr.groupphase.backend.exception.ConflictException;
 import at.ac.tuwien.sepr.groupphase.backend.exception.NotFoundException;
@@ -312,11 +313,11 @@ public class DepartmentEndpoint {
 
     @RolesAllowed({"ADMIN", "SUPERVISOR", "EMPLOYEE"})
     @Transactional
-    @Operation(summary = "Get the concrete shift plan for the given department and return the scheduled shifts in suitable calendar format")
+    @Operation(summary = "Get the concrete shift plans for the given department and return the scheduled shifts in suitable calendar format")
     @ApiResponse(responseCode = "201", description = "Concrete shift plan in calendar format.")
-    @GetMapping(path = "/{departmentName}/shiftplan",
+    @GetMapping(path = "/{departmentName}/shiftplans",
         produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<DepartmentShiftplanCalendarResponse> getConcreteShiftplan(@PathVariable("departmentName") String name,
+    public ResponseEntity<DepartmentShiftplanCalendarResponse> getConcreteShiftplans(@PathVariable("departmentName") String name,
                                                                                     Principal principal) {
         LOGGER.trace("getConcreteShiftplan({}, {})", name, principal);
 
@@ -326,16 +327,19 @@ public class DepartmentEndpoint {
         List<ScheduledShift> shifts;
 
         if (currentUser.getRole().equals("EMPLOYEE")) {
-            shifts = shiftPlanningService.getCurrentConcretePlan(name)
-                .getScheduledShifts().stream()
+            shifts = shiftPlanningService.getAllNotOverridenPlans(name)
+                .stream().map(ConcreteShiftPlan::getScheduledShifts)
+                .flatMap(List::stream)
                 .filter(s -> s.getAssignments()
                     .stream()
                     .map(a -> a.getUser().getEmail())
                     .anyMatch(userEmail -> userEmail.equals(principal.getName())))
                 .toList();
         } else {
-            shifts = shiftPlanningService.getCurrentConcretePlan(name)
-                .getScheduledShifts();
+            shifts = shiftPlanningService.getAllNotOverridenPlans(name)
+                .stream().map(ConcreteShiftPlan::getScheduledShifts)
+                .flatMap(List::stream)
+                .toList();
         }
 
         DepartmentShiftplanCalendarResponse response = new DepartmentShiftplanCalendarResponse(

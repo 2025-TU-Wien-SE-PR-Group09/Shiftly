@@ -2,7 +2,8 @@ import { Component, OnInit } from '@angular/core';
 import {
   DepartmentDetailRestResponseDto,
   DepartmentService,
-  DepartmentShiftplanCalendarResponse, UserEndpointService,
+  DepartmentShiftplanCalendarResponse,
+  UserEndpointService,
 } from '../../../../rest_client';
 import { ToastrService } from 'ngx-toastr';
 import { CommonModule } from '@angular/common';
@@ -16,10 +17,9 @@ import { SKIP_EXCEPTION_INTERCEPTOR } from '../../../../core/interceptor/skip-ex
   selector: 'app-supervisor-home',
   imports: [CommonModule, CalendarModule, ButtonComponent, FormsModule],
   templateUrl: './supervisor-home.component.html',
-  styleUrl: './supervisor-home.component.css'
+  styleUrl: './supervisor-home.component.css',
 })
-export class SupervisorHomeComponent implements OnInit{
-
+export class SupervisorHomeComponent implements OnInit {
   constructor(
     private _userService: UserEndpointService,
     private _departmentService: DepartmentService,
@@ -29,7 +29,7 @@ export class SupervisorHomeComponent implements OnInit{
   protected selectedDepartment: DepartmentDetailRestResponseDto | undefined;
   shiftPlan: DepartmentShiftplanCalendarResponse | undefined;
   code: string = 'test';
-  protected missingShifts: {shift: string, start: number, end:number}[] = [];
+  protected missingShifts: { shift: string; start: number; end: number }[] = [];
 
   view: CalendarView = CalendarView.Month;
   CalendarView = CalendarView; // Für Template-Zugriff
@@ -51,6 +51,7 @@ export class SupervisorHomeComponent implements OnInit{
   }
 
   activeDayIsOpen: boolean = true;
+
   closeOpenMonthViewDay() {
     this.activeDayIsOpen = false;
   }
@@ -62,22 +63,22 @@ export class SupervisorHomeComponent implements OnInit{
   //fetching department and loading shifts
   load() {
     this._userService.getCurrentUserProfile().subscribe({
-      next: value => {
+      next: (value) => {
         var departmentName = value.department;
         if (departmentName) {
-          console.log("department name: ", departmentName)
+          console.log('department name: ', departmentName);
           this._departmentService.getDepartmentByName(departmentName).subscribe({
-            next: data => {
+            next: (data) => {
               this.selectedDepartment = data;
               this.loadScheduledShifts();
             },
-            error: err => {
-              console.log("error",err);
-            }
-          })
+            error: (err) => {
+              console.log('error', err);
+            },
+          });
         }
-      }
-    })
+      },
+    });
   }
 
   private shiftColors = new Map<string, { primary: string; secondary: string }>();
@@ -88,7 +89,7 @@ export class SupervisorHomeComponent implements OnInit{
     { primary: '#ffd700', secondary: '#fff4b3' }, // Gold
     { primary: '#9370db', secondary: '#e6d5ff' }, // Lila
     { primary: '#ff8c00', secondary: '#ffe4b3' }, // Orange
-    { primary: '#20b2aa', secondary: '#b3e6e4' }  // Türkis
+    { primary: '#20b2aa', secondary: '#b3e6e4' }, // Türkis
   ];
 
   private getColorForShiftType(shiftType: string): { primary: string; secondary: string } {
@@ -98,7 +99,6 @@ export class SupervisorHomeComponent implements OnInit{
     }
     return this.shiftColors.get(shiftType)!;
   }
-
 
   calculateEvents() {
     if (!this.shiftPlan || !this.shiftPlan.shifts) {
@@ -125,68 +125,74 @@ export class SupervisorHomeComponent implements OnInit{
           //todo: workers should become entity "worker" e.g. including the role
           //todo: 'springer' should be displayed visible in the calendar
           workers: shift.workers,
-          manpower: shift.manpower
-        }
+          manpower: shift.manpower,
+        },
       });
     }
-
   }
 
   loadScheduledShifts() {
-    console.log("loadschedule");
+    console.log('loadschedule');
     if (this.selectedDepartment?.name) {
-      console.log("fetching plan");
-      this._departmentService.getConcreteShiftplan(this.selectedDepartment.name!, 'body', false, {
-        context: new HttpContext().set(SKIP_EXCEPTION_INTERCEPTOR, true)
-      }).subscribe({
-        next: (data) => {
-          if (data.shifts) {
-            this.shiftPlan = data;
-            let shiftStartDate: Record<string, number[][]> = {};
-            const oneDayInMs = 24 * 60 * 60 * 1000 * 3; // milliseconds in a day TODO: find better solution for weekends
+      console.log('fetching plan');
+      this._departmentService
+        .getConcreteShiftplans(this.selectedDepartment.name!, 'body', false, {
+          context: new HttpContext().set(SKIP_EXCEPTION_INTERCEPTOR, true),
+        })
+        .subscribe({
+          next: (data) => {
+            if (data.shifts) {
+              this.shiftPlan = data;
+              let shiftStartDate: Record<string, number[][]> = {};
+              const oneDayInMs = 24 * 60 * 60 * 1000 * 3; // milliseconds in a day TODO: find better solution for weekends
 
-            for (let shift of this.shiftPlan!.shifts!) {
-
-              if (shift.workers?.length! < shift.manpower!) {
-                if(shiftStartDate[shift.shiftDescription!] == undefined) {
-                  shiftStartDate[shift.shiftDescription!] = [[Date.parse(shift.day?.start!), Date.parse(shift.day?.end!)]]
-                } else {
-                  if(shiftStartDate[shift.shiftDescription!][shiftStartDate[shift.shiftDescription!].length - 1][1]+oneDayInMs >= Date.parse(shift.day?.end!)) {
-                    shiftStartDate[shift.shiftDescription!][shiftStartDate[shift.shiftDescription!].length - 1][1] =  Date.parse(shift.day?.end!)
+              for (let shift of this.shiftPlan!.shifts!) {
+                if (shift.workers?.length! < shift.manpower!) {
+                  if (shiftStartDate[shift.shiftDescription!] == undefined) {
+                    shiftStartDate[shift.shiftDescription!] = [
+                      [Date.parse(shift.day?.start!), Date.parse(shift.day?.end!)],
+                    ];
                   } else {
-                    shiftStartDate[shift.shiftDescription!][shiftStartDate[shift.shiftDescription!].length] = [Date.parse(shift.day?.start!), Date.parse(shift.day?.end!)]
+                    if (
+                      shiftStartDate[shift.shiftDescription!][shiftStartDate[shift.shiftDescription!].length - 1][1] +
+                        oneDayInMs >=
+                      Date.parse(shift.day?.end!)
+                    ) {
+                      shiftStartDate[shift.shiftDescription!][shiftStartDate[shift.shiftDescription!].length - 1][1] =
+                        Date.parse(shift.day?.end!);
+                    } else {
+                      shiftStartDate[shift.shiftDescription!][shiftStartDate[shift.shiftDescription!].length] = [
+                        Date.parse(shift.day?.start!),
+                        Date.parse(shift.day?.end!),
+                      ];
+                    }
                   }
                 }
               }
-            }
 
-            for (let shift in shiftStartDate) {
-              for (let lMissingDates of shiftStartDate[shift]) {
-                if(lMissingDates[1] - lMissingDates[0] <= oneDayInMs) {
-                  this.missingShifts.push(
-                    {
+              for (let shift in shiftStartDate) {
+                for (let lMissingDates of shiftStartDate[shift]) {
+                  if (lMissingDates[1] - lMissingDates[0] <= oneDayInMs) {
+                    this.missingShifts.push({
                       shift: shift,
                       start: lMissingDates[0],
-                      end: -1
-                    }
-                  )
-                } else {
-                  this.missingShifts.push(
-                    {
+                      end: -1,
+                    });
+                  } else {
+                    this.missingShifts.push({
                       shift: shift,
                       start: lMissingDates[0],
-                      end: lMissingDates[1]
-                    }
-                  )
+                      end: lMissingDates[1],
+                    });
+                  }
                 }
               }
-            }
-            console.log(shiftStartDate);
+              console.log(shiftStartDate);
 
-            this.calculateEvents();
-          }
-        },
-      })
+              this.calculateEvents();
+            }
+          },
+        });
     }
   }
 }

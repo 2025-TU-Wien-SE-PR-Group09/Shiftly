@@ -1,13 +1,13 @@
 package at.ac.tuwien.sepr.groupphase.backend.service.shift;
 
 import at.ac.tuwien.sepr.groupphase.backend.entity.ConcreteShiftPlan;
-import at.ac.tuwien.sepr.groupphase.backend.entity.ShiftBlueprint;
 import at.ac.tuwien.sepr.groupphase.backend.service.dto.department.DepartmentNameDto;
 import at.ac.tuwien.sepr.groupphase.backend.service.dto.shift.ConcretePlanGenerateDto;
 import at.ac.tuwien.sepr.groupphase.backend.service.dto.shift.PlanBlueprintAddShiftDto;
 import at.ac.tuwien.sepr.groupphase.backend.service.dto.shift.PlanBlueprintCreationDto;
 import at.ac.tuwien.sepr.groupphase.backend.service.dto.shift.PlanBlueprintDto;
 
+import java.util.List;
 import java.util.Optional;
 
 
@@ -55,4 +55,12 @@ public interface ShiftPlanningService {
      * @return an Optional containing the DepartmentNameDto if found, or empty if not found
      */
     Optional<DepartmentNameDto> getDeparmentNameForShiftBlueprint(Long id);
+
+    /**
+     * Retrieves all shift plans for a given department departmentName.
+     *
+     * @param departmentName the departmentName of the department for which to retrieve all shift plans
+     * @return a ConcreteShiftPlan containing all plans for the specified department
+     */
+    List<ConcreteShiftPlan> getAllNotOverridenPlans(String departmentName);
 }

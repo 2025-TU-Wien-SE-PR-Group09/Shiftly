@@ -89,4 +89,12 @@ public class ScheduledShiftAssignment {
         }
     }
 
+    @Override
+    public String toString() {
+        return "ScheduledShiftAssignment{"
+            + "id=" + id
+            + ", scheduledShift=" + scheduledShift
+            + ", user=" + user
+            + '}';
+    }
 }

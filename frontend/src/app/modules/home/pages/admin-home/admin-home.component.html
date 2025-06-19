@@ -128,7 +128,7 @@
   </p>
 </ng-container>
 
-<ng-container *ngIf="this.departments.length > 0 && (shiftPlan === undefined || shiftPlan?.shifts === undefined || shiftPlan!.shifts!.length <= 0)">
+<ng-container *ngIf="!this.shiftPlan || !this.shiftPlan.shifts || this.shiftPlan.shifts.length <= 0">
   <p class="text-foreground flex items-center">
     <svg xmlns="http://www.w3.org/2000/svg"
          fill="none"

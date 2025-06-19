@@ -25,6 +25,8 @@ public class ConcreteShiftPlan {
     private LocalDate startDate;
     private LocalDate endDate;
 
+    private boolean overwritten = false;
+
     @ManyToOne(optional = false)
     private Department department;
 
@@ -108,4 +110,11 @@ public class ConcreteShiftPlan {
         }
     }
 
+    public boolean isOverwritten() {
+        return overwritten;
+    }
+
+    public void setOverwritten(boolean overwritten) {
+        this.overwritten = overwritten;
+    }
 }

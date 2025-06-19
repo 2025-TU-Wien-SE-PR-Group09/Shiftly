@@ -56,4 +56,12 @@ public class ScheduledShiftAssignmentId implements Serializable {
     public int hashCode() {
         return Objects.hash(scheduledShiftId, userEmail);
     }
+
+    @Override
+    public String toString() {
+        return "ScheduledShiftAssignmentId{"
+            + "scheduledShiftId=" + scheduledShiftId
+            + ", userEmail='" + userEmail + '\''
+            + '}';
+    }
 }
