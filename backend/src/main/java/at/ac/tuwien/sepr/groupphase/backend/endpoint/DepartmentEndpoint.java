@@ -6,6 +6,7 @@ import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.department.DepartmentEd
 import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.department.DepartmentShiftplanCalendarResponse;
 import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.employee.EmployeeListItemResponseDto;
 import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.employee.EmployeeRestResponseDto;
+import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.employee.JumperRestResponseDto;
 import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.shift.AddShiftToPlanBlueprintDto;
 import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.shift.CreatePlanBlueprintDto;
 import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.shift.GenerateConcretePlanDto;
@@ -25,6 +26,7 @@ import at.ac.tuwien.sepr.groupphase.backend.service.dto.department.DepartmentEdi
 import at.ac.tuwien.sepr.groupphase.backend.service.dto.department.DepartmentNameDto;
 import at.ac.tuwien.sepr.groupphase.backend.service.dto.employee.EmployeeDto;
 import at.ac.tuwien.sepr.groupphase.backend.service.dto.employee.EmployeeListItemDto;
+import at.ac.tuwien.sepr.groupphase.backend.service.dto.employee.JumperDto;
 import at.ac.tuwien.sepr.groupphase.backend.service.dto.shift.ConcretePlanGenerateDto;
 import at.ac.tuwien.sepr.groupphase.backend.service.dto.user.UserEmailDto;
 import at.ac.tuwien.sepr.groupphase.backend.service.dto.user.UserProfileDto;
@@ -267,6 +269,31 @@ public class DepartmentEndpoint {
         // does not require the department name, only the id
         // and the rest response does not require the department id, only the name
         return new EmployeeRestResponseDto(employee.email(), department.name());
+    }
+
+    @Transactional
+    @RolesAllowed({"SUPERVISOR"})
+    @Operation(summary = "Add a jumper to a department")
+    @ApiResponse(responseCode = "200", description = "Successfully added jumper to department")
+    @PostMapping(path = "/{departmentName}/addJumper/{employeeEmail}", produces = MediaType.APPLICATION_JSON_VALUE)
+    public JumperRestResponseDto addJumperToDepartment(
+        @PathVariable(name = "departmentName") String departmentName,
+        @PathVariable(name = "employeeEmail") String employeeEmail,
+        Principal principal) {
+        LOGGER.trace("addJumperToDepartment({}, {}, {})", departmentName, employeeEmail, principal);
+        userService.checkAccessToDepartment(new DepartmentNameDto(departmentName));
+
+
+        DepartmentDto department = departmentService.getDepartmentByName(departmentName)
+            .orElseThrow(() -> new NotFoundException("Department not found!"));
+
+        JumperDto jumper = new JumperDto(employeeEmail, department.name());
+        jumper = employeeService.convertUserToJumper(jumper);
+
+        // in this case, a mapper function cannot be used because the service
+        // does not require the department name, only the id
+        // and the rest response does not require the department id, only the name
+        return new JumperRestResponseDto(jumper.email(), department.name());
     }
 
     @Transactional

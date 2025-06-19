@@ -22,8 +22,10 @@ export class DepartmentUserManagementComponent implements OnChanges, OnInit {
   @Input() departmentName: string = '';
   employees: EmployeeListItemResponseDto[] = [];
   supervisorEmail: String | null = null;
-  showForm: boolean = false;
+  showFormEmployee: boolean = false;
+  showFormJumper: boolean = false;
   newEmployeeMail: string = '';
+  newJumperMail: string = '';
   possibleEmployeeMails: string[] = [];
   confirmingRemoveEmployee: EmployeeListItemResponseDto | null = null;
 
@@ -72,9 +74,36 @@ export class DepartmentUserManagementComponent implements OnChanges, OnInit {
 
     this.departmentService.addEmployeeToDepartment(this.departmentName, this.newEmployeeMail).subscribe({
       next: (employee) => {
-        this.toastrService.success('Successfully added ' + employee.email + ' to ' + employee.departmentName + '!');
+        this.toastrService.success('Successfully added ' + employee.email + ' to ' + employee.departmentName
+          + ' as an employee.',
+          'Success');
         this.loadData();
-        this.showForm = false;
+        this.showFormEmployee = false;
+      },
+      error: () => {
+        // TODO handle error properly
+        this.toastrService.error('Failed to add employee.', 'Error');
+      },
+    });
+  }
+
+  inviteJumper() {
+    if (!this.newJumperMail || !this.newJumperMail.trim()) {
+      this.toastrService.error('Please enter a valid Jumper Mail', 'Error occurred');
+      return;
+    }
+
+    this.departmentService.addJumperToDepartment(this.departmentName, this.newJumperMail).subscribe({
+      next: (jumper) => {
+        this.toastrService.success('Successfully added ' + jumper.email + ' to ' + jumper.departmentName
+          + ' as a jumper!',
+          'Success');
+        this.loadData();
+        this.showFormJumper = false;
+      },
+      error: () => {
+        // TODO handle error properly
+        this.toastrService.error('Failed to add jumper.', 'Error');
       },
     });
   }
@@ -102,6 +131,7 @@ export class DepartmentUserManagementComponent implements OnChanges, OnInit {
             'Success'
           );
           this.employees = this.employees.filter(e => e.email !== this.confirmingRemoveEmployee!.email);
+          this.possibleEmployeeMails.push(this.confirmingRemoveEmployee!.email!);
           this.confirmingRemoveEmployee = null;
         },
         error: () => {

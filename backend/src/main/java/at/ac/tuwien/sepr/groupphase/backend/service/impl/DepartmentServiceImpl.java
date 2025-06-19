@@ -199,12 +199,23 @@ public class DepartmentServiceImpl implements DepartmentService {
             .orElseThrow(() -> new NotFoundException("Department with name '" + employee.departmentName() + "' not found"));
 
         if (user.getDepartment() == null || !user.getDepartment().getName().equals(department.getName())) {
-            throw new NotFoundException("User '" + user.getEmail() + "' is not part of department '" + department.getName() + "'");
+            throw new NotFoundException(
+                "User '" + user.getEmail()
+                + "' is not part of department '"
+                + department.getName() + "'");
+        }
+
+        if (user.getRoles().stream().noneMatch(role -> role.getName().equals("EMPLOYEE") || role.getName().equals("JUMPER"))) {
+            throw new ConflictException(
+                "User '" + user.getEmail()
+                + "' is not an employee or jumper, but assigned to"
+                + " department '" + department.getName() + "'");
         }
 
         user.getAssignments().clear();
         user.setDepartment(null);
         user.getRoles().removeIf(role -> role.getName().equals("EMPLOYEE"));
+        user.getRoles().removeIf(role -> role.getName().equals("JUMPER"));
         applicationUserRepository.save(user);
     }
 

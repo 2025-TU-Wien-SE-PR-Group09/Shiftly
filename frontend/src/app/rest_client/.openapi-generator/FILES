@@ -33,6 +33,7 @@ model/departmentShiftplanCalendarResponse.ts
 model/employeeListItemResponseDto.ts
 model/employeeRestResponseDto.ts
 model/generateConcretePlanDto.ts
+model/jumperRestResponseDto.ts
 model/loginResponseRestDto.ts
 model/messageResponseDto.ts
 model/models.ts

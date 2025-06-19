@@ -5,6 +5,7 @@ import at.ac.tuwien.sepr.groupphase.backend.exception.NotFoundException;
 import at.ac.tuwien.sepr.groupphase.backend.service.dto.department.DepartmentNameDto;
 import at.ac.tuwien.sepr.groupphase.backend.service.dto.employee.EmployeeDto;
 import at.ac.tuwien.sepr.groupphase.backend.service.dto.employee.EmployeeListItemDto;
+import at.ac.tuwien.sepr.groupphase.backend.service.dto.employee.JumperDto;
 
 import java.util.List;
 
@@ -19,6 +20,16 @@ public interface EmployeeService {
      * @throws NotFoundException if the user with the given e-mail address does not exist
      */
     EmployeeDto convertUserToEmployee(EmployeeDto employeeDto) throws ConflictException, NotFoundException;
+
+    /**
+     * Converts an ApplicationUser to a Jumper.
+     *
+     * @param jumperDto a {@link JumperDto} containing the user email and the department
+     * @return the e-mail of the Jumper
+     * @throws ConflictException if the user is already an employee, supervisor or admin
+     * @throws NotFoundException if the user with the given e-mail address does not exist
+     */
+    JumperDto convertUserToJumper(JumperDto jumperDto) throws ConflictException, NotFoundException;
 
     /**
      * Lists all employees of a department.
