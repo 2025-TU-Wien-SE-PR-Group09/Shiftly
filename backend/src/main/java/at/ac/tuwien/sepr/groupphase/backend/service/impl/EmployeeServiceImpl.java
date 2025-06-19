@@ -13,6 +13,7 @@ import at.ac.tuwien.sepr.groupphase.backend.service.dto.department.DepartmentNam
 import at.ac.tuwien.sepr.groupphase.backend.service.dto.employee.EmployeeDto;
 import at.ac.tuwien.sepr.groupphase.backend.service.dto.employee.EmployeeListItemDto;
 import at.ac.tuwien.sepr.groupphase.backend.service.dto.Role;
+import at.ac.tuwien.sepr.groupphase.backend.service.dto.employee.JumperDto;
 import at.ac.tuwien.sepr.groupphase.backend.service.dto.user.UserRoleDto;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -47,7 +48,7 @@ public class EmployeeServiceImpl implements EmployeeService {
 
         if (applicationUser.getRoles().stream()
             .map(ApplicationRole::getName)
-            .anyMatch(r -> r.equals("EMPLOYEE") || r.equals("ADMIN") || r.equals("SUPERVISOR"))) {
+            .anyMatch(r -> r.equals("EMPLOYEE") || r.equals("JUMPER") || r.equals("ADMIN") || r.equals("SUPERVISOR"))) {
             throw new ConflictException(
                 "Employee with email " + employeeDto.email() + " is already member of a department or admin.");
         }
@@ -62,6 +63,32 @@ public class EmployeeServiceImpl implements EmployeeService {
         userRepository.save(applicationUser);
 
         return employeeDto;
+    }
+
+    @Override
+    public JumperDto convertUserToJumper(JumperDto jumperDto) throws ConflictException, NotFoundException {
+        LOGGER.trace("convertUserToEmployee({})", jumperDto);
+
+        ApplicationUser applicationUser = userRepository.findByEmail(jumperDto.email())
+            .orElseThrow(() -> new NotFoundException("Employee with email " + jumperDto.email() + " not found"));
+
+        if (applicationUser.getRoles().stream()
+            .map(ApplicationRole::getName)
+            .anyMatch(r -> r.equals("EMPLOYEE") || r.equals("JUMPER") || r.equals("ADMIN") || r.equals("SUPERVISOR"))) {
+            throw new ConflictException(
+                "Employee with email " + jumperDto.email() + " is already member of a department or admin.");
+        }
+
+        userService.assignRoleToUser(new UserRoleDto(applicationUser.getEmail(), Role.JUMPER, jumperDto.departmentName()));
+
+        Department department = departmentRepository.findById(jumperDto.departmentName())
+            .orElseThrow(
+                () -> new NotFoundException("Department with name " + jumperDto.departmentName() + " not found"));
+
+        applicationUser.setDepartment(department);
+        userRepository.save(applicationUser);
+
+        return jumperDto;
     }
 
     @Override

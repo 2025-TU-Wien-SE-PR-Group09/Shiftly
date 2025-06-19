@@ -16,6 +16,7 @@ export * from './departmentShiftplanCalendarResponse';
 export * from './employeeListItemResponseDto';
 export * from './employeeRestResponseDto';
 export * from './generateConcretePlanDto';
+export * from './jumperRestResponseDto';
 export * from './loginResponseRestDto';
 export * from './messageResponseDto';
 export * from './planBlueprintResponse';
