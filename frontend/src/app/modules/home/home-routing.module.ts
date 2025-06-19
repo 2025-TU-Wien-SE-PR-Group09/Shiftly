@@ -33,7 +33,7 @@ const routes: Routes = [
         component: EmployeeHomeComponent,
         canActivate: [AuthGuard, RoleGuard],
         data: {
-          roles: ['EMPLOYEE'],
+          roles: ['EMPLOYEE', 'JUMPER'],
         },
       },
     ],
@@ -44,4 +44,4 @@ const routes: Routes = [
   imports: [RouterModule.forChild(routes)],
   exports: [RouterModule],
 })
-export class HomeRoutingModule { }
+export class HomeRoutingModule {}

@@ -120,7 +120,7 @@ public class DepartmentEndpoint {
     }
 
     @Transactional
-    @RolesAllowed({"ADMIN", "SUPERVISOR", "EMPLOYEE"})
+    @RolesAllowed({"ADMIN", "SUPERVISOR", "EMPLOYEE", "JUMPER"})
     @Operation(summary = "Get department by name")
     @ApiResponse(responseCode = "200", description = "Get department by name")
     @GetMapping(path = "/{departmentName}", produces = MediaType.APPLICATION_JSON_VALUE)
@@ -338,7 +338,7 @@ public class DepartmentEndpoint {
         return employees.stream().map(EmployeeListItemResponseDto::from).toList();
     }
 
-    @RolesAllowed({"ADMIN", "SUPERVISOR", "EMPLOYEE"})
+    @RolesAllowed({"ADMIN", "SUPERVISOR", "EMPLOYEE", "JUMPER"})
     @Transactional
     @Operation(summary = "Get the concrete shift plans for the given department and return the scheduled shifts in suitable calendar format")
     @ApiResponse(responseCode = "201", description = "Concrete shift plan in calendar format.")
@@ -353,7 +353,7 @@ public class DepartmentEndpoint {
         UserProfileDto currentUser = userService.getCurrentUserProfile();
         List<ScheduledShift> shifts;
 
-        if (currentUser.getRole().equals("EMPLOYEE")) {
+        if (currentUser.getRole().equals("EMPLOYEE") || currentUser.getRole().equals("JUMPER")) {
             shifts = shiftPlanningService.getAllNotOverridenPlans(name)
                 .stream().map(ConcreteShiftPlan::getScheduledShifts)
                 .flatMap(List::stream)
