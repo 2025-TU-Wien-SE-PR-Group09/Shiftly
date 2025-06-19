@@ -2,6 +2,7 @@ package at.ac.tuwien.sepr.groupphase.backend.service.impl.shift;
 
 import at.ac.tuwien.sepr.groupphase.backend.entity.*;
 import at.ac.tuwien.sepr.groupphase.backend.logic.ShiftRotator;
+import at.ac.tuwien.sepr.groupphase.backend.logic.ShiftRotatorFactory;
 import at.ac.tuwien.sepr.groupphase.backend.repository.ConcreteShiftPlanRepository;
 import at.ac.tuwien.sepr.groupphase.backend.repository.ShiftAssignmentAuditLogRepository;
 import at.ac.tuwien.sepr.groupphase.backend.service.TimeService;
@@ -23,20 +24,20 @@ public class ShiftPlanRotationServiceImpl implements ShiftPlanRotationService {
     private final TimeService timeService;
     private final ConcreteShiftPlanRepository concreteShiftPlanRepository;
     private final ShiftAssignmentAuditLogRepository shiftAssignmentAuditLogRepository;
-
+    private ShiftRotatorFactory shiftRotatorFactory;
 
     public ShiftPlanRotationServiceImpl(TimeService timeService, ConcreteShiftPlanRepository concreteShiftPlanRepository, ShiftAssignmentAuditLogRepository shiftAssignmentAuditLogRepository) {
         this.timeService = timeService;
         this.concreteShiftPlanRepository = concreteShiftPlanRepository;
         this.shiftAssignmentAuditLogRepository = shiftAssignmentAuditLogRepository;
-
+        this.shiftRotatorFactory = (planBlueprint) -> new ShiftRotator(planBlueprint, ShiftRotator.Strategy.FAIR_GREEDY);
     }
 
     @Override
     public ConcreteShiftPlan generateRotatingPlan(ConcreteShiftPlan concreteShiftPlan, PlanBlueprint planBlueprint, List<ApplicationUser> employees) {
         LOGGER.trace("generateRotatingPlan({}, {}, {})", concreteShiftPlan, planBlueprint, employees);
 
-        ShiftRotator rotator = new ShiftRotator(planBlueprint);
+        ShiftRotator rotator = shiftRotatorFactory.create(planBlueprint);
         rotator.assignInitialUsers(employees);
 
         List<ScheduledShift> allShifts = new ArrayList<>();
@@ -86,5 +87,10 @@ public class ShiftPlanRotationServiceImpl implements ShiftPlanRotationService {
 
         return result;
 
+    }
+
+    public void setShiftRotatorFactory(ShiftRotatorFactory shiftRotatorFactory) {
+        LOGGER.trace("setShiftRotatorFactory({})", shiftRotatorFactory);
+        this.shiftRotatorFactory = shiftRotatorFactory;
     }
 }

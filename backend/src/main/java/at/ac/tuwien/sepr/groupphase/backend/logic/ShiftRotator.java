@@ -13,45 +13,8 @@ public class ShiftRotator {
     private final List<RotatingShiftSlot> slotsInNaturalOrder;
     private InitialShiftAssignmentStrategy initialShiftAssignmentStrategy;
     private final int shifts;
-
-    public static final InitialShiftAssignmentStrategy FAIR_GREEDY = (slots, users) -> {
-        if (users.isEmpty() || slots.isEmpty()) return;
-
-        List<ApplicationUser> userPool = new ArrayList<>(users);
-        int userIndex = 0;
-
-        int totalAssignments = Math.min(
-            userPool.size(),
-            slots.stream().mapToInt(RotatingShiftSlot::getManpower).sum()
-        );
-
-        int assigned = 0;
-        int slotIndex = 0;
-
-        while (assigned < totalAssignments) {
-            RotatingShiftSlot slot = slots.get(slotIndex % slots.size());
-
-            if (slot.assignedUsers.size() < slot.getManpower()) {
-                slot.assignedUsers.add(userPool.get(userIndex));
-                assigned++;
-                userIndex++;
-            }
-
-            slotIndex++;
-        }
-    };
-    public static final InitialShiftAssignmentStrategy FILL_ASSIGNMENT = (slots, users) -> {
-
-        var totalManPower = slots.stream().mapToInt(RotatingShiftSlot::getManpower).sum();
-
-        Iterator<ApplicationUser> userIterator = users.stream().limit(totalManPower).iterator();
-
-        for (RotatingShiftSlot slot : slots) {
-            for (int i = 0; i < slot.getManpower() && userIterator.hasNext(); i++) {
-                slot.assignedUsers.add(userIterator.next());
-            }
-        }
-    };
+    private final int weeksPerShift;
+    private final int minimumManpower;
 
 
     public ShiftRotator(PlanBlueprint blueprint) {
@@ -60,8 +23,16 @@ public class ShiftRotator {
             throw new IllegalArgumentException("Blueprint must contain at least one shift.");
         }
 
-        this.initialShiftAssignmentStrategy = FAIR_GREEDY;
+        this.initialShiftAssignmentStrategy = Strategy.FAIR_GREEDY;
         this.shifts = blueprint.getShifts().size();
+        this.weeksPerShift = blueprint.getShifts().stream()
+            .mapToInt(shift -> shift.getShiftWeeks().size())
+            .max()
+            .orElseThrow(() -> new IllegalArgumentException("No weeks found in shifts."));
+        this.minimumManpower = blueprint.getShifts().stream()
+            .mapToInt(ShiftBlueprint::getManPower)
+            .min()
+            .orElseThrow(() -> new IllegalArgumentException("No manpower defined in shifts."));
 
         List<RotatingShiftSlot> allSlotsBase = blueprint.getShifts().stream()
             .flatMap(shift -> shift.getShiftWeeks().stream()
@@ -110,6 +81,24 @@ public class ShiftRotator {
     public void assignInitialUsers(List<ApplicationUser> users) {
         var slots = slotsInRotationOrder.stream().limit(slotsInRotationOrder.size()).toList();
         this.initialShiftAssignmentStrategy.assign(slots, users);
+        alignManpowerPerShiftToFirstWeekAssignments();
+    }
+
+    private void alignManpowerPerShiftToFirstWeekAssignments() {
+        Map<ShiftBlueprint, Integer> assignedPerShift = new HashMap<>();
+
+        for (RotatingShiftSlot slot : slotsInRotationOrder) {
+            if (slot.getWeek().getWeekIndex() == 0 && !assignedPerShift.containsKey(slot.getBlueprint())) {
+                assignedPerShift.put(slot.getBlueprint(), slot.assignedUsers.size());
+            }
+        }
+
+        for (RotatingShiftSlot slot : slotsInRotationOrder) {
+            Integer newManpower = assignedPerShift.get(slot.getBlueprint());
+            if (newManpower != null) {
+                slot.setManpower(newManpower);
+            }
+        }
     }
 
     public List<CurrentShiftSlot> getNextCycle() {
@@ -121,19 +110,86 @@ public class ShiftRotator {
             result.add(new CurrentShiftSlot(slot.getBlueprint(), slot.getWeek(), new ArrayList<>(slot.assignedUsers)));
         }
 
+        var cycle = new ArrayList<RotatingShiftSlot>();
         for (int i = 0; i < shifts; i++) {
             RotatingShiftSlot slot = rotationQueue.poll();
             assert slot != null;
-            // in cases like [user1]->[user2,user3] when the current slot we want to rotate is [user1] we need to rotate the user1 to the next slot
-            // so slot.rotate() will also rotate the next slot so user1 has a chance to be assigned to the next slot
-            // .rotate() will return the number of slots to skip in the rotation queue
-            i += slot.rotate();
+            cycle.add(slot);
             rotationQueue.add(slot);
         }
+
+        if (weeksPerShift == 1) {
+            cycle.getFirst().rotateSimple(minimumManpower);
+            return result;
+        }
+
+        var overflow = new ArrayList<ApplicationUser>();
+        cycle.forEach(slot -> overflow.addAll(slot.rotate()));
+
+        for (ApplicationUser user : overflow) {
+            for (RotatingShiftSlot slot : cycle.stream().map(c -> c.next).toList()) {
+                if (slot.trySqueeze(user)) {
+                    break;
+                }
+            }
+        }
+
+
         return result;
     }
 
     public record CurrentShiftSlot(ShiftBlueprint blueprint, ShiftWeekBlueprint week,
                                    List<ApplicationUser> assignedUsers) {
+    }
+
+    public static class Strategy {
+        public static final InitialShiftAssignmentStrategy FAIR_GREEDY = (slots, users) -> {
+            if (users.isEmpty() || slots.isEmpty()) {
+                return;
+            }
+
+            List<ApplicationUser> userPool = new ArrayList<>(users);
+            int userIndex = 0;
+
+            int totalAssignments = Math.min(
+                userPool.size(),
+                slots.stream().mapToInt(RotatingShiftSlot::getManpower).sum()
+            );
+
+            int assigned = 0;
+            int slotIndex = 0;
+
+            while (assigned < totalAssignments) {
+                RotatingShiftSlot slot = slots.get(slotIndex % slots.size());
+
+                if (slot.assignedUsers.size() < slot.getManpower()) {
+                    slot.assignedUsers.add(userPool.get(userIndex));
+                    assigned++;
+                    userIndex++;
+                }
+
+                slotIndex++;
+            }
+
+            for (RotatingShiftSlot slot : slots) {
+                slot.setManpower(slot.assignedUsers.size());
+            }
+        };
+        public static final InitialShiftAssignmentStrategy FILL_GREEDY = (slots, users) -> {
+
+            var totalManPower = slots.stream().mapToInt(RotatingShiftSlot::getManpower).sum();
+
+            Iterator<ApplicationUser> userIterator = users.stream().limit(totalManPower).iterator();
+
+            for (RotatingShiftSlot slot : slots) {
+                for (int i = 0; i < slot.getManpower() && userIterator.hasNext(); i++) {
+                    slot.assignedUsers.add(userIterator.next());
+                }
+            }
+
+            for (RotatingShiftSlot slot : slots) {
+                slot.setManpower(slot.assignedUsers.size());
+            }
+        };
     }
 }
