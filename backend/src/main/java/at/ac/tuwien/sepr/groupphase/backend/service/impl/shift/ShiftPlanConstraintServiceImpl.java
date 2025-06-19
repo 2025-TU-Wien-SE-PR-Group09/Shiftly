@@ -1,11 +1,6 @@
 package at.ac.tuwien.sepr.groupphase.backend.service.impl.shift;
 
-import at.ac.tuwien.sepr.groupphase.backend.entity.ApplicationUser;
-import at.ac.tuwien.sepr.groupphase.backend.entity.ConcreteShiftPlan;
-import at.ac.tuwien.sepr.groupphase.backend.entity.ScheduledShift;
-import at.ac.tuwien.sepr.groupphase.backend.entity.ScheduledShiftAssignment;
-import at.ac.tuwien.sepr.groupphase.backend.entity.ScheduledShiftAssignmentId;
-import at.ac.tuwien.sepr.groupphase.backend.entity.VacationRequest;
+import at.ac.tuwien.sepr.groupphase.backend.entity.*;
 import at.ac.tuwien.sepr.groupphase.backend.repository.ScheduledShiftRepository;
 import at.ac.tuwien.sepr.groupphase.backend.repository.UserRepository;
 import at.ac.tuwien.sepr.groupphase.backend.repository.VacationRequestRepository;
@@ -176,10 +171,10 @@ public class ShiftPlanConstraintServiceImpl implements ShiftPlanConstraintServic
      * @param weekStart The start date of the week to check.
      * @return A list of available jumper employees.
      */
-    private List<ApplicationUser> getAvailableJumperEmployees(LocalDate weekStart) {
+    private List<ApplicationUser> getAvailableJumperEmployees(LocalDate weekStart, Department department) {
         LOGGER.trace("getAvailableJumperEmployees({})", weekStart);
 
-        List<ApplicationUser> jumperUsers = userRepository.findAllByRoleName("JUMPER");
+        List<ApplicationUser> jumperUsers = userRepository.findJumpersByDepartment(department);
 
         LocalDate weekEnd = weekStart.plusDays(6);
         List<ScheduledShift> shiftsInWeek = scheduledShiftRepository.findByStartBetween(
@@ -235,13 +230,10 @@ public class ShiftPlanConstraintServiceImpl implements ShiftPlanConstraintServic
     private Map<LocalDate, Set<ApplicationUser>> getAvailableJumperEmployeesPerDay(ConcreteShiftPlan concreteShiftPlan) {
         LOGGER.trace("getAvailableJumperEmployeesPerDay({})", concreteShiftPlan);
 
-        List<ApplicationUser> jumperUsers = userRepository.findAllByRoleName("JUMPER");
+        List<ApplicationUser> jumperUsersInDepartment = userRepository.findJumpersByDepartment(concreteShiftPlan.getDepartment());
 
         var department = concreteShiftPlan.getDepartment();
         var weekStart = concreteShiftPlan.getStartDate();
-        Set<ApplicationUser> jumperUsersInDepartment = jumperUsers.stream()
-            .filter(user -> user.getDepartment().equals(department))
-            .collect(Collectors.toSet());
 
         Map<LocalDate, Set<ApplicationUser>> result = new HashMap<>();
         for (int i = 0; i <= ChronoUnit.DAYS.between(concreteShiftPlan.getStartDate(), concreteShiftPlan.getEndDate()); i++) {
