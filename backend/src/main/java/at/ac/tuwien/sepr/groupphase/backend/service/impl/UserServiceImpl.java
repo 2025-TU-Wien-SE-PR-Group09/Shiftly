@@ -1,27 +1,26 @@
 package at.ac.tuwien.sepr.groupphase.backend.service.impl;
 
 import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.user.ApplicationUserResponseDto;
-import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.user.RegisterRestDto;
 import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.user.RegisterTokenRequestDto;
+import at.ac.tuwien.sepr.groupphase.backend.entity.ApplicationRole;
+import at.ac.tuwien.sepr.groupphase.backend.entity.ApplicationUser;
 import at.ac.tuwien.sepr.groupphase.backend.entity.InvitationToken;
+import at.ac.tuwien.sepr.groupphase.backend.exception.NotFoundException;
 import at.ac.tuwien.sepr.groupphase.backend.exception.TokenAlreadyUsedException;
 import at.ac.tuwien.sepr.groupphase.backend.exception.TokenExpiredException;
 import at.ac.tuwien.sepr.groupphase.backend.repository.InvitationTokenRepository;
+import at.ac.tuwien.sepr.groupphase.backend.repository.RoleRepository;
+import at.ac.tuwien.sepr.groupphase.backend.repository.UserRepository;
 import at.ac.tuwien.sepr.groupphase.backend.security.JwtTokenizer;
 import at.ac.tuwien.sepr.groupphase.backend.service.MailService;
+import at.ac.tuwien.sepr.groupphase.backend.service.UserService;
 import at.ac.tuwien.sepr.groupphase.backend.service.dto.department.DepartmentNameDto;
+import at.ac.tuwien.sepr.groupphase.backend.service.dto.user.ChangePasswordDto;
 import at.ac.tuwien.sepr.groupphase.backend.service.dto.user.UserDataDto;
 import at.ac.tuwien.sepr.groupphase.backend.service.dto.user.UserDepartmentDto;
 import at.ac.tuwien.sepr.groupphase.backend.service.dto.user.UserEmailDto;
 import at.ac.tuwien.sepr.groupphase.backend.service.dto.user.UserProfileDto;
 import at.ac.tuwien.sepr.groupphase.backend.service.dto.user.UserRoleDto;
-import at.ac.tuwien.sepr.groupphase.backend.entity.ApplicationRole;
-import at.ac.tuwien.sepr.groupphase.backend.entity.ApplicationUser;
-import at.ac.tuwien.sepr.groupphase.backend.exception.NotFoundException;
-import at.ac.tuwien.sepr.groupphase.backend.repository.RoleRepository;
-import at.ac.tuwien.sepr.groupphase.backend.repository.UserRepository;
-import at.ac.tuwien.sepr.groupphase.backend.service.UserService;
-import org.aspectj.weaver.ast.Not;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -29,7 +28,6 @@ import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
-import at.ac.tuwien.sepr.groupphase.backend.service.dto.user.ChangePasswordDto;
 
 import java.lang.invoke.MethodHandles;
 import java.time.LocalDateTime;
@@ -57,8 +55,7 @@ public class UserServiceImpl implements UserService {
                            RoleRepository roleRepository,
                            PasswordEncoder passwordEncoder,
                            InvitationTokenRepository invitationTokenRepository,
-                           MailService mailService, JwtTokenizer jwtTokenizer)
-    {
+                           MailService mailService, JwtTokenizer jwtTokenizer) {
         this.userRepository = userRepository;
         this.roleRepository = roleRepository;
         this.passwordEncoder = passwordEncoder;
@@ -237,7 +234,7 @@ public class UserServiceImpl implements UserService {
     }
 
 
-// Aktualisiere den Konstruktor entsprechend mit den neuen Abhängigkeiten
+    // Aktualisiere den Konstruktor entsprechend mit den neuen Abhängigkeiten
 
     @Override
     public void createInvitation(String email) throws IllegalArgumentException {

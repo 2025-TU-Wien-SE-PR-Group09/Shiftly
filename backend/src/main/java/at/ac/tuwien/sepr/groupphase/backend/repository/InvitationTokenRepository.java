@@ -10,6 +10,7 @@ import java.util.Optional;
 @Repository
 public interface InvitationTokenRepository extends JpaRepository<InvitationToken, Long> {
     Optional<InvitationToken> findByToken(String token);
+
     Optional<InvitationToken> findByEmail(String email);
-    void deleteByExpiryDateBefore(LocalDateTime dateTime);
+
 }

@@ -4,9 +4,6 @@ import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.MessageResponseDto;
 import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.user.RegisterRestDto;
 import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.user.RegisterTokenRequestDto;
 import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.user.UserInviteRequestDto;
-import at.ac.tuwien.sepr.groupphase.backend.exception.NotFoundException;
-import at.ac.tuwien.sepr.groupphase.backend.exception.TokenAlreadyUsedException;
-import at.ac.tuwien.sepr.groupphase.backend.exception.TokenExpiredException;
 import at.ac.tuwien.sepr.groupphase.backend.service.UserService;
 import at.ac.tuwien.sepr.groupphase.backend.service.dto.user.UserDataDto;
 import io.swagger.v3.oas.annotations.Operation;
@@ -76,13 +73,8 @@ public class RegistrationEndpoint {
     public MessageResponseDto inviteUser(@RequestBody @Valid UserInviteRequestDto request) {
         LOGGER.trace("inviteUser({})", request);
 
-        try {
-            userService.createInvitation(request.email());
-            return new MessageResponseDto(
-                "Invitation sent to " + request.email());
-        } catch (IllegalArgumentException e) {
-            throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, e.getMessage());
-        }
+        userService.createInvitation(request.email());
+        return new MessageResponseDto("Invitation sent to " + request.email());
     }
 
     @PostMapping(path = "/validate-token", produces = MediaType.APPLICATION_JSON_VALUE)
@@ -95,12 +87,8 @@ public class RegistrationEndpoint {
     public ResponseEntity<?> validateToken(@RequestParam String token) {
         LOGGER.trace("validateToken({})", token);
 
-        try {
-            String email = userService.validateInvitationToken(token);
-            return ResponseEntity.ok(Map.of("email", email));
-        } catch (NotFoundException | TokenExpiredException | TokenAlreadyUsedException e) {
-            return ResponseEntity.badRequest().body(Map.of("error", e.getMessage()));
-        }
+        String email = userService.validateInvitationToken(token);
+        return ResponseEntity.ok(Map.of("email", email));
     }
 
     @PostMapping(path = "/register-with-token", produces = MediaType.APPLICATION_JSON_VALUE)
@@ -118,14 +106,9 @@ public class RegistrationEndpoint {
 
         LOGGER.trace("registerWithToken({}, {})", userData, arg1);
         System.out.println("endpoint: " + userData + "\n token: " + arg1);
-        try {
-            userService.registerUserWithToken(userData, arg1);
-            return ResponseEntity.status(HttpStatus.CREATED).build();
-        } catch (NotFoundException | TokenExpiredException | TokenAlreadyUsedException | IllegalArgumentException e) {
-            return ResponseEntity.badRequest().body(Map.of("error", e.getMessage()));
-        }
+        userService.registerUserWithToken(userData, arg1);
+        return ResponseEntity.status(HttpStatus.CREATED).build();
     }
-
 }
 
 

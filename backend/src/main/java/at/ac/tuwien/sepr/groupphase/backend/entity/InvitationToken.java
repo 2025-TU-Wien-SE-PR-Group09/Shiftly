@@ -93,11 +93,15 @@ public class InvitationToken {
 
     @Override
     public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
+        if (this == o) {
+            return true;
+        }
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
         InvitationToken that = (InvitationToken) o;
-        return Objects.equals(id, that.id) &&
-            Objects.equals(token, that.token);
+        return Objects.equals(id, that.id)
+            && Objects.equals(token, that.token);
     }
 
     @Override
