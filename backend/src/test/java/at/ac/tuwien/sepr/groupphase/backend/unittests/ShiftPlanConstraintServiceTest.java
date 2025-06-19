@@ -50,7 +50,7 @@ public class ShiftPlanConstraintServiceTest {
         ApplicationUser jumper = createJumper("jumper@shyft.local", department);
         ApplicationUser max = createUser("max@shyft.local", department);
 
-        when(userRepository.findAllByRoleName("JUMPER"))
+        when(userRepository.findJumpersByDepartment(department))
             .thenReturn(List.of(jumper));
 
         // Vacation for max from Monday to Tuesday
@@ -98,7 +98,7 @@ public class ShiftPlanConstraintServiceTest {
         ApplicationUser jumper1 = createJumper("jumper1@shift.local", department);
         ApplicationUser max = createUser("max@shift.local", department);
 
-        when(userRepository.findAllByRoleName("JUMPER")).thenReturn(List.of(jumper1));
+        when(userRepository.findJumpersByDepartment(department)).thenReturn(List.of(jumper1));
 
         // Max: Vacation from Monday to Tuesday
         LocalDate weekStart = LocalDate.of(2025, 6, 9);

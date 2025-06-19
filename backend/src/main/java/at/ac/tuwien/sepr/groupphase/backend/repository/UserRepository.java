@@ -32,4 +32,9 @@ public interface UserRepository extends JpaRepository<ApplicationUser, String> {
         + "WHERE r.name = 'SUPERVISOR' AND u.department = :department")
     List<ApplicationUser> findSupervisorsByDepartment(@Param("department") at.ac.tuwien.sepr.groupphase.backend.entity.Department department);
 
+    @Query("SELECT u FROM ApplicationUser u JOIN u.roles r "
+        + "WHERE r.name = 'JUMPER' AND u.department = :department")
+    List<ApplicationUser> findJumpersByDepartment(@Param("department") at.ac.tuwien.sepr.groupphase.backend.entity.Department department);
+
+
 }
