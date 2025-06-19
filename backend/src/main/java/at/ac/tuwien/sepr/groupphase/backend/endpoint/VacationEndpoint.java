@@ -160,4 +160,25 @@ public class VacationEndpoint {
             .toList();
     }
 
+    @GetMapping(value = "/rejected", produces = MediaType.APPLICATION_JSON_VALUE)
+    @RolesAllowed("SUPERVISOR")
+    @Operation(
+        summary = "Get all rejected vacation requests for the supervisor",
+        description = "Retrieves all vacation requests that have been rejected and belong to the department of the currently authenticated supervisor."
+    )
+    @ApiResponse(responseCode = "200", description = "List of rejected vacation requests retrieved")
+    public List<VacationRequestResponseRestDto> getRejectedRequests(Principal principal) {
+        LOGGER.trace("getRejectedRequests({})", principal);
+
+        return vacationRequestService
+            .getVacationRequestsByStatusAndSupervisor(
+                new RetrieveVacationByStatusAndSupervisorDto(VacationStatus.REJECTED, principal.getName()))
+            .stream()
+            .map(VacationRequestResponseRestDto::from)
+            .toList();
+    }
+
+
+
+
 }

@@ -50,4 +50,5 @@ model/userProfileRestDto.ts
 model/vacationRequestResponseRestDto.ts
 model/vacationRequestRestDto.ts
 param.ts
+provide-api.ts
 variables.ts
