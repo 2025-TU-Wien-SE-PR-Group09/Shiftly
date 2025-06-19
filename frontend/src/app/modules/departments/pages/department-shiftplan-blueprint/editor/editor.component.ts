@@ -165,8 +165,17 @@ export class EditorComponent {
         if (start && end) {
           const [sh, sm] = start.split(':').map(Number);
           const [eh, em] = end.split(':').map(Number);
-          const duration = eh * 60 + em - (sh * 60 + sm);
-          if (duration > 0) totalMinutes += duration;
+
+          const startMinutes = sh * 60 + sm;
+          const endMinutes = eh * 60 + em;
+
+          let duration = endMinutes - startMinutes;
+          if (duration < 0) {
+            // über Mitternacht (z.B. 23:00 – 02:00)
+            duration += 24 * 60;
+          }
+
+          totalMinutes += duration;
         }
       }
 

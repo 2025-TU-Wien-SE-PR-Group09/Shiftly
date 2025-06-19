@@ -5,25 +5,6 @@
       [formGroupName]="i"
       class="border-border bg-muted rounded-lg border p-4">
       <div class="mb-4 flex items-center justify-between">
-        <div class="flex items-center gap-2">
-          <label>
-            Description:
-          </label>
-          <input
-            formControlName="description"
-            type="text"
-            placeholder="Shift-Description"
-            class="text-primary w-40 border-b border-gray-400 bg-transparent font-semibold placeholder-gray-400 outline-none mr-8" />
-          <label>
-            Manpower:
-          </label>
-          <input
-            formControlName="manPower"
-            type="number"
-            min="1"
-            max="150"
-            placeholder="2"
-            class="w-10 border-b border-gray-400 bg-transparent text-center text-sm outline-none max-w-32 ml-2" />
         <div class="flex flex-col gap-2">
           <div class="flex items-center gap-2">
             <label>Description:</label>
@@ -37,6 +18,7 @@
               formControlName="manPower"
               type="number"
               min="1"
+              max="150"
               placeholder="2"
               class="max-w-32 ml-2 w-10 border-b border-gray-400 bg-transparent text-center text-sm outline-none" />
           </div>
@@ -49,7 +31,7 @@
 
           <!-- Fehleranzeige für manpower -->
           <div *ngIf="shift.get('manPower')?.invalid && shift.get('manPower')?.touched" class="text-xs text-red-500">
-            Manpower must be at least 1.
+            Manpower must be at least 1 and must not be greater than 150.
           </div>
         </div>
 
