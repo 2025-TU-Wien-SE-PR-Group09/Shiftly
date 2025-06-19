@@ -80,6 +80,9 @@ export class DepartmentUserManagementComponent implements OnChanges, OnInit {
   }
 
   toggleConfirmRemoveEmployee(emp: EmployeeListItemResponseDto): void {
+    if (emp.email === this.supervisorEmail) {
+      return;
+    }
     this.confirmingRemoveEmployee = emp;
   }
 

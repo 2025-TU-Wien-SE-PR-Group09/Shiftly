@@ -66,6 +66,7 @@
         <tr>
           <th class="pb-3">Name</th>
           <th class="pb-3">E-Mail</th>
+          <th class="pb-3">Role</th>
           <th class="pb-3">Actions</th>
         </tr>
       </thead>
@@ -73,9 +74,9 @@
         <tr *ngFor="let emp of employees; let i = index" class="hover:bg-card/50">
           <td class="py-1">{{ emp.firstName }} {{ emp.lastName }}</td>
           <td class="py-1">{{ emp.email }}</td>
+          <td class="py-1">{{ emp.role }}</td>
           <td class="py-1">
-            <app-button tone="danger" shape="rounded" impact="bold" size="medium"
-              *ngIf="emp.email !== supervisorEmail"
+            <app-button tone="danger" shape="rounded" impact="bold" size="medium" [disabled]="emp.email === supervisorEmail"
               (click)="toggleConfirmRemoveEmployee(emp)">
               Remove
             </app-button>

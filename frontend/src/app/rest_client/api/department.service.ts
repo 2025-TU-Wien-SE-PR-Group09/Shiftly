@@ -646,7 +646,7 @@ export class DepartmentService extends BaseService {
     }
 
     /**
-     * Get the concrete shift plan for the given department and return the scheduled shifts in suitable calendar format
+     * Get the concrete shift plans for the given department and return the scheduled shifts in suitable calendar format
      * @param departmentName 
      * @param observe set whether or not to return the data Observable as the body, response or events. defaults to returning the body.
      * @param reportProgress flag to report request and response progress.
