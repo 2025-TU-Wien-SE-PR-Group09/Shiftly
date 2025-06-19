@@ -5,6 +5,7 @@ import at.ac.tuwien.sepr.groupphase.backend.repository.IcalSubscriptionTokenRepo
 import at.ac.tuwien.sepr.groupphase.backend.service.IcalSubscriptionTokenService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -124,5 +125,17 @@ public class IcalSubscriptionTokenServiceImpl implements IcalSubscriptionTokenSe
         List<IcalSubscriptionToken> tokens = tokenRepository.findAll();
         LOGGER.debug("Found {} tokens in database", tokens.size());
         return tokens;
+    }
+
+    /**
+     * Scheduled task to clean up old tokens that haven't been accessed in 90 days.
+     * Runs every day at 2 AM.
+     */
+    @Scheduled(cron = "0 0 2 * * ?")
+    @Transactional
+    public void cleanupOldTokensScheduled() {
+        LOGGER.info("Starting scheduled cleanup of old subscription tokens");
+        int deletedCount = cleanupOldTokens(90);
+        LOGGER.info("Scheduled cleanup completed. Deleted {} old tokens", deletedCount);
     }
 } 

@@ -2,6 +2,8 @@ package at.ac.tuwien.sepr.groupphase.backend.endpoint;
 
 import at.ac.tuwien.sepr.groupphase.backend.entity.ConcreteShiftPlan;
 import at.ac.tuwien.sepr.groupphase.backend.entity.ScheduledShift;
+import at.ac.tuwien.sepr.groupphase.backend.entity.IcalSubscriptionToken;
+import at.ac.tuwien.sepr.groupphase.backend.service.IcalSubscriptionTokenService;
 import at.ac.tuwien.sepr.groupphase.backend.service.dto.ConcreteShiftPlanIcalDto;
 import at.ac.tuwien.sepr.groupphase.backend.service.dto.department.DepartmentNameDto;
 import at.ac.tuwien.sepr.groupphase.backend.exception.NotFoundException;
@@ -31,6 +33,7 @@ import java.security.Principal;
 import java.util.List;
 import java.util.Date;
 import java.util.Map;
+import java.util.Optional;
 
 // iCal4j imports for test endpoint
 import net.fortuna.ical4j.model.Calendar;
@@ -57,15 +60,14 @@ public class IcalEndpoint {
     private final IcalService icalService;
     private final ShiftPlanningService shiftPlanningService;
     private final UserService userService;
-    
-    // Simple token storage (in production, use a proper cache or database)
-    private final Map<String, String> subscriptionTokens = new java.util.concurrent.ConcurrentHashMap<>();
+    private final IcalSubscriptionTokenService tokenService;
 
     public IcalEndpoint(IcalService icalService, ShiftPlanningService shiftPlanningService,
-                        UserService userService) {
+                        UserService userService, IcalSubscriptionTokenService tokenService) {
         this.icalService = icalService;
         this.shiftPlanningService = shiftPlanningService;
         this.userService = userService;
+        this.tokenService = tokenService;
     }
 
     @RolesAllowed({"ADMIN", "SUPERVISOR", "EMPLOYEE"})
@@ -83,11 +85,11 @@ public class IcalEndpoint {
         try {
             // Check if user has access to the department
             UserDepartmentDto userDepartment = userService.getUserByEmail(new UserEmailDto(userEmail));
-            
+
             // Get current user's role to check if they're ADMIN
             UserProfileDto currentUser = userService.getCurrentUserProfile();
             boolean isAdmin = "ADMIN".equals(currentUser.getRole());
-            
+
             // Admin has access to all departments, others only to their own
             boolean hasAccess = isAdmin || userDepartment.deparmentName().equals(departmentName);
 
@@ -189,6 +191,7 @@ public class IcalEndpoint {
         }
     }
 
+    /*
     @RolesAllowed({"EMPLOYEE"})
     @Operation(summary = "Subscribe to employee's shifts calendar")
     @ApiResponse(responseCode = "200", description = "iCal file successfully generated and returned")
@@ -233,6 +236,8 @@ public class IcalEndpoint {
         }
     }
 
+     */
+
     @RolesAllowed({"EMPLOYEE"})
     @Operation(summary = "Generate personal subscription URL")
     @ApiResponse(responseCode = "200", description = "Personal subscription URL generated")
@@ -243,21 +248,46 @@ public class IcalEndpoint {
         String employeeEmail = principal.getName();
 
         try {
-            // Generate a simple token (in production, you might want to use a more secure approach)
-            String token = java.util.UUID.randomUUID().toString();
-            
-            // Store the token in a simple way (in production, use a proper cache or database)
-            // For now, we'll use a simple approach with the email as key
-            subscriptionTokens.put(employeeEmail, token);
-            
-            String subscriptionUrl = "http://localhost:8080/api/ical/employee/shifts/subscribe/" + token;
-            
+            // Get or create token using the service
+            IcalSubscriptionToken token = tokenService.getOrCreateToken(employeeEmail);
+
+            // Generate the subscription URL using the request's server URL
+            String subscriptionUrl = String.format("%s/api/ical/employee/shifts/subscribe/%s",
+                getServerUrl(), token.getToken());
+
             LOGGER.info("Generated subscription URL for employee {}: {}", employeeEmail, subscriptionUrl);
-            
+
             return ResponseEntity.ok(subscriptionUrl);
         } catch (Exception e) {
             LOGGER.error("Error generating subscription URL for employee {}: {}", employeeEmail, e.getMessage());
             throw new RuntimeException("Error generating subscription URL", e);
+        }
+    }
+
+    @RolesAllowed({"EMPLOYEE"})
+    @Operation(summary = "Regenerate personal subscription URL with new token")
+    @ApiResponse(responseCode = "200", description = "New personal subscription URL generated")
+    @ApiResponse(responseCode = "500", description = "Internal server error")
+    @GetMapping(path = "/employee/shifts/regenerate-subscription-url", produces = "text/plain")
+    public ResponseEntity<String> regenerateSubscriptionUrl(Principal principal) {
+        LOGGER.trace("regenerateSubscriptionUrl(principal={})", principal.getName());
+        String employeeEmail = principal.getName();
+
+        try {
+            // Delete existing token and create a new one
+            tokenService.deleteToken(employeeEmail);
+            IcalSubscriptionToken newToken = tokenService.getOrCreateToken(employeeEmail);
+
+            // Generate the subscription URL using the request's server URL
+            String subscriptionUrl = String.format("%s/api/ical/employee/shifts/subscribe/%s",
+                getServerUrl(), newToken.getToken());
+
+            LOGGER.info("Regenerated subscription URL for employee {}: {}", employeeEmail, subscriptionUrl);
+
+            return ResponseEntity.ok(subscriptionUrl);
+        } catch (Exception e) {
+            LOGGER.error("Error regenerating subscription URL for employee {}: {}", employeeEmail, e.getMessage());
+            throw new RuntimeException("Error regenerating subscription URL", e);
         }
     }
 
@@ -270,28 +300,24 @@ public class IcalEndpoint {
     @Transactional
     public ResponseEntity<String> subscribeToEmployeeShiftsIcalWithToken(@PathVariable("token") String token) {
         LOGGER.info("subscribeToEmployeeShiftsIcalWithToken(token={})", token);
-        
-        // Find the employee email for this token
-        String employeeEmail = null;
-        for (Map.Entry<String, String> entry : subscriptionTokens.entrySet()) {
-            if (entry.getValue().equals(token)) {
-                employeeEmail = entry.getKey();
-                break;
-            }
-        }
-        
-        if (employeeEmail == null) {
+
+        // Validate and update the token using the service
+        Optional<IcalSubscriptionToken> tokenOpt = tokenService.validateAndUpdateToken(token);
+
+        if (tokenOpt.isEmpty()) {
             LOGGER.warn("Invalid subscription token: {}", token);
             return ResponseEntity.status(403).body("Invalid or expired subscription token");
         }
 
+        IcalSubscriptionToken subscriptionToken = tokenOpt.get();
+        String employeeEmail = subscriptionToken.getUserEmail();
         LOGGER.info("Found employee email {} for token {}", employeeEmail, token);
 
         try {
             // Get the employee's department
             String departmentName = userService.getDepartmentForUser(employeeEmail);
             LOGGER.info("Employee {} is in department: {}", employeeEmail, departmentName);
-            
+
             if (departmentName == null) {
                 LOGGER.warn("Employee {} is not assigned to any department", employeeEmail);
                 return ResponseEntity.notFound().build();
@@ -300,7 +326,7 @@ public class IcalEndpoint {
             // Get all shifts for the department
             ConcreteShiftPlan concretePlan = shiftPlanningService.getCurrentConcretePlan(departmentName);
             LOGGER.info("Retrieved concrete plan for department {}: {}", departmentName, concretePlan != null ? "found" : "not found");
-            
+
             if (concretePlan == null) {
                 LOGGER.warn("No concrete plan found for department: {}", departmentName);
                 return ResponseEntity.notFound().build();
@@ -366,5 +392,14 @@ public class IcalEndpoint {
         return ResponseEntity.ok()
             .headers(headers)
             .body(icalContent);
+    }
+
+    /**
+     * Helper method to get the server URL from the current request.
+     * This ensures the subscription URL uses the correct server address.
+     */
+    private String getServerUrl() {
+        // Since user is using port forwarding, localhost is fine
+        return "http://localhost:8080";
     }
 }

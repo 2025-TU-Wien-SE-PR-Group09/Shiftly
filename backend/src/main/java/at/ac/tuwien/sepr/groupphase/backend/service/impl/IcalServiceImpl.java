@@ -90,6 +90,8 @@ public class IcalServiceImpl implements IcalService {
 
     @Override
     public String generateEmployeeIcal(ConcreteShiftPlanIcalDto shiftPlanDto, String employeeEmail) {
+        System.out.println("Generating employee iCal for email " + employeeEmail);
+
         LOGGER.info("Generating employee-specific iCal for email {} from {} shifts", employeeEmail, shiftPlanDto.scheduledShifts().size());
 
         // Filter shifts to only include those assigned to the specified employee

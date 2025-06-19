@@ -85,7 +85,7 @@
       size="medium"
       (click)="getSubscriptionUrl()"
     >
-      Get Subscription URL
+      Subscribe to Calendar
     </app-button>
   </div>
 
@@ -174,25 +174,66 @@
     <button class="close-button text-gray-400 hover:text-gray-600 dark:text-gray-500 dark:hover:text-gray-300"
             (click)="hideSubscriptionUrl()">✕</button>
 
-    <h3 class="text-xl font-semibold mb-4 text-foreground">My Shifts Calendar Subscription URL</h3>
+    <h3 class="text-xl font-semibold mb-4 text-foreground">Calendar Subscription</h3>
 
-    <p class="text-sm text-gray-600 dark:text-gray-400 mb-4">
-      Use this URL to subscribe to your shifts calendar in your preferred calendar application:
-    </p>
-
-    <div class="mb-4">
-      <input
-        type="text"
-        class="w-full p-2 border border-gray-300 rounded text-sm bg-gray-50 dark:bg-gray-700 dark:border-gray-600 dark:text-white"
-        [value]="subscriptionUrl"
-        readonly
-      />
+    <div class="mb-6">
+      <p class="text-sm text-gray-600 dark:text-gray-400 mb-4">
+        To display your Shyft shifts in an external calendar, first generate a token and then copy the link to your clipboard. 
+        Add your Shyft shifts to your external calendar using the link. Alternatively, you can also download the iCal file directly. 
+        However, please note that in this case, the appointments in your external calendar cannot be automatically updated.
+      </p>
+      
+      <p class="text-sm text-gray-600 dark:text-gray-400 mb-4">
+        If you believe someone has gained knowledge of your token, you can generate a new one at any time.
+      </p>
     </div>
 
-    <button (click)="copySubscriptionUrl()"
-            class="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded text-sm">
-      Copy URL
-    </button>
+    <div class="mb-6">
+      <div class="flex items-center justify-between mb-2">
+        <label class="text-sm font-medium text-foreground">Subscription URL:</label>
+        <button (click)="regenerateSubscriptionUrl()"
+                class="text-sm bg-red-500 hover:bg-red-600 text-white px-3 py-1 rounded">
+          Generate new token
+        </button>
+      </div>
+      
+      <div class="flex items-center">
+        <input
+          type="text"
+          class="flex-1 p-3 border border-gray-300 rounded-l text-sm bg-gray-50 dark:bg-gray-700 dark:border-gray-600 dark:text-white"
+          [value]="subscriptionUrl"
+          readonly
+        />
+        <button (click)="copySubscriptionUrl()"
+                class="p-3 bg-blue-500 hover:bg-blue-600 text-white rounded-r">
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 5H6a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2v-1M8 5a2 2 0 002 2h2a2 2 0 002-2M8 5a2 2 0 012-2h2a2 2 0 012 2" />
+          </svg>
+        </button>
+      </div>
+    </div>
+
+    <div class="mb-6">
+      <h4 class="text-md font-medium mb-3 text-foreground">How to use:</h4>
+      <ol class="list-decimal pl-5 text-sm text-gray-600 dark:text-gray-400 space-y-1">
+        <li>Copy the URL above</li>
+        <li>Open your calendar application (Google Calendar, Outlook, Apple Calendar, etc.)</li>
+        <li>Find the option to add a calendar by URL or subscribe to a calendar</li>
+        <li>Paste the URL and save</li>
+        <li>Your shifts will now appear in your calendar and update automatically</li>
+      </ol>
+    </div>
+
+    <div class="border-t pt-4">
+      <h4 class="text-md font-medium mb-2 text-foreground">Alternative: Direct Download</h4>
+      <p class="text-sm text-gray-600 dark:text-gray-400 mb-3">
+        You can also download the iCal file directly, but it won't update automatically in your calendar.
+      </p>
+      <button (click)="downloadMyShifts()"
+              class="bg-green-500 hover:bg-green-600 text-white px-4 py-2 rounded text-sm">
+        Download iCal File
+      </button>
+    </div>
   </div>
 </div>
 </div>

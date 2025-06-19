@@ -196,9 +196,7 @@ export class EmployeeHomeComponent implements OnInit{
    * Generates and displays the subscription URL for the employee's shifts calendar
    */
   getSubscriptionUrl(): void {
-    // Call the backend to generate a personal subscription URL with token
-    const baseUrl = environment.basePath || window.location.origin;
-    this._httpClient.get<string>(`${baseUrl}/api/ical/employee/shifts/subscription-url`, { responseType: 'text' as 'json' }).subscribe({
+    this._icalService.generateSubscriptionUrl().subscribe({
       next: (response: string) => {
         this.subscriptionUrl = response;
         this.showSubscriptionUrl = true;
@@ -207,6 +205,23 @@ export class EmployeeHomeComponent implements OnInit{
       error: (err: any) => {
         console.error('Error generating subscription URL', err);
         this._toastr.error('Failed to generate subscription URL', 'Error');
+      }
+    });
+  }
+
+  /**
+   * Regenerates the subscription URL with a new token
+   */
+  regenerateSubscriptionUrl(): void {
+    this._icalService.regenerateSubscriptionUrl().subscribe({
+      next: (response: string) => {
+        this.subscriptionUrl = response;
+        this.showSubscriptionUrl = true;
+        this._toastr.success('New subscription URL generated successfully', 'Success');
+      },
+      error: (err: any) => {
+        console.error('Error regenerating subscription URL', err);
+        this._toastr.error('Failed to regenerate subscription URL', 'Error');
       }
     });
   }
