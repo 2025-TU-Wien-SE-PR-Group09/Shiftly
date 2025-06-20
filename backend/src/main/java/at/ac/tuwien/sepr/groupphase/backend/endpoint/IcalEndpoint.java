@@ -96,7 +96,7 @@ public class IcalEndpoint {
             }
 
             // Get all shifts for the department
-            List<ScheduledShift> shifts = shiftPlanningService.getAllPlans(departmentName).stream().flatMap(x -> x.getScheduledShifts().stream()).toList();
+            List<ScheduledShift> shifts = shiftPlanningService.getAllNotOverridenPlans(departmentName).stream().flatMap(x -> x.getScheduledShifts().stream()).toList();
 
             // Generate iCal content
             String icalContent = icalService.generateIcal(new ConcreteShiftPlanIcalDto(shifts));
@@ -141,7 +141,7 @@ public class IcalEndpoint {
 
 
 
-            List<ScheduledShift> shifts = shiftPlanningService.getAllPlans(departmentName).stream().flatMap(x -> x.getScheduledShifts().stream()).toList();
+            List<ScheduledShift> shifts = shiftPlanningService.getAllNotOverridenPlans(departmentName).stream().flatMap(x -> x.getScheduledShifts().stream()).toList();
 
             LOGGER.info("Retrieved {} shifts from concrete plan", shifts.size());
 
@@ -316,7 +316,7 @@ public class IcalEndpoint {
 
 
 
-            List<ScheduledShift> shifts = shiftPlanningService.getAllPlans(departmentName).stream().flatMap(x -> x.getScheduledShifts().stream()).toList();
+            List<ScheduledShift> shifts = shiftPlanningService.getAllNotOverridenPlans(departmentName).stream().flatMap(x -> x.getScheduledShifts().stream()).toList();
 
             LOGGER.info("Retrieved {} shifts from concrete plan", shifts.size());
 
