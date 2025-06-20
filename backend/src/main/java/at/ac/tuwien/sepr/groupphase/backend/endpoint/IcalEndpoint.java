@@ -1,11 +1,9 @@
 package at.ac.tuwien.sepr.groupphase.backend.endpoint;
 
-import at.ac.tuwien.sepr.groupphase.backend.entity.ConcreteShiftPlan;
 import at.ac.tuwien.sepr.groupphase.backend.entity.ScheduledShift;
 import at.ac.tuwien.sepr.groupphase.backend.entity.IcalSubscriptionToken;
 import at.ac.tuwien.sepr.groupphase.backend.service.IcalSubscriptionTokenService;
 import at.ac.tuwien.sepr.groupphase.backend.service.dto.ConcreteShiftPlanIcalDto;
-import at.ac.tuwien.sepr.groupphase.backend.service.dto.department.DepartmentNameDto;
 import at.ac.tuwien.sepr.groupphase.backend.exception.NotFoundException;
 import at.ac.tuwien.sepr.groupphase.backend.service.IcalService;
 import at.ac.tuwien.sepr.groupphase.backend.service.dto.user.UserDepartmentDto;
@@ -32,7 +30,6 @@ import java.nio.file.AccessDeniedException;
 import java.security.Principal;
 import java.util.List;
 import java.util.Date;
-import java.util.Map;
 import java.util.Optional;
 
 // iCal4j imports for test endpoint

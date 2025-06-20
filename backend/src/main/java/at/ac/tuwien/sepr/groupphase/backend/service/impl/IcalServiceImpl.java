@@ -1,7 +1,6 @@
 package at.ac.tuwien.sepr.groupphase.backend.service.impl;
 
 import at.ac.tuwien.sepr.groupphase.backend.entity.ScheduledShift;
-import at.ac.tuwien.sepr.groupphase.backend.entity.ScheduledShiftAssignment;
 import at.ac.tuwien.sepr.groupphase.backend.service.IcalService;
 import at.ac.tuwien.sepr.groupphase.backend.service.dto.ConcreteShiftPlanIcalDto;
 import net.fortuna.ical4j.model.*;
@@ -32,11 +31,11 @@ public class IcalServiceImpl implements IcalService {
         calendar.getProperties().add(new ProdId("-//Shyft//iCal4j 3.2.10//EN"));
         calendar.getProperties().add(Version.VERSION_2_0);
         calendar.getProperties().add(CalScale.GREGORIAN);
-        ZoneId zoneId = ZoneId.of("Europe/Vienna"); // oder ZoneId.systemDefault()
+        ZoneId zoneId = ZoneId.of("Europe/Vienna"); // or ZoneId.systemDefault()
         TimeZoneRegistry registry = TimeZoneRegistryFactory.getInstance().createRegistry();
         TimeZone tz = registry.getTimeZone(zoneId.getId());
-        VTimeZone vTimeZone = tz.getVTimeZone();
-        calendar.getComponents().add(vTimeZone);
+        VTimeZone vtimezone = tz.getVTimeZone();
+        calendar.getComponents().add(vtimezone);
         calendar.getProperties().add(new XProperty("X-WR-TIMEZONE", ZoneId.systemDefault().getId()));
 
 
@@ -52,7 +51,7 @@ public class IcalServiceImpl implements IcalService {
             endDateTime.setTimeZone(tz);
 
             VEvent event = new VEvent(startDateTime, endDateTime, shift.getDescription());
-            event.getProperties().add(new TzId(tz.getID())); // explizit TZID setzen
+            event.getProperties().add(new TzId(tz.getID())); // explicitly set TZID
 
 
             // Add unique ID
@@ -177,7 +176,7 @@ public class IcalServiceImpl implements IcalService {
     }
 
     /**
-     * Generates an iCalendar (.ics) file content specifically for subscription with additional properties
+     * Generates an iCalendar (.ics) file content specifically for subscription with additional properties.
      */
     @Override
     public String  generateEmployeeSubscriptionIcal(ConcreteShiftPlanIcalDto shiftPlanDto, String employeeEmail) {

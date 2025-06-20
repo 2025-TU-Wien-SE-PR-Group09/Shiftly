@@ -245,22 +245,22 @@ class DepartmentServiceTest {
         ScheduledShiftAssignment assignment1 = new ScheduledShiftAssignment(shift1, employee);
         ScheduledShiftAssignment assignment2 = new ScheduledShiftAssignment(shift2, employee);
 
-        // Füge sie der Collection hinzu (nur wenn du ein Mapping hast!)
+        // Add them to the collection (only if you have a mapping!)
         employee.getAssignments().addAll(List.of(assignment1, assignment2));
 
         when(userRepository.findById(email)).thenReturn(Optional.of(employee));
         when(departmentRepository.findByName(departmentName)).thenReturn(Optional.of(department));
 
-        // Act - vor dem Entfernen prüfen
-        assertEquals(2, employee.getAssignments().size(), "User sollte 2 Assignments haben");
+        // Act - check before removal
+        assertEquals(2, employee.getAssignments().size(), "User should have 2 assignments");
 
         EmployeeDto employeeDto = new EmployeeDto(email, departmentName);
         departmentService.removeEmployeeFromDepartment(employeeDto);
 
-        // Assert - nach dem Entfernen prüfen
-        assertNull(employee.getDepartment(), "Department sollte null sein");
-        assertTrue(employee.getRoles().stream().noneMatch(r -> r.getName().equals("EMPLOYEE")), "Employee Rolle sollte entfernt sein");
-        assertEquals(0, employee.getAssignments().size(), "User sollte keine Assignments mehr haben");
+        // Assert - check after removal
+        assertNull(employee.getDepartment(), "Department should be null");
+        assertTrue(employee.getRoles().stream().noneMatch(r -> r.getName().equals("EMPLOYEE")), "Employee role should be removed");
+        assertEquals(0, employee.getAssignments().size(), "User should have no assignments left");
     }
 
 }

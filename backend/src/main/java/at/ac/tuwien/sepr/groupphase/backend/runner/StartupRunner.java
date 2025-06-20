@@ -120,7 +120,7 @@ public class StartupRunner implements CommandLineRunner {
     }
 
     private void createUsers(Department production, String supervisorMail, int startC) {
-        // Neue Employees für Production
+        // New Employees for Production
         for (int i = startC; i < startC + 5; i++) {
             String email = firstNames[i].toLowerCase(Locale.ROOT) + "_doe@shyft.local";
             this.userService.createUser(new UserDataDto(email, "password", firstNames[i], "Doe"));
@@ -131,7 +131,7 @@ public class StartupRunner implements CommandLineRunner {
             this.userService.assignRoleToUser(new UserRoleDto(email, Role.EMPLOYEE, production.getName()));
         }
 
-        // Neue Jumper für Production
+        // New Jumpers for Production
         for (int i = startC + 5; i < startC + 7; i++) {
             String email = firstNames[i].toLowerCase(Locale.ROOT) + "_doe@shyft.local";
             this.userService.createUser(new UserDataDto(email, "password", firstNames[i], "Doe"));

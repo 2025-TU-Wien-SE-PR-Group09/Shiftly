@@ -29,7 +29,7 @@ public class IcalSubscriptionToken {
 
     @NotNull
     @Size(max = 255)
-    @Column(name = "token", nullable = false, length = 255, unique = true)
+    @Column(name = "token", nullable = false, unique = true)
     private String token;
 
     @NotNull
@@ -69,18 +69,6 @@ public class IcalSubscriptionToken {
         return token;
     }
 
-    public void setToken(String token) {
-        this.token = token;
-    }
-
-    public LocalDateTime getCreatedAt() {
-        return createdAt;
-    }
-
-    public void setCreatedAt(LocalDateTime createdAt) {
-        this.createdAt = createdAt;
-    }
-
     public LocalDateTime getLastAccessedAt() {
         return lastAccessedAt;
     }
@@ -89,17 +77,14 @@ public class IcalSubscriptionToken {
         this.lastAccessedAt = lastAccessedAt;
     }
 
-    /**
-     * Updates the last accessed timestamp to the current time.
-     */
-    public void updateLastAccessed() {
-        this.lastAccessedAt = LocalDateTime.now();
-    }
-
     @Override
     public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
+        if (this == o) {
+            return true;
+        }
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
         IcalSubscriptionToken that = (IcalSubscriptionToken) o;
         return Objects.equals(id, that.id) && Objects.equals(userEmail, that.userEmail) && Objects.equals(token, that.token);
     }
@@ -111,12 +96,12 @@ public class IcalSubscriptionToken {
 
     @Override
     public String toString() {
-        return "IcalSubscriptionToken{" +
-            "id=" + id +
-            ", userEmail='" + userEmail + '\'' +
-            ", token='" + token + '\'' +
-            ", createdAt=" + createdAt +
-            ", lastAccessedAt=" + lastAccessedAt +
-            '}';
+        return "IcalSubscriptionToken{"
+            + "id=" + id
+            + ", userEmail='" + userEmail + '\''
+            + ", token='" + token + '\''
+            + ", createdAt=" + createdAt
+            + ", lastAccessedAt=" + lastAccessedAt
+            + '}';
     }
 }
