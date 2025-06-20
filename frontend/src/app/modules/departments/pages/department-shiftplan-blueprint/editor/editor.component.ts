@@ -163,19 +163,7 @@ export class EditorComponent {
         const end = dayCtrl.get('endTime')?.value;
 
         if (start && end) {
-          const [sh, sm] = start.split(':').map(Number);
-          const [eh, em] = end.split(':').map(Number);
-
-          const startMinutes = sh * 60 + sm;
-          const endMinutes = eh * 60 + em;
-
-          let duration = endMinutes - startMinutes;
-          if (duration < 0) {
-            // über Mitternacht (z.B. 23:00 – 02:00)
-            duration += 24 * 60;
-          }
-
-          totalMinutes += duration;
+          totalMinutes += this.calculateDurationMinutes(start, end);
         }
       }
 
@@ -186,6 +174,23 @@ export class EditorComponent {
 
       return null;
     };
+  }
+
+  private calculateDurationMinutes(startTime: string, endTime: string): number {
+    const [sh, sm] = startTime.split(':').map(Number);
+    const [eh, em] = endTime.split(':').map(Number);
+
+    const startMinutes = sh * 60 + sm;
+    const endMinutes = eh * 60 + em;
+
+    if (endMinutes <= startMinutes) {
+      // über Mitternacht
+      const startToMidnight = 23 * 60 + 59 - startMinutes + 1; // bis 00:00
+      const midnightToEnd = endMinutes; // ab 00:00 bis Ende
+      return startToMidnight + midnightToEnd;
+    } else {
+      return endMinutes - startMinutes;
+    }
   }
 
   copyDayToOthers(shiftIndex: number, weekIndex: number, weekday: string) {
