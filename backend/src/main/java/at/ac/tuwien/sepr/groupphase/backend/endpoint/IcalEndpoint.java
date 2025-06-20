@@ -99,7 +99,7 @@ public class IcalEndpoint {
             }
 
             // Get all shifts for the department
-            List<ScheduledShift> shifts = shiftPlanningService.getCurrentConcretePlan(departmentName).getScheduledShifts();
+            List<ScheduledShift> shifts = shiftPlanningService.getAllPlans(departmentName).stream().flatMap(x -> x.getScheduledShifts().stream()).toList();
 
             // Generate iCal content
             String icalContent = icalService.generateIcal(new ConcreteShiftPlanIcalDto(shifts));
@@ -142,16 +142,10 @@ public class IcalEndpoint {
                 return ResponseEntity.notFound().build();
             }
 
-            // Get all shifts for the department
-            ConcreteShiftPlan concretePlan = shiftPlanningService.getCurrentConcretePlan(departmentName);
-            LOGGER.info("Retrieved concrete plan for department {}: {}", departmentName, concretePlan != null ? "found" : "not found");
 
-            if (concretePlan == null) {
-                LOGGER.warn("No concrete plan found for department: {}", departmentName);
-                return ResponseEntity.notFound().build();
-            }
 
-            List<ScheduledShift> shifts = concretePlan.getScheduledShifts();
+            List<ScheduledShift> shifts = shiftPlanningService.getAllPlans(departmentName).stream().flatMap(x -> x.getScheduledShifts().stream()).toList();
+
             LOGGER.info("Retrieved {} shifts from concrete plan", shifts.size());
 
             // Log details about each shift
@@ -323,16 +317,10 @@ public class IcalEndpoint {
                 return ResponseEntity.notFound().build();
             }
 
-            // Get all shifts for the department
-            ConcreteShiftPlan concretePlan = shiftPlanningService.getCurrentConcretePlan(departmentName);
-            LOGGER.info("Retrieved concrete plan for department {}: {}", departmentName, concretePlan != null ? "found" : "not found");
 
-            if (concretePlan == null) {
-                LOGGER.warn("No concrete plan found for department: {}", departmentName);
-                return ResponseEntity.notFound().build();
-            }
 
-            List<ScheduledShift> shifts = concretePlan.getScheduledShifts();
+            List<ScheduledShift> shifts = shiftPlanningService.getAllPlans(departmentName).stream().flatMap(x -> x.getScheduledShifts().stream()).toList();
+
             LOGGER.info("Retrieved {} shifts from concrete plan", shifts.size());
 
             // Generate iCal content with only the employee's shifts

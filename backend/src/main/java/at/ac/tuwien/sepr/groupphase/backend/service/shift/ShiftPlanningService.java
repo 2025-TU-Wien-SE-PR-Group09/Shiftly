@@ -72,4 +72,6 @@ public interface ShiftPlanningService {
      * @return the current ConcreteShiftPlan with all shifts and assignments loaded
      */
     ConcreteShiftPlan getCurrentConcretePlanWithShifts(String departmentName);
+
+    List<ConcreteShiftPlan> getAllPlans(String departmentName);
 }
