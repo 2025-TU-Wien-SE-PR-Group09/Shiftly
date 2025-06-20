@@ -7,7 +7,8 @@ import { DepartmentShiftplanBlueprintComponent } from './pages/department-shiftp
 import { DepartmentResolver } from './resolvers/department.resolver';
 import { BlueprintsResolver } from './resolvers/blueprints.resolver';
 import { RoleGuard } from 'src/app/core/guards/role.guard';
-
+import { DepartmentGuard } from 'src/app/core/guards/department.guard';
+import { AuthGuard } from 'src/app/core/guards/auth.guard';
 const routes: Routes = [
   {
     path: '',
@@ -16,7 +17,7 @@ const routes: Routes = [
       {
         path: 'admin',
         component: DepartmentDetailAdminComponent,
-        canActivate: [RoleGuard],
+        canActivate: [AuthGuard, RoleGuard],
         data: {
           roles: ['ADMIN'],
         },
@@ -24,21 +25,21 @@ const routes: Routes = [
       {
         path: 'supervisor',
         component: DepartmentDetailSupervisorComponent,
-        canActivate: [RoleGuard],
+        canActivate: [AuthGuard, RoleGuard, DepartmentGuard],
         data: {
           roles: ['SUPERVISOR'],
         },
       },
       {
-        path: ':name/shiftplan-editor',
+        path: ':depName/shiftplan-editor',
         component: DepartmentShiftplanBlueprintComponent,
         resolve: {
-          department: DepartmentResolver,
-          blueprints: BlueprintsResolver,
-          canActivate: [RoleGuard],
-          data: {
-            roles: ['ADMIN', 'SUPERVISOR'],
-          },
+          department: DepartmentResolver, /* Loads department and puts it into this.route.snapshot.data['department']*/
+          blueprints: BlueprintsResolver, /* Loads blueprints and puts it into this.route.snapshot.data['blueprints']*/
+        },
+        canActivate: [AuthGuard, RoleGuard, DepartmentGuard], /* DepartmentGuard takes :depName or :depId and checks if user has access */
+        data: {
+          roles: ['ADMIN', 'SUPERVISOR'], /* Admins and Supervisors can access*/
         },
       }
     ],
@@ -49,4 +50,4 @@ const routes: Routes = [
   imports: [RouterModule.forChild(routes)],
   exports: [RouterModule],
 })
-export class DepartmentsRoutingModule {}
+export class DepartmentsRoutingModule { }

@@ -7,9 +7,31 @@ import jakarta.validation.constraints.Pattern;
 import jakarta.validation.constraints.Size;
 
 public class RegisterRestDto {
-    @NotNull(message = "Email must not be null")
-    @Size(max = 50, min = 1, message = "Email must be between 1 and 50 characters long")
+    @NotNull(message = "First name must not be null")
+    @Size(max = 50, min = 1, message = "First name must be between 1 and 50 characters long")
     @Email
+    @Pattern(
+        regexp = "^[A-ZÄÖÜa-zäöüß]*$",
+        message = "The first name can only contain characters A-ZÄÖÜa-zäöüß."
+    )
+    private String firstName;
+
+    @NotNull(message = "Last name must not be null")
+    @Size(max = 50, min = 1, message = "Last name must be between 1 and 50 characters long")
+    @Email
+    @Pattern(
+        regexp = "^[A-ZÄÖÜa-zäöüß]*$",
+        message = "The last name can only contain the characters A-ZÄÖÜa-zäöüß."
+    )
+    private String lastName;
+
+    @NotNull(message = "Email must not be null")
+    @Size(max = 200, min = 5, message = "Email must be between 5 and 50 characters long")
+    @Email
+    @Pattern(
+        regexp = "^[a-zA-Z0-9._-]*$",
+        message = "The email can only contain the characters a-zA-Z0-9._-."
+    )
     private String email;
 
     @Size(max = 50, min = 8, message = "Password must be between 8 and 50 characters long")
@@ -47,7 +69,9 @@ public class RegisterRestDto {
     public RegisterRestDto() {
     }
 
-    public RegisterRestDto(String email, String password, String code) {
+    public RegisterRestDto(String firstName, String lastName, String email, String password, String code) {
+        this.firstName = firstName;
+        this.lastName = lastName;
         this.email = email;
         this.password = password;
         this.code = code;
@@ -69,7 +93,25 @@ public class RegisterRestDto {
     public static UserDataDto from(RegisterRestDto registerRestDto) {
         return new UserDataDto(
             registerRestDto.getEmail(),
-            registerRestDto.getPassword()
+            registerRestDto.getPassword(),
+            registerRestDto.firstName,
+            registerRestDto.lastName
         );
+    }
+
+    public String getFirstName() {
+        return firstName;
+    }
+
+    public void setFirstName(String firstName) {
+        this.firstName = firstName;
+    }
+
+    public String getLastName() {
+        return lastName;
+    }
+
+    public void setLastName(String lastName) {
+        this.lastName = lastName;
     }
 }

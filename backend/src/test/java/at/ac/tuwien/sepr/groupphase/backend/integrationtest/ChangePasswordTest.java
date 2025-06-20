@@ -53,15 +53,17 @@ public class ChangePasswordTest implements TestData {
             roleRepository.save(new ApplicationRole("ADMIN"));
         }
 
-        createUser(NORMAL_USER_EMAIL, "UserPass123", "USER");
-        createUser(ADMIN_USER_EMAIL, "AdminPass123", "ADMIN");
+        createUser(NORMAL_USER_EMAIL, "UserPass123", "USER", "Normal", "Test");
+        createUser(ADMIN_USER_EMAIL, "AdminPass123", "ADMIN", "Admin", "Test");
     }
 
-    private void createUser(String email, String password, String role) {
+    private void createUser(String email, String password, String role, String firstName, String lastName) {
         ApplicationUser user = new ApplicationUser();
         user.setEmail(email);
         user.setPasswordHash(passwordEncoder.encode(password));
         user.getRoles().add(roleRepository.getReferenceById(role));
+        user.setFirstName(firstName);
+        user.setLastName(lastName);
         userRepository.save(user);
     }
 

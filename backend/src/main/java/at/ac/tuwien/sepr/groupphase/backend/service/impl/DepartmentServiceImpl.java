@@ -16,17 +16,22 @@ import at.ac.tuwien.sepr.groupphase.backend.service.UserService;
 import at.ac.tuwien.sepr.groupphase.backend.service.dto.department.DepartmentCreateDto;
 import at.ac.tuwien.sepr.groupphase.backend.service.dto.department.DepartmentDto;
 import at.ac.tuwien.sepr.groupphase.backend.service.dto.Role;
+import at.ac.tuwien.sepr.groupphase.backend.service.dto.employee.EmployeeDto;
 import at.ac.tuwien.sepr.groupphase.backend.service.dto.user.UserEmailDto;
 import at.ac.tuwien.sepr.groupphase.backend.service.dto.user.UserRoleDto;
 import at.ac.tuwien.sepr.groupphase.backend.service.mapper.DepartmentMapper;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
+import java.lang.invoke.MethodHandles;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 
 @Service
 public class DepartmentServiceImpl implements DepartmentService {
+    private static final Logger LOGGER = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
 
     private final DepartmentRepository departmentRepository;
     private final UserRepository applicationUserRepository;
@@ -42,6 +47,8 @@ public class DepartmentServiceImpl implements DepartmentService {
 
     @Override
     public DepartmentCreateResponseDto createDepartment(DepartmentCreateDto dto) throws ConflictException {
+        LOGGER.trace("createDepartment({})", dto);
+
         if (departmentRepository.existsByName(dto.getName())) {
             throw new ConflictException("Department with name '" + dto.getName() + "' already exists");
         }
@@ -62,17 +69,18 @@ public class DepartmentServiceImpl implements DepartmentService {
         applicationUserRepository.save(supervisor);
         userService.assignRoleToUser(new UserRoleDto(
             supervisor.getEmail(),
-            Role.SUPERVISOR
-        ));
+            Role.SUPERVISOR,
+            department.getName()));
 
         return new DepartmentCreateResponseDto(
-            department.getId(),
             department.getName(),
             getSupervisorByDepartmentName(department.getName()).map(UserEmailDto::email).orElse("NONE"));
     }
 
     @Override
     public DepartmentEditResponseDto editDepartment(DepartmentEditDto dto) {
+        LOGGER.trace("editDepartment({})", dto);
+
         Department department = departmentRepository.findByName(dto.getOldName())
             .orElseThrow(() -> new NotFoundException("Department with name '" + dto.getOldName() + "' not found"));
 
@@ -86,6 +94,8 @@ public class DepartmentServiceImpl implements DepartmentService {
 
         if (newSupervisor.getDepartment() != null
             && !newSupervisor.getDepartment().getName().equals(department.getName())) {
+            // TODO does this make sense? The second condition checks if the supervisor is
+            //  already assigned to the current department
             throw new ConflictException("Supervisor '" + newSupervisor.getEmail()
                 + "' is already assigned to another department");
         }
@@ -110,7 +120,8 @@ public class DepartmentServiceImpl implements DepartmentService {
 
         userService.assignRoleToUser(new UserRoleDto(
             newSupervisor.getEmail(),
-            Role.SUPERVISOR
+            Role.SUPERVISOR,
+            department.getName()
         ));
 
         return new DepartmentEditResponseDto(
@@ -122,9 +133,10 @@ public class DepartmentServiceImpl implements DepartmentService {
 
     @Override
     public List<DepartmentDetailResponseDto> getAllDepartments() {
+        LOGGER.trace("getAllDepartments()");
+
         return departmentRepository.findAll().stream()
             .map(dept -> new DepartmentDetailResponseDto(
-                dept.getId(),
                 dept.getName(),
                 getSupervisorByDepartmentName(dept.getName()).map(UserEmailDto::email).orElse("NONE")))
             .toList();
@@ -132,12 +144,16 @@ public class DepartmentServiceImpl implements DepartmentService {
 
     @Override
     public Optional<DepartmentDto> getDepartmentByName(String departmentName) {
+        LOGGER.trace("getDepartmentByName({})", departmentName);
+
         return departmentRepository.findByName(departmentName)
             .map(DepartmentMapper::fromEntity);
     }
 
     @Override
     public Optional<UserEmailDto> getSupervisorByDepartmentName(String departmentName) {
+        LOGGER.trace("getSupervisorByDepartmentName({})", departmentName);
+
         Optional<Department> actDept = departmentRepository.findByName(departmentName);
 
         if (actDept.isPresent()) {
@@ -153,4 +169,55 @@ public class DepartmentServiceImpl implements DepartmentService {
 
         return Optional.empty();
     }
+
+    @Override
+    public void deleteDepartmentByName(String departmentName) {
+        LOGGER.trace("deleteDepartmentByName({})", departmentName);
+
+        Department department = departmentRepository.findByName(departmentName)
+            .orElseThrow(() -> new NotFoundException("Department with name '" + departmentName + "' not found"));
+
+        // Unassign all users from this department and remove SUPERVISOR role if present
+        for (ApplicationUser user : department.getUsers()) {
+            user.setDepartment(null);
+            user.getRoles().removeIf(role -> role.getName().equals("SUPERVISOR"));
+            applicationUserRepository.save(user);
+        }
+
+        // Delete the department from the database
+        departmentRepository.delete(department);
+    }
+
+    @Override
+    public void removeEmployeeFromDepartment(EmployeeDto employee) {
+        LOGGER.trace("removeEmployeeFromDepartment({})", employee);
+
+        ApplicationUser user = applicationUserRepository.findById(employee.email())
+            .orElseThrow(() -> new NotFoundException("User with email '" + employee.email() + "' not found"));
+
+        Department department = departmentRepository.findByName(employee.departmentName())
+            .orElseThrow(() -> new NotFoundException("Department with name '" + employee.departmentName() + "' not found"));
+
+        if (user.getDepartment() == null || !user.getDepartment().getName().equals(department.getName())) {
+            throw new NotFoundException(
+                "User '" + user.getEmail()
+                + "' is not part of department '"
+                + department.getName() + "'");
+        }
+
+        if (user.getRoles().stream().noneMatch(role -> role.getName().equals("EMPLOYEE") || role.getName().equals("JUMPER"))) {
+            throw new ConflictException(
+                "User '" + user.getEmail()
+                + "' is not an employee or jumper, but assigned to"
+                + " department '" + department.getName() + "'");
+        }
+
+        user.getAssignments().clear();
+        user.setDepartment(null);
+        user.getRoles().removeIf(role -> role.getName().equals("EMPLOYEE"));
+        user.getRoles().removeIf(role -> role.getName().equals("JUMPER"));
+        applicationUserRepository.save(user);
+    }
+
+
 }

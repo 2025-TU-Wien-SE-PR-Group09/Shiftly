@@ -1,36 +1,49 @@
-import { Component , OnInit} from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import {
   AdminEndpointService,
   DepartmentDetailRestResponseDto,
-  DepartmentService, DepartmentShiftplanCalendarResponse,
+  DepartmentService,
+  DepartmentShiftplanCalendarResponse, RegistrationEndpointService, UserInviteRequestDto, ICalService,
 } from '../../../../rest_client';
 import { ToastrService } from 'ngx-toastr';
 import { CommonModule } from '@angular/common';
 import { CalendarEvent, CalendarModule, CalendarView } from 'angular-calendar';
 import { ButtonComponent } from '../../../../shared/components/button/button.component';
 import { FormsModule } from '@angular/forms';
+import { HttpContext } from '@angular/common/http';
+import { SKIP_EXCEPTION_INTERCEPTOR } from '../../../../core/interceptor/skip-exception-interceptor';
+import { environment } from '../../../../../environments/environment';
 
 @Component({
   selector: 'app-admin-home',
   imports: [CommonModule, CalendarModule, ButtonComponent, FormsModule],
   templateUrl: './admin-home.component.html',
   styleUrl: './admin-home.component.css',
+
 })
+
 export class AdminHomeComponent implements OnInit {
   constructor(
     private _adminService: AdminEndpointService,
     private _departmentService: DepartmentService,
     private readonly _toastr: ToastrService,
-  ) {}
+    private _icalService: ICalService,
+    private _registrationService: RegistrationEndpointService,
+  ) { }
 
   protected departments: DepartmentDetailRestResponseDto[] = [];
   protected selectedDepartment: DepartmentDetailRestResponseDto | undefined;
   protected shiftPlan: DepartmentShiftplanCalendarResponse | undefined;
   code: string = 'test';
+  protected subscriptionUrl: string = '';
+  protected showSubscriptionUrl: boolean = false;
 
   view: CalendarView = CalendarView.Month;
   CalendarView = CalendarView; // Für Template-Zugriff
   viewDate: Date = new Date();
+
+  emailToInvite: string = ''; // Das kommt neu dazu
+
   events: CalendarEvent[] = [
     {
       start: new Date(2025, 4, 21, 22, 0, 0),
@@ -57,6 +70,38 @@ export class AdminHomeComponent implements OnInit {
       color: { primary: '#cc99ff', secondary: '#ccccff' },
     },
   ];
+
+  selectedEvent: CalendarEvent | null = null;
+
+  handleEventClick(event: { event: CalendarEvent }): void {
+    if (this.selectedEvent === event.event) {
+      this.selectedEvent = null;
+    } else {
+      this.selectedEvent = event.event;
+    }
+  }
+
+  inviteUser() {
+    if (!this.emailToInvite) {
+      this._toastr.error('Bitte gib eine E-Mail-Adresse ein.');
+      return;
+    }
+
+    const request: UserInviteRequestDto = {
+      email: this.emailToInvite,
+    };
+
+    this._registrationService.inviteUser(request).subscribe({
+      next: () => {
+        this._toastr.success('Einladung wurde erfolgreich versendet.');
+        this.emailToInvite = '';
+      },
+      error: () => {
+        this._toastr.error('Fehler beim Versenden der Einladung.');
+      }
+    });
+  }
+
 
   setView(view: CalendarView) {
     this.view = view;
@@ -88,8 +133,6 @@ export class AdminHomeComponent implements OnInit {
 
   private getColorForShiftType(shiftType: string): { primary: string; secondary: string } {
     if (!this.shiftColors.has(shiftType)) {
-      //todo delete this comment
-      // Nimm die nächste verfügbare Farbe oder starte von vorne wenn alle verwendet wurden
       const colorIndex = this.shiftColors.size % this.colorPalette.length;
       this.shiftColors.set(shiftType, this.colorPalette[colorIndex]);
     }
@@ -119,7 +162,10 @@ export class AdminHomeComponent implements OnInit {
         end: endDate,
         color: this.getColorForShiftType(shiftTitle),
         meta: {
-          workers: shift.workers
+          //todo: workers should become entity "worker" e.g. including the role
+          //todo: 'springer' should be displayed visible in the calendar
+          workers: shift.workers,
+          manpower: shift.manpower
         }
       });
     }
@@ -130,6 +176,11 @@ export class AdminHomeComponent implements OnInit {
     this._departmentService.getAllDepartments().subscribe({
       next: (data) => {
         this.departments = data;
+
+        if (this.departments.length > 0) {
+          this.selectedDepartment = this.departments[0];
+          this.loadScheduledShifts(true);
+        }
       },
     });
   }
@@ -142,9 +193,17 @@ export class AdminHomeComponent implements OnInit {
     });
   }
 
-  loadScheduledShifts() {
-    if (this.selectedDepartment?.id) {
-      this._departmentService.getConcreteShiftplan(this.selectedDepartment.id).subscribe({
+  loadScheduledShifts(skipException: boolean = false) {
+    this.shiftPlan = undefined;
+
+    if (this.selectedDepartment?.name) {
+      let req = this._departmentService.getConcreteShiftplans(this.selectedDepartment.name);
+      if (skipException) {
+        req =  this._departmentService.getConcreteShiftplans(this.selectedDepartment.name, 'body', false, {
+          context: new HttpContext().set(SKIP_EXCEPTION_INTERCEPTOR, true)
+        })
+      }
+      req.subscribe({
         next: (data) => {
           if (data.shifts) {
             this.shiftPlan = data;
@@ -157,5 +216,88 @@ export class AdminHomeComponent implements OnInit {
 
   onDepartmentChanged() {
     this.loadScheduledShifts();
+  }
+
+  /**
+   * Downloads the department's shifts as an iCal file
+   */
+  downloadCalendar(): void {
+    if (!this.selectedDepartment?.name) {
+      this._toastr.error('No department selected', 'Error');
+      return;
+    }
+
+    const departmentName = this.selectedDepartment.name;
+
+    this._icalService.downloadIcalForDepartmentShiftplan(departmentName, 'response').subscribe({
+      next: (response) => {
+        if (!response.body) {
+          this._toastr.error('Empty response received', 'Error');
+          return;
+        }
+
+        // Convert the response body to a blob
+        const blob = new Blob([response.body], { type: 'text/calendar' });
+
+        // Create a URL for the blob
+        const url = window.URL.createObjectURL(blob);
+
+        // Create a temporary anchor element
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = `${departmentName}-calendar.ics`;
+
+        // Append to the document, click it, and remove it
+        document.body.appendChild(a);
+        a.click();
+        window.URL.revokeObjectURL(url);
+        document.body.removeChild(a);
+
+        this._toastr.success('Calendar downloaded successfully', 'Success');
+      },
+      error: (err) => {
+        console.error('Error downloading calendar', err);
+        this._toastr.error('Failed to download calendar', 'Error');
+      }
+    });
+  }
+
+  /**
+   * Generates and displays the subscription URL for the department's shifts calendar
+   */
+  getSubscriptionUrl(): void {
+    if (!this.selectedDepartment?.name) {
+      this._toastr.error('No department selected', 'Error');
+      return;
+    }
+
+    const departmentName = this.selectedDepartment.name;
+
+    // Generate the subscription URL
+    const baseUrl = environment.basePath || window.location.origin;
+    this.subscriptionUrl = `${baseUrl}/api/ical/department/${departmentName}/shiftplan`;
+    this.showSubscriptionUrl = true;
+  }
+
+  /**
+   * Copies the subscription URL to the clipboard
+   */
+  copySubscriptionUrl(): void {
+    navigator.clipboard.writeText(this.subscriptionUrl).then(
+      () => {
+        this._toastr.success('Subscription URL copied to clipboard', 'Success');
+      },
+      (err) => {
+        console.error('Could not copy text: ', err);
+        this._toastr.error('Failed to copy subscription URL', 'Error');
+      }
+    );
+  }
+
+  /**
+   * Hides the subscription URL
+   */
+  hideSubscriptionUrl(): void {
+    this.showSubscriptionUrl = false;
   }
 }

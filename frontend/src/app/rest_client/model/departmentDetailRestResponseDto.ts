@@ -10,7 +10,6 @@
 
 
 export interface DepartmentDetailRestResponseDto { 
-    id?: number;
     name?: string;
     supervisorEmail: string;
 }

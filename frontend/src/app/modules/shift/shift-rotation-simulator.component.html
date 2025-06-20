@@ -1,0 +1,28 @@
+<div class="p-4" *ngIf="weeks.length > 0">
+  <div class="flex justify-between mb-4">
+    <button (click)="prevWeek()" [disabled]="weekIndex === 0">Previous Week</button>
+    <h2 class="text-xl font-semibold">Week: {{ currentWeek?.week }}</h2>
+    <button (click)="nextWeek()" [disabled]="weekIndex === weeks.length - 1">Next Week</button>
+  </div>
+
+  <div class="grid grid-cols-5 gap-4">
+    <div *ngFor="let day of weekdays" class="text-center font-medium">{{ day }}</div>
+
+    <ng-container *ngFor="let day of weekdays">
+      <div class="border rounded p-2 space-y-2">
+        <ng-container *ngFor="let shift of getShiftsForDay(day)">
+          <div class="border p-2 rounded bg-gray-100">
+            <div class="font-bold text-sm">{{ shift.shiftDescription }}</div>
+            <div class="text-xs">{{ shift.shortDate }}</div>
+            <ul class="text-xs mt-1 list-disc ml-4">
+              <li *ngFor="let worker of shift.workers | sortByName" [ngStyle]="{ 'color': getWorkerColor(worker) }">
+                {{ worker }}
+              </li>
+            </ul>
+          </div>
+        </ng-container>
+      </div>
+    </ng-container>
+  </div>
+</div>
+

@@ -1,31 +1,30 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, ElementRef, OnInit, ViewChild } from '@angular/core';
 import { CommonModule, DatePipe, NgIf } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import {
-  SickLeaveCertificateRestDto,
-  SickLeaveCertificateEndpointService
-} from '../../../../rest_client';
+import { SickLeaveCertificateRestDto, SickLeaveCertificateEndpointService } from '../../../../rest_client';
 import { ToastrService } from 'ngx-toastr';
 import { ButtonComponent } from '../../../../shared/components/button/button.component';
 import { Observable } from 'rxjs';
 
 @Component({
   selector: 'app-employee-sick-notes',
-  standalone: true,
   imports: [DatePipe, FormsModule, CommonModule, NgIf, ButtonComponent],
+  providers: [DatePipe],
   templateUrl: './employee-sick-notes.component.html',
   styleUrl: './employee-sick-notes.component.css',
 })
 export class EmployeeSickNotesComponent implements OnInit {
+  @ViewChild('fileInput') fileInputRef!: ElementRef<HTMLInputElement>;
+
   sickNotes: SickLeaveCertificateRestDto[] = [];
   selectedFile: File | null = null;
   loading = false;
   uploadSuccess = false;
+  startDate: string = '';
+  endDate: string = '';
+  confirmingDeleteId: number | null = null;
 
-  constructor(
-    private sickLeaveService: SickLeaveCertificateEndpointService,
-    private toastr: ToastrService
-  ) {}
+  constructor(private sickLeaveService: SickLeaveCertificateEndpointService, private toastr: ToastrService) {}
 
   ngOnInit(): void {
     this.loadSickNotes();
@@ -38,7 +37,7 @@ export class EmployeeSickNotesComponent implements OnInit {
       },
       error: () => {
         this.showError('Could not load sick leave certificates.');
-      }
+      },
     });
   }
 
@@ -55,34 +54,66 @@ export class EmployeeSickNotesComponent implements OnInit {
       return;
     }
 
+    if (!this.startDate || !this.endDate) {
+      this.toastr.warning('Please provide both start and end dates and make sure the days exist.');
+      return;
+    }
+    const start = new Date(this.startDate);
+    const end = new Date(this.endDate);
+
+    const maxDate = new Date('9999-12-31T23:59:59Z');
+
+    if (start > maxDate || end > maxDate) {
+      this.toastr.warning('Dates cannot be later than 31.12.9999.');
+      return;
+    }
+
+    if (start > end) {
+      this.toastr.error('Start date cannot be after end date.');
+      return;
+    }
+
     this.loading = true;
-    this.uploadSuccess = false;
 
-    this.sickLeaveService.upload(this.selectedFile).subscribe({
-      next: (newCert) => {
-        this.toastr.success('File uploaded successfully.');
-        this.selectedFile = null;
-        this.uploadSuccess = true;
-        this.loadSickNotes();
+    this.sickLeaveService
+      .upload(
+        this.selectedFile,
+        {
+          startDate: this.startDate,
+          endDate: this.endDate,
+        }
+      )
+      .subscribe({
+        next: () => {
+          this.toastr.success('File uploaded successfully.');
+          this.selectedFile = null;
+          this.startDate = '';
+          this.endDate = '';
+          this.uploadSuccess = true;
+          this.loadSickNotes();
 
-        setTimeout(() => {
-          this.uploadSuccess = false;
-        }, 5000);
-      },
-      error: (err) => {
-        const msg = err?.error?.errors?.[0] ?? 'Upload failed. Please try again.';
-        this.showError(msg);
-      },
-      complete: () => {
-        this.loading = false;
-      }
-    });
+          if (this.fileInputRef) {
+            this.fileInputRef.nativeElement.value = '';
+          }
+
+          setTimeout(() => {
+            this.uploadSuccess = false;
+          }, 5000);
+        }, error: (err) => {
+          this.loading = false;
+        },
+        complete: () => {
+          this.loading = false;
+        },
+      });
   }
 
   downloadFile(note: SickLeaveCertificateRestDto): void {
-    (this.sickLeaveService.download(note.id!, 'body', false, {
-      httpHeaderAccept: 'application/octet-stream'
-    }) as unknown as Observable<Blob>).subscribe({
+    (
+      this.sickLeaveService.download(note.id!, 'body', false, {
+        httpHeaderAccept: 'application/octet-stream',
+      }) as unknown as Observable<Blob>
+    ).subscribe({
       next: (blob: Blob) => {
         const url = window.URL.createObjectURL(blob);
         const a = document.createElement('a');
@@ -93,13 +124,20 @@ export class EmployeeSickNotesComponent implements OnInit {
       },
       error: () => {
         this.showError('Failed to download the file.');
-      }
+      },
     });
   }
 
   cancelUpload(): void {
     this.selectedFile = null;
-    this.toastr.info('File selection cleared.');
+    this.startDate = '';
+    this.endDate = '';
+
+    if (this.fileInputRef) {
+      this.fileInputRef.nativeElement.value = '';
+    }
+
+    this.toastr.info('Selection cleared.');
   }
 
   get selectedFileName(): string {
@@ -109,7 +147,26 @@ export class EmployeeSickNotesComponent implements OnInit {
   private showError(message: string): void {
     this.toastr.error(message, '', {
       timeOut: 8000,
-      progressBar: true
+      progressBar: true,
+    });
+  }
+
+  toggleConfirmDelete(id: number): void {
+    this.confirmingDeleteId = id;
+  }
+
+  cancelDelete(): void {
+    this.confirmingDeleteId = null;
+  }
+
+  confirmDelete(id: number): void {
+    this.sickLeaveService.deleteSickLeaveCertificate(id).subscribe({
+      next: () => {
+        this.toastr.success('Certificate deleted');
+        this.sickNotes = this.sickNotes.filter((note) => note.id !== id);
+        this.confirmingDeleteId = null;
+      },
+      error: () => this.toastr.error('Failed to delete certificate'),
     });
   }
 }

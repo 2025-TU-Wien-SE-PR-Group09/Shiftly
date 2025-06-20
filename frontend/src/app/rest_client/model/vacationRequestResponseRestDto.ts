@@ -14,6 +14,7 @@ export interface VacationRequestResponseRestDto {
     startDate?: string;
     endDate?: string;
     status?: VacationRequestResponseRestDto.StatusEnum;
+    employeeEmail?: string;
 }
 export namespace VacationRequestResponseRestDto {
     export const StatusEnum = {

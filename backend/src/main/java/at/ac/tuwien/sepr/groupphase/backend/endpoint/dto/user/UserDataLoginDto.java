@@ -6,14 +6,12 @@ import jakarta.validation.constraints.Size;
 
 import java.util.Objects;
 
-public class UserDataRestDto {
+public class UserDataLoginDto {
 
     @NotNull(message = "Email must not be null")
-    @Size(max = 50, min = 1, message = "Email must be between 1 and 50 characters long")
     @Email(message = "Email must be a valid email address")
     private String email;
 
-    @Size(max = 50, min = 8, message = "Password must be between 8 and 50 characters long")
     @NotNull(message = "Password must not be null")
     private String password;
 
@@ -33,10 +31,10 @@ public class UserDataRestDto {
         this.password = password;
     }
 
-    public UserDataRestDto() {
+    public UserDataLoginDto() {
     }
 
-    public UserDataRestDto(String email, String password) {
+    public UserDataLoginDto(String email, String password) {
         this.email = email;
         this.password = password;
     }
@@ -46,7 +44,7 @@ public class UserDataRestDto {
         if (this == o) {
             return true;
         }
-        if (!(o instanceof UserDataRestDto userLoginDto)) {
+        if (!(o instanceof UserDataLoginDto userLoginDto)) {
             return false;
         }
         return Objects.equals(email, userLoginDto.email)

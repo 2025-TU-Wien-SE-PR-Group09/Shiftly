@@ -1,42 +1,49 @@
 package at.ac.tuwien.sepr.groupphase.backend.endpoint;
 
-import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.shift.CreatePlanBlueprintDto;
-import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.shift.PlanBlueprintResponse;
-import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.department.DepartmentShiftplanCalendarResponse;
-import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.shift.AddShiftToPlanBlueprintDto;
-import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.shift.GenerateConcretePlanDto;
-import at.ac.tuwien.sepr.groupphase.backend.endpoint.mapper.ShiftRestMapper;
-import at.ac.tuwien.sepr.groupphase.backend.entity.*;
-import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.user.ApplicationUserResponseDto;
 import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.department.DepartmentCreateRestDto;
 import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.department.DepartmentDetailRestResponseDto;
-import at.ac.tuwien.sepr.groupphase.backend.service.dto.department.DepartmentEditDto;
 import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.department.DepartmentEditRestDto;
+import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.department.DepartmentShiftplanCalendarResponse;
 import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.employee.EmployeeListItemResponseDto;
 import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.employee.EmployeeRestResponseDto;
+import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.employee.JumperRestResponseDto;
+import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.shift.AddShiftToPlanBlueprintDto;
+import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.shift.CreatePlanBlueprintDto;
+import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.shift.GenerateConcretePlanDto;
+import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.shift.PlanBlueprintResponse;
+import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.user.ApplicationUserResponseDto;
+import at.ac.tuwien.sepr.groupphase.backend.endpoint.mapper.ShiftRestMapper;
 import at.ac.tuwien.sepr.groupphase.backend.entity.ConcreteShiftPlan;
+import at.ac.tuwien.sepr.groupphase.backend.entity.ScheduledShift;
+import at.ac.tuwien.sepr.groupphase.backend.exception.ConflictException;
 import at.ac.tuwien.sepr.groupphase.backend.exception.NotFoundException;
 import at.ac.tuwien.sepr.groupphase.backend.service.DepartmentService;
 import at.ac.tuwien.sepr.groupphase.backend.service.EmployeeService;
-import at.ac.tuwien.sepr.groupphase.backend.service.ShiftPlanningService;
-import at.ac.tuwien.sepr.groupphase.backend.service.dto.shift.ConcretePlanGenerateDto;
 import at.ac.tuwien.sepr.groupphase.backend.service.UserService;
 import at.ac.tuwien.sepr.groupphase.backend.service.dto.department.DepartmentCreateDto;
 import at.ac.tuwien.sepr.groupphase.backend.service.dto.department.DepartmentDto;
+import at.ac.tuwien.sepr.groupphase.backend.service.dto.department.DepartmentEditDto;
 import at.ac.tuwien.sepr.groupphase.backend.service.dto.department.DepartmentNameDto;
 import at.ac.tuwien.sepr.groupphase.backend.service.dto.employee.EmployeeDto;
 import at.ac.tuwien.sepr.groupphase.backend.service.dto.employee.EmployeeListItemDto;
+import at.ac.tuwien.sepr.groupphase.backend.service.dto.employee.JumperDto;
+import at.ac.tuwien.sepr.groupphase.backend.service.dto.shift.ConcretePlanGenerateDto;
 import at.ac.tuwien.sepr.groupphase.backend.service.dto.user.UserEmailDto;
+import at.ac.tuwien.sepr.groupphase.backend.service.dto.user.UserProfileDto;
 import at.ac.tuwien.sepr.groupphase.backend.service.mapper.ShiftPlanningMapper;
+import at.ac.tuwien.sepr.groupphase.backend.service.shift.ShiftPlanningService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.annotation.security.RolesAllowed;
 import jakarta.transaction.Transactional;
 import jakarta.validation.Valid;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -45,14 +52,20 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import java.time.LocalDateTime;
-import java.util.ArrayList;
+import java.lang.invoke.MethodHandles;
+import java.security.Principal;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Tag(name = "Department")
 @RestController
 @RequestMapping("/api/departments")
+@ApiResponse(responseCode = "403", description = "Access denied")
+@ApiResponse(responseCode = "404", description = "Given resource not found")
+@ApiResponse(responseCode = "400", description = "Invalid request data")
+@ApiResponse(responseCode = "409", description = "Conflict with existing data")
 public class DepartmentEndpoint {
+    private static final Logger LOGGER = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
 
     private final DepartmentService departmentService;
     private final EmployeeService employeeService;
@@ -75,9 +88,10 @@ public class DepartmentEndpoint {
     @ApiResponse(responseCode = "200", description = "List of all departments")
     @GetMapping(produces = MediaType.APPLICATION_JSON_VALUE)
     public List<DepartmentDetailRestResponseDto> getAllDepartments() {
+        LOGGER.trace("getAllDepartments()");
+
         return departmentService.getAllDepartments().stream()
             .map(dept -> new DepartmentDetailRestResponseDto(
-                dept.getId(),
                 dept.getName(),
                 dept.getSupervisorEmail()))
             .toList();
@@ -87,35 +101,50 @@ public class DepartmentEndpoint {
     @Operation(summary = "Get all supervisors")
     @ApiResponse(responseCode = "200", description = "List of all supervisors")
     @GetMapping(value = "/api/departments/supervisors", produces = MediaType.APPLICATION_JSON_VALUE)
-    public List<ApplicationUserResponseDto> getAllSupervisors() {
-        return userService.getAllSupervisors();
+    public List<ApplicationUserResponseDto> getAllAvailableSupervisors() {
+        LOGGER.trace("getAllAvailableSupervisors()");
+
+        List<ApplicationUserResponseDto> availableUsers = userService.getAllAvailableUsers();
+        availableUsers.addAll(userService.getAllSupervisors(false));
+        return availableUsers;
+    }
+
+    @RolesAllowed({"ADMIN", "SUPERVISOR"})
+    @Operation(summary = "Get all available employees")
+    @ApiResponse(responseCode = "200", description = "List of all employees that can be invited to department")
+    @GetMapping(value = "/api/departments/employees", produces = MediaType.APPLICATION_JSON_VALUE)
+    public List<ApplicationUserResponseDto> getAllAvailableEmployees() {
+        LOGGER.trace("getAllAvailableEmployees()");
+
+        return userService.getAllAvailableUsers();
     }
 
     @Transactional
-    @RolesAllowed({"ADMIN"})
+    @RolesAllowed({"ADMIN", "SUPERVISOR", "EMPLOYEE", "JUMPER"})
     @Operation(summary = "Get department by name")
     @ApiResponse(responseCode = "200", description = "Get department by name")
     @GetMapping(path = "/{departmentName}", produces = MediaType.APPLICATION_JSON_VALUE)
     public DepartmentDetailRestResponseDto getDepartmentByName(@PathVariable(name = "departmentName") String departmentName) {
-        return departmentService.getDepartmentByName(departmentName).map(d ->
-            new DepartmentDetailRestResponseDto(
-                d.id(),
-                d.name(),
-                departmentService.getSupervisorByDepartmentName(d.name())
-                    .map(UserEmailDto::email)
-                    .orElse("NONE")
-            )
-        ).orElseThrow(() -> new NotFoundException("Department not found!"));
-    }
+        LOGGER.trace("getDepartmentByName({})", departmentName);
+        userService.checkAccessToDepartment(new DepartmentNameDto(departmentName));
 
+        return departmentService.getDepartmentByName(departmentName).map(d ->
+                new DepartmentDetailRestResponseDto(
+                    d.name(),
+                    departmentService.getSupervisorByDepartmentName(d.name())
+                        .map(UserEmailDto::email)
+                        .orElse("NONE")))
+            .orElseThrow(() -> new NotFoundException("Department not found!"));
+    }
 
     @Transactional
     @RolesAllowed({"ADMIN"})
     @Operation(summary = "Create a new department")
     @ApiResponse(responseCode = "201", description = "New department created")
-    @PostMapping(produces = MediaType.APPLICATION_JSON_VALUE,
-        consumes = MediaType.APPLICATION_JSON_VALUE)
+    @PostMapping(produces = MediaType.APPLICATION_JSON_VALUE, consumes = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<Void> createDepartment(@RequestBody @Valid DepartmentCreateRestDto restDto) {
+        LOGGER.trace("createDepartment({})", restDto);
+
         DepartmentCreateDto serviceDto = new DepartmentCreateDto(
             restDto.getName(),
             restDto.getSupervisorEmail());
@@ -127,9 +156,12 @@ public class DepartmentEndpoint {
     @RolesAllowed({"ADMIN"})
     @Operation(summary = "Edit existing department")
     @ApiResponse(responseCode = "200", description = "Department edited")
-    @PutMapping(produces = MediaType.APPLICATION_JSON_VALUE,
-        consumes = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<Void> editDepartment(@RequestBody @Valid DepartmentEditRestDto restDto) throws NotFoundException {
+    @PutMapping(produces = MediaType.APPLICATION_JSON_VALUE, consumes = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<Void> editDepartment(@RequestBody @Valid DepartmentEditRestDto restDto)
+        throws NotFoundException {
+        LOGGER.trace("editDepartment({})", restDto);
+        userService.checkAccessToDepartment(new DepartmentNameDto(restDto.getOldName()));
+
         DepartmentEditDto serviceDto = new DepartmentEditDto(
             restDto.getOldName(),
             restDto.getNewName(),
@@ -142,17 +174,21 @@ public class DepartmentEndpoint {
     @RolesAllowed({"ADMIN", "SUPERVISOR"})
     @Operation(summary = "Create shift plan(Blueprint) for a department")
     @ApiResponse(responseCode = "201", description = "Shiftplan for the department")
-    @PostMapping(path = "/{departmentName}/shiftplanBlueprint",
-        produces = MediaType.APPLICATION_JSON_VALUE,
-        consumes = MediaType.APPLICATION_JSON_VALUE)
+    @PostMapping(path = "/{departmentName}/shiftplanBlueprint", produces = MediaType.APPLICATION_JSON_VALUE, consumes = MediaType.APPLICATION_JSON_VALUE)
     public PlanBlueprintResponse createShiftplanBlueprint(
         @PathVariable(name = "departmentName") String departmentName,
         @RequestBody @Valid CreatePlanBlueprintDto blueprintDto) {
+        LOGGER.trace("createShiftplanBlueprint({}, {})", departmentName, blueprintDto);
+        userService.checkAccessToDepartment(new DepartmentNameDto(departmentName));
 
         DepartmentDto department = departmentService.getDepartmentByName(departmentName)
             .orElseThrow(() -> new NotFoundException("Department not found!"));
 
-        var mapped = ShiftRestMapper.mapFromRequest(department.id(), blueprintDto);
+        if (department.plans().stream().anyMatch(p -> p.description().equals(blueprintDto.description()))) {
+            throw new ConflictException("A plan with the same description already exists for this department.");
+        }
+
+        var mapped = ShiftRestMapper.mapFromRequest(department.name(), blueprintDto);
         return ShiftPlanningMapper.Plans.toResponse(shiftPlanningService.createPlanBlueprint(mapped));
     }
 
@@ -160,28 +196,29 @@ public class DepartmentEndpoint {
     @RolesAllowed({"ADMIN", "SUPERVISOR"})
     @Operation(summary = "Add shift to existing plan(Blueprint) for a department")
     @ApiResponse(responseCode = "201", description = "Add shift to existing plan(Blueprint) for a department")
-    @PostMapping(path = "/{departmentName}/shiftplanBlueprint/add",
-        produces = MediaType.APPLICATION_JSON_VALUE,
-        consumes = MediaType.APPLICATION_JSON_VALUE)
+    @PostMapping(path = "/{departmentName}/shiftplanBlueprint/add", produces = MediaType.APPLICATION_JSON_VALUE, consumes = MediaType.APPLICATION_JSON_VALUE)
     public PlanBlueprintResponse addShiftToPlanBlueprint(
         @PathVariable(name = "departmentName") String departmentName,
         @RequestBody @Valid AddShiftToPlanBlueprintDto blueprintDto) {
+        LOGGER.trace("addShiftToPlanBlueprint({}, {})", departmentName, blueprintDto);
+        userService.checkAccessToDepartment(new DepartmentNameDto(departmentName));
 
-        DepartmentDto department = departmentService.getDepartmentByName(departmentName)
+        departmentService.getDepartmentByName(departmentName)
             .orElseThrow(() -> new NotFoundException("Department not found!"));
 
         var mapped = ShiftRestMapper.mapFromRequest(blueprintDto);
         return ShiftPlanningMapper.Plans.toResponse(shiftPlanningService.addShiftToPlan(mapped));
     }
 
-
     @Transactional
-    @RolesAllowed({"ADMIN"})
+    @RolesAllowed({"ADMIN", "SUPERVISOR", "EMPLOYEE"})
     @Operation(summary = "Get shift plan for a department")
     @ApiResponse(responseCode = "200", description = "Shiftplan for the department")
     @GetMapping(path = "/{departmentName}/shiftplanBlueprint", produces = MediaType.APPLICATION_JSON_VALUE)
     public List<PlanBlueprintResponse> getShiftplanBlueprints(
         @PathVariable(name = "departmentName") String departmentName) {
+        LOGGER.trace("getShiftplanBlueprints({})", departmentName);
+        userService.checkAccessToDepartment(new DepartmentNameDto(departmentName));
 
         DepartmentDto department = departmentService.getDepartmentByName(departmentName)
             .orElseThrow(() -> new NotFoundException("Department not found!"));
@@ -194,10 +231,17 @@ public class DepartmentEndpoint {
     @Operation(summary = "Generate concrete shift plan for the given department and return the scheduled shifts")
     @ApiResponse(responseCode = "201", description = "Concrete shift plan generated and returned")
     @PostMapping(path = "/{id}/generate-concrete-plan", consumes = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<Void> generateConcretePlan(@RequestBody @Valid GenerateConcretePlanDto generateConcretePlanDto, @PathVariable("id") Long id) {
+    public ResponseEntity<Void> generateConcretePlan(
+        @RequestBody @Valid GenerateConcretePlanDto generateConcretePlanDto, @PathVariable("id") Long id) {
+        LOGGER.trace("generateConcretePlan({}, {})", generateConcretePlanDto, id);
+
+        DepartmentNameDto blueprintDepartment = shiftPlanningService.getDeparmentNameForShiftBlueprint(id)
+            .orElseThrow(() -> new NotFoundException("Blueprint not found!"));
+        userService.checkAccessToDepartment(blueprintDepartment);
+
         ConcretePlanGenerateDto mapped = ShiftRestMapper.mapFromRequest(id, generateConcretePlanDto);
 
-        ConcreteShiftPlan plan = shiftPlanningService.generateConcreteQuarterlyPlan(mapped);
+        shiftPlanningService.generateConcreteQuarterlyPlan(mapped);
 
         return ResponseEntity.status(HttpStatus.CREATED).build();
     }
@@ -209,14 +253,16 @@ public class DepartmentEndpoint {
     @PostMapping(path = "/{departmentName}/addEmployee/{employeeEmail}", produces = MediaType.APPLICATION_JSON_VALUE)
     public EmployeeRestResponseDto addEmployeeToDepartment(
         @PathVariable(name = "departmentName") String departmentName,
-        @PathVariable(name = "employeeEmail") String employeeEmail) {
+        @PathVariable(name = "employeeEmail") String employeeEmail,
+        Principal principal) {
+        LOGGER.trace("addEmployeeToDepartment({}, {}, {})", departmentName, employeeEmail, principal);
+        userService.checkAccessToDepartment(new DepartmentNameDto(departmentName));
+
 
         DepartmentDto department = departmentService.getDepartmentByName(departmentName)
             .orElseThrow(() -> new NotFoundException("Department not found!"));
 
-        // TODO: Verify if user has access to this department
-
-        EmployeeDto employee = new EmployeeDto(employeeEmail, department.id());
+        EmployeeDto employee = new EmployeeDto(employeeEmail, department.name());
         employee = employeeService.convertUserToEmployee(employee);
 
         // in this case, a mapper function cannot be used because the service
@@ -225,65 +271,120 @@ public class DepartmentEndpoint {
         return new EmployeeRestResponseDto(employee.email(), department.name());
     }
 
+    @Transactional
+    @RolesAllowed({"SUPERVISOR"})
+    @Operation(summary = "Add a jumper to a department")
+    @ApiResponse(responseCode = "200", description = "Successfully added jumper to department")
+    @PostMapping(path = "/{departmentName}/addJumper/{employeeEmail}", produces = MediaType.APPLICATION_JSON_VALUE)
+    public JumperRestResponseDto addJumperToDepartment(
+        @PathVariable(name = "departmentName") String departmentName,
+        @PathVariable(name = "employeeEmail") String employeeEmail,
+        Principal principal) {
+        LOGGER.trace("addJumperToDepartment({}, {}, {})", departmentName, employeeEmail, principal);
+        userService.checkAccessToDepartment(new DepartmentNameDto(departmentName));
+
+
+        DepartmentDto department = departmentService.getDepartmentByName(departmentName)
+            .orElseThrow(() -> new NotFoundException("Department not found!"));
+
+        JumperDto jumper = new JumperDto(employeeEmail, department.name());
+        jumper = employeeService.convertUserToJumper(jumper);
+
+        // in this case, a mapper function cannot be used because the service
+        // does not require the department name, only the id
+        // and the rest response does not require the department id, only the name
+        return new JumperRestResponseDto(jumper.email(), department.name());
+    }
+
+    @Transactional
+    @RolesAllowed({"SUPERVISOR"})
+    @Operation(summary = "Remove an employee from a department")
+    @ApiResponse(responseCode = "204", description = "Successfully removed employee from department")
+    @PostMapping(path = "/{departmentName}/removeEmployee/{employeeEmail}")
+    public ResponseEntity<Void> removeEmployeeFromDepartment(
+        @PathVariable(name = "departmentName") String departmentName,
+        @PathVariable(name = "employeeEmail") String employeeEmail,
+        Principal principal) {
+        LOGGER.trace("removeEmployeeFromDepartment({}, {}, {})", departmentName, employeeEmail, principal);
+        userService.checkAccessToDepartment(new DepartmentNameDto(departmentName));
+
+
+        DepartmentDto department = departmentService.getDepartmentByName(departmentName)
+            .orElseThrow(() -> new NotFoundException("Department not found!"));
+
+        EmployeeDto employee = new EmployeeDto(employeeEmail, department.name());
+        departmentService.removeEmployeeFromDepartment(employee);
+
+        return ResponseEntity.noContent().build();
+    }
+
     @RolesAllowed({"SUPERVISOR"})
     @Operation(summary = "List all employees of a department")
     @ApiResponse(responseCode = "200", description = "List all employees of a department")
     @GetMapping(path = "/{departmentName}/employees", produces = MediaType.APPLICATION_JSON_VALUE)
     @Transactional
     public List<EmployeeListItemResponseDto> getEmployeesOfDepartment(
-        @PathVariable(name = "departmentName") String departmentName) {
+        @PathVariable(name = "departmentName") String departmentName,
+        Principal principal) {
+        LOGGER.trace("getEmployeesOfDepartment({}, {})", departmentName, principal);
+        userService.checkAccessToDepartment(new DepartmentNameDto(departmentName));
 
         DepartmentDto department = departmentService.getDepartmentByName(departmentName)
             .orElseThrow(() -> new NotFoundException("Department not found!"));
 
-        // TODO: Verify if user has access to this department
-
         List<EmployeeListItemDto> employees = employeeService.getEmployeesOfDepartment(
-            new DepartmentNameDto(department.name())
-        );
+            new DepartmentNameDto(department.name()));
 
         return employees.stream().map(EmployeeListItemResponseDto::from).toList();
     }
 
-    @RolesAllowed({"ADMIN", "SUPERVISOR"})
+    @RolesAllowed({"ADMIN", "SUPERVISOR", "EMPLOYEE", "JUMPER"})
     @Transactional
-    @Operation(summary = "Get the concrete shift plan for the given department and return the scheduled shifts in suitable calendar format")
+    @Operation(summary = "Get the concrete shift plans for the given department and return the scheduled shifts in suitable calendar format")
     @ApiResponse(responseCode = "201", description = "Concrete shift plan in calendar format.")
-    @GetMapping(path = "/{departmentId}/shiftplan",
+    @GetMapping(path = "/{departmentName}/shiftplans",
         produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<DepartmentShiftplanCalendarResponse> getConcreteShiftplan(@PathVariable("departmentId") Long id) {
+    public ResponseEntity<DepartmentShiftplanCalendarResponse> getConcreteShiftplans(@PathVariable("departmentName") String name,
+                                                                                    Principal principal) {
+        LOGGER.trace("getConcreteShiftplan({}, {})", name, principal);
 
-        var plan = shiftPlanningService.getCurrentConcretePlan(id);
-        List<DepartmentShiftplanCalendarResponse.ScheduledShift> result = new ArrayList<>();
+        userService.checkAccessToDepartment(new DepartmentNameDto(name));
 
-        //TODO: move to service/mapper
-        for (ScheduledShift shift : plan.getScheduledShifts()) {
-            ShiftBlueprint blueprint = shift.getShift();
+        UserProfileDto currentUser = userService.getCurrentUserProfile();
+        List<ScheduledShift> shifts;
 
-            for (ShiftWeekBlueprint week : blueprint.getShiftWeeks()) {
-                for (ShiftDayBlueprint dayBlueprint : week.getDays()) {
-                    LocalDateTime start = shift.getWeekStartDate()
-                        .with(dayBlueprint.getDay())
-                        .atTime(dayBlueprint.getStartTime());
-
-                    LocalDateTime end = start.plus(dayBlueprint.getDuration());
-
-                    List<String> workers = shift.getAssignments().stream()
-                        .map(a -> a.getUser().getEmail())
-                        .toList();
-
-                    DepartmentShiftplanCalendarResponse.ScheduledShift shiftDto =
-                        new DepartmentShiftplanCalendarResponse.ScheduledShift(
-                            blueprint.getDescription(),
-                            new DepartmentShiftplanCalendarResponse.Day(start, end),
-                            workers
-                        );
-
-                    result.add(shiftDto);
-                }
-            }
+        if (currentUser.getRole().equals("EMPLOYEE") || currentUser.getRole().equals("JUMPER")) {
+            shifts = shiftPlanningService.getAllNotOverridenPlans(name)
+                .stream().map(ConcreteShiftPlan::getScheduledShifts)
+                .flatMap(List::stream)
+                .filter(s -> s.getAssignments()
+                    .stream()
+                    .map(a -> a.getUser().getEmail())
+                    .anyMatch(userEmail -> userEmail.equals(principal.getName())))
+                .toList();
+        } else {
+            shifts = shiftPlanningService.getAllNotOverridenPlans(name)
+                .stream().map(ConcreteShiftPlan::getScheduledShifts)
+                .flatMap(List::stream)
+                .toList();
         }
 
-        return ResponseEntity.status(HttpStatus.CREATED).body(new DepartmentShiftplanCalendarResponse(result));
+        DepartmentShiftplanCalendarResponse response = new DepartmentShiftplanCalendarResponse(
+            shifts.stream()
+                .map(ShiftPlanningMapper.Calendar::toResponse)
+                .collect(Collectors.toList()));
+
+        return ResponseEntity.ok(response);
+    }
+
+    @DeleteMapping(path = "/{departmentName}")
+    @RolesAllowed({"ADMIN"})
+    @Operation(summary = "Delete a department")
+    @ApiResponse(responseCode = "200", description = "Department deleted successfully")
+    public ResponseEntity<Void> deleteDepartment(@PathVariable("departmentName") String departmentName) {
+        LOGGER.trace("deleteDepartment({})", departmentName);
+
+        departmentService.deleteDepartmentByName(departmentName);
+        return ResponseEntity.ok().build();
     }
 }

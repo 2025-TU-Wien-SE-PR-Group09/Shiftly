@@ -1,5 +1,6 @@
 package at.ac.tuwien.sepr.groupphase.backend.entity;
 
+import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
@@ -7,6 +8,7 @@ import jakarta.persistence.Id;
 import jakarta.persistence.Lob;
 import jakarta.persistence.ManyToOne;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 
@@ -35,6 +37,18 @@ public class SickLeaveCertificate {
      */
     @Lob
     private byte[] data;
+
+    /**
+     * Start Date of the uploaded file.
+     */
+    @Column(nullable = false)
+    private LocalDate startDate;
+
+    /**
+     * End Date of the uploaded file.
+     */
+    @Column(nullable = false)
+    private LocalDate endDate;
 
 
     /**
@@ -96,4 +110,19 @@ public class SickLeaveCertificate {
         this.uploadedAt = uploadedAt;
     }
 
+    public LocalDate getEndDate() {
+        return endDate;
+    }
+
+    public LocalDate getStartDate() {
+        return startDate;
+    }
+
+    public void setEndDate(LocalDate endDate) {
+        this.endDate = endDate;
+    }
+
+    public void setStartDate(LocalDate startDate) {
+        this.startDate = startDate;
+    }
 }

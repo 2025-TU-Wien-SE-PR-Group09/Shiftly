@@ -1,6 +1,6 @@
-<div class="grid grid-cols-4 gap-4">
+
   <!-- Linke Spalte: Shiftplans (jetzt breiter durch grid-cols) -->
-  <div class="bg-card text-foreground font-[var(--font-poppins)] rounded-xl p-6 shadow-sm col-span-4 3xl:col-span-3">
+  <div class="text-foreground font-[var(--font-poppins)] rounded-xl p-6 shadow-sm bg-background col-span-4 3xl:col-span-3">
     <div class="flex justify-between mb-2">
       <h2 class="mb-4 flex items-center text-xl font-semibold">
         <svg class="text-primary mr-2 h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -13,12 +13,18 @@
         Shiftplan Blueprints
       </h2>
 
-      <div class="w-xs">
-        <app-button full impact="bold" tone="primary" shape="rounded" size="medium" (click)="showForm = !showForm">Generate Plan</app-button>
+      <div>
+        <app-button *ngIf="shiftplans.length > 0" full impact="bold" tone="primary" shape="rounded" size="medium" (click)="showForm = !showForm">
+          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-5 mr-2">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M16.023 9.348h4.992v-.001M2.985 19.644v-4.992m0 0h4.992m-4.993 0 3.181 3.183a8.25 8.25 0 0 0 13.803-3.7M4.031 9.865a8.25 8.25 0 0 1 13.803-3.7l3.181 3.182m0-4.991v4.99" />
+          </svg>
+
+          Generate Plan
+        </app-button>
       </div>
     </div>
 
-    <div class="h-[600px] space-y-4 overflow-y-auto pr-2">
+    <div class="space-y-4 overflow-y-auto pr-2">
       <div
         *ngFor="let plan of shiftplans; let i = index"
         class="border-border bg-card text-foreground rounded-xl border shadow-sm">
@@ -40,13 +46,22 @@
           </app-plan-blueprint>
         </div>
       </div>
+
+      <p *ngIf="!shiftplans.length"
+         class="text-sm text-gray-400 dark:text-gray-500 mb-8 ml-2">
+        This department has no shiftplan blueprints yet. Create one to get started.
+      </p>
+
+      <div class="max-w-fit mt-4">
+        <app-button (click)="showAddBlueprintForm = true" full impact="bold" tone="primary" shape="rounded" size="medium">+ Add Blueprint</app-button>
+
+      </div>
     </div>
   </div>
   <!-- <app-department-concrete-shiftplan [departmentId]="this.department.id!"></app-department-concrete-shiftplan> -->
-</div>
 
 <!-- Modal Overlay -->
-<div *ngIf="showForm" class="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50">
+<div *ngIf="showForm" class="fixed inset-0 z-50 flex items-center justify-center bg-black/50 bg-opacity-50">
   <!-- Modal Box -->
   <div class="relative w-full max-w-md rounded bg-white p-6 shadow-lg dark:bg-gray-900">
     <h2 class="mb-4 text-xl font-bold text-gray-900 dark:text-white">Generate Shiftplan</h2>
@@ -56,3 +71,40 @@
 
   </div>
 </div>
+
+  <!-- Module for delete confirmation -->
+  <div
+    *ngIf="showAddBlueprintForm"
+    class="fixed inset-0 z-50 flex items-center justify-center bg-black/50 bg-opacity-50"
+  >
+    <div class="bg-background border border-border rounded-lg p-6 shadow-lg w-full max-w-md">
+      <h2 class="text-xl font-bold text-foreground mb-4">Add Blueprint</h2>
+      <h2 class="mb-1 text-l font-bold text-gray-900 dark:text-white">Blueprint Description</h2>
+      <input
+        type="text"
+        class="mb-3 w-full rounded border p-2"
+        placeholder="Blueprint Description"
+        [(ngModel)]="newBlueprintName" />
+
+      <div class="flex justify-end space-x-2">
+        <app-button
+          tone="warning"
+          shape="rounded"
+          impact="bold"
+          size="medium"
+          (click)="showAddBlueprintForm = false"
+        >
+          Cancel
+        </app-button>
+        <app-button
+          tone="success"
+          shape="rounded"
+          impact="bold"
+          size="medium"
+          (click)="addBlueprint()"
+        >
+          Create
+        </app-button>
+      </div>
+    </div>
+  </div>

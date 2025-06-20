@@ -10,6 +10,6 @@ public class DepartmentMapper {
 
     public static DepartmentDto fromEntity(Department department) {
         var mappedPlans = department.getPlans().stream().map(ShiftPlanningMapper.Plans::fromEntity).toList();
-        return new DepartmentDto(department.getId(), department.getName(), mappedPlans);
+        return new DepartmentDto(department.getName(), mappedPlans);
     }
 }

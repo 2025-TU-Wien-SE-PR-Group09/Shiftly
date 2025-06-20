@@ -41,10 +41,22 @@ export class CreateConcretePlanComponent {
   generatePlan(): void {
     if (!this.selectedMonth || !this.selectedPlan) return;
 
+    const start = new Date(this.selectedMonth);
+
+    const maxDate = new Date('9999-12-31T23:59:59Z');
+
+    if (start > maxDate) {
+      this.toastrService.warning('Dates cannot be later than 31.12.9999.');
+      return;
+    }
+
     const dto = { startDate: this.selectedMonth };
 
     this.departmentService.generateConcretePlan(this.selectedPlan.id!, dto).subscribe({
-      next: (data) => this.toastrService.success('Plan generated successfully!')
+      next: (data) => {
+        this.toastrService.success('Plan generated successfully!');
+        this.onCancel.emit();
+        },
     });
   }
 

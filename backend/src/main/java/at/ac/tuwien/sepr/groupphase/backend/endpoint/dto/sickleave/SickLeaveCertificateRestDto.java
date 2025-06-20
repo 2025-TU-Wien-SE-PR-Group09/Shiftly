@@ -1,28 +1,43 @@
 package at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.sickleave;
 
+import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.validator.annotation.ValidDateRange;
+import jakarta.validation.constraints.Email;
+import jakarta.validation.constraints.NotNull;
+
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 /**
  * DTO for returning sick leave certificate metadata via REST API.
  */
+@ValidDateRange
 public class SickLeaveCertificateRestDto {
 
     private Long id;
     private String fileName;
     private String fileType;
     private LocalDateTime uploadedAt;
+
+    @NotNull(message = "Email must not be null")
+    @Email(message = "Email must be a valid email address")
     private String employeeEmail;
 
-    public SickLeaveCertificateRestDto(Long id, String fileName, String fileType, LocalDateTime uploadedAt, String employeeEmail) {
+    @NotNull(message = "Start date must not be null")
+    private LocalDate startDate;
+
+    @NotNull(message = "End date must not be null")
+    private LocalDate endDate;
+
+    public SickLeaveCertificateRestDto(Long id, String fileName, String fileType, LocalDateTime uploadedAt, String employeeEmail, LocalDate startDate, LocalDate endDate) {
         this.id = id;
         this.fileName = fileName;
         this.fileType = fileType;
         this.uploadedAt = uploadedAt;
         this.employeeEmail = employeeEmail;
+        this.startDate = startDate;
+        this.endDate = endDate;
     }
 
-    public SickLeaveCertificateRestDto() {
-    }
 
     public Long getId() {
         return id;
@@ -62,5 +77,35 @@ public class SickLeaveCertificateRestDto {
 
     public void setEmployeeEmail(String employeeEmail) {
         this.employeeEmail = employeeEmail;
+    }
+
+    public LocalDate getStartDate() {
+        return startDate;
+    }
+
+    public void setStartDate(LocalDate startDate) {
+        this.startDate = startDate;
+    }
+
+    public LocalDate getEndDate() {
+        return endDate;
+    }
+
+    public void setEndDate(LocalDate endDate) {
+        this.endDate = endDate;
+    }
+
+    @Override
+    public String toString() {
+        return "SickLeaveCertificateRestDto{"
+            + "id=" + id
+            + ", fileName='" + fileName + '\''
+            + ", fileType='" + fileType + '\''
+            + ", uploadedAt=" + uploadedAt
+            + ", employeeEmail='" + employeeEmail
+            + '\''
+            + ", startDate=" + startDate
+            + ", endDate=" + endDate
+            + '}';
     }
 }

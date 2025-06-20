@@ -1,26 +1,41 @@
 package at.ac.tuwien.sepr.groupphase.backend.service.dto.sickleave;
 
+import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.validator.annotation.ValidSickLeaveDateRange;
+import jakarta.validation.constraints.Email;
+import jakarta.validation.constraints.NotNull;
+
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 /**
  * Internal DTO used in the service layer to represent sick leave certificate data.
  */
+@ValidSickLeaveDateRange
 public class SickLeaveCertificateDto {
     private Long id;
     private String fileName;
     private String fileType;
     private LocalDateTime uploadedAt;
+
+    @NotNull(message = "Email must not be null")
+    @Email(message = "Email must be a valid email address")
     private String employeeEmail;
 
-    public SickLeaveCertificateDto() {
-    }
+    @NotNull(message = "Start date must not be null")
+    private LocalDate startDate;
 
-    public SickLeaveCertificateDto(Long id, String fileName, String fileType, LocalDateTime uploadedAt, String employeeEmail) {
+    @NotNull(message = "End date must not be null")
+    private LocalDate endDate;
+
+
+    public SickLeaveCertificateDto(Long id, String fileName, String fileType, LocalDateTime uploadedAt, String employeeEmail, LocalDate startDate, LocalDate endDate) {
         this.id = id;
         this.fileName = fileName;
         this.fileType = fileType;
         this.uploadedAt = uploadedAt;
         this.employeeEmail = employeeEmail;
+        this.startDate = startDate;
+        this.endDate = endDate;
     }
 
     public Long getId() {
@@ -61,5 +76,21 @@ public class SickLeaveCertificateDto {
 
     public void setEmployeeEmail(String employeeEmail) {
         this.employeeEmail = employeeEmail;
+    }
+
+    public LocalDate getEndDate() {
+        return endDate;
+    }
+
+    public void setEndDate(LocalDate endDate) {
+        this.endDate = endDate;
+    }
+
+    public LocalDate getStartDate() {
+        return startDate;
+    }
+
+    public void setStartDate(LocalDate startDate) {
+        this.startDate = startDate;
     }
 }

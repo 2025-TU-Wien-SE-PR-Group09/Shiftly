@@ -1,0 +1,184 @@
+package at.ac.tuwien.sepr.groupphase.backend.unittests;
+
+import at.ac.tuwien.sepr.groupphase.backend.entity.*;
+import at.ac.tuwien.sepr.groupphase.backend.exception.ConflictException;
+import at.ac.tuwien.sepr.groupphase.backend.repository.*;
+import at.ac.tuwien.sepr.groupphase.backend.service.TimeService;
+import at.ac.tuwien.sepr.groupphase.backend.service.impl.shift.ShiftPlanConstraintServiceImpl;
+import at.ac.tuwien.sepr.groupphase.backend.service.shift.ShiftPlanConstraintService;
+import at.ac.tuwien.sepr.groupphase.backend.type.VacationStatus;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+
+import java.time.*;
+import java.util.*;
+import java.util.stream.Collectors;
+
+import static org.junit.jupiter.api.Assertions.*;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.Mockito.*;
+
+public class ShiftPlanConstraintServiceTest {
+
+    private ShiftPlanConstraintService serviceUnderTest;
+    private UserRepository userRepository;
+    private VacationRequestRepository vacationRequestRepository;
+    private ScheduledShiftRepository scheduledShiftRepository;
+    private TimeService timeService;
+
+    @BeforeEach
+    void setUp() {
+        timeService = mock(TimeService.class);
+        when(timeService.now()).thenReturn(LocalDateTime.now());
+
+        userRepository = mock(UserRepository.class);
+        vacationRequestRepository = mock(VacationRequestRepository.class);
+        scheduledShiftRepository = mock(ScheduledShiftRepository.class);
+
+        serviceUnderTest = new ShiftPlanConstraintServiceImpl(
+            userRepository,
+            vacationRequestRepository,
+            scheduledShiftRepository
+        );
+    }
+
+    @Test
+    void testJumperAssignedForAllVacationDaysOfEmployee() {
+        // Arrange
+        Department department = new Department();
+        department.setName("Production");
+        ApplicationUser jumper = createJumper("jumper@shyft.local", department);
+        ApplicationUser max = createUser("max@shyft.local", department);
+
+        when(userRepository.findJumpersByDepartment(department))
+            .thenReturn(List.of(jumper));
+
+        // Vacation for max from Monday to Tuesday
+        LocalDate weekStart = LocalDate.of(2025, 6, 2);
+        VacationRequest vacationRequest = new VacationRequest();
+        vacationRequest.setEmployee(max);
+        vacationRequest.setStartDate(weekStart);
+        vacationRequest.setEndDate(weekStart.plusDays(1));
+        vacationRequest.setStatus(VacationStatus.APPROVED);
+        when(vacationRequestRepository.findByEmployeeEmailAndStatus(max.getEmail(), VacationStatus.APPROVED))
+            .thenReturn(List.of(vacationRequest));
+
+        // No other jumper shifts scheduled
+        when(scheduledShiftRepository.findByStartBetween(any(), any()))
+            .thenReturn(List.of());
+
+        // Plan with shifts for Max
+        ScheduledShift shiftMonday = createShift(weekStart.atTime(8, 0), max);
+        ScheduledShift shiftTuesday = createShift(weekStart.plusDays(1).atTime(8, 0), max);
+        ConcreteShiftPlan plan = new ConcreteShiftPlan();
+        plan.addScheduledShifts(List.of(shiftMonday, shiftTuesday));
+        plan.setStartDate(weekStart);
+        plan.setEndDate(weekStart.plusMonths(3));
+        plan.setDepartment(department);
+
+        // Act
+        ConcreteShiftPlan updatedPlan = serviceUnderTest.applyConstraints(plan);
+
+        // Assert: Jumper should be assigned to both shifts
+        for (ScheduledShift shift : updatedPlan.getScheduledShifts()) {
+            List<String> assignedEmails = shift.getAssignments().stream()
+                .map(a -> a.getUser().getEmail())
+                .toList();
+
+            assertTrue(assignedEmails.contains("jumper@shyft.local"));
+            assertFalse(assignedEmails.contains("max@shyft.local"));
+        }
+    }
+
+    @Test
+    void testJumperAssignedConsistentlyForAllVacationDays() {
+        // Setup
+        Department department = new Department();
+        department.setName("Production");
+        ApplicationUser jumper1 = createJumper("jumper1@shift.local", department);
+        ApplicationUser max = createUser("max@shift.local", department);
+
+        when(userRepository.findJumpersByDepartment(department)).thenReturn(List.of(jumper1));
+
+        // Max: Vacation from Monday to Tuesday
+        LocalDate weekStart = LocalDate.of(2025, 6, 9);
+        VacationRequest vacationRequest = new VacationRequest();
+        vacationRequest.setEmployee(max);
+        vacationRequest.setStartDate(weekStart);
+        vacationRequest.setEndDate(weekStart.plusDays(1));
+        vacationRequest.setStatus(VacationStatus.APPROVED);
+        when(vacationRequestRepository.findByEmployeeEmailAndStatus(max.getEmail(), VacationStatus.APPROVED))
+            .thenReturn(List.of(vacationRequest));
+
+        // No other jumper shifts scheduled
+        when(scheduledShiftRepository.findByStartBetween(any(), any()))
+            .thenReturn(List.of());
+
+        // Plan with shifts for Max on Monday and Tuesday
+        ScheduledShift mondayShift = createShift(weekStart.atTime(8, 0), max);
+        ScheduledShift tuesdayShift = createShift(weekStart.plusDays(1).atTime(8, 0), max);
+        ConcreteShiftPlan plan = new ConcreteShiftPlan();
+        plan.setStartDate(weekStart);
+        plan.setEndDate(weekStart.plusMonths(3));
+        plan.addScheduledShifts(List.of(mondayShift, tuesdayShift));
+        plan.setDepartment(department);
+
+        // Action
+        ConcreteShiftPlan updatedPlan = serviceUnderTest.applyConstraints(plan);
+
+        // Assertions
+        assertShiftHasAssignedUser(updatedPlan, weekStart, jumper1);
+        assertShiftHasAssignedUser(updatedPlan, weekStart.plusDays(1), jumper1);
+    }
+
+
+    // Helper
+    private ApplicationUser createUser(String email, Department department) {
+        ApplicationUser user = new ApplicationUser();
+        user.setEmail(email);
+        user.setDepartment(department);
+        return user;
+    }
+
+    private ApplicationUser createJumper(String email, Department department) {
+        ApplicationUser jumper = createUser(email, department);
+
+        ApplicationRole jumperRole = new ApplicationRole("JUMPER");
+
+        jumper.getRoles().add(jumperRole);
+        jumperRole.getUsers().add(jumper);
+
+        return jumper;
+    }
+
+
+    private ScheduledShift createShift(LocalDateTime start, ApplicationUser assignedUser) {
+        ScheduledShift shift = new ScheduledShift.Builder()
+            .withStart(start)
+            .withEnd(start.plusHours(8))
+            .withDescription("Test shift")
+            .withPlan(new ConcreteShiftPlan())
+            .build();
+
+        ScheduledShiftAssignment assignment = new ScheduledShiftAssignment.Builder()
+            .withShift(shift)
+            .withUser(assignedUser)
+            .build();
+
+        shift.addAssignment(assignment);
+        return shift;
+    }
+
+    private void assertShiftHasAssignedUser(ConcreteShiftPlan plan, LocalDate date, ApplicationUser expectedUser) {
+        ScheduledShift shift = plan.getScheduledShifts().stream()
+            .filter(s -> s.getStart().toLocalDate().equals(date))
+            .findFirst()
+            .orElseThrow();
+
+        Set<ApplicationUser> assignedUsers = shift.getAssignments().stream()
+            .map(ScheduledShiftAssignment::getUser)
+            .collect(Collectors.toSet());
+
+        assertThat(assignedUsers).containsExactly(expectedUser);
+    }
+}

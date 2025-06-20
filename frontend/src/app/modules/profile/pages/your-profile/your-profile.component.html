@@ -7,8 +7,13 @@
 
   <div class="space-y-4 text-left">
     <div class="form__group">
-      <label class="block text-muted-foreground text-sm mb-1">Name</label>
-      <div class="bg-background p-3 rounded-md text-foreground">{{ userData.name }}</div>
+      <label class="block text-muted-foreground text-sm mb-1">First Name</label>
+      <div class="bg-background p-3 rounded-md text-foreground"> {{ userData.firstName }}</div>
+    </div>
+
+    <div class="form__group">
+      <label class="block text-muted-foreground text-sm mb-1">Last Name</label>
+      <div class="bg-background p-3 rounded-md text-foreground"> {{ userData.lastName }}</div>
     </div>
 
     <div class="form__group">
@@ -28,7 +33,7 @@
   </div>
 
   <!-- Change Password -->
-  <div class="pt-6 text-center">
+  <div class="pt-6 text-center" *ngIf="!isAdmin()">
     <app-button
       (click)="changePassword()"
       impact="bold"

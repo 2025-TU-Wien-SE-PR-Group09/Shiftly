@@ -1,7 +1,9 @@
 package at.ac.tuwien.sepr.groupphase.backend.service.impl;
 
+import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.user.UserDataLoginDto;
 import at.ac.tuwien.sepr.groupphase.backend.entity.ApplicationRole;
 import at.ac.tuwien.sepr.groupphase.backend.entity.ApplicationUser;
+import at.ac.tuwien.sepr.groupphase.backend.entity.Department;
 import at.ac.tuwien.sepr.groupphase.backend.repository.UserRepository;
 import at.ac.tuwien.sepr.groupphase.backend.security.JwtTokenizer;
 import at.ac.tuwien.sepr.groupphase.backend.service.AuthService;
@@ -40,20 +42,24 @@ public class AuthServiceImpl implements AuthService {
     }
 
     @Override
-    public LoginResponseDto login(UserDataDto userLoginDto) {
+    public LoginResponseDto login(UserDataLoginDto userLoginDto) throws BadCredentialsException {
         LOGGER.trace("login({})", userLoginDto);
         UserDetails userDetails = loadUserByUsername(userLoginDto.getEmail());
         if (userDetails != null
             && userDetails.isAccountNonExpired()
             && userDetails.isAccountNonLocked()
             && userDetails.isCredentialsNonExpired()
-            && passwordEncoder.matches(userLoginDto.getPassword(), userDetails.getPassword())
-        ) {
+            && passwordEncoder.matches(userLoginDto.getPassword(), userDetails.getPassword())) {
+
+            var department = userRepository.findByEmail(userLoginDto.getEmail()).map(ApplicationUser::getDepartment);
+
+            var depName = department.map(Department::getName);
             List<String> roles = userDetails.getAuthorities()
                 .stream()
                 .map(GrantedAuthority::getAuthority)
                 .toList();
-            return new LoginResponseDto(jwtTokenizer.getAuthToken(userDetails.getUsername(), roles));
+            return new LoginResponseDto(
+                jwtTokenizer.getAuthToken(userDetails.getUsername(), roles, depName));
         }
         throw new BadCredentialsException("Username or password is incorrect or account is locked");
     }
@@ -74,7 +80,8 @@ public class AuthServiceImpl implements AuthService {
     }
 
     @Override
-    public ApplicationUser getCurrentUser() {
+    public ApplicationUser getCurrentUser() throws UsernameNotFoundException {
+        LOGGER.trace("getCurrentUser()");
         var authentication = SecurityContextHolder.getContext().getAuthentication();
         if (authentication == null || !authentication.isAuthenticated()) {
             throw new UsernameNotFoundException("No authentication found");

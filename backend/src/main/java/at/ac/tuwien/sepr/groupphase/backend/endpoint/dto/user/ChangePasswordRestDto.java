@@ -28,4 +28,11 @@ public class ChangePasswordRestDto {
     public void setNewPassword(String newPassword) {
         this.newPassword = newPassword;
     }
+
+    @Override
+    public String toString() {
+        return "ChangePasswordRestDto{"
+            + "newPassword='" + newPassword + '\''
+            + '}';
+    }
 }

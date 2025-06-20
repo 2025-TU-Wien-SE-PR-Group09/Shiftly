@@ -10,6 +10,8 @@
 
 
 export interface RegisterRestDto { 
+    firstName: string;
+    lastName: string;
     email: string;
     password: string;
     code: string;

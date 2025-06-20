@@ -1,11 +1,10 @@
 import { NgModule } from '@angular/core';
 import { RouterModule, Routes } from '@angular/router';
 import { VacationsComponent } from './vacations.component';
-import {
-  EmployeeVacationsComponent
-} from './pages/employee-vacations/employee-vacations.component';
+import { EmployeeVacationsComponent } from './pages/employee-vacations/employee-vacations.component';
 import { SupervisorVacationsComponent } from './pages/supervisor-vacations/supervisor-vacations.component';
-import { RoleGuard } from '../../core/guards/role.guard';
+import { AuthGuard } from 'src/app/core/guards/auth.guard';
+import { RoleGuard } from 'src/app/core/guards/role.guard';
 
 const routes: Routes = [
   {
@@ -15,7 +14,7 @@ const routes: Routes = [
       {
         path: 'employee',
         component: EmployeeVacationsComponent,
-        canActivate: [RoleGuard],
+        canActivate: [AuthGuard, RoleGuard],
         data: {
           roles: ['EMPLOYEE'],
         },
@@ -23,12 +22,12 @@ const routes: Routes = [
       {
         path: 'supervisor',
         component: SupervisorVacationsComponent,
-        canActivate: [RoleGuard],
+        canActivate: [AuthGuard, RoleGuard],
         data: {
           roles: ['SUPERVISOR'],
         },
       },
-    ]
+    ],
   },
 ];
 
@@ -36,4 +35,4 @@ const routes: Routes = [
   imports: [RouterModule.forChild(routes)],
   exports: [RouterModule],
 })
-export class VacationsRoutingModule {}
+export class VacationsRoutingModule { }

@@ -14,8 +14,8 @@ public class ConflictException extends RuntimeException {
     }
 
     public ConflictException(ValidationErrors validationErrors) {
-        super(String.join("; ", validationErrors.validationErrors()));
-        errors.addAll(validationErrors.validationErrors());
+        super(String.join("; ", validationErrors.getValidationErrors()));
+        errors.addAll(validationErrors.getValidationErrors());
     }
 
     public List<String> getErrors() {

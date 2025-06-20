@@ -1,5 +1,6 @@
 package at.ac.tuwien.sepr.groupphase.backend.service.mapper;
 
+import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.department.DepartmentShiftplanCalendarResponse;
 import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.shift.PlanBlueprintResponse;
 import at.ac.tuwien.sepr.groupphase.backend.entity.PlanBlueprint;
 import at.ac.tuwien.sepr.groupphase.backend.entity.ShiftBlueprint;
@@ -56,7 +57,6 @@ public class ShiftPlanningMapper {
      */
     public static class Shifts {
 
-
         /**
          * Converts a Shift(DAO) entity to a ShiftDto(Service DTO).
          *
@@ -68,7 +68,8 @@ public class ShiftPlanningMapper {
                 .map(ShiftPlanningMapper.ShiftWeeks::fromEntity)
                 .toList();
 
-            return new ShiftBlueprintDto(shiftBlueprint.getId(), shiftBlueprint.getDescription(), shiftBlueprint.getManPower(), shiftWeeks);
+            return new ShiftBlueprintDto(shiftBlueprint.getId(), shiftBlueprint.getDescription(),
+                shiftBlueprint.getManPower(), shiftWeeks);
         }
 
         /**
@@ -90,7 +91,6 @@ public class ShiftPlanningMapper {
      * Mapper class for all classes related to ShiftWeek.
      */
     public static class ShiftWeeks {
-
 
         /**
          * Converts a ShiftWeek(DAO) entity to a ShiftWeekDto(Service DTO).
@@ -128,7 +128,8 @@ public class ShiftPlanningMapper {
          * @return the ShiftDayDto
          */
         public static ShiftDayDto fromEntity(ShiftDayBlueprint shiftDayBlueprint) {
-            return new ShiftDayDto(shiftDayBlueprint.getDay(), shiftDayBlueprint.getStartTime(), shiftDayBlueprint.getDuration());
+            return new ShiftDayDto(shiftDayBlueprint.getDay(), shiftDayBlueprint.getStartTime(),
+                shiftDayBlueprint.getDuration());
         }
 
         /**
@@ -138,7 +139,23 @@ public class ShiftPlanningMapper {
          * @return the ShiftDayResponseDto(Rest)
          */
         public static PlanBlueprintResponse.ShiftDayResponseDto toResponse(ShiftDayDto shiftDayDto) {
-            return new PlanBlueprintResponse.ShiftDayResponseDto(shiftDayDto.day(), shiftDayDto.startTime(), shiftDayDto.duration());
+            return new PlanBlueprintResponse.ShiftDayResponseDto(shiftDayDto.day(), shiftDayDto.startTime(),
+                shiftDayDto.duration());
+        }
+    }
+
+    public static class Calendar {
+
+        public static DepartmentShiftplanCalendarResponse.ScheduledShift toResponse(
+            at.ac.tuwien.sepr.groupphase.backend.entity.ScheduledShift scheduledShift) {
+            return new DepartmentShiftplanCalendarResponse.ScheduledShift(
+                scheduledShift.getDescription(),
+                new DepartmentShiftplanCalendarResponse.Day(scheduledShift.getStart(), scheduledShift.getEnd()),
+                scheduledShift.getManpower(),
+                scheduledShift.getAssignments().stream()
+                    .map(a -> a.getUser().getFirstName() + " "
+                        + a.getUser().getLastName()
+                        + " (" + a.getUser().getEmail() + ")").toList());
         }
     }
 

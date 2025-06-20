@@ -12,12 +12,18 @@ import { environment } from '../../../environments/environment';
 import { AuthService } from '../services/auth.service';
 import { ToastrService } from 'ngx-toastr';
 import { Router } from '@angular/router';
+import { SKIP_EXCEPTION_INTERCEPTOR } from './skip-exception-interceptor';
 
 @Injectable()
 export class ExceptionInterceptor implements HttpInterceptor {
   constructor(private toastr: ToastrService, private router: Router, private authService: AuthService) { }
 
   intercept(req: HttpRequest<any>, next: HttpHandler): Observable<HttpEvent<any>> {
+    const shouldSkip = req.context.get(SKIP_EXCEPTION_INTERCEPTOR);
+    if (shouldSkip) {
+      return next.handle(req); // Skip logic
+    }
+
     return next.handle(req).pipe(
       catchError((error: HttpErrorResponse) => {
         console.log(error)
@@ -26,12 +32,15 @@ export class ExceptionInterceptor implements HttpInterceptor {
           return throwError(() => error);
         }
 
+
         if (error.status === 401) {
           this.toastr.error('Your session has expired. Please log in again.');
           this.authService.logoutUser();            // drop any stale token
           this.router.navigate(['/auth/sign-in']).then();
           return EMPTY;
         }
+
+        // Workaround for not being able to change exception message in backend. DO NOT REMOVE
         if (error.status===413){
           this.toastr.error("File Size can not exceed 5MB","Error occurred")
           return EMPTY;
@@ -40,6 +49,7 @@ export class ExceptionInterceptor implements HttpInterceptor {
         if (error.error?.errors) {
           // If errors is an object or array, iterate and show each message
           const errors = error.error.errors;
+          console.log(errors);
           if (Array.isArray(errors)) {
             errors.forEach(err => this.toastr.error(err, "Error occurred"));
           } else if (typeof errors === 'object') {

@@ -1,4 +1,5 @@
 package at.ac.tuwien.sepr.groupphase.backend.unittests;
+
 import at.ac.tuwien.sepr.groupphase.backend.entity.ApplicationUser;
 import at.ac.tuwien.sepr.groupphase.backend.entity.VacationRequest;
 import at.ac.tuwien.sepr.groupphase.backend.exception.ConflictException;
@@ -6,13 +7,19 @@ import at.ac.tuwien.sepr.groupphase.backend.exception.NotFoundException;
 import at.ac.tuwien.sepr.groupphase.backend.repository.UserRepository;
 import at.ac.tuwien.sepr.groupphase.backend.repository.VacationRequestRepository;
 import at.ac.tuwien.sepr.groupphase.backend.service.dto.user.UserEmailDto;
+import at.ac.tuwien.sepr.groupphase.backend.service.dto.vacation.DeletePendingVacationRequestDto;
 import at.ac.tuwien.sepr.groupphase.backend.service.dto.vacation.VacationRequestDto;
 import at.ac.tuwien.sepr.groupphase.backend.service.impl.VacationRequestServiceImpl;
 import at.ac.tuwien.sepr.groupphase.backend.type.VacationStatus;
+
+
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.springframework.security.access.AccessDeniedException;
+
 import java.util.List;
 import java.util.Optional;
+
 import static at.ac.tuwien.sepr.groupphase.backend.basetest.TestData.EMPLOYEE_EMAIL;
 import static at.ac.tuwien.sepr.groupphase.backend.basetest.TestData.END_DATE;
 import static at.ac.tuwien.sepr.groupphase.backend.basetest.TestData.OVERLAPPING_END;
@@ -65,7 +72,7 @@ class VacationServiceTest {
     }
 
     @Test
-    void deletePendingRequest_byNonOwner_shouldThrowConflictException() {
+    void deletePendingRequest_byNonOwner_shouldThrowAccessDeniedException() {
         ApplicationUser otherUser = new ApplicationUser();
         otherUser.setEmail("someoneelse@example.com");
 
@@ -76,7 +83,7 @@ class VacationServiceTest {
 
         when(vacationRequestRepository.findById(VACATION_ID)).thenReturn(Optional.of(request));
 
-        assertThrows(ConflictException.class, () -> service.deletePendingRequest(VACATION_ID, EMPLOYEE_EMAIL));
+        assertThrows(AccessDeniedException.class, () -> service.deletePendingRequest(new DeletePendingVacationRequestDto(VACATION_ID, EMPLOYEE_EMAIL)));
     }
 
     @Test
@@ -92,7 +99,7 @@ class VacationServiceTest {
         when(vacationRequestRepository.findById(VACATION_ID)).thenReturn(Optional.of(request));
 
 
-        assertDoesNotThrow(() -> service.deletePendingRequest(VACATION_ID, EMPLOYEE_EMAIL));
+        assertDoesNotThrow(() -> service.deletePendingRequest(new DeletePendingVacationRequestDto(VACATION_ID, EMPLOYEE_EMAIL)));
         verify(vacationRequestRepository, times(1)).delete(request);
     }
 
@@ -126,7 +133,7 @@ class VacationServiceTest {
     }
 
     @Test
-    void deletePendingRequest_withApprovedStatus_shouldThrowIllegalStateException() {
+    void deletePendingRequest_withApprovedStatus_shouldThrowConflictException() {
         ApplicationUser user = new ApplicationUser();
         user.setEmail(EMPLOYEE_EMAIL);
 
@@ -137,8 +144,8 @@ class VacationServiceTest {
 
         when(vacationRequestRepository.findById(VACATION_ID)).thenReturn(Optional.of(request));
 
-        assertThrows(IllegalStateException.class, () ->
-            service.deletePendingRequest(VACATION_ID, EMPLOYEE_EMAIL));
+        assertThrows(ConflictException.class, () ->
+            service.deletePendingRequest(new DeletePendingVacationRequestDto(VACATION_ID, EMPLOYEE_EMAIL)));
     }
 
     @Test
@@ -146,16 +153,8 @@ class VacationServiceTest {
         when(vacationRequestRepository.findById(VACATION_ID)).thenReturn(Optional.empty());
 
         assertThrows(NotFoundException.class, () ->
-            service.deletePendingRequest(VACATION_ID, EMPLOYEE_EMAIL));
+            service.deletePendingRequest(new DeletePendingVacationRequestDto(VACATION_ID, EMPLOYEE_EMAIL)));
     }
-
-
-
-
-
-
-
-
 
 
 }

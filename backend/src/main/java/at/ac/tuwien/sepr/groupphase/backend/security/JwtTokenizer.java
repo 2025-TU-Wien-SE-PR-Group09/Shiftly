@@ -8,6 +8,7 @@ import org.springframework.stereotype.Component;
 import javax.crypto.SecretKey;
 import java.util.Date;
 import java.util.List;
+import java.util.Optional;
 
 @Component
 public class JwtTokenizer {
@@ -18,19 +19,37 @@ public class JwtTokenizer {
         this.securityProperties = securityProperties;
     }
 
-    public String getAuthToken(String user, List<String> roles) {
+    public String getAuthToken(String user, List<String> roles, Optional<String> departmentName) {
         byte[] signingKey = securityProperties.getJwtSecret().getBytes();
         SecretKey key = Keys.hmacShaKeyFor(signingKey);
 
-        String token = Jwts.builder()
+        var builder = Jwts.builder()
             .header().add("typ", securityProperties.getJwtType()).and()
             .issuer(securityProperties.getJwtIssuer())
             .audience().add(securityProperties.getJwtAudience()).and()
             .subject(user)
             .expiration(new Date(System.currentTimeMillis() + securityProperties.getJwtExpirationTime()))
-            .claim("rol", roles)
+            .claim("rol", roles);
+
+        departmentName.ifPresent(depName -> builder.claim("depName", depName));
+
+        var token = builder.signWith(key, Jwts.SIG.HS512).compact();
+        return securityProperties.getAuthTokenPrefix() + token;
+    }
+
+    public String generateInvitationToken(String email) {
+        byte[] signingKey = securityProperties.getJwtSecret().getBytes();
+        SecretKey key = Keys.hmacShaKeyFor(signingKey);
+
+        return Jwts.builder()
+            .header().add("typ", "INVITATION").and()
+            .issuer(securityProperties.getJwtIssuer())
+            .audience().add(securityProperties.getJwtAudience()).and()
+            .subject(email)
+            .issuedAt(new Date())
+            .expiration(new Date(System.currentTimeMillis() + 86400000)) // 24 Stunden
+            .claim("purpose", "invitation")
             .signWith(key, Jwts.SIG.HS512)
             .compact();
-        return securityProperties.getAuthTokenPrefix() + token;
     }
 }

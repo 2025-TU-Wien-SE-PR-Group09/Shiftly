@@ -4,6 +4,7 @@ import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.validator.annotation.Va
 import at.ac.tuwien.sepr.groupphase.backend.service.dto.vacation.VacationRequestDto;
 import jakarta.validation.constraints.Future;
 import jakarta.validation.constraints.NotNull;
+
 import java.time.LocalDate;
 
 @ValidDateRange
@@ -16,8 +17,6 @@ public class VacationRequestRestDto {
     @NotNull(message = "End date must not be null")
     @Future(message = "End date must be in the future")
     private LocalDate endDate;
-
-
 
 
     public VacationRequestRestDto() {
@@ -56,7 +55,6 @@ public class VacationRequestRestDto {
     }
 
 
-
     /**
      * Converts a VacationRequestRestDto to a VacationRequestDto.
      *
@@ -70,5 +68,11 @@ public class VacationRequestRestDto {
         return restDto;
     }
 
-
+    @Override
+    public String toString() {
+        return "VacationRequestRestDto{"
+            + "startDate=" + startDate
+            + ", endDate=" + endDate
+            + '}';
+    }
 }

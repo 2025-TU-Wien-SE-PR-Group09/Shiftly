@@ -1,7 +1,7 @@
 package at.ac.tuwien.sepr.groupphase.backend.entity;
 
-
 import jakarta.persistence.CascadeType;
+import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
@@ -25,6 +25,8 @@ public class ConcreteShiftPlan {
     private LocalDate startDate;
     private LocalDate endDate;
 
+    private boolean overwritten = false;
+
     @ManyToOne(optional = false)
     private Department department;
 
@@ -36,41 +38,47 @@ public class ConcreteShiftPlan {
         return id;
     }
 
-    public void setId(Long id) {
-        this.id = id;
-    }
-
     public LocalDate getStartDate() {
         return startDate;
-    }
-
-    public void setStartDate(LocalDate startDate) {
-        this.startDate = startDate;
-    }
-
-    public LocalDate getEndDate() {
-        return endDate;
-    }
-
-    public void setEndDate(LocalDate endDate) {
-        this.endDate = endDate;
     }
 
     public Department getDepartment() {
         return department;
     }
 
-    public void setDepartment(Department department) {
-        this.department = department;
+    public LocalDate getEndDate() {
+        return endDate;
     }
 
     public List<ScheduledShift> getScheduledShifts() {
         return scheduledShifts;
     }
 
-    public void addScheduledShifts(List<ScheduledShift> scheduledShifts) {
+    public void setStartDate(LocalDate startDate) {
+        this.startDate = startDate;
+    }
+
+    public void setEndDate(LocalDate endDate) {
+        this.endDate = endDate;
+    }
+
+    public void setId(Long id) {
+        this.id = id;
+    }
+
+    public void setDepartment(Department department) {
+        this.department = department;
+    }
+
+    public void addScheduledShifts(List<ScheduledShift> newShifts) {
+        for (ScheduledShift shift : newShifts) {
+            shift.setPlan(this);
+            this.scheduledShifts.add(shift);
+        }
+    }
+
+    public void setScheduledShifts(List<ScheduledShift> scheduledShifts) {
         this.scheduledShifts = scheduledShifts;
-        scheduledShifts.forEach(scheduledShift -> scheduledShift.setPlan(this));
     }
 
     public static class Builder {
@@ -102,4 +110,11 @@ public class ConcreteShiftPlan {
         }
     }
 
+    public boolean isOverwritten() {
+        return overwritten;
+    }
+
+    public void setOverwritten(boolean overwritten) {
+        this.overwritten = overwritten;
+    }
 }

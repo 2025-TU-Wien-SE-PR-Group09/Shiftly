@@ -42,24 +42,28 @@ class UserServiceTest {
 
     @Test
     public void createOrChangePasswordUserDoesNotExistOK() {
-        UserDataDto toUpdate = new UserDataDto(TestData.ADMIN_USER_EMAIL, TestData.ADMIN_PW);
+        UserDataDto toUpdate = new UserDataDto(TestData.ADMIN_USER_EMAIL, TestData.ADMIN_PW, "Admin",
+            "Test");
         userService.createOrChangePassword(toUpdate);
         assertUserExists(toUpdate);
     }
 
     @Test
     public void createOrChangePasswordUserExistsOK() {
-        userService.createOrChangePassword(new UserDataDto(TestData.ADMIN_USER_EMAIL, "empty_pw"));
+        userService.createOrChangePassword(new UserDataDto(TestData.ADMIN_USER_EMAIL, "empty_pw",
+            "Admin", "Test"));
 
-        UserDataDto toUpdate = new UserDataDto(TestData.ADMIN_USER_EMAIL, TestData.ADMIN_PW);
+        UserDataDto toUpdate = new UserDataDto(TestData.ADMIN_USER_EMAIL, TestData.ADMIN_PW, "Admin",
+            "Test");
         userService.createOrChangePassword(toUpdate);
         assertUserExists(toUpdate);
     }
 
     @Test
     public void assignRoleToUserOK() {
-        userService.createOrChangePassword(new UserDataDto(TestData.ADMIN_USER_EMAIL, TestData.ADMIN_PW));
-        userService.assignRoleToUser(new UserRoleDto(TestData.ADMIN_USER_EMAIL, Role.ADMIN));
+        userService.createOrChangePassword(new UserDataDto(TestData.ADMIN_USER_EMAIL, TestData.ADMIN_PW,
+            "Admin", "Test"));
+        userService.assignRoleToUser(new UserRoleDto(TestData.ADMIN_USER_EMAIL, Role.ADMIN, null));
 
         UserDetails applicationUser = authService.loadUserByUsername(TestData.ADMIN_USER_EMAIL);
         assertUserHasRole(applicationUser, Role.ADMIN);
@@ -68,8 +72,7 @@ class UserServiceTest {
     @Test
     public void assignRoleToUserNonexistentUser() {
         assertThrows(NotFoundException.class,
-            () -> userService.assignRoleToUser(new UserRoleDto("NONEXISTENT_MAIL@test.com", Role.ADMIN))
-        );
+            () -> userService.assignRoleToUser(new UserRoleDto("NONEXISTENT_MAIL@test.com", Role.ADMIN, null)));
     }
 
     private void assertUserHasRole(UserDetails user, Role role) {
@@ -91,7 +94,6 @@ class UserServiceTest {
             () -> assertThat(passwordEncoder.matches(user.getPassword(), applicationUser.getPasswordHash()))
                 .as("Password of " + user.getEmail() + " (" + user.getPassword() + ") does not match "
                     + applicationUser.getPasswordHash())
-                .isTrue()
-        );
+                .isTrue());
     }
 }

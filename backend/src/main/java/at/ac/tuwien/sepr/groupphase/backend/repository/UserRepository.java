@@ -18,4 +18,23 @@ public interface UserRepository extends JpaRepository<ApplicationUser, String> {
 
     @Query("SELECT u FROM ApplicationUser u JOIN u.roles r WHERE r.name = :roleName")
     List<ApplicationUser> findAllByRoleName(@Param("roleName") String roleName);
+
+    @Query("SELECT u FROM ApplicationUser u WHERE u.department.id = :departmentId")
+    List<ApplicationUser> findAllByDepartmentId(@Param("departmentId") Long departmentId);
+
+    @Query("SELECT u FROM ApplicationUser u LEFT JOIN u.roles r WHERE r IS NULL")
+    List<ApplicationUser> findAllWithNoRole();
+
+    @Query("SELECT u FROM ApplicationUser u WHERE u.department.id = :departmentId")
+    List<ApplicationUser> findByDepartmentId(@Param("departmentId") Long departmentId);
+
+    @Query("SELECT u FROM ApplicationUser u JOIN u.roles r "
+        + "WHERE r.name = 'SUPERVISOR' AND u.department = :department")
+    List<ApplicationUser> findSupervisorsByDepartment(@Param("department") at.ac.tuwien.sepr.groupphase.backend.entity.Department department);
+
+    @Query("SELECT u FROM ApplicationUser u JOIN u.roles r "
+        + "WHERE r.name = 'JUMPER' AND u.department = :department")
+    List<ApplicationUser> findJumpersByDepartment(@Param("department") at.ac.tuwien.sepr.groupphase.backend.entity.Department department);
+
+
 }

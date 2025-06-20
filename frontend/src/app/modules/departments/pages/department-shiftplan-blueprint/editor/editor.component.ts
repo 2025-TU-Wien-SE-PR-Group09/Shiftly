@@ -4,9 +4,10 @@ import { FormArray, FormBuilder, FormGroup, ReactiveFormsModule, Validators } fr
 import { AddShiftToPlanBlueprintDto, DepartmentService, PlanBlueprintResponse } from 'src/app/rest_client';
 import { ToastrService } from 'ngx-toastr';
 import { AbstractControl, ValidationErrors, ValidatorFn } from '@angular/forms';
+import { ButtonComponent } from '../../../../../shared/components/button/button.component';
 @Component({
   selector: 'app-editor',
-  imports: [CommonModule, ReactiveFormsModule],
+  imports: [CommonModule, ReactiveFormsModule, ButtonComponent],
   templateUrl: './editor.component.html',
 })
 export class EditorComponent {
@@ -15,6 +16,24 @@ export class EditorComponent {
   @Output() shiftAdded = new EventEmitter<PlanBlueprintResponse>();
   blueprintForm: FormGroup;
   daysOfWeek = ['MONDAY', 'TUESDAY', 'WEDNESDAY', 'THURSDAY', 'FRIDAY', 'SATURDAY', 'SUNDAY'];
+  distinctColors = [
+    'rgba(230, 25, 75, 0.6)', // Red
+    'rgba(60, 180, 75, 0.6)', // Green
+    'rgba(255, 225, 25, 0.6)', // Yellow
+    'rgba(0, 130, 200, 0.6)', // Blue
+    'rgba(245, 130, 48, 0.6)', // Orange
+    'rgba(145, 30, 180, 0.6)', // Purple
+    'rgba(70, 240, 240, 0.6)', // Cyan
+    'rgba(240, 50, 230, 0.6)', // Magenta
+    'rgba(210, 245, 60, 0.6)', // Lime
+    'rgba(250, 190, 190, 0.6)', // Light Pink
+    'rgba(0, 128, 128, 0.6)', // Teal
+    'rgba(230, 190, 255, 0.6)', // Lavender
+    'rgba(170, 110, 40, 0.6)', // Brown
+    'rgba(128, 0, 0, 0.6)', // Maroon
+    'rgba(128, 128, 0, 0.6)', // Olive
+  ];
+  @Input() amountShiftWeeks: number = 1;
 
   constructor(private fb: FormBuilder, private departmentService: DepartmentService, private toastr: ToastrService) {
     this.blueprintForm = this.fb.group({
@@ -36,13 +55,20 @@ export class EditorComponent {
   }
 
   addShift() {
-    this.shifts.push(
-      this.fb.group({
-        description: ['', Validators.required],
-        manPower: [1, [Validators.required, Validators.min(1)]],
-        shiftWeeks: this.fb.array([], this.minLengthFormArray(1)),
-      }),
-    );
+    const newShift = this.fb.group({
+      description: ['', [Validators.required, Validators.minLength(3), Validators.maxLength(255)]],
+
+      manPower: [1, [Validators.required, Validators.min(1)]],
+      shiftWeeks: this.fb.array([], this.minLengthFormArray(1)),
+    });
+
+    this.shifts.push(newShift);
+
+    console.log(this.amountShiftWeeks);
+
+    for (let i = 0; i < this.amountShiftWeeks; i++) {
+      this.addWeek(this.shifts.length - 1);
+    }
   }
 
   removeShift(i: number) {
@@ -56,9 +82,13 @@ export class EditorComponent {
   addWeek(shiftIndex: number) {
     this.getWeeks(shiftIndex).push(
       this.fb.group({
-        shiftDays: this.fb.array([], this.minLengthFormArray(1)),
+        shiftDays: this.fb.array([], [this.minLengthFormArray(1), this.exactWeeklyHoursValidator(40)]),
       }),
     );
+  }
+
+  hasFixedWeekCount(): boolean {
+    return this.amountShiftWeeks !== 1;
   }
 
   removeWeek(shiftIndex: number, weekIndex: number) {
@@ -120,5 +150,80 @@ export class EditorComponent {
         this.resetFormCompletely();
       },
     });
+  }
+
+  exactWeeklyHoursValidator(expectedHours: number): ValidatorFn {
+    return (control: AbstractControl): ValidationErrors | null => {
+      if (!(control instanceof FormArray)) return null;
+
+      let totalMinutes = 0;
+
+      for (const dayCtrl of control.controls) {
+        const start = dayCtrl.get('startTime')?.value;
+        const end = dayCtrl.get('endTime')?.value;
+
+        if (start && end) {
+          totalMinutes += this.calculateDurationMinutes(start, end);
+        }
+      }
+
+      const totalHours = totalMinutes / 60;
+      if (totalHours !== expectedHours) {
+        return { exactWeeklyHours: totalHours };
+      }
+
+      return null;
+    };
+  }
+
+  private calculateDurationMinutes(startTime: string, endTime: string): number {
+    const [sh, sm] = startTime.split(':').map(Number);
+    const [eh, em] = endTime.split(':').map(Number);
+
+    const startMinutes = sh * 60 + sm;
+    const endMinutes = eh * 60 + em;
+
+    if (endMinutes <= startMinutes) {
+      // über Mitternacht
+      const startToMidnight = 23 * 60 + 59 - startMinutes + 1; // bis 00:00
+      const midnightToEnd = endMinutes; // ab 00:00 bis Ende
+      return startToMidnight + midnightToEnd;
+    } else {
+      return endMinutes - startMinutes;
+    }
+  }
+
+  copyDayToOthers(shiftIndex: number, weekIndex: number, weekday: string) {
+    const otherWeekdays = this.daysOfWeek.filter((d) => d !== weekday);
+    const weekDaysData = this.getDays(shiftIndex, weekIndex).value;
+    let startTime = '';
+    let endTime = '';
+
+    for (let weekDayData of weekDaysData) {
+      if (weekDayData.day === weekday) {
+        startTime = weekDayData.startTime;
+        endTime = weekDayData.endTime;
+      }
+    }
+
+    if (startTime === '' || endTime === '') {
+      this.toastr.error('Cannot copy time to other days because startTime and endTime is empty.', 'Error occurred');
+      return;
+    }
+
+    for (let otherWeekday of otherWeekdays) {
+      const dayIndex = this.getDayIndex(shiftIndex, weekIndex, otherWeekday);
+      if (dayIndex >= 0) {
+        this.removeDay(shiftIndex, weekIndex, this.getDayIndex(shiftIndex, weekIndex, otherWeekday));
+      }
+
+      this.getDays(shiftIndex, weekIndex).push(
+        this.fb.group({
+          day: [otherWeekday, Validators.required],
+          startTime: [startTime, Validators.required],
+          endTime: [endTime, Validators.required],
+        }),
+      );
+    }
   }
 }

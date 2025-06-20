@@ -8,6 +8,7 @@ import at.ac.tuwien.sepr.groupphase.backend.exception.ConflictException;
 import at.ac.tuwien.sepr.groupphase.backend.exception.NotFoundException;
 import at.ac.tuwien.sepr.groupphase.backend.service.dto.department.DepartmentCreateDto;
 import at.ac.tuwien.sepr.groupphase.backend.service.dto.department.DepartmentDto;
+import at.ac.tuwien.sepr.groupphase.backend.service.dto.employee.EmployeeDto;
 import at.ac.tuwien.sepr.groupphase.backend.service.dto.user.UserEmailDto;
 
 import java.util.List;
@@ -21,8 +22,9 @@ public interface DepartmentService {
      * @param dto the department data transfer object containing the details of the department to be created
      * @return the details of the created department
      * @throws ConflictException if a department with the same name already exists
+     * @throws NotFoundException if the supervisor specified in the DTO does not exist
      */
-    DepartmentCreateResponseDto createDepartment(DepartmentCreateDto dto) throws ConflictException;
+    DepartmentCreateResponseDto createDepartment(DepartmentCreateDto dto) throws ConflictException, NotFoundException;
 
     /**
      * Edits an existing department.
@@ -30,8 +32,9 @@ public interface DepartmentService {
      * @param dto the department edit data transfer object containing the details of the department to be edited
      * @return the response containing the details of the edited department
      * @throws NotFoundException if the department to be edited does not exist
+     * @throws ConflictException if the new department data conflicts with an existing department
      */
-    DepartmentEditResponseDto editDepartment(DepartmentEditDto dto) throws NotFoundException;
+    DepartmentEditResponseDto editDepartment(DepartmentEditDto dto) throws NotFoundException, ConflictException;
 
     /**
      * Retrieves all departments.
@@ -55,4 +58,22 @@ public interface DepartmentService {
      * @return an optional containing the supervisor details if found, or empty if not found
      */
     Optional<UserEmailDto> getSupervisorByDepartmentName(String departmentName);
+
+    /**
+     * Deletes a department by its name.
+     *
+     * <p>Also unassigns any users linked to this department and removes their supervisor role if assigned.
+     *
+     * @param departmentName the name of the department to be deleted
+     * @throws NotFoundException if no department with the given name exists
+     */
+    void deleteDepartmentByName(String departmentName) throws NotFoundException;
+
+    /**
+     * Removes an employee from a department.
+     *
+     * @param employee the employee data transfer object containing the details of the employee to be removed
+     * @throws NotFoundException if the employee does not exist or the department does not exist
+     */
+    void removeEmployeeFromDepartment(EmployeeDto employee) throws NotFoundException;
 }

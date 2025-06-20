@@ -38,6 +38,8 @@ export class UserEndpointService extends BaseService {
     }
 
     /**
+     * Change password of the currently authenticated user
+     * Allows a non-admin user to change their password. The user must be authenticated.
      * @param changePasswordRestDto 
      * @param observe set whether or not to return the data Observable as the body, response or events. defaults to returning the body.
      * @param reportProgress flag to report request and response progress.
@@ -100,6 +102,8 @@ export class UserEndpointService extends BaseService {
     }
 
     /**
+     * Get current user profile
+     * Retrieves the profile information of the currently authenticated user, including name, email, role, and department.
      * @param observe set whether or not to return the data Observable as the body, response or events. defaults to returning the body.
      * @param reportProgress flag to report request and response progress.
      */

@@ -1,31 +1,39 @@
 <div *ngFor="let shift of plan.shifts" class="border-border bg-muted mb-4 rounded-lg border p-4">
-  <div class="text-primary font-semibold">{{ shift.description }} ({{ shift.manPower }} Personen)</div>
+  <div class="text-primary font-semibold">{{ shift.description }} ({{ shift.manPower }} employees required)</div>
 
   <div class="mt-4 space-y-4">
-    <div *ngFor="let week of shift.shiftWeeks" class="border-primary/30 border-l-4 pl-4">
-      <div class="grid gap-4 mt-2 grid-cols-2 sm:grid-cols-4 xl:grid-cols-7">
+    <div *ngFor="let week of shift.shiftWeeks; let i = index" class="border-l-4 pl-4"  [style]="'border-color: ' + distinctColors[i] + ' !important;'">
+      <div class="grid gap-4 mt-2 grid-cols-2 sm:grid-cols-4 xl:grid-cols-7 xl:gap-2">
         <ng-container *ngFor="let weekday of daysOfWeek">
           <ng-container *ngIf="getDayForWeekday(week.shiftDays!, weekday) as day; else empty">
             <div
               class="border-border bg-card flex sm:min-w-[80px] lg:min-w-[100px] 3xl:min-w-[120px] flex-col items-start rounded-md border p-3 shadow transition hover:shadow-md">
               <span class="text-foreground text-sm font-medium">{{ day.day }}</span>
               <span class="text-muted-foreground text-xs">
-                {{ getHourMinute(day.startTime) }} – {{ formatDuration(day.duration) }}
+                {{ getHourMinute(day.startTime) }} – {{ formatDuration(day.startTime, day.duration) }}
               </span>
             </div>
           </ng-container>
           <ng-template #empty>
             <div
-              class="flex min-w-[120px] flex-col items-center justify-center rounded-md border border-dashed border-gray-400 p-3 text-xs italic">
+              class="flex  flex-col items-center justify-center rounded-md border border-dashed border-gray-400 p-3 text-xs italic">
               {{ weekday }}
             </div>
           </ng-template>
         </ng-container>
       </div>
     </div>
+
   </div>
 </div>
+
+<p *ngIf="!plan.shifts?.length"
+   class="text-sm text-gray-400 dark:text-gray-500 mb-8 ml-2">
+  This blueprint has no shifts yet. Add one to get started.
+</p>
+
 <app-editor
   [planId]="this.plan.id!"
   (shiftAdded)="onEditorChange($event)"
-  [departmentName]="this.department.name!"></app-editor>
+  [departmentName]="this.department.name!"
+  [amountShiftWeeks]="getAmountShiftweeks()"></app-editor>

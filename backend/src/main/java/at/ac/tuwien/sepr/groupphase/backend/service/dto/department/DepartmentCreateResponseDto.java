@@ -7,9 +7,6 @@ import jakarta.validation.constraints.Email;
 import java.util.Objects;
 
 public class DepartmentCreateResponseDto {
-
-    private Long id;
-
     @NotBlank(message = "Department name must not be blank")
     @Size(min = 1, max = 100, message = "Department name must be between 1 and 100 characters long")
     private String name;
@@ -22,8 +19,7 @@ public class DepartmentCreateResponseDto {
     public DepartmentCreateResponseDto() {
     }
 
-    public DepartmentCreateResponseDto(Long id, String name, String supervisorEmail) {
-        this.id = id;
+    public DepartmentCreateResponseDto(String name, String supervisorEmail) {
         this.name = name;
         this.supervisorEmail = supervisorEmail;
     }
@@ -42,10 +38,6 @@ public class DepartmentCreateResponseDto {
 
     public void setSupervisorEmail(String supervisorEmail) {
         this.supervisorEmail = supervisorEmail;
-    }
-
-    public Long getId() {
-        return id;
     }
 
     @Override

@@ -1,4 +1,4 @@
-import { Component, EventEmitter, Input, Output } from '@angular/core';
+import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ReactiveFormsModule, FormControl } from '@angular/forms';
 import { debounceTime } from 'rxjs';
@@ -9,21 +9,28 @@ import { debounceTime } from 'rxjs';
   imports: [CommonModule, ReactiveFormsModule],
   templateUrl: './autocomplete.component.html',
 })
-export class AutocompleteComponent {
+export class AutocompleteComponent implements OnInit {
   @Input() options: string[] = [];
   @Output() selected = new EventEmitter<string>();
+  @Input() charsTyped = 3;
 
   searchControl = new FormControl('');
   filteredOptions: string[] = [];
   showDropdown = false;
 
   ngOnInit() {
-    this.filteredOptions = this.options;
-
     this.searchControl.valueChanges.pipe(debounceTime(200)).subscribe((value) => {
       const search = value?.toLowerCase() ?? '';
+
+      // do not show the whole list when empty
+      if (!search.trim()) {
+        this.filteredOptions = [];
+        this.showDropdown = false;
+        return;
+      }
+
       this.filteredOptions = this.options.filter((opt) => opt.toLowerCase().includes(search));
-      this.showDropdown = true;
+      this.showDropdown = this.filteredOptions.length > 0 && search.trim().length >= this.charsTyped;
     });
   }
 

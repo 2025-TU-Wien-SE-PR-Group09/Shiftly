@@ -14,6 +14,8 @@ export interface SickLeaveCertificateRestDto {
     fileName?: string;
     fileType?: string;
     uploadedAt?: string;
-    employeeEmail?: string;
+    employeeEmail: string;
+    startDate: string;
+    endDate: string;
 }
 

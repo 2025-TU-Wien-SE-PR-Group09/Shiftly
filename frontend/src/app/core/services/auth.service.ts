@@ -1,35 +1,32 @@
-import {Injectable} from '@angular/core';
-import {Observable} from 'rxjs';
-import {tap} from 'rxjs/operators';
-import {jwtDecode} from 'jwt-decode';
-import { LoginEndpointService, LoginResponseRestDto, UserDataRestDto } from '../../rest_client';
+import { Injectable } from '@angular/core';
+import { Observable } from 'rxjs';
+import { tap } from 'rxjs/operators';
+import { jwtDecode } from 'jwt-decode';
+import { LoginEndpointService, LoginResponseRestDto, UserDataLoginDto } from '../../rest_client';
+import { UserDataRestDto } from '../../rest_client/model/userDataRestDto';
 
 @Injectable({
-  providedIn: 'root'
+  providedIn: 'root',
 })
 export class AuthService {
-
-  constructor(private loginEndpoint: LoginEndpointService ) {
-  }
+  constructor(private loginEndpoint: LoginEndpointService) {}
 
   /**
    * Login in the user. If it was successful, a valid JWT token will be stored
    *
    * @param authRequest User data
    */
-  loginUser(authRequest: UserDataRestDto): Observable<LoginResponseRestDto> {
-    return this.loginEndpoint.login(authRequest)
-      .pipe(
-        tap((authResponse: LoginResponseRestDto) => this.setToken(authResponse.jwt!))
-      );
+  loginUser(authRequest: UserDataLoginDto): Observable<LoginResponseRestDto> {
+    return this.loginEndpoint
+      .login(authRequest)
+      .pipe(tap((authResponse: LoginResponseRestDto) => this.setToken(authResponse.jwt!)));
   }
-
 
   /**
    * Check if a valid JWT token is saved in the localStorage
    */
   isLoggedIn() {
-    return !!this.getToken() && (this.getTokenExpirationDate(this.getToken()!).valueOf() > new Date().valueOf());
+    return !!this.getToken() && this.getTokenExpirationDate(this.getToken()!).valueOf() > new Date().valueOf();
   }
 
   logoutUser() {
@@ -59,7 +56,6 @@ export class AuthService {
   }
 
   private getTokenExpirationDate(token: string): Date {
-
     const decoded: any = jwtDecode(token);
     if (decoded.exp === undefined) {
       return new Date(0);
@@ -77,5 +73,21 @@ export class AuthService {
     }
 
     return 'none';
+  }
+  getDepartmentId() {
+    if (this.getToken() != null) {
+      const decoded: any = jwtDecode(this.getToken()!);
+      return decoded.depId;
+    }
+
+    return null;
+  }
+  getDepartmentName() {
+    if (this.getToken() != null) {
+      const decoded: any = jwtDecode(this.getToken()!);
+      return decoded.depName;
+    }
+
+    return null;
   }
 }
