@@ -11,7 +11,7 @@ public class RegisterRestDto {
     @Size(max = 50, min = 1, message = "First name must be between 1 and 50 characters long")
     @Email
     @Pattern(
-        regexp = "^[A-ZÄÖÜa-zäöüß]{1,50}$",
+        regexp = "^[A-ZÄÖÜa-zäöüß]*$",
         message = "The first name can only contain characters A-ZÄÖÜa-zäöüß."
     )
     private String firstName;
@@ -20,7 +20,7 @@ public class RegisterRestDto {
     @Size(max = 50, min = 1, message = "Last name must be between 1 and 50 characters long")
     @Email
     @Pattern(
-        regexp = "^[A-ZÄÖÜa-zäöüß]{1,50}$",
+        regexp = "^[A-ZÄÖÜa-zäöüß]*$",
         message = "The last name can only contain the characters A-ZÄÖÜa-zäöüß."
     )
     private String lastName;
@@ -29,7 +29,7 @@ public class RegisterRestDto {
     @Size(max = 200, min = 5, message = "Email must be between 5 and 50 characters long")
     @Email
     @Pattern(
-        regexp = "^[a-zA-Z0-9._-]{5,200}$",
+        regexp = "^[a-zA-Z0-9._-]*$",
         message = "The email can only contain the characters a-zA-Z0-9._-."
     )
     private String email;

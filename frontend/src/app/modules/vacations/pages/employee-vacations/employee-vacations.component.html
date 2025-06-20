@@ -30,12 +30,12 @@
       </div>
 
       <div class="flex justify-end space-x-2 pt-2">
-        <app-button tone="warning" shape="rounded" impact="light" size="medium" [type]="'button'"
+        <app-button tone="light" shape="rounded" impact="light" size="medium" [type]="'button'"
           (click)="startDate = ''; endDate = ''"
         >
           Cancel
         </app-button>
-        <app-button tone="success" shape="rounded" impact="light" size="medium" [type]="'submit'">
+        <app-button tone="primary" shape="rounded" impact="light" size="medium" [type]="'submit'">
           Submit
         </app-button>
       </div>
@@ -53,6 +53,7 @@
           <th class="pb-2">Start</th>
           <th class="pb-2">End</th>
           <th class="pb-2">Status</th>
+          <th class="pb-2">Action</th>
         </tr>
         </thead>
         <tbody>
@@ -61,10 +62,19 @@
           <td>{{ req.endDate | date:"dd.MM.yyyy"}}</td>
           <td>{{ req.status }}</td>
           <td>
-            <button *ngIf="req.id !== undefined && req.status === 'PENDING'" (click)="deleteButton(req)"
-                    class="bg-primary text-white px-4 py-2 rounded hover:opacity-90 transition">
-              Delete
-            </button>
+            <app-button
+              *ngIf="req.id !== undefined && req.status === 'PENDING'"
+              tone="danger"
+              impact="bold"
+              size="small"
+              shape="rounded"
+              (click)="deleteButton(req)"
+            >
+              <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-4">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M6 18 18 6M6 6l12 12" />
+              </svg>
+
+            </app-button>
           </td>
         </tr>
 
@@ -87,7 +97,7 @@
 
 
 
-    <p>
+    <p class="text-foreground mb-6">
       Are you sure you want to delete this vacation request from {{toDelete?.startDate | date:"dd.MM.yyyy"}} to {{toDelete?.endDate | date:"dd-MM-yyyy"}}? This action cannot be undone.
     </p>
     <!-- Buttons -->

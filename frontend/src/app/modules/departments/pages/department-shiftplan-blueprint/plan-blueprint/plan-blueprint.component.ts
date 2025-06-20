@@ -77,4 +77,8 @@ export class PlanBlueprintComponent implements OnInit {
 
   ngOnInit(): void {
   }
+
+  getAmountShiftweeks() {
+    return this.plan.shifts && this.plan.shifts.length > 0 && this.plan.shifts[0].shiftWeeks && this.plan.shifts[0].shiftWeeks.length > 0 ? this.plan.shifts[0].shiftWeeks!.length! : 1;
+  }
 }

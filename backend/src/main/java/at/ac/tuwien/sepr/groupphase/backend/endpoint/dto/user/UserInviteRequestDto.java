@@ -4,8 +4,8 @@ import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 
 public record UserInviteRequestDto(
-    @NotBlank(message = "Email darf nicht leer sein")
-    @Email(message = "Ungültiges Email-Format")
+    @NotBlank(message = "Email cannot be empty")
+    @Email(message = "Invalid email format")
     String email
 ) {
 }

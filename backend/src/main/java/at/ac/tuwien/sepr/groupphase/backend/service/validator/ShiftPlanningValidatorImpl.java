@@ -109,49 +109,6 @@ public class ShiftPlanningValidatorImpl implements ShiftPlanningValidator {
         return Optional.empty();
     }
 
-    /*  @Override
-    public Optional<ValidationErrors> validateWeeklyDurationsPerPlan(List<ShiftBlueprint> shifts, PlanBlueprint plan) {
-        ValidationErrors errors = new ValidationErrors();
-
-
-        List<ShiftBlueprint> relevantShifts = shifts.stream()
-            .filter(s -> plan.equals(s.getPlan()) || s.getPlan() == null)
-            .toList();
-
-
-        Map<Integer, List<Duration>> weekDurations = new HashMap<>();
-
-        for (ShiftBlueprint shift : relevantShifts) {
-            for (ShiftWeekBlueprint week : shift.getShiftWeeks()) {
-                int index = week.getWeekIndex();
-                Duration total = week.getDays().stream()
-                    .map(ShiftDayBlueprint::getDuration)
-                    .reduce(Duration.ZERO, Duration::plus);
-
-                weekDurations.computeIfAbsent(index, k -> new ArrayList<>()).add(total);
-            }
-        }
-
-
-        for (var entry : weekDurations.entrySet()) {
-            Integer index = entry.getKey();
-            List<Duration> durations = entry.getValue();
-
-            Duration reference = durations.get(0);
-            for (Duration d : durations) {
-                if (!reference.minus(d).abs().isZero()) {
-                    errors.add(String.format(
-                        "Inconsistent weekly shift duration: Expected %dh but found %dh in one of the shifts.",
-                        reference.toHours(), d.toHours()
-                    ));
-                }
-            }
-        }
-
-        return errors.isValid() ? Optional.empty() : Optional.of(errors);
-    }
-    */
-
     @Override
     public Optional<ValidationErrors> validateWeeklyDurationsPerPlan(List<ShiftBlueprint> shifts, PlanBlueprint plan) {
         ValidationErrors errors = new ValidationErrors();
