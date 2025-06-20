@@ -12,6 +12,7 @@ import { ButtonComponent } from '../../../../shared/components/button/button.com
 import { FormsModule } from '@angular/forms';
 import { HttpContext } from '@angular/common/http';
 import { SKIP_EXCEPTION_INTERCEPTOR } from '../../../../core/interceptor/skip-exception-interceptor';
+import { environment } from '../../../../../environments/environment';
 
 @Component({
   selector: 'app-admin-home',
@@ -27,6 +28,7 @@ export class AdminHomeComponent implements OnInit {
     private _departmentService: DepartmentService,
     private readonly _toastr: ToastrService,
     private _icalService: ICalService,
+    private _registrationService: RegistrationEndpointService,
   ) { }
 
   protected departments: DepartmentDetailRestResponseDto[] = [];
