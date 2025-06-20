@@ -75,7 +75,9 @@ public class ShiftPlanConstraintServiceImpl implements ShiftPlanConstraintServic
             // to find jumper for worker in vacation problem
             if (shift.getManpower() > assignmentsCopy.size()) {
                 // If the shift has more manpower than assignments, we need to add jumpers
-                int requiredJumpers = shift.getManpower() - assignmentsCopy.size();
+                var availableJumpers =  availableJumpersPerDay.get(shiftDate);
+                int requiredJumpers = Math.min(shift.getManpower() - assignmentsCopy.size(), availableJumpers.size());
+
 
                 // Add jumpers to the shift until the required manpower is reached
                 for (int i = 0; i < requiredJumpers; i++) {

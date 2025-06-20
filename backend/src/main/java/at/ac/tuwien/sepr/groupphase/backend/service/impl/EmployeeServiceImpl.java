@@ -81,6 +81,7 @@ public class EmployeeServiceImpl implements EmployeeService {
 
         userService.assignRoleToUser(new UserRoleDto(applicationUser.getEmail(), Role.JUMPER, jumperDto.departmentName()));
 
+
         Department department = departmentRepository.findById(jumperDto.departmentName())
             .orElseThrow(
                 () -> new NotFoundException("Department with name " + jumperDto.departmentName() + " not found"));
