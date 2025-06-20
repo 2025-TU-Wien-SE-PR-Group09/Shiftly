@@ -36,4 +36,4 @@
   [planId]="this.plan.id!"
   (shiftAdded)="onEditorChange($event)"
   [departmentName]="this.department.name!"
-  [amountShiftWeeks]="plan.shifts && plan.shifts.length > 0 ? plan.shifts.length! : 1"></app-editor>
+  [amountShiftWeeks]="getAmountShiftweeks()"></app-editor>

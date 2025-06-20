@@ -64,6 +64,8 @@ export class EditorComponent {
 
     this.shifts.push(newShift);
 
+    console.log(this.amountShiftWeeks);
+
     for (let i = 0; i < this.amountShiftWeeks; i++) {
       this.addWeek(this.shifts.length - 1);
     }

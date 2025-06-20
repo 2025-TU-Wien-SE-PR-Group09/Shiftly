@@ -16,7 +16,7 @@ public class DepartmentEditRestDto {
     @NotBlank(message = "New department name must not be blank")
     @Size(min = 1, max = 100, message = "New department name must be between 1 and 100 characters long")
     @Pattern(
-        regexp = "^[A-Za-z0-9-_]{1,100}$",
+        regexp = "^[A-Za-z0-9-_]*$",
         message = "The new name can only contain characters A-Za-z0-9-_."
     )
     private String newName;

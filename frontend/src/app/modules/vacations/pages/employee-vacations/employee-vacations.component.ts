@@ -38,7 +38,7 @@ export class EmployeeVacationsComponent implements OnInit {
 
   submitVacationRequest(): void {
     if (!this.startDate || !this.endDate) {
-      this.toastr.error('Please provide both start and end dates and make sure the days exist.');
+      this.toastr.warning('Please provide both start and end dates and make sure the days exist.');
       return;
     }
 
