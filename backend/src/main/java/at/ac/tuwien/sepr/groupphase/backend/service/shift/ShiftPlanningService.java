@@ -60,7 +60,16 @@ public interface ShiftPlanningService {
      * Retrieves all shift plans for a given department departmentName.
      *
      * @param departmentName the departmentName of the department for which to retrieve all shift plans
-     * @return a ConcreteShiftPlan containing all plans for the specified department
+     * @return a List of ConcreteShiftPlan containing all plans for the specified department
      */
     List<ConcreteShiftPlan> getAllNotOverridenPlans(String departmentName);
+
+    /**
+     * Retrieves all concrete shift plans for a given department.
+     * This includes both current and historical plans.
+     *
+     * @param departmentName the name of the department for which to retrieve all plans
+     * @return a list of all ConcreteShiftPlan objects for the specified department
+     */
+    List<ConcreteShiftPlan> getAllPlans(String departmentName);
 }

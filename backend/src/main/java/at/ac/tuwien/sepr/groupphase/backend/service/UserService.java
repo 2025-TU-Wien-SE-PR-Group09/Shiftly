@@ -1,7 +1,6 @@
 package at.ac.tuwien.sepr.groupphase.backend.service;
 
 import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.user.ApplicationUserResponseDto;
-import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.user.RegisterRestDto;
 import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.user.RegisterTokenRequestDto;
 import at.ac.tuwien.sepr.groupphase.backend.entity.ApplicationUser;
 import at.ac.tuwien.sepr.groupphase.backend.exception.TokenAlreadyUsedException;
@@ -93,6 +92,14 @@ public interface UserService {
      */
     void checkAccessToDepartment(DepartmentNameDto departmentNameDto) throws AccessDeniedException;
 
+    /**
+     * Gets the department name for a user.
+     *
+     * @param userEmail the email of the user
+     * @return the name of the department the user belongs to, or null if the user doesn't belong to any department
+     * @throws NotFoundException if the user with the given email doesn't exist
+     */
+    String getDepartmentForUser(String userEmail) throws NotFoundException;
 
     /**
      * Creates an invitation for a new user and sends an email with the invitation link.

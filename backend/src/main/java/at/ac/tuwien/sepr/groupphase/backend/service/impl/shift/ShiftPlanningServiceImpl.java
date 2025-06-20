@@ -358,4 +358,10 @@ public class ShiftPlanningServiceImpl implements ShiftPlanningService {
             .filter(c -> !c.isOverwritten()).toList();
     }
 
+    @Override
+    public List<ConcreteShiftPlan> getAllPlans(String departmentName) {
+        LOGGER.trace("getAllPlans({})", departmentName);
+
+        return concreteShiftPlanRepository.findByDepartmentName(departmentName).stream().toList();
+    }
 }
