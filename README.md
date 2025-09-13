@@ -53,9 +53,28 @@ You can start the application using Docker Compose by running `docker-compose up
 * Backend: [http://localhost:8080](http://localhost:8080)
 * Mailhog Web Interface [http://localhost:8025](http://localhost:8025).
 
-Default username: `admin@shyft.local`
-Default password: `password`
+Default credentials (password is `password` for all users):
+* admin@shyft.local - System Administrator
 
+* Department Production
+    * alex_doe@shyft.local - Supervisor
+    * john_doe@shyft.local - Employee
+    * jane_doe@shyft.local - Employee
+    * max_doe@shyft.local - Employee
+    * anna_doe@shyft.local - Employee
+    * lisa_doe@shyft.local - Employee
+    * mike_doe@shyft.local - Jumper
+    * sara_doe@shyft.local - Jumper
+
+* Department Customer Support
+    * julia_doe@shyft.local - Supervisor
+    * david_doe@shyft.local - Employee
+    * laura_doe@shyft.local - Employee
+    * chris_doe@shyft.local - Employee
+    * nina_doe@shyft.local - Employee
+    * paul_doe@shyft.local - Employee
+    * eva_doe@shyft.local - Jumper
+    * mark_doe@shyft.local - Jumper
 
 ## Screenshots
 
