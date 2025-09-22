@@ -58,11 +58,7 @@ public class SecurityConfig {
         public void doFilter(ServletRequest req, ServletResponse res, FilterChain chain) throws IOException, ServletException {
             final HttpServletResponse response = (HttpServletResponse) res;
             String hostHeader = ((HttpServletRequest) req).getHeader("Host");
-            if (hostHeader == null || hostHeader.contains("localhost")) {
-                response.setHeader("Access-Control-Allow-Origin", "http://localhost:4200");
-            } else {
-                response.setHeader("Access-Control-Allow-Origin", "https://*.apps.student.inso-w.at");
-            }
+            response.setHeader("Access-Control-Allow-Origin", "*"); // CORS * can be a security issue, but this project is only a group project that will not be deployed on any server
             response.setHeader("Access-Control-Allow-Methods", "GET, POST, PUT, PATCH, DELETE, HEAD");
             response.setHeader("Access-Control-Allow-Headers", "Authorization, Content-Type");
             response.setHeader("Access-Control-Max-Age", "3600");
