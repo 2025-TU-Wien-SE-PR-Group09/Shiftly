@@ -1,0 +1,27 @@
+volumes:
+  dbdata:
+
+services:
+  backend:
+    build:
+      context: ./backend   
+    ports:
+      - "8080:8080"
+    volumes:
+      - dbdata:/app/database
+    environment:
+      - MAIL_HOST=mailhog
+      - ADMIN_USER_PASSWORD=password
+  frontend:
+    build: 
+      context: ./frontend
+    ports:
+      - "80:80"
+    depends_on:
+      - backend
+  mailhog:
+    image: mailhog/mailhog
+    container_name: mailhog
+    ports:
+      - "8025:8025"  # Web UI
+    restart: unless-stopped
